@@ -323,6 +323,99 @@ int fill_in_time_coordinates_from_sentence(char *buffer, int bufferLength, DateP
             }
         }
     }
+    else if(strcmp(sentenceType, "+CGPSINFO:") == 0)
+    {
+        /*
+         * +CGPSINFO:3113.343286,N,12121.234064,E,250311,072809.0,44.1,0.0,0
+         *
+         *              1        2      3       4   5       6       7   8  9
+         *
+         *  1
+         *  2
+         *  3
+         *  4
+         *  5   Date (ddmmyy)
+         *  6   Time (hh:mm:ss.0)
+         */
+        while(1)
+        {
+            if(strlen(buffer) < 1)
+            {
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sLength of +CGPSINFO-sentence is less than zero."), GPS_ERROR);
+                error_log(LOG_GLOBAL_BUFFER);
+
+                goto failure;
+            }
+
+            memset(t, 0, sizeof(t));
+            get_nth_token_thread_safe(original, ',', 1, t, 1);
+            if(sg_strnstr(t, "+CGPSINFO", strlen(t)) != t)
+            {
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFirst token does not contain +CGPSINFO in sentence [%s]."), GPS_ERROR, original);
+                error_log(LOG_GLOBAL_BUFFER);
+
+                goto failure;
+            }
+
+            memset(t, 0, sizeof(t));
+            get_nth_token_thread_safe(original, ',', 5, t, 1);
+            if(strlen(t) != 6)
+            {
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFifth token [%s] in +CGPSINFO-sentence [%s] is invalid date."),
+                           GPS_ERROR, t, original);
+                error_log(LOG_GLOBAL_BUFFER);
+
+                goto failure;
+            }
+            else
+            {
+                char small[6];
+
+                memset(small, 0, sizeof(small));
+                memcpy(small, t, 2);
+                dateParams->tm_mday = sg_atoi(small);
+
+                memset(small, 0, sizeof(small));
+                memcpy(small, t + 2, 2);
+                dateParams->tm_mon = sg_atoi(small);
+
+                memset(small, 0, sizeof(small));
+                memcpy(small, t + 4, 2);
+                dateParams->tm_year = sg_atoi(small);
+
+
+
+                memset(t, 0, sizeof(t));
+                get_nth_token_thread_safe(original, ',', 6, t, 1);
+                if(strlen(t) != 8)
+                {
+                    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFifth token [%s] in +CIPGSMLOC-sentence [%s] is invalid datestamp."),
+                               GPS_ERROR, t, original);
+                    error_log(LOG_GLOBAL_BUFFER);
+
+                    goto failure;
+                }
+                else
+                {
+                    memset(small, 0, sizeof(small));
+                    memcpy(small, t, 2);
+                    dateParams->tm_hour = sg_atoi(small);
+
+                    memset(small, 0, sizeof(small));
+                    memcpy(small, t + 2, 2);
+                    dateParams->tm_min = sg_atoi(small);
+
+                    memset(small, 0, sizeof(small));
+                    memcpy(small, t + 4, 2);
+                    dateParams->tm_sec = sg_atoi(small);
+
+                    print_date_info(dateParams, "GPS");
+                    return SUCCESS;
+                }
+            }
+        }
+    }
+
     else
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sExtracting Time-Coordinates from sentence-type [%s] is NOT supported"),
