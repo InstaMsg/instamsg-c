@@ -4,7 +4,7 @@ Let Client2 have client-id "b5fb75e0-2ef1-11e5-86dd-34689524378f" (according to 
 
 1)
 Add Client1 and Client2 in InstaMsg eco-system, using the InstaMsg-Server-Webapp.
-Add a topic, say "listener_topic" as a sub_topic for Client1, and as a "pub_topic" for Client2.
+Add a topic, say "listener_topic" as a sub_topic for Client1, and as a pub_topic for Client2.
 
 Also, add appropriate passwords.
 
@@ -12,7 +12,7 @@ Also, add appropriate passwords.
 Compile the binary "stdoutsub", using "sh build.sh" OR "sh compile.sh"
 
 3)
-In one terminal, fire
+In one terminal, fire the following for Client1
 
 	./stdoutsub "listener_topic" --clientid "920dfd80-2eef-11e5-b031" --username 34689524378f  --password ajaygarg456 --qos 0 --sub
 
@@ -22,7 +22,7 @@ This should subscribe Client1 for topic "listener_topic" at the InstaMsg-Server,
 
 
 4)
-In second terminal (while the first terminal is still active), fire
+In second terminal (while the first terminal is still active), fire the following for Client2
 
 	./stdoutsub "listener_topic" --clientid "b5fb75e0-2ef1-11e5-86dd" --username 34689524378f  --password ajaygarg789 --qos 0 --pub --msg "this really works !!"
 
