@@ -90,6 +90,7 @@ struct opts_struct
 
 	int subscribe;
 	int publish;
+	char msg[100];
 } opts =
 {
 	(char*)"stdout-subscriber", 0, (char*)"\n", QOS2, NULL, NULL, (char*)"localhost", 1883, 0, 0, 0
@@ -182,6 +183,14 @@ void getopts(int argc, char** argv)
 		{
 			opts.publish = 1;
 		}
+                else if (strcmp(argv[count], "--msg") == 0)
+                {
+                        if (++count < argc)
+                                strcpy(opts.msg, argv[count]);
+                        else
+                                usage();
+                }
+
 
 		count++;
 	}
@@ -208,6 +217,8 @@ int main(int argc, char** argv)
 	int rc = 0;
 	unsigned char buf[100];
 	unsigned char readbuf[100];
+
+	MQTTMessage message;
 
 	if (argc < 2)
 		usage();
@@ -250,6 +261,20 @@ int main(int argc, char** argv)
     		printf("Subscribing to %s\n", topic);
 		rc = MQTTSubscribe(&c, topic, opts.qos, messageArrived);
 		printf("Subscribed %d\n", rc);
+	}
+
+	if(opts.publish == 1)
+	{
+		printf("Publishing message [%s] to %s\n", opts.msg, topic);
+
+		message.qos = opts.qos;
+		message.retained = 0;  	// false in Python/C++
+		message.dup = 0;	// false in Python/C++
+		message.payload = (void*)(opts.msg);
+		message.payloadlen = strlen(opts.msg) + 1;
+
+		rc = MQTTPublish(&c, topic, &message);
+		printf("Published %d\n", rc);
 	}
 
 	while (!toStop)
