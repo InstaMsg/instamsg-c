@@ -87,9 +87,12 @@ struct opts_struct
 	char* host;
 	int port;
 	int showtopics;
+
+	int subscribe;
+	int publish;
 } opts =
 {
-	(char*)"stdout-subscriber", 0, (char*)"\n", QOS2, NULL, NULL, (char*)"localhost", 1883, 0
+	(char*)"stdout-subscriber", 0, (char*)"\n", QOS2, NULL, NULL, (char*)"localhost", 1883, 0, 0, 0
 };
 
 
@@ -171,6 +174,15 @@ void getopts(int argc, char** argv)
 			else
 				usage();
 		}
+		else if (strcmp(argv[count], "--sub") == 0)
+		{
+			opts.subscribe = 1;
+		}
+		else if (strcmp(argv[count], "--pub") == 0)
+		{
+			opts.publish = 1;
+		}
+
 		count++;
 	}
 	
@@ -232,10 +244,13 @@ int main(int argc, char** argv)
 	
 	rc = MQTTConnect(&c, &data);
 	printf("Connected %d\n", rc);
-    
-    printf("Subscribing to %s\n", topic);
-	rc = MQTTSubscribe(&c, topic, opts.qos, messageArrived);
-	printf("Subscribed %d\n", rc);
+   
+	if(opts.subscribe == 1)
+	{ 
+    		printf("Subscribing to %s\n", topic);
+		rc = MQTTSubscribe(&c, topic, opts.qos, messageArrived);
+		printf("Subscribed %d\n", rc);
+	}
 
 	while (!toStop)
 	{
