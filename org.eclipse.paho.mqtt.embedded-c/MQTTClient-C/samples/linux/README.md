@@ -1,5 +1,5 @@
-Let Client1 have cliendid "920dfd80-2eef-11e5-b031-34689524378f" (according to InstaMsg-Server conventions).
-Let Client2 have cliendid "b5fb75e0-2ef1-11e5-86dd-34689524378f" (according to InstaMsg-Server conventions).
+Let Client1 have client-id "920dfd80-2eef-11e5-b031-34689524378f" (according to InstaMsg-Server conventions).
+Let Client2 have client-id "b5fb75e0-2ef1-11e5-86dd-34689524378f" (according to InstaMsg-Server conventions).
 
 
 1)
