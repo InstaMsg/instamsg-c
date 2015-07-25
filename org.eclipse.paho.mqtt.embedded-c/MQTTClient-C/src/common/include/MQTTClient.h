@@ -17,9 +17,11 @@
 #ifndef __MQTT_CLIENT_C_
 #define __MQTT_CLIENT_C_
 
-#include "MQTTPacket.h"
+#include "../../../../MQTTPacket/src/MQTTPacket.h"
+#include "../../specific/include/clienttime.h"
+#include "../../specific/include/clientnetwork.h"
+
 #include "stdio.h"
-#include "" //Platform specific implementation header file
 
 #define MAX_PACKET_ID 65535
 #define MAX_MESSAGE_HANDLERS 5
@@ -70,8 +72,8 @@ struct Client {
     unsigned int next_packetid;
     unsigned int command_timeout_ms;
     size_t buf_size, readbuf_size;
-    unsigned char *buf;  
-    unsigned char *readbuf; 
+    unsigned char *buf;
+    unsigned char *readbuf;
     unsigned int keepAliveInterval;
     char ping_outstanding;
     int isconnected;
@@ -81,11 +83,11 @@ struct Client {
         const char* topicFilter;
         void (*fp) (MessageData*);
     } messageHandlers[MAX_MESSAGE_HANDLERS];      // Message handlers are indexed by subscription topic
-    
+
     void (*defaultMessageHandler) (MessageData*);
-    
+
     Network* ipstack;
-    Timer ping_timer;
+    Timer* ping_timer;
 };
 
 #define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}
