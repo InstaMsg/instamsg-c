@@ -295,7 +295,7 @@ int MQTTYield(Client* c, int timeout_ms)
     timer->init_timer(timer);
 
     timer->countdown_ms(timer, timeout_ms);
-    while (!expired(&timer))
+    while (!expired(timer))
     {
         if (cycle(c, timer) == FAILURE)
         {
