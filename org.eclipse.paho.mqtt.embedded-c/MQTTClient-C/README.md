@@ -9,7 +9,7 @@ Add a topic, say "listener_topic" as a sub_topic for Client1, and as a pub_topic
 Also, add appropriate passwords.
 
 2)
-Compile the binary "stdoutsub", using "sh build.sh" OR "sh compile.sh"
+Compile the binary "stdoutsub", using "sh build.sh <device-name>"
 
 3)
 In one terminal, fire the following for Client1

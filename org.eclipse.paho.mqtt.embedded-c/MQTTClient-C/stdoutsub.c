@@ -41,7 +41,7 @@
 
 */
 #include <stdio.h>
-#include "../../src/common/include/MQTTClient.h"
+#include "src/common/include/MQTTClient.h"
 
 #include <stdio.h>
 #include <signal.h>
