@@ -222,7 +222,6 @@ void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 
 int main(int argc, char** argv)
 {
-    init_thread_library();
 	int rc = 0;
 	unsigned char buf[100];
 	unsigned char readbuf[100];

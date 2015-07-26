@@ -532,17 +532,6 @@ int MQTTUnsubscribe(Client* c, const char* topicFilter)
     if ((rc = sendPacket(c, len, timer)) != SUCCESS) // send the subscribe packet
         goto exit; // there was a problem
 
-#if 0
-    if (waitfor(c, UNSUBACK, timer) == UNSUBACK)
-    {
-        unsigned short mypacketid;  // should be the same as the packetid above
-        if (MQTTDeserialize_unsuback(&mypacketid, c->readbuf, c->readbuf_size) == 1)
-            rc = 0;
-    }
-    else
-        rc = FAILURE;
-#endif
-
 exit:
     release_timer(timer);
     return rc;
@@ -591,29 +580,9 @@ int MQTTPublish(Client* c,
 
     if (qos == QOS1)
     {
-#if 0
-        if (waitfor(c, PUBACK, timer) == PUBACK)
-        {
-            MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
-            if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, c->readbuf, c->readbuf_size) != SUCCESS)
-                rc = FAILURE;
-        }
-        else
-            rc = FAILURE;
-#endif
     }
     else if (qos == QOS2)
     {
-#if 0
-        if (waitfor(c, PUBCOMP, timer) == PUBCOMP)
-        {
-            MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
-            if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, c->readbuf, c->readbuf_size) != SUCCESS)
-                rc = FAILURE;
-        }
-        else
-            rc = FAILURE;
-#endif
     }
 
 exit:
