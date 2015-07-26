@@ -444,6 +444,7 @@ int MQTTConnect(Client* c, MQTTPacket_connectData* options)
     if ((rc = sendPacket(c, c->buf, len)) != SUCCESS)  // send the connect packet
         goto exit; // there was a problem
 
+
 exit:
     return rc;
 }

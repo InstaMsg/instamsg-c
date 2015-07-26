@@ -266,13 +266,11 @@ int main(int argc, char** argv)
 	data.cleansession = 1;
 	printf("Connecting to %s %d\n", opts.host, opts.port);
 
+	rc = MQTTConnect(&c, &data);
+
     create_and_init_thread(clientTimerThread, &c);
     create_and_init_thread(keepAliveThread, &c);
     create_and_init_thread(cycle, &c);
-
-
-	rc = MQTTConnect(&c, &data);
-
 
 	while (!toStop)
 	{
@@ -287,7 +285,8 @@ int main(int argc, char** argv)
 int onConnect()
 {
     int rc;
-	printf("Connected successfully\n");
+    printf("Connected successfully\n");
+
 
 	if(opts.subscribe == 1)
 	{
