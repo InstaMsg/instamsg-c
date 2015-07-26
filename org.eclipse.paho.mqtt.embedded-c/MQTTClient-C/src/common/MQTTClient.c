@@ -27,6 +27,34 @@ int getNextPacketId(Client *c) {
     return c->next_packetid = (c->next_packetid == MAX_PACKET_ID) ? 1 : c->next_packetid + 1;
 }
 
+void attachResultHandler(Client *c, unsigned int msgId, void (*resultHandler)(MQTTFixedHeaderPlusMsgId*))
+{
+    int i;
+    for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
+    {
+        if (c->resultHandlers[i].msgId == 0)
+        {
+            c->resultHandlers[i].msgId = msgId;
+            c->resultHandlers[i].fp = resultHandler;
+                                                                                                                                                            break;
+                                                                                                                                                        }
+    }
+}
+
+void fireResultHandlerAndRemove(Client *c, MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
+{
+    int i;
+    for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
+    {
+        if (c->resultHandlers[i].msgId == fixedHeaderPlusMsgId->msgId)
+        {
+            c->resultHandlers[i].fp(fixedHeaderPlusMsgId);
+
+            c->resultHandlers[i].msgId = 0;
+            break;
+                                                                                                                                                        }
+    }
+}
 
 int sendPacket(Client* c, int length, Timer* timer)
 {
@@ -57,7 +85,11 @@ void MQTTClient(Client* c, Network* network, unsigned int command_timeout_ms, un
     c->ipstack = network;
 
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
+    {
         c->messageHandlers[i].topicFilter = 0;
+        c->resultHandlers[i].msgId = 0;
+    }
+
     c->command_timeout_ms = command_timeout_ms;
     c->buf = buf;
     c->buf_size = buf_size;
@@ -156,7 +188,7 @@ char isTopicMatched(char* topicFilter, MQTTString* topicName)
         curf++;
         curn++;
     };
-    
+
     return (curn == curn_end) && (*curf == '\0');
 }
 
@@ -237,7 +269,17 @@ int cycle(Client* c, Timer* timer)
     switch (fixedHeader.packetType)
     {
         case CONNACK:
+            break;
         case PUBACK:
+        {
+            MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
+            if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, c->readbuf, c->readbuf_size) == SUCCESS)
+            {
+                fireResultHandlerAndRemove(c, &fixedHeaderPlusMsgId);
+            }
+
+            break;
+        }
         case SUBACK:
             break;
         case PUBLISH:
@@ -472,8 +514,8 @@ int MQTTPublish(Client* c,
                 const char* payload,
                 const enum QoS qos,
                 const char dup,
-                void *resultHandler,
-                void *resultHandlerTimeout,
+                void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
+                unsigned int resultHandlerTimeout,
                 const char retain,
                 const char logging)
 {
@@ -493,6 +535,12 @@ int MQTTPublish(Client* c,
     if (qos == QOS1 || qos == QOS2)
     {
         id = getNextPacketId(c);
+
+        /*
+         * We will get PUBACK from server only for QOS1 and QOS2.
+         * So, it makes sense to lodge the result-handler only for these cases.
+         */
+        attachResultHandler(c, id, resultHandler);
     }
 
     len = MQTTSerialize_publish(c->buf, c->buf_size, 0, qos, retain, id, topic, (unsigned char*)payload, strlen(payload) + 1);

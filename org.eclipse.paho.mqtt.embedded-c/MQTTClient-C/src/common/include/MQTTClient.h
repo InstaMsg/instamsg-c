@@ -57,8 +57,8 @@ int MQTTPublish(Client* c,
                 const char* payload,
                 const enum QoS qos,
                 const char dup,
-                void *resultHandler,
-                void *resultHandlerTimeout,
+                void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
+                unsigned int resultHandlerTimeout,
                 const char retain,
                 const char logging);
 
@@ -87,6 +87,12 @@ struct Client {
         const char* topicFilter;
         void (*fp) (MessageData*);
     } messageHandlers[MAX_MESSAGE_HANDLERS];      // Message handlers are indexed by subscription topic
+
+    struct ResultHandlers
+    {
+        unsigned int msgId;
+        void (*fp) (MQTTFixedHeaderPlusMsgId*);
+    } resultHandlers[MAX_MESSAGE_HANDLERS];      // Message handlers are indexed by subscription topic
 
     void (*defaultMessageHandler) (MessageData*);
 

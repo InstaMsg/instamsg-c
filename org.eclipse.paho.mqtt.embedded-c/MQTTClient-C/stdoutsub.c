@@ -52,6 +52,7 @@
 
 
 volatile int toStop = 0;
+unsigned int INSTAMSG_RESULT_HANDLER_TIMEOUT = 10;
 
 
 void usage()
@@ -213,6 +214,11 @@ void messageArrived(MessageData* md)
 }
 
 
+void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
+{
+    printf("Msg with id [%u] successfully published to server\n", fixedHeaderPlusMsgId->msgId);
+}
+
 int main(int argc, char** argv)
 {
 	int rc = 0;
@@ -265,7 +271,7 @@ int main(int argc, char** argv)
 	if(opts.publish == 1)
 	{
 		printf("Publishing message [%s] to %s\n", opts.msg, topic);
-		rc = MQTTPublish(&c, topic, (const char*)opts.msg, opts.qos, 0, NULL, NULL, 0, 1);
+		rc = MQTTPublish(&c, topic, (const char*)opts.msg, opts.qos, 0, publishAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT, 0, 1);
 		printf("Published %d\n", rc);
 	}
 
