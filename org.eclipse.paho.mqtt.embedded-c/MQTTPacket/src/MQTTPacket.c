@@ -408,3 +408,10 @@ exit:
 	return rc;
 }
 
+void fillFixedHeaderFieldsFromPacketHeader(MQTTFixedHeader *fixedHeader, const MQTTHeader* const header)
+{
+    fixedHeader->packetType = (header->bits).type;
+    fixedHeader->dup = (header->bits).dup;
+    fixedHeader->qos = (header->bits).qos;
+    fixedHeader->retain = (header->bits).retain;
+}

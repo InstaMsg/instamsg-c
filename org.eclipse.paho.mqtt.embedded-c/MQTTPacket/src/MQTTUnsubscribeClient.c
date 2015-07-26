@@ -91,13 +91,12 @@ exit:
   */
 int MQTTDeserialize_unsuback(unsigned short* packetid, unsigned char* buf, int buflen)
 {
-	unsigned char type = 0;
-	unsigned char dup = 0;
+    MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
 	int rc = 0;
 
 	FUNC_ENTRY;
-	rc = MQTTDeserialize_ack(&type, &dup, packetid, buf, buflen);
-	if (type == UNSUBACK)
+	rc = MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, buf, buflen);
+	if (fixedHeaderPlusMsgId.fixedHeader.packetType == UNSUBACK)
 		rc = 1;
 	FUNC_EXIT_RC(rc);
 	return rc;

@@ -219,8 +219,6 @@ int main(int argc, char** argv)
 	unsigned char buf[100];
 	unsigned char readbuf[100];
 
-	MQTTMessage message;
-
 	if (argc < 2)
 		usage();
 
@@ -267,14 +265,7 @@ int main(int argc, char** argv)
 	if(opts.publish == 1)
 	{
 		printf("Publishing message [%s] to %s\n", opts.msg, topic);
-
-		message.qos = opts.qos;
-		message.retained = 0;  	// false in Python/C++
-		message.dup = 0;	// false in Python/C++
-		message.payload = (void*)(opts.msg);
-		message.payloadlen = strlen(opts.msg) + 1;
-
-		rc = MQTTPublish(&c, topic, &message);
+		rc = MQTTPublish(&c, topic, (const char*)opts.msg, opts.qos, 0, NULL, NULL, 0, 1);
 		printf("Published %d\n", rc);
 	}
 

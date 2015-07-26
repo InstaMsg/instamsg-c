@@ -15,6 +15,7 @@
  *******************************************************************************/
 
 #include "./include/MQTTClient.h"
+#include <string.h>
 
 void NewMessageData(MessageData* md, MQTTString* aTopicName, MQTTMessage* aMessgage) {
     md->topicName = aTopicName;
@@ -99,7 +100,7 @@ exit:
 }
 
 
-int readPacket(Client* c, Timer* timer) 
+int readPacket(Client* c, MQTTFixedHeader *fixedHeader, Timer* timer)
 {
     int rc = FAILURE;
     MQTTHeader header = {0};
@@ -120,7 +121,10 @@ int readPacket(Client* c, Timer* timer)
         goto exit;
 
     header.byte = c->readbuf[0];
-    rc = header.bits.type;
+    fillFixedHeaderFieldsFromPacketHeader(fixedHeader, &header);
+
+    rc = SUCCESS;
+
 exit:
     return rc;
 }
@@ -224,13 +228,13 @@ exit:
 
 int cycle(Client* c, Timer* timer)
 {
+    int len = 0;
+
     // read the socket, see what work is due
-    unsigned short packet_type = readPacket(c, timer);
+    MQTTFixedHeader fixedHeader;
+    int rc = readPacket(c, &fixedHeader, timer);
 
-    int len = 0,
-        rc = SUCCESS;
-
-    switch (packet_type)
+    switch (fixedHeader.packetType)
     {
         case CONNACK:
         case PUBACK:
@@ -240,16 +244,25 @@ int cycle(Client* c, Timer* timer)
         {
             MQTTString topicName;
             MQTTMessage msg;
-            if (MQTTDeserialize_publish((unsigned char*)&msg.dup, (int*)&msg.qos, (unsigned char*)&msg.retained, (unsigned short*)&msg.id, &topicName,
-               (unsigned char**)&msg.payload, (int*)&msg.payloadlen, c->readbuf, c->readbuf_size) != 1)
-                goto exit;
-            deliverMessage(c, &topicName, &msg);
-            if (msg.qos != QOS0)
+            if (MQTTDeserialize_publish(&(msg.fixedHeaderPlusMsgId),
+                                        &topicName,
+                                        (unsigned char**)&msg.payload,
+                                        (int*)&msg.payloadlen,
+                                        c->readbuf,
+                                        c->readbuf_size) != SUCCESS)
             {
-                if (msg.qos == QOS1)
-                    len = MQTTSerialize_ack(c->buf, c->buf_size, PUBACK, 0, msg.id);
-                else if (msg.qos == QOS2)
-                    len = MQTTSerialize_ack(c->buf, c->buf_size, PUBREC, 0, msg.id);
+                goto exit;
+            }
+
+            deliverMessage(c, &topicName, &msg);
+
+            enum QoS qos = msg.fixedHeaderPlusMsgId.fixedHeader.qos;
+            if (qos != QOS0)
+            {
+                if (qos == QOS1)
+                    len = MQTTSerialize_ack(c->buf, c->buf_size, PUBACK, 0, msg.fixedHeaderPlusMsgId.msgId);
+                else if (qos == QOS2)
+                    len = MQTTSerialize_ack(c->buf, c->buf_size, PUBREC, 0, msg.fixedHeaderPlusMsgId.msgId);
                 if (len <= 0)
                     rc = FAILURE;
                    else
@@ -261,11 +274,11 @@ int cycle(Client* c, Timer* timer)
         }
         case PUBREC:
         {
-            unsigned short mypacketid;
-            unsigned char dup, type;
-            if (MQTTDeserialize_ack(&type, &dup, &mypacketid, c->readbuf, c->readbuf_size) != 1)
+            MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
+
+            if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, c->readbuf, c->readbuf_size) != SUCCESS)
                 rc = FAILURE;
-            else if ((len = MQTTSerialize_ack(c->buf, c->buf_size, PUBREL, 0, mypacketid)) <= 0)
+            else if ((len = MQTTSerialize_ack(c->buf, c->buf_size, PUBREL, 0, fixedHeaderPlusMsgId.msgId)) <= 0)
                 rc = FAILURE;
             else if ((rc = sendPacket(c, len, timer)) != SUCCESS) // send the PUBREL packet
                 rc = FAILURE; // there was a problem
@@ -282,7 +295,7 @@ int cycle(Client* c, Timer* timer)
     keepalive(c);
 exit:
     if (rc == SUCCESS)
-        rc = packet_type;
+        rc = fixedHeader.packetType;
     return rc;
 }
 
@@ -454,13 +467,22 @@ exit:
 }
 
 
-int MQTTPublish(Client* c, const char* topicName, MQTTMessage* message)
+int MQTTPublish(Client* c,
+                const char* topicName,
+                const char* payload,
+                const enum QoS qos,
+                const char dup,
+                void *resultHandler,
+                void *resultHandlerTimeout,
+                const char retain,
+                const char logging)
 {
     int rc = FAILURE;
     Timer *timer = get_new_timer();
     MQTTString topic = MQTTString_initializer;
     topic.cstring = (char *)topicName;
     int len = 0;
+    int id;
 
     timer->init_timer(timer);
     timer->countdown_ms(timer, c->command_timeout_ms);
@@ -468,35 +490,34 @@ int MQTTPublish(Client* c, const char* topicName, MQTTMessage* message)
     if (!c->isconnected)
         goto exit;
 
-    if (message->qos == QOS1 || message->qos == QOS2)
-        message->id = getNextPacketId(c);
+    if (qos == QOS1 || qos == QOS2)
+    {
+        id = getNextPacketId(c);
+    }
 
-    len = MQTTSerialize_publish(c->buf, c->buf_size, 0, message->qos, message->retained, message->id, 
-              topic, (unsigned char*)message->payload, message->payloadlen);
+    len = MQTTSerialize_publish(c->buf, c->buf_size, 0, qos, retain, id, topic, (unsigned char*)payload, strlen(payload) + 1);
     if (len <= 0)
         goto exit;
     if ((rc = sendPacket(c, len, timer)) != SUCCESS) // send the subscribe packet
         goto exit; // there was a problem
 
-    if (message->qos == QOS1)
+    if (qos == QOS1)
     {
         if (waitfor(c, PUBACK, timer) == PUBACK)
         {
-            unsigned short mypacketid;
-            unsigned char dup, type;
-            if (MQTTDeserialize_ack(&type, &dup, &mypacketid, c->readbuf, c->readbuf_size) != 1)
+            MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
+            if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, c->readbuf, c->readbuf_size) != SUCCESS)
                 rc = FAILURE;
         }
         else
             rc = FAILURE;
     }
-    else if (message->qos == QOS2)
+    else if (qos == QOS2)
     {
         if (waitfor(c, PUBCOMP, timer) == PUBCOMP)
         {
-            unsigned short mypacketid;
-            unsigned char dup, type;
-            if (MQTTDeserialize_ack(&type, &dup, &mypacketid, c->readbuf, c->readbuf_size) != 1)
+            MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
+            if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, c->readbuf, c->readbuf_size) != SUCCESS)
                 rc = FAILURE;
         }
         else

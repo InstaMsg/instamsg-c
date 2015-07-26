@@ -134,6 +134,7 @@ char* MQTTFormat_toClientString(char* strbuf, int strbuflen, unsigned char* buf,
 	}
 	break;
 	case PUBLISH:
+    /*
 	{
 		unsigned char dup, retained, *payload;
 		unsigned short packetid;
@@ -144,16 +145,18 @@ char* MQTTFormat_toClientString(char* strbuf, int strbuflen, unsigned char* buf,
 			strindex = MQTTStringFormat_publish(strbuf, strbuflen, dup, qos, retained, packetid,
 					topicName, payload, payloadlen);
 	}
+    */
 	break;
 	case PUBACK:
 	case PUBREC:
 	case PUBREL:
 	case PUBCOMP:
 	{
-		unsigned char packettype, dup;
-		unsigned short packetid;
-		if (MQTTDeserialize_ack(&packettype, &dup, &packetid, buf, buflen) == 1)
-			strindex = MQTTStringFormat_ack(strbuf, strbuflen, packettype, dup, packetid);
+        MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
+		if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, buf, buflen) == SUCCESS)
+			strindex = MQTTStringFormat_ack(strbuf, strbuflen, fixedHeaderPlusMsgId.fixedHeader.packetType,
+                                                               fixedHeaderPlusMsgId.fixedHeader.dup,
+                                                               fixedHeaderPlusMsgId.msgId);
 	}
 	break;
 	case SUBACK:
@@ -203,6 +206,7 @@ char* MQTTFormat_toServerString(char* strbuf, int strbuflen, unsigned char* buf,
 	}
 	break;
 	case PUBLISH:
+    /*
 	{
 		unsigned char dup, retained, *payload;
 		unsigned short packetid;
@@ -213,16 +217,18 @@ char* MQTTFormat_toServerString(char* strbuf, int strbuflen, unsigned char* buf,
 			strindex = MQTTStringFormat_publish(strbuf, strbuflen, dup, qos, retained, packetid,
 					topicName, payload, payloadlen);
 	}
+    */
 	break;
 	case PUBACK:
 	case PUBREC:
 	case PUBREL:
 	case PUBCOMP:
 	{
-		unsigned char packettype, dup;
-		unsigned short packetid;
-		if (MQTTDeserialize_ack(&packettype, &dup, &packetid, buf, buflen) == 1)
-			strindex = MQTTStringFormat_ack(strbuf, strbuflen, packettype, dup, packetid);
+        MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
+		if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, buf, buflen) == 1)
+			strindex = MQTTStringFormat_ack(strbuf, strbuflen, fixedHeaderPlusMsgId.fixedHeader.packetType,
+                                                               fixedHeaderPlusMsgId.fixedHeader.dup,
+                                                               fixedHeaderPlusMsgId.msgId);
 	}
 	break;
 	case SUBSCRIBE:

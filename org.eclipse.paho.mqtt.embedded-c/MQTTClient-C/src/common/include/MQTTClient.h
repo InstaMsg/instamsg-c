@@ -26,10 +26,6 @@
 #define MAX_PACKET_ID 65535
 #define MAX_MESSAGE_HANDLERS 5
 
-enum QoS { QOS0, QOS1, QOS2 };
-
-// all failure return codes must be negative
-enum returnCode { BUFFER_OVERFLOW = -2, FAILURE = -1, SUCCESS = 0 };
 
 void NewTimer(Timer*);
 
@@ -39,10 +35,7 @@ typedef struct MessageData MessageData;
 
 struct MQTTMessage
 {
-    enum QoS qos;
-    char retained;
-    char dup;
-    unsigned short id;
+    MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
     void *payload;
     size_t payloadlen;
 };
@@ -58,7 +51,18 @@ typedef void (*messageHandler)(MessageData*);
 typedef struct Client Client;
 
 int MQTTConnect (Client*, MQTTPacket_connectData*);
-int MQTTPublish (Client*, const char*, MQTTMessage*);
+
+int MQTTPublish(Client* c,
+                const char* topicName,
+                const char* payload,
+                const enum QoS qos,
+                const char dup,
+                void *resultHandler,
+                void *resultHandlerTimeout,
+                const char retain,
+                const char logging);
+
+
 int MQTTSubscribe (Client*, const char*, enum QoS, messageHandler);
 int MQTTUnsubscribe (Client*, const char*);
 int MQTTDisconnect (Client*);

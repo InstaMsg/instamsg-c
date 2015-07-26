@@ -33,6 +33,9 @@ extern "C" {
   #define DLLExport  
 #endif
 
+enum returnCode { BUFFER_OVERFLOW = -2, FAILURE = -1, SUCCESS = 0 };
+enum QoS { QOS0, QOS1, QOS2 };
+
 enum errors
 {
 	MQTTPACKET_BUFFER_TOO_SHORT = -2,
@@ -86,6 +89,21 @@ typedef struct
 
 #define MQTTString_initializer {NULL, {0, NULL}}
 
+typedef struct
+{
+    unsigned int packetType;
+    char dup;
+    enum QoS qos;
+    char retain;
+} MQTTFixedHeader;
+
+typedef struct
+{
+    MQTTFixedHeader fixedHeader;
+    unsigned int msgId;
+} MQTTFixedHeaderPlusMsgId;
+
+
 int MQTTstrlen(MQTTString mqttstring);
 
 #include "MQTTConnect.h"
@@ -124,6 +142,7 @@ typedef struct {
 }MQTTTransport;
 
 int MQTTPacket_readnb(unsigned char* buf, int buflen, MQTTTransport *trp);
+void fillFixedHeaderFieldsFromPacketHeader(MQTTFixedHeader *fixedHeader, const MQTTHeader* const header);
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 }
