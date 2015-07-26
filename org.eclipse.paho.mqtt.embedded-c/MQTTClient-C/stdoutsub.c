@@ -55,6 +55,12 @@
 volatile int toStop = 0;
 unsigned int INSTAMSG_RESULT_HANDLER_TIMEOUT = 10;
 
+Network n;
+Client c;
+char *topic;
+
+int onConnect();
+
 
 void usage()
 {
@@ -229,7 +235,7 @@ int main(int argc, char** argv)
 	if (argc < 2)
 		usage();
 
-	char* topic = argv[1];
+	topic = argv[1];
 
 	if (strchr(topic, '#') || strchr(topic, '+'))
 		opts.showtopics = 1;
@@ -237,10 +243,6 @@ int main(int argc, char** argv)
 		printf("topic is %s\n", topic);
 
 	getopts(argc, argv);
-
-	Network n;
-	Client c;
-
 	signal(SIGINT, cfinish);
 	signal(SIGTERM, cfinish);
 
@@ -261,8 +263,14 @@ int main(int argc, char** argv)
 	printf("Connecting to %s %d\n", opts.host, opts.port);
 
 	rc = MQTTConnect(&c, &data);
-	printf("Connected %d\n", rc);
+    onConnect();
+}
 
+int onConnect()
+{
+	printf("Connected\n");
+
+    /*
 	if(opts.subscribe == 1)
 	{
     		printf("Subscribing to %s\n", topic);
@@ -286,6 +294,7 @@ int main(int argc, char** argv)
 
 	MQTTDisconnect(&c);
 	n.disconnect(&n);
+    */
 
 	return 0;
 }
