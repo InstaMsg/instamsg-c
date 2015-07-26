@@ -276,6 +276,7 @@ int main(int argc, char** argv)
         thread_sleep(120);
 	}
 
+    printf("Now I am disconnecting :(\n");
 	MQTTDisconnect(&c);
 	n.disconnect(&n);
 }

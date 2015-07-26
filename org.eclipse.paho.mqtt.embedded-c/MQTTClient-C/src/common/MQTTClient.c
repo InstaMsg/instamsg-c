@@ -291,122 +291,134 @@ void cycle(Client* c)
 {
     while(1)
     {
-    int len = 0;
+        int len = 0;
 
-    // read the socket, see what work is due
-    MQTTFixedHeader fixedHeader;
-    int rc = readPacket(c, &fixedHeader);
+        // read the socket, see what work is due
+        MQTTFixedHeader fixedHeader;
+        int rc = readPacket(c, &fixedHeader);
 
-    switch (fixedHeader.packetType)
-    {
-        case CONNACK:
+        switch (fixedHeader.packetType)
         {
-            unsigned char connack_rc = 255;
-            char sessionPresent = 0;
-            if (MQTTDeserialize_connack((unsigned char*)&sessionPresent, &connack_rc, c->readbuf, c->readbuf_size) == 1)
+            case CONNACK:
             {
-                if(connack_rc == 0x00)  // Connection Accepted
+                unsigned char connack_rc = 255;
+                char sessionPresent = 0;
+                if (MQTTDeserialize_connack((unsigned char*)&sessionPresent, &connack_rc, c->readbuf, c->readbuf_size) == 1)
                 {
-                    c->isconnected = 1;
-                    c->onConnectCallback();
-                }
-                else
-                {
-                    printf("Client-Connection failed with code [%d]\n", connack_rc);
-                }
-            }
-
-            break;
-        }
-        case PUBACK:
-        case SUBACK:
-        {
-            /*
-             * Fire the result-handler
-             */
-            MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
-            if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, c->readbuf, c->readbuf_size) == SUCCESS)
-            {
-                fireResultHandlerAndRemove(c, &fixedHeaderPlusMsgId);
-            }
-
-            /*
-             * Remove the message-handlers, if the server was unable to process the subscription-request.
-             */
-            int count = 0, grantedQoS = -1;
-            unsigned short msgId;
-
-            if (MQTTDeserialize_suback(&msgId, 1, &count, &grantedQoS, c->readbuf, c->readbuf_size) == 1)
-                rc = grantedQoS; // 0, 1, 2 or 0x80
-            if (rc == 0x80)
-            {
-                int i;
-                for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
-                {
-                    if (c->messageHandlers[i].msgId == msgId)
+                    if(connack_rc == 0x00)  // Connection Accepted
                     {
-                        c->messageHandlers[i].topicFilter = 0;
-                        break;
+                        c->isconnected = 1;
+                        c->onConnectCallback();
+                    }
+                    else
+                    {
+                        printf("Client-Connection failed with code [%d]\n", connack_rc);
                     }
                 }
+
+                break;
             }
 
-            break;
-        }
-        case PUBLISH:
-        {
-            MQTTString topicName;
-            MQTTMessage msg;
-            if (MQTTDeserialize_publish(&(msg.fixedHeaderPlusMsgId),
-                                        &topicName,
-                                        (unsigned char**)&msg.payload,
-                                        (int*)&msg.payloadlen,
-                                        c->readbuf,
-                                        c->readbuf_size) != SUCCESS)
+            case PUBACK:
+            case SUBACK:
             {
-                goto exit;
+                /*
+                * Fire the result-handler
+                */
+                MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
+                if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, c->readbuf, c->readbuf_size) == SUCCESS)
+                {
+                    fireResultHandlerAndRemove(c, &fixedHeaderPlusMsgId);
+                }
+
+                /*
+                * Remove the message-handlers, if the server was unable to process the subscription-request.
+                */
+                int count = 0, grantedQoS = -1;
+                unsigned short msgId;
+
+                if (MQTTDeserialize_suback(&msgId, 1, &count, &grantedQoS, c->readbuf, c->readbuf_size) == 1)
+                    rc = grantedQoS; // 0, 1, 2 or 0x80
+
+                if (rc == 0x80)
+                {
+                    int i;
+                    for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
+                    {
+                        if (c->messageHandlers[i].msgId == msgId)
+                        {
+                            c->messageHandlers[i].topicFilter = 0;
+                            break;
+                        }
+                    }
+                }
+
+                break;
             }
 
-            deliverMessage(c, &topicName, &msg);
-
-            enum QoS qos = msg.fixedHeaderPlusMsgId.fixedHeader.qos;
-            if (qos != QOS0)
+            case PUBLISH:
             {
-                if (qos == QOS1)
-                    len = MQTTSerialize_ack(c->buf, c->buf_size, PUBACK, 0, msg.fixedHeaderPlusMsgId.msgId);
-                else if (qos == QOS2)
-                    len = MQTTSerialize_ack(c->buf, c->buf_size, PUBREC, 0, msg.fixedHeaderPlusMsgId.msgId);
-                if (len <= 0)
+                MQTTString topicName;
+                MQTTMessage msg;
+                if (MQTTDeserialize_publish(&(msg.fixedHeaderPlusMsgId),
+                                            &topicName,
+                                            (unsigned char**)&msg.payload,
+                                            (int*)&msg.payloadlen,
+                                            c->readbuf,
+                                            c->readbuf_size) != SUCCESS)
+                {
+                    goto exit;
+                }
+
+                deliverMessage(c, &topicName, &msg);
+
+                enum QoS qos = msg.fixedHeaderPlusMsgId.fixedHeader.qos;
+                if (qos != QOS0)
+                {
+                    if (qos == QOS1)
+                        len = MQTTSerialize_ack(c->buf, c->buf_size, PUBACK, 0, msg.fixedHeaderPlusMsgId.msgId);
+                    else if (qos == QOS2)
+                        len = MQTTSerialize_ack(c->buf, c->buf_size, PUBREC, 0, msg.fixedHeaderPlusMsgId.msgId);
+                    if (len <= 0)
+                        rc = FAILURE;
+                    else
+                        rc = sendPacket(c, len);
+
+                    if (rc == FAILURE)
+                        goto exit; // there was a problem
+                }
+
+                break;
+            }
+
+            case PUBREC:
+            {
+                MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
+
+                if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, c->readbuf, c->readbuf_size) != SUCCESS)
                     rc = FAILURE;
-                   else
-                       rc = sendPacket(c, len);
+                else if ((len = MQTTSerialize_ack(c->buf, c->buf_size, PUBREL, 0, fixedHeaderPlusMsgId.msgId)) <= 0)
+                    rc = FAILURE;
+                else if ((rc = sendPacket(c, len)) != SUCCESS) // send the PUBREL packet
+                    rc = FAILURE; // there was a problem
                 if (rc == FAILURE)
                     goto exit; // there was a problem
+
+                break;
             }
-            break;
-        }
-        case PUBREC:
-        {
-            MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
 
-            if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, c->readbuf, c->readbuf_size) != SUCCESS)
-                rc = FAILURE;
-            else if ((len = MQTTSerialize_ack(c->buf, c->buf_size, PUBREL, 0, fixedHeaderPlusMsgId.msgId)) <= 0)
-                rc = FAILURE;
-            else if ((rc = sendPacket(c, len)) != SUCCESS) // send the PUBREL packet
-                rc = FAILURE; // there was a problem
-            if (rc == FAILURE)
-                goto exit; // there was a problem
-            break;
-        }
-        case PUBCOMP:
-            break;
-        case PINGRESP:
-            c->ping_outstanding = 0;
-            break;
-    }
+            case PUBCOMP:
 
-    keepalive(c);
+                break;
+
+            case PINGRESP:
+                c->ping_outstanding = 0;
+
+                break;
+        }
+
+        keepalive(c);
+
 exit:
 
     continue;
