@@ -57,7 +57,8 @@ void NewMessageData(MessageData* md, MQTTString* aTopicName, MQTTMessage* aMessg
 
 
 int getNextPacketId(Client *c) {
-    return c->next_packetid = (c->next_packetid == MAX_PACKET_ID) ? 1 : c->next_packetid + 1;
+    int id = c->next_packetid = (c->next_packetid == MAX_PACKET_ID) ? 1 : c->next_packetid + 1;
+    return id;
 }
 
 void attachResultHandler(Client *c, int msgId, unsigned int timeout, void (*resultHandler)(MQTTFixedHeaderPlusMsgId *))
@@ -134,6 +135,7 @@ void MQTTClient(Client* c, Network* network, unsigned int command_timeout_ms, un
     c->isconnected = 0;
     c->ping_outstanding = 0;
     c->defaultMessageHandler = NULL;
+    c->next_packetid = MAX_PACKET_ID;
 
     c->ping_timer = get_new_timer();
     c->ping_timer->init_timer(c->ping_timer);
