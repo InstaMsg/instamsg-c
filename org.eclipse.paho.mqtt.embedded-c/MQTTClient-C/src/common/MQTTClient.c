@@ -156,6 +156,7 @@ void MQTTClient(Client* c, Network* network, unsigned int command_timeout_ms, un
     c->readbuf = readbuf;
     c->readbuf_size = readbuf_size;
     c->isconnected = 0;
+    c->keepAliveInterval = 0;
     c->ping_outstanding = 0;
     c->defaultMessageHandler = NULL;
     c->next_packetid = MAX_PACKET_ID;
