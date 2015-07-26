@@ -20,6 +20,7 @@
 #include "../../../../MQTTPacket/src/MQTTPacket.h"
 #include "../../specific/include/clienttime.h"
 #include "../../specific/include/clientnetwork.h"
+#include "../../specific/include/clientthreading.h"
 
 #include "stdio.h"
 
@@ -104,12 +105,13 @@ struct Client {
 
     void (*defaultMessageHandler) (MessageData*);
     int (*onConnectCallback)();
+    struct Mutex *mtx;
 
     Network* ipstack;
-    Timer* ping_timer;
 };
 
 void* clientTimerThread(Client *c);
+void* keepAliveThread(Client *c);
 void cycle(Client *c);
 
 #define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}

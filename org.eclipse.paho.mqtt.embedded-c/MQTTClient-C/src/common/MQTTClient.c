@@ -46,6 +46,21 @@ void* clientTimerThread(Client *c)
 
 }
 
+void* keepAliveThread(Client *c)
+{
+    while(1)
+    {
+        unsigned char buf[1000];
+        int len = MQTTSerialize_pingreq(buf, 1000);
+        if (len > 0)
+        {
+            sendPacket(c, buf, len);
+        }
+
+        thread_sleep(c->keepAliveInterval);
+    }
+}
+
 void NewMessageData(MessageData* md, MQTTString* aTopicName, MQTTMessage* aMessgage) {
     md->topicName = aTopicName;
     md->message = aMessgage;
@@ -88,30 +103,36 @@ void fireResultHandlerAndRemove(Client *c, MQTTFixedHeaderPlusMsgId *fixedHeader
     }
 }
 
-int sendPacket(Client* c, int length)
+int sendPacket(Client *c, unsigned char *buf, int length)
 {
+    c->mtx->lock(c->mtx);
+
     int rc = FAILURE,
         sent = 0;
 
     while (sent < length)
     {
-        rc = c->ipstack->mqttwrite(c->ipstack, &c->buf[sent], length);
+        rc = c->ipstack->mqttwrite(c->ipstack, &(buf[sent]), length);
         if (rc < 0)  // there was an error writing the data
             break;
         sent += rc;
     }
     if (sent == length)
     {
-        countdown(c->ping_timer, c->keepAliveInterval); // record the fact that we have successfully sent the packet
         rc = SUCCESS;
     }
     else
+    {
         rc = FAILURE;
+    }
+
+    c->mtx->unlock(c->mtx);
     return rc;
 }
 
 
-void MQTTClient(Client* c, Network* network, unsigned int command_timeout_ms, unsigned char* buf, size_t buf_size, unsigned char* readbuf, size_t readbuf_size, int (*onConnect)())
+void MQTTClient(Client* c, Network* network, unsigned int command_timeout_ms, unsigned char* buf, size_t buf_size, 
+                unsigned char* readbuf, size_t readbuf_size, int (*onConnect)())
 {
     int i;
     c->ipstack = network;
@@ -135,9 +156,8 @@ void MQTTClient(Client* c, Network* network, unsigned int command_timeout_ms, un
     c->defaultMessageHandler = NULL;
     c->next_packetid = MAX_PACKET_ID;
     c->onConnectCallback = onConnect;
+    c->mtx = get_new_mutex();
 
-    c->ping_timer = get_new_timer();
-    c->ping_timer->init_timer(c->ping_timer);
 }
 
 
@@ -251,7 +271,7 @@ int deliverMessage(Client* c, MQTTString* topicName, MQTTMessage* message)
         }
     }
 
-    if (rc == FAILURE && c->defaultMessageHandler != NULL) 
+    if (rc == FAILURE && c->defaultMessageHandler != NULL)
     {
         MessageData md;
         NewMessageData(&md, topicName, message);
@@ -262,30 +282,6 @@ int deliverMessage(Client* c, MQTTString* topicName, MQTTMessage* message)
     return rc;
 }
 
-
-int keepalive(Client* c)
-{
-    int rc = FAILURE;
-
-    if (c->keepAliveInterval == 0)
-    {
-        rc = SUCCESS;
-        goto exit;
-    }
-
-    if (expired(c->ping_timer))
-    {
-        if (!c->ping_outstanding)
-        {
-            int len = MQTTSerialize_pingreq(c->buf, c->buf_size);
-            if (len > 0 && (rc = sendPacket(c, len)) == SUCCESS) // send the ping packet
-                c->ping_outstanding = 1;
-        }
-    }
-
-exit:
-    return rc;
-}
 
 void cycle(Client* c)
 {
@@ -382,7 +378,7 @@ void cycle(Client* c)
                     if (len <= 0)
                         rc = FAILURE;
                     else
-                        rc = sendPacket(c, len);
+                        rc = sendPacket(c, c->buf, len);
 
                     if (rc == FAILURE)
                         goto exit; // there was a problem
@@ -399,7 +395,7 @@ void cycle(Client* c)
                     rc = FAILURE;
                 else if ((len = MQTTSerialize_ack(c->buf, c->buf_size, PUBREL, 0, fixedHeaderPlusMsgId.msgId)) <= 0)
                     rc = FAILURE;
-                else if ((rc = sendPacket(c, len)) != SUCCESS) // send the PUBREL packet
+                else if ((rc = sendPacket(c, c->buf, len)) != SUCCESS) // send the PUBREL packet
                     rc = FAILURE; // there was a problem
                 if (rc == FAILURE)
                     goto exit; // there was a problem
@@ -416,8 +412,6 @@ void cycle(Client* c)
 
                 break;
         }
-
-        keepalive(c);
 
 exit:
 
@@ -439,14 +433,13 @@ int MQTTConnect(Client* c, MQTTPacket_connectData* options)
         options = &default_options; // set default options if none were supplied
 
     c->keepAliveInterval = options->keepAliveInterval;
-    countdown(c->ping_timer, c->keepAliveInterval);
+
     if ((len = MQTTSerialize_connect(c->buf, c->buf_size, options)) <= 0)
         goto exit;
-    if ((rc = sendPacket(c, len)) != SUCCESS)  // send the connect packet
+    if ((rc = sendPacket(c, c->buf, len)) != SUCCESS)  // send the connect packet
         goto exit; // there was a problem
 
 exit:
-
     return rc;
 }
 
@@ -496,7 +489,7 @@ int MQTTSubscribe(Client* c,
          }
     }
 
-    if ((rc = sendPacket(c, len)) != SUCCESS) // send the subscribe packet
+    if ((rc = sendPacket(c, c->buf, len)) != SUCCESS) // send the subscribe packet
         goto exit;             // there was a problem
 
 exit:
@@ -516,7 +509,7 @@ int MQTTUnsubscribe(Client* c, const char* topicFilter)
 
     if ((len = MQTTSerialize_unsubscribe(c->buf, c->buf_size, 0, getNextPacketId(c), 1, &topic)) <= 0)
         goto exit;
-    if ((rc = sendPacket(c, len)) != SUCCESS) // send the subscribe packet
+    if ((rc = sendPacket(c, c->buf, len)) != SUCCESS) // send the subscribe packet
         goto exit; // there was a problem
 
 exit:
@@ -557,7 +550,7 @@ int MQTTPublish(Client* c,
     len = MQTTSerialize_publish(c->buf, c->buf_size, 0, qos, retain, id, topic, (unsigned char*)payload, strlen(payload) + 1);
     if (len <= 0)
         goto exit;
-    if ((rc = sendPacket(c, len)) != SUCCESS) // send the subscribe packet
+    if ((rc = sendPacket(c, c->buf, len)) != SUCCESS) // send the subscribe packet
         goto exit; // there was a problem
 
     if (qos == QOS1)
@@ -578,10 +571,9 @@ int MQTTDisconnect(Client* c)
 
     int len = MQTTSerialize_disconnect(c->buf, c->buf_size);
     if (len > 0)
-        rc = sendPacket(c, len);            // send the disconnect packet
+        rc = sendPacket(c, c->buf, len);            // send the disconnect packet
 
     c->isconnected = 0;
-    release_timer(c->ping_timer);
 
     return rc;
 }
