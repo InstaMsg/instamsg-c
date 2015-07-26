@@ -118,7 +118,9 @@ void MQTTClient(Client* c, Network* network, unsigned int command_timeout_ms, un
 
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {
+        c->messageHandlers[i].msgId = 0;
         c->messageHandlers[i].topicFilter = 0;
+
         c->resultHandlers[i].msgId = 0;
         c->resultHandlers[i].timeout = 0;
     }
@@ -319,10 +321,34 @@ void cycle(Client* c)
         case PUBACK:
         case SUBACK:
         {
+            /*
+             * Fire the result-handler
+             */
             MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
             if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, c->readbuf, c->readbuf_size) == SUCCESS)
             {
                 fireResultHandlerAndRemove(c, &fixedHeaderPlusMsgId);
+            }
+
+            /*
+             * Remove the message-handlers, if the server was unable to process the subscription-request.
+             */
+            int count = 0, grantedQoS = -1;
+            unsigned short msgId;
+
+            if (MQTTDeserialize_suback(&msgId, 1, &count, &grantedQoS, c->readbuf, c->readbuf_size) == 1)
+                rc = grantedQoS; // 0, 1, 2 or 0x80
+            if (rc == 0x80)
+            {
+                int i;
+                for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
+                {
+                    if (c->messageHandlers[i].msgId == msgId)
+                    {
+                        c->messageHandlers[i].topicFilter = 0;
+                        break;
+                    }
+                }
             }
 
             break;
@@ -437,34 +463,29 @@ int MQTTSubscribe(Client* c,
 
     attachResultHandler(c, id, resultHandlerTimeout, resultHandler);
 
+    /*
+     * We follow optimistic approach, and assume that the subscription will be successful, and accordingly assign the
+     * message-handlers.
+     *
+     * If the subscription is unsuccessful, we would then remove/unsubscribe the topic.
+     */
+    {
+        int i;
+        for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
+        {
+            if (c->messageHandlers[i].topicFilter == 0)
+            {
+                c->messageHandlers[i].msgId = id;
+                c->messageHandlers[i].topicFilter = topicName;
+                c->messageHandlers[i].fp = messageHandler;
+
+                break;
+            }
+         }
+    }
+
     if ((rc = sendPacket(c, len)) != SUCCESS) // send the subscribe packet
         goto exit;             // there was a problem
-
-#if 0
-    if (waitfor(c, SUBACK) == SUBACK)      // wait for suback
-    {
-        int count = 0, grantedQoS = -1;
-        unsigned short mypacketid;
-        if (MQTTDeserialize_suback(&mypacketid, 1, &count, &grantedQoS, c->readbuf, c->readbuf_size) == 1)
-            rc = grantedQoS; // 0, 1, 2 or 0x80
-        if (rc != 0x80)
-        {
-            int i;
-            for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
-            {
-                if (c->messageHandlers[i].topicFilter == 0)
-                {
-                    c->messageHandlers[i].topicFilter = topicFilter;
-                    c->messageHandlers[i].fp = messageHandler;
-                    rc = 0;
-                    break;
-                }
-            }
-        }
-    }
-    else
-        rc = FAILURE;
-#endif
 
 exit:
     return rc;

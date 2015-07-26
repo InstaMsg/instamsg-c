@@ -90,6 +90,7 @@ struct Client {
 
     struct MessageHandlers
     {
+        int msgId;
         const char* topicFilter;
         void (*fp) (MessageData*);
     } messageHandlers[MAX_MESSAGE_HANDLERS];      // Message handlers are indexed by subscription topic
