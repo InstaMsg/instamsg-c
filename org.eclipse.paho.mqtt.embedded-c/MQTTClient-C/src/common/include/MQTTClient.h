@@ -90,7 +90,7 @@ struct Client {
 
     struct ResultHandlers
     {
-        unsigned int msgId;
+        int msgId;
         unsigned int timeout;
         void (*fp) (MQTTFixedHeaderPlusMsgId*);
     } resultHandlers[MAX_MESSAGE_HANDLERS];      // Message handlers are indexed by subscription topic

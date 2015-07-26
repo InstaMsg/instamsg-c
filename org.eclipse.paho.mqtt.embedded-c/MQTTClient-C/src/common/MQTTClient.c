@@ -60,7 +60,7 @@ int getNextPacketId(Client *c) {
     return c->next_packetid = (c->next_packetid == MAX_PACKET_ID) ? 1 : c->next_packetid + 1;
 }
 
-void attachResultHandler(Client *c, unsigned int msgId, unsigned int timeout, void (*resultHandler)(MQTTFixedHeaderPlusMsgId *))
+void attachResultHandler(Client *c, int msgId, unsigned int timeout, void (*resultHandler)(MQTTFixedHeaderPlusMsgId *))
 {
     int i;
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
@@ -530,6 +530,7 @@ int MQTTUnsubscribe(Client* c, const char* topicFilter)
     if ((rc = sendPacket(c, len, timer)) != SUCCESS) // send the subscribe packet
         goto exit; // there was a problem
 
+#if 0
     if (waitfor(c, UNSUBACK, timer) == UNSUBACK)
     {
         unsigned short mypacketid;  // should be the same as the packetid above
@@ -538,6 +539,7 @@ int MQTTUnsubscribe(Client* c, const char* topicFilter)
     }
     else
         rc = FAILURE;
+#endif
 
 exit:
     release_timer(timer);
@@ -587,6 +589,7 @@ int MQTTPublish(Client* c,
 
     if (qos == QOS1)
     {
+#if 0
         if (waitfor(c, PUBACK, timer) == PUBACK)
         {
             MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
@@ -595,9 +598,11 @@ int MQTTPublish(Client* c,
         }
         else
             rc = FAILURE;
+#endif
     }
     else if (qos == QOS2)
     {
+#if 0
         if (waitfor(c, PUBCOMP, timer) == PUBCOMP)
         {
             MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
@@ -606,6 +611,7 @@ int MQTTPublish(Client* c,
         }
         else
             rc = FAILURE;
+#endif
     }
 
 exit:

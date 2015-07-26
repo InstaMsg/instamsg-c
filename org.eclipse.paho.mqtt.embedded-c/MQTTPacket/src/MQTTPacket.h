@@ -100,7 +100,7 @@ typedef struct
 typedef struct
 {
     MQTTFixedHeader fixedHeader;
-    unsigned int msgId;
+    int msgId;
 } MQTTFixedHeaderPlusMsgId;
 
 
