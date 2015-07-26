@@ -103,6 +103,7 @@ struct Client {
 };
 
 void* clientTimerThread(Client *c);
+void cycle(Client *c);
 
 #define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}
 

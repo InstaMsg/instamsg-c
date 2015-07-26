@@ -21,21 +21,17 @@ void* clientTimerThread(Client *c)
 {
     while(1)
     {
-        unsigned int sleepInterval = 100000;
-
-        Timer *timer = get_new_timer();
-        timer->init_timer(timer);
-        timer->countdown_ms(timer, sleepInterval);
-        release_timer(timer);
+        unsigned int sleepIntervalSeconds = 1;
+        thread_sleep(sleepIntervalSeconds);
 
         int i;
         for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
         {
             if (c->resultHandlers[i].msgId > 0)
             {
-                if(c->resultHandlers[i].timeout > 0)
+                if(c->resultHandlers[i].timeout > (sleepIntervalSeconds * 1000))
                 {
-                    c->resultHandlers[i].timeout = c->resultHandlers[i].timeout - sleepInterval;
+                    c->resultHandlers[i].timeout = c->resultHandlers[i].timeout - (sleepIntervalSeconds * 1000);
                 }
                 else
                 {
@@ -92,14 +88,14 @@ void fireResultHandlerAndRemove(Client *c, MQTTFixedHeaderPlusMsgId *fixedHeader
     }
 }
 
-int sendPacket(Client* c, int length, Timer* timer)
+int sendPacket(Client* c, int length)
 {
     int rc = FAILURE,
         sent = 0;
 
-    while (sent < length && !expired(timer))
+    while (sent < length)
     {
-        rc = c->ipstack->mqttwrite(c->ipstack, &c->buf[sent], length, left_ms(timer));
+        rc = c->ipstack->mqttwrite(c->ipstack, &c->buf[sent], length);
         if (rc < 0)  // there was an error writing the data
             break;
         sent += rc;
@@ -143,7 +139,7 @@ void MQTTClient(Client* c, Network* network, unsigned int command_timeout_ms, un
 }
 
 
-int decodePacket(Client* c, int* value, int timeout)
+int decodePacket(Client* c, int* value)
 {
     unsigned char i;
     int multiplier = 1;
@@ -160,7 +156,7 @@ int decodePacket(Client* c, int* value, int timeout)
             rc = MQTTPACKET_READ_ERROR; /* bad data */
             goto exit;
         }
-        rc = c->ipstack->mqttread(c->ipstack, &i, 1, timeout);
+        rc = c->ipstack->mqttread(c->ipstack, &i, 1);
         if (rc != 1)
             goto exit;
         *value += (i & 127) * multiplier;
@@ -171,7 +167,7 @@ exit:
 }
 
 
-int readPacket(Client* c, MQTTFixedHeader *fixedHeader, Timer* timer)
+int readPacket(Client* c, MQTTFixedHeader *fixedHeader)
 {
     int rc = FAILURE;
     MQTTHeader header = {0};
@@ -179,16 +175,16 @@ int readPacket(Client* c, MQTTFixedHeader *fixedHeader, Timer* timer)
     int rem_len = 0;
 
     /* 1. read the header byte.  This has the packet type in it */
-    if (c->ipstack->mqttread(c->ipstack, c->readbuf, 1, left_ms(timer)) != 1)
+    if (c->ipstack->mqttread(c->ipstack, c->readbuf, 1) != 1)
         goto exit;
 
     len = 1;
     /* 2. read the remaining length.  This is variable in itself */
-    decodePacket(c, &rem_len, left_ms(timer));
+    decodePacket(c, &rem_len);
     len += MQTTPacket_encode(c->readbuf + 1, rem_len); /* put the original remaining length back into the buffer */
 
     /* 3. read the rest of the buffer using a callback to supply the rest of the data */
-    if (rem_len > 0 && (c->ipstack->mqttread(c->ipstack, c->readbuf + len, rem_len, left_ms(timer)) != rem_len))
+    if (rem_len > 0 && (c->ipstack->mqttread(c->ipstack, c->readbuf + len, rem_len) != rem_len))
         goto exit;
 
     header.byte = c->readbuf[0];
@@ -279,16 +275,9 @@ int keepalive(Client* c)
     {
         if (!c->ping_outstanding)
         {
-            Timer *timer = get_new_timer();
-
-            timer->init_timer(timer);
-            timer->countdown_ms(timer, 1000);
-
             int len = MQTTSerialize_pingreq(c->buf, c->buf_size);
-            if (len > 0 && (rc = sendPacket(c, len, timer)) == SUCCESS) // send the ping packet
+            if (len > 0 && (rc = sendPacket(c, len)) == SUCCESS) // send the ping packet
                 c->ping_outstanding = 1;
-
-            release_timer(timer);
         }
     }
 
@@ -296,14 +285,15 @@ exit:
     return rc;
 }
 
-
-int cycle(Client* c, Timer* timer)
+void cycle(Client* c)
 {
+    while(1)
+    {
     int len = 0;
 
     // read the socket, see what work is due
     MQTTFixedHeader fixedHeader;
-    int rc = readPacket(c, &fixedHeader, timer);
+    int rc = readPacket(c, &fixedHeader);
 
     switch (fixedHeader.packetType)
     {
@@ -313,14 +303,14 @@ int cycle(Client* c, Timer* timer)
             char sessionPresent = 0;
             if (MQTTDeserialize_connack((unsigned char*)&sessionPresent, &connack_rc, c->readbuf, c->readbuf_size) == 1)
             {
-                if(connack_rc == 0)  // Connection Accepted
+                if(connack_rc == 0x00)  // Connection Accepted
                 {
                     c->isconnected = 1;
                     c->onConnectCallback();
                 }
                 else
                 {
-                    printf("Client-Connection failed with code [%d]", connack_rc);
+                    printf("Client-Connection failed with code [%d]\n", connack_rc);
                 }
             }
 
@@ -364,7 +354,7 @@ int cycle(Client* c, Timer* timer)
                 if (len <= 0)
                     rc = FAILURE;
                    else
-                       rc = sendPacket(c, len, timer);
+                       rc = sendPacket(c, len);
                 if (rc == FAILURE)
                     goto exit; // there was a problem
             }
@@ -378,7 +368,7 @@ int cycle(Client* c, Timer* timer)
                 rc = FAILURE;
             else if ((len = MQTTSerialize_ack(c->buf, c->buf_size, PUBREL, 0, fixedHeaderPlusMsgId.msgId)) <= 0)
                 rc = FAILURE;
-            else if ((rc = sendPacket(c, len, timer)) != SUCCESS) // send the PUBREL packet
+            else if ((rc = sendPacket(c, len)) != SUCCESS) // send the PUBREL packet
                 rc = FAILURE; // there was a problem
             if (rc == FAILURE)
                 goto exit; // there was a problem
@@ -390,61 +380,20 @@ int cycle(Client* c, Timer* timer)
             c->ping_outstanding = 0;
             break;
     }
+
     keepalive(c);
 exit:
-    if (rc == SUCCESS)
-        rc = fixedHeader.packetType;
-    return rc;
-}
 
-
-int MQTTYield(Client* c, int timeout_ms)
-{
-    int rc = SUCCESS;
-
-    Timer *timer = get_new_timer();
-    timer->init_timer(timer);
-
-    timer->countdown_ms(timer, timeout_ms);
-    while (!expired(timer))
-    {
-        if (cycle(c, timer) == FAILURE)
-        {
-            rc = FAILURE;
-            break;
-        }
+    continue;
     }
-
-    release_timer(timer);
-    return rc;
-}
-
-
-// only used in single-threaded mode where one command at a time is in process
-int waitfor(Client* c, int packet_type, Timer* timer)
-{
-    int rc = FAILURE;
-
-    do
-    {
-        if (expired(timer))
-            break; // we timed out
-    }
-    while ((rc = cycle(c, timer)) != packet_type);
-
-    return rc;
 }
 
 
 int MQTTConnect(Client* c, MQTTPacket_connectData* options)
 {
-    Timer *connect_timer = get_new_timer();
     int rc = FAILURE;
     MQTTPacket_connectData default_options = MQTTPacket_connectData_initializer;
     int len = 0;
-
-    connect_timer->init_timer(connect_timer);
-    connect_timer->countdown_ms(connect_timer, c->command_timeout_ms);
 
     if (c->isconnected) // don't send connect packet again if we are already connected
         goto exit;
@@ -456,12 +405,11 @@ int MQTTConnect(Client* c, MQTTPacket_connectData* options)
     countdown(c->ping_timer, c->keepAliveInterval);
     if ((len = MQTTSerialize_connect(c->buf, c->buf_size, options)) <= 0)
         goto exit;
-    if ((rc = sendPacket(c, len, connect_timer)) != SUCCESS)  // send the connect packet
+    if ((rc = sendPacket(c, len)) != SUCCESS)  // send the connect packet
         goto exit; // there was a problem
 
 exit:
 
-    release_timer(connect_timer);
     return rc;
 }
 
@@ -469,13 +417,9 @@ exit:
 int MQTTSubscribe(Client* c, const char* topicFilter, enum QoS qos, messageHandler messageHandler)
 {
     int rc = FAILURE;
-    Timer *timer = get_new_timer();
     int len = 0;
     MQTTString topic = MQTTString_initializer;
     topic.cstring = (char *)topicFilter;
-
-    timer->init_timer(timer);
-    timer->countdown_ms(timer, c->command_timeout_ms);
 
     if (!c->isconnected)
         goto exit;
@@ -483,10 +427,11 @@ int MQTTSubscribe(Client* c, const char* topicFilter, enum QoS qos, messageHandl
     len = MQTTSerialize_subscribe(c->buf, c->buf_size, 0, getNextPacketId(c), 1, &topic, (int*)&qos);
     if (len <= 0)
         goto exit;
-    if ((rc = sendPacket(c, len, timer)) != SUCCESS) // send the subscribe packet
+    if ((rc = sendPacket(c, len)) != SUCCESS) // send the subscribe packet
         goto exit;             // there was a problem
 
-    if (waitfor(c, SUBACK, timer) == SUBACK)      // wait for suback
+#if 0
+    if (waitfor(c, SUBACK) == SUBACK)      // wait for suback
     {
         int count = 0, grantedQoS = -1;
         unsigned short mypacketid;
@@ -509,9 +454,9 @@ int MQTTSubscribe(Client* c, const char* topicFilter, enum QoS qos, messageHandl
     }
     else
         rc = FAILURE;
+#endif
 
 exit:
-    release_timer(timer);
     return rc;
 }
 
@@ -519,24 +464,19 @@ exit:
 int MQTTUnsubscribe(Client* c, const char* topicFilter)
 {
     int rc = FAILURE;
-    Timer *timer = get_new_timer();
     MQTTString topic = MQTTString_initializer;
     topic.cstring = (char *)topicFilter;
     int len = 0;
-
-    timer->init_timer(timer);
-    timer->countdown_ms(timer, c->command_timeout_ms);
 
     if (!c->isconnected)
         goto exit;
 
     if ((len = MQTTSerialize_unsubscribe(c->buf, c->buf_size, 0, getNextPacketId(c), 1, &topic)) <= 0)
         goto exit;
-    if ((rc = sendPacket(c, len, timer)) != SUCCESS) // send the subscribe packet
+    if ((rc = sendPacket(c, len)) != SUCCESS) // send the subscribe packet
         goto exit; // there was a problem
 
 exit:
-    release_timer(timer);
     return rc;
 }
 
@@ -552,14 +492,10 @@ int MQTTPublish(Client* c,
                 const char logging)
 {
     int rc = FAILURE;
-    Timer *timer = get_new_timer();
     MQTTString topic = MQTTString_initializer;
     topic.cstring = (char *)topicName;
     int len = 0;
     int id;
-
-    timer->init_timer(timer);
-    timer->countdown_ms(timer, c->command_timeout_ms);
 
     if (!c->isconnected)
         goto exit;
@@ -578,7 +514,7 @@ int MQTTPublish(Client* c,
     len = MQTTSerialize_publish(c->buf, c->buf_size, 0, qos, retain, id, topic, (unsigned char*)payload, strlen(payload) + 1);
     if (len <= 0)
         goto exit;
-    if ((rc = sendPacket(c, len, timer)) != SUCCESS) // send the subscribe packet
+    if ((rc = sendPacket(c, len)) != SUCCESS) // send the subscribe packet
         goto exit; // there was a problem
 
     if (qos == QOS1)
@@ -589,7 +525,6 @@ int MQTTPublish(Client* c,
     }
 
 exit:
-    release_timer(timer);
     return rc;
 }
 
@@ -597,20 +532,14 @@ exit:
 int MQTTDisconnect(Client* c)
 {
     int rc = FAILURE;
-    Timer *timer = get_new_timer();     // we might wait for incomplete incoming publishes to complete
 
     int len = MQTTSerialize_disconnect(c->buf, c->buf_size);
-
-    timer->init_timer(timer);
-    timer->countdown_ms(timer, c->command_timeout_ms);
-
     if (len > 0)
-        rc = sendPacket(c, len, timer);            // send the disconnect packet
+        rc = sendPacket(c, len);            // send the disconnect packet
 
     c->isconnected = 0;
     release_timer(c->ping_timer);
 
-    release_timer(timer);
     return rc;
 }
 

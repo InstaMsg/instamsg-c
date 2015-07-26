@@ -250,6 +250,7 @@ int main(int argc, char** argv)
 	ConnectNetwork(&n, opts.host, opts.port);
 	MQTTClient(&c, &n, 1000, buf, 100, readbuf, 100, onConnect);
     create_and_init_thread(clientTimerThread, &c);
+    create_and_init_thread(cycle, &c);
 
 	MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
 	data.willFlag = 0;
@@ -267,7 +268,7 @@ int main(int argc, char** argv)
 
 	while (!toStop)
 	{
-		MQTTYield(&c, 1000);
+        thread_sleep(120);
 	}
 }
 

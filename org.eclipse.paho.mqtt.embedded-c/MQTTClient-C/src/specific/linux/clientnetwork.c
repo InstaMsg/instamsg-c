@@ -38,25 +38,16 @@
 
 
 
-int linux_read(Network*, unsigned char*, int, int);
-int linux_write(Network*, unsigned char*, int, int);
+int linux_read(Network*, unsigned char*, int);
+int linux_write(Network*, unsigned char*, int);
 void linux_disconnect(Network*);
 
 
 #endif
 
 
-int linux_read(Network* n, unsigned char* buffer, int len, int timeout_ms)
+int linux_read(Network* n, unsigned char* buffer, int len)
 {
-	struct timeval interval = {timeout_ms / 1000, (timeout_ms % 1000) * 1000};
-	if (interval.tv_sec < 0 || (interval.tv_sec == 0 && interval.tv_usec <= 0))
-	{
-		interval.tv_sec = 0;
-		interval.tv_usec = 100;
-	}
-
-	setsockopt(n->my_socket, SOL_SOCKET, SO_RCVTIMEO, (char *)&interval, sizeof(struct timeval));
-
 	int bytes = 0;
 	while (bytes < len)
 	{
@@ -76,14 +67,8 @@ int linux_read(Network* n, unsigned char* buffer, int len, int timeout_ms)
 }
 
 
-int linux_write(Network* n, unsigned char* buffer, int len, int timeout_ms)
+int linux_write(Network* n, unsigned char* buffer, int len)
 {
-	struct timeval tv;
-
-	tv.tv_sec = 0;  /* 30 Secs Timeout */
-	tv.tv_usec = timeout_ms * 1000;  // Not init'ing this can cause strange errors
-
-	setsockopt(n->my_socket, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval));
 	int	rc = write(n->my_socket, buffer, len);
 	return rc;
 }
