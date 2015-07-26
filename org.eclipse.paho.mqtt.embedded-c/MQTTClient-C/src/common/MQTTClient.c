@@ -248,15 +248,15 @@ int deliverMessage(Client* c, MQTTString* topicName, MQTTMessage* message)
             }
         }
     }
-    
+
     if (rc == FAILURE && c->defaultMessageHandler != NULL) 
     {
         MessageData md;
         NewMessageData(&md, topicName, message);
         c->defaultMessageHandler(&md);
         rc = SUCCESS;
-    }   
-    
+    }
+
     return rc;
 }
 
@@ -314,9 +314,10 @@ void cycle(Client* c)
                 }
             }
 
-        }
             break;
+        }
         case PUBACK:
+        case SUBACK:
         {
             MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
             if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, c->readbuf, c->readbuf_size) == SUCCESS)
@@ -326,8 +327,6 @@ void cycle(Client* c)
 
             break;
         }
-        case SUBACK:
-            break;
         case PUBLISH:
         {
             MQTTString topicName;
@@ -414,19 +413,30 @@ exit:
 }
 
 
-int MQTTSubscribe(Client* c, const char* topicFilter, enum QoS qos, messageHandler messageHandler)
+int MQTTSubscribe(Client* c,
+                  const char* topicName,
+                  const enum QoS qos,
+                  messageHandler messageHandler,
+                  void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
+                  unsigned int resultHandlerTimeout)
 {
     int rc = FAILURE;
     int len = 0;
+    int id;
+
     MQTTString topic = MQTTString_initializer;
-    topic.cstring = (char *)topicFilter;
+    topic.cstring = (char *)topicName;
 
     if (!c->isconnected)
         goto exit;
 
-    len = MQTTSerialize_subscribe(c->buf, c->buf_size, 0, getNextPacketId(c), 1, &topic, (int*)&qos);
+    id = getNextPacketId(c);
+    len = MQTTSerialize_subscribe(c->buf, c->buf_size, 0, id, 1, &topic, (int*)&qos);
     if (len <= 0)
         goto exit;
+
+    attachResultHandler(c, id, resultHandlerTimeout, resultHandler);
+
     if ((rc = sendPacket(c, len)) != SUCCESS) // send the subscribe packet
         goto exit;             // there was a problem
 

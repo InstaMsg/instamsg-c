@@ -63,7 +63,13 @@ int MQTTPublish(Client* c,
                 const char logging);
 
 
-int MQTTSubscribe (Client*, const char*, enum QoS, messageHandler);
+int MQTTSubscribe(Client* c,
+                  const char* topicName,
+                  const enum QoS qos,
+                  messageHandler messageHandler,
+                  void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
+                  unsigned int resultHandlerTimeout);
+
 int MQTTUnsubscribe (Client*, const char*);
 int MQTTDisconnect (Client*);
 int MQTTYield (Client*, int);

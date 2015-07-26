@@ -223,7 +223,12 @@ void messageArrived(MessageData* md)
 
 void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
-    printf("Msg with id [%u] successfully published to server\n", fixedHeaderPlusMsgId->msgId);
+    printf("PUBACK received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
+}
+
+void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
+{
+    printf("SUBACK received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
 }
 
 int main(int argc, char** argv)
@@ -270,17 +275,20 @@ int main(int argc, char** argv)
 	{
         thread_sleep(120);
 	}
+
+	MQTTDisconnect(&c);
+	n.disconnect(&n);
 }
 
 int onConnect()
 {
-	printf("Connected\n");
+    int rc;
+	printf("Connected successfully\n");
 
-    /*
 	if(opts.subscribe == 1)
 	{
-    		printf("Subscribing to %s\n", topic);
-		rc = MQTTSubscribe(&c, topic, opts.qos, messageArrived);
+    	printf("Subscribing to %s\n", topic);
+		rc = MQTTSubscribe(&c, topic, opts.qos, messageArrived, subscribeAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT);
 		printf("Subscribed %d\n", rc);
 	}
 
@@ -291,16 +299,6 @@ int onConnect()
 		printf("Published %d\n", rc);
 	}
 
-	while (!toStop)
-	{
-		MQTTYield(&c, 1000);
-	}
-
-	printf("Stopping\n");
-
-	MQTTDisconnect(&c);
-	n.disconnect(&n);
-    */
 
 	return 0;
 }
