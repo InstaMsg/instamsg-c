@@ -17,6 +17,39 @@
 #include "./include/MQTTClient.h"
 #include <string.h>
 
+void* clientTimerThread(Client *c)
+{
+    while(1)
+    {
+        unsigned int sleepInterval = 100000;
+
+        Timer *timer = get_new_timer();
+        timer->init_timer(timer);
+        timer->countdown_ms(timer, sleepInterval);
+        release_timer(timer);
+
+        int i;
+        for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
+        {
+            if (c->resultHandlers[i].msgId > 0)
+            {
+                if(c->resultHandlers[i].timeout > 0)
+                {
+                    c->resultHandlers[i].timeout = c->resultHandlers[i].timeout - sleepInterval;
+                }
+                else
+                {
+                    printf("No result obtained for msgId [%u] in the specified period\n", c->resultHandlers[i].msgId);
+                    c->resultHandlers[i].msgId = 0;
+                }
+
+                break;
+            }
+        }
+    }
+
+}
+
 void NewMessageData(MessageData* md, MQTTString* aTopicName, MQTTMessage* aMessgage) {
     md->topicName = aTopicName;
     md->message = aMessgage;
@@ -27,7 +60,7 @@ int getNextPacketId(Client *c) {
     return c->next_packetid = (c->next_packetid == MAX_PACKET_ID) ? 1 : c->next_packetid + 1;
 }
 
-void attachResultHandler(Client *c, unsigned int msgId, void (*resultHandler)(MQTTFixedHeaderPlusMsgId*))
+void attachResultHandler(Client *c, unsigned int msgId, unsigned int timeout, void (*resultHandler)(MQTTFixedHeaderPlusMsgId *))
 {
     int i;
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
@@ -35,9 +68,11 @@ void attachResultHandler(Client *c, unsigned int msgId, void (*resultHandler)(MQ
         if (c->resultHandlers[i].msgId == 0)
         {
             c->resultHandlers[i].msgId = msgId;
+            c->resultHandlers[i].timeout = timeout;
             c->resultHandlers[i].fp = resultHandler;
-                                                                                                                                                            break;
-                                                                                                                                                        }
+
+            break;
+        }
     }
 }
 
@@ -88,6 +123,7 @@ void MQTTClient(Client* c, Network* network, unsigned int command_timeout_ms, un
     {
         c->messageHandlers[i].topicFilter = 0;
         c->resultHandlers[i].msgId = 0;
+        c->resultHandlers[i].timeout = 0;
     }
 
     c->command_timeout_ms = command_timeout_ms;
@@ -540,7 +576,7 @@ int MQTTPublish(Client* c,
          * We will get PUBACK from server only for QOS1 and QOS2.
          * So, it makes sense to lodge the result-handler only for these cases.
          */
-        attachResultHandler(c, id, resultHandler);
+        attachResultHandler(c, id, resultHandlerTimeout, resultHandler);
     }
 
     len = MQTTSerialize_publish(c->buf, c->buf_size, 0, qos, retain, id, topic, (unsigned char*)payload, strlen(payload) + 1);

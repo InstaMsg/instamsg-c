@@ -42,6 +42,7 @@
 */
 #include <stdio.h>
 #include "src/common/include/MQTTClient.h"
+#include "src/specific/include/clientthreading.h"
 
 #include <stdio.h>
 #include <signal.h>
@@ -246,6 +247,7 @@ int main(int argc, char** argv)
 	NewNetwork(&n);
 	ConnectNetwork(&n, opts.host, opts.port);
 	MQTTClient(&c, &n, 1000, buf, 100, readbuf, 100);
+    //create_and_init_thread(clientTimerThread, &c);
 
 	MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
 	data.willFlag = 0;
