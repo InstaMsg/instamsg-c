@@ -70,7 +70,7 @@ int MQTTYield (Client*, int);
 
 void setDefaultMessageHandler(Client*, messageHandler);
 
-void MQTTClient(Client*, Network*, unsigned int, unsigned char*, size_t, unsigned char*, size_t);
+void MQTTClient(Client*, Network*, unsigned int, unsigned char*, size_t, unsigned char*, size_t, int (*onConnect)());
 
 struct Client {
     unsigned int next_packetid;
@@ -96,6 +96,7 @@ struct Client {
     } resultHandlers[MAX_MESSAGE_HANDLERS];      // Message handlers are indexed by subscription topic
 
     void (*defaultMessageHandler) (MessageData*);
+    int (*onConnectCallback)();
 
     Network* ipstack;
     Timer* ping_timer;

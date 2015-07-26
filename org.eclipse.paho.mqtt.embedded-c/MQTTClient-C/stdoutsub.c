@@ -248,7 +248,7 @@ int main(int argc, char** argv)
 
 	NewNetwork(&n);
 	ConnectNetwork(&n, opts.host, opts.port);
-	MQTTClient(&c, &n, 1000, buf, 100, readbuf, 100);
+	MQTTClient(&c, &n, 1000, buf, 100, readbuf, 100, onConnect);
     //create_and_init_thread(clientTimerThread, &c);
 
 	MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
@@ -263,7 +263,12 @@ int main(int argc, char** argv)
 	printf("Connecting to %s %d\n", opts.host, opts.port);
 
 	rc = MQTTConnect(&c, &data);
-    onConnect();
+
+
+	while (!toStop)
+	{
+		MQTTYield(&c, 1000);
+	}
 }
 
 int onConnect()

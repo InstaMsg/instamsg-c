@@ -115,7 +115,7 @@ int sendPacket(Client* c, int length, Timer* timer)
 }
 
 
-void MQTTClient(Client* c, Network* network, unsigned int command_timeout_ms, unsigned char* buf, size_t buf_size, unsigned char* readbuf, size_t readbuf_size)
+void MQTTClient(Client* c, Network* network, unsigned int command_timeout_ms, unsigned char* buf, size_t buf_size, unsigned char* readbuf, size_t readbuf_size, int (*onConnect)())
 {
     int i;
     c->ipstack = network;
@@ -136,6 +136,7 @@ void MQTTClient(Client* c, Network* network, unsigned int command_timeout_ms, un
     c->ping_outstanding = 0;
     c->defaultMessageHandler = NULL;
     c->next_packetid = MAX_PACKET_ID;
+    c->onConnectCallback = onConnect;
 
     c->ping_timer = get_new_timer();
     c->ping_timer->init_timer(c->ping_timer);
@@ -307,6 +308,23 @@ int cycle(Client* c, Timer* timer)
     switch (fixedHeader.packetType)
     {
         case CONNACK:
+        {
+            unsigned char connack_rc = 255;
+            char sessionPresent = 0;
+            if (MQTTDeserialize_connack((unsigned char*)&sessionPresent, &connack_rc, c->readbuf, c->readbuf_size) == 1)
+            {
+                if(connack_rc == 0)  // Connection Accepted
+                {
+                    c->isconnected = 1;
+                    c->onConnectCallback();
+                }
+                else
+                {
+                    printf("Client-Connection failed with code [%d]", connack_rc);
+                }
+            }
+
+        }
             break;
         case PUBACK:
         {
@@ -441,22 +459,7 @@ int MQTTConnect(Client* c, MQTTPacket_connectData* options)
     if ((rc = sendPacket(c, len, connect_timer)) != SUCCESS)  // send the connect packet
         goto exit; // there was a problem
 
-    // this will be a blocking call, wait for the connack
-    if (waitfor(c, CONNACK, connect_timer) == CONNACK)
-    {
-        unsigned char connack_rc = 255;
-        char sessionPresent = 0;
-        if (MQTTDeserialize_connack((unsigned char*)&sessionPresent, &connack_rc, c->readbuf, c->readbuf_size) == 1)
-            rc = connack_rc;
-        else
-            rc = FAILURE;
-    }
-    else
-        rc = FAILURE;
-
 exit:
-    if (rc == SUCCESS)
-        c->isconnected = 1;
 
     release_timer(connect_timer);
     return rc;
