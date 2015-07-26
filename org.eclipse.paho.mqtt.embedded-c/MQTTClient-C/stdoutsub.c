@@ -253,12 +253,8 @@ int main(int argc, char** argv)
 
 	NewNetwork(&n);
 	ConnectNetwork(&n, opts.host, opts.port);
+
 	MQTTClient(&c, &n, 1000, buf, 100, readbuf, 100, onConnect);
-
-    create_and_init_thread(clientTimerThread, &c);
-    //create_and_init_thread(keepAliveThread, &c);
-    create_and_init_thread(cycle, &c);
-
 	MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
 	data.willFlag = 0;
 	data.MQTTVersion = 3;
@@ -269,6 +265,11 @@ int main(int argc, char** argv)
 	data.keepAliveInterval = 10;
 	data.cleansession = 1;
 	printf("Connecting to %s %d\n", opts.host, opts.port);
+
+    create_and_init_thread(clientTimerThread, &c);
+    create_and_init_thread(keepAliveThread, &c);
+    create_and_init_thread(cycle, &c);
+
 
 	rc = MQTTConnect(&c, &data);
 

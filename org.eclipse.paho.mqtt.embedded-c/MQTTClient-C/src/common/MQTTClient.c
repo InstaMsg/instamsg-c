@@ -114,9 +114,13 @@ int sendPacket(Client *c, unsigned char *buf, int length)
     {
         rc = c->ipstack->mqttwrite(c->ipstack, &(buf[sent]), length);
         if (rc < 0)  // there was an error writing the data
+        {
             break;
+        }
+
         sent += rc;
     }
+
     if (sent == length)
     {
         rc = SUCCESS;
@@ -131,7 +135,7 @@ int sendPacket(Client *c, unsigned char *buf, int length)
 }
 
 
-void MQTTClient(Client* c, Network* network, unsigned int command_timeout_ms, unsigned char* buf, size_t buf_size, 
+void MQTTClient(Client* c, Network* network, unsigned int command_timeout_ms, unsigned char* buf, size_t buf_size,
                 unsigned char* readbuf, size_t readbuf_size, int (*onConnect)())
 {
     int i;
