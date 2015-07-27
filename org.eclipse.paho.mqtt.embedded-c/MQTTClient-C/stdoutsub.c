@@ -58,7 +58,77 @@ Network n;
 InstaMsg c;
 char *topic;
 
-int onConnect();
+
+struct opts_struct
+{
+	char* clientid;
+	int nodelimiter;
+	char* delimiter;
+	enum QoS qos;
+	char* username;
+	char* password;
+	char* host;
+	int port;
+	int showtopics;
+
+	int subscribe;
+	int publish;
+	char msg[100];
+} opts =
+{
+	(char*)"stdout-subscriber", 0, (char*)"\n", QOS2, NULL, NULL, (char*)"localhost", 1883, 0, 0, 0
+};
+
+
+static void messageArrived(MessageData* md)
+{
+	MQTTMessage* message = md->message;
+
+	if (opts.showtopics)
+		printf("%.*s\t", md->topicName->lenstring.len, md->topicName->lenstring.data);
+	if (opts.nodelimiter)
+		printf("%.*s", (int)message->payloadlen, (char*)message->payload);
+	else
+		printf("%.*s%s", (int)message->payloadlen, (char*)message->payload, opts.delimiter);
+}
+
+
+static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
+{
+    printf("PUBACK received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
+}
+
+
+static void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
+{
+    printf("SUBACK received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
+}
+
+
+static int onConnect()
+{
+    int rc;
+    printf("Connected successfully\n");
+
+
+	if(opts.subscribe == 1)
+	{
+    	printf("Subscribing to %s\n", topic);
+		rc = MQTTSubscribe(&c, topic, opts.qos, messageArrived, subscribeAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT);
+		printf("Subscribed %d\n", rc);
+	}
+
+	if(opts.publish == 1)
+	{
+		printf("Publishing message [%s] to %s\n", opts.msg, topic);
+		rc = MQTTPublish(&c, topic, (const char*)opts.msg, opts.qos, 0, publishAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT, 0, 1);
+		printf("Published %d\n", rc);
+	}
+
+
+	return 0;
+}
+
 
 
 void usage()
@@ -82,27 +152,6 @@ void cfinish(int sig)
 	signal(SIGINT, NULL);
 	toStop = 1;
 }
-
-
-struct opts_struct
-{
-	char* clientid;
-	int nodelimiter;
-	char* delimiter;
-	enum QoS qos;
-	char* username;
-	char* password;
-	char* host;
-	int port;
-	int showtopics;
-
-	int subscribe;
-	int publish;
-	char msg[100];
-} opts =
-{
-	(char*)"stdout-subscriber", 0, (char*)"\n", QOS2, NULL, NULL, (char*)"localhost", 1883, 0, 0, 0
-};
 
 
 void getopts(int argc, char** argv)
@@ -202,33 +251,8 @@ void getopts(int argc, char** argv)
 
 		count++;
 	}
-
 }
 
-
-void messageArrived(MessageData* md)
-{
-	MQTTMessage* message = md->message;
-
-	if (opts.showtopics)
-		printf("%.*s\t", md->topicName->lenstring.len, md->topicName->lenstring.data);
-	if (opts.nodelimiter)
-		printf("%.*s", (int)message->payloadlen, (char*)message->payload);
-	else
-		printf("%.*s%s", (int)message->payloadlen, (char*)message->payload, opts.delimiter);
-	//fflush(stdout);
-}
-
-
-void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
-{
-    printf("PUBACK received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
-}
-
-void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
-{
-    printf("SUBACK received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
-}
 
 int main(int argc, char** argv)
 {
@@ -278,29 +302,4 @@ int main(int argc, char** argv)
 	MQTTDisconnect(&c);
 	n.disconnect(&n);
 }
-
-int onConnect()
-{
-    int rc;
-    printf("Connected successfully\n");
-
-
-	if(opts.subscribe == 1)
-	{
-    	printf("Subscribing to %s\n", topic);
-		rc = MQTTSubscribe(&c, topic, opts.qos, messageArrived, subscribeAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT);
-		printf("Subscribed %d\n", rc);
-	}
-
-	if(opts.publish == 1)
-	{
-		printf("Publishing message [%s] to %s\n", opts.msg, topic);
-		rc = MQTTPublish(&c, topic, (const char*)opts.msg, opts.qos, 0, publishAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT, 0, 1);
-		printf("Published %d\n", rc);
-	}
-
-
-	return 0;
-}
-
 
