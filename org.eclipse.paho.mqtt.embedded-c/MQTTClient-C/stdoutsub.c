@@ -55,7 +55,7 @@
 volatile int toStop = 0;
 
 Network n;
-Client c;
+InstaMsg c;
 char *topic;
 
 int onConnect();

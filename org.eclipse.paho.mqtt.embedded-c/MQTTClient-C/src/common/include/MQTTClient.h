@@ -50,8 +50,8 @@ struct MessageData
 
 typedef void (*messageHandler)(MessageData*);
 
-typedef struct Client Client;
-struct Client {
+typedef struct InstaMsg InstaMsg;
+struct InstaMsg {
     unsigned int next_packetid;
     unsigned int command_timeout_ms;
     unsigned char readbuf[MAX_BUFFER_SIZE];
@@ -83,11 +83,11 @@ struct Client {
 };
 
 
-int MQTTConnect (Client*, MQTTPacket_connectData*);
+int MQTTConnect (InstaMsg*, MQTTPacket_connectData*);
 
-int MQTTPublish(Client* c,
-                const char* topicName,
-                const char* payload,
+int MQTTPublish(InstaMsg *c,
+                const char *topicName,
+                const char *payload,
                 const enum QoS qos,
                 const char dup,
                 void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
@@ -96,25 +96,25 @@ int MQTTPublish(Client* c,
                 const char logging);
 
 
-int MQTTSubscribe(Client* c,
-                  const char* topicName,
+int MQTTSubscribe(InstaMsg *c,
+                  const char *topicName,
                   const enum QoS qos,
                   messageHandler messageHandler,
                   void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
                   unsigned int resultHandlerTimeout);
 
-int MQTTUnsubscribe (Client*, const char*);
-int MQTTDisconnect (Client*);
-void setDefaultMessageHandler(Client*, messageHandler);
+int MQTTUnsubscribe (InstaMsg*, const char*);
+int MQTTDisconnect (InstaMsg*);
+void setDefaultMessageHandler(InstaMsg*, messageHandler);
 
-void MQTTClient(Client* c,
+void MQTTClient(InstaMsg *c,
                 Network* network,
                 unsigned int command_timeout_ms,
-                int (*onConnect)());
+                int (*connectHandler)());
 
-void* clientTimerThread(Client *c);
-void* keepAliveThread(Client *c);
-void readPacketThread(Client *c);
+void* clientTimerThread(InstaMsg *c);
+void* keepAliveThread(InstaMsg *c);
+void readPacketThread(InstaMsg *c);
 
 extern unsigned int INSTAMSG_RESULT_HANDLER_TIMEOUT;
 

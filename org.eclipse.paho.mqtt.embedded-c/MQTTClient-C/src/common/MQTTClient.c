@@ -33,13 +33,13 @@ static void NewMessageData(MessageData* md, MQTTString* aTopicName, MQTTMessage*
 }
 
 
-static int getNextPacketId(Client *c) {
+static int getNextPacketId(InstaMsg *c) {
     int id = c->next_packetid = (c->next_packetid == MAX_PACKET_ID) ? 1 : c->next_packetid + 1;
     return id;
 }
 
 
-static void attachResultHandler(Client *c, int msgId, unsigned int timeout, void (*resultHandler)(MQTTFixedHeaderPlusMsgId *))
+static void attachResultHandler(InstaMsg *c, int msgId, unsigned int timeout, void (*resultHandler)(MQTTFixedHeaderPlusMsgId *))
 {
     int i;
 
@@ -59,7 +59,7 @@ static void attachResultHandler(Client *c, int msgId, unsigned int timeout, void
 }
 
 
-static void fireResultHandlerAndRemove(Client *c, MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
+static void fireResultHandlerAndRemove(InstaMsg *c, MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
     int i;
 
@@ -78,7 +78,7 @@ static void fireResultHandlerAndRemove(Client *c, MQTTFixedHeaderPlusMsgId *fixe
 }
 
 
-static int sendPacket(Client *c, unsigned char *buf, int length)
+static int sendPacket(InstaMsg *c, unsigned char *buf, int length)
 {
     c->sendPacketMutex->lock(c->sendPacketMutex);
 
@@ -110,7 +110,7 @@ static int sendPacket(Client *c, unsigned char *buf, int length)
 }
 
 
-static int decodePacket(Client* c, int* value)
+static int decodePacket(InstaMsg* c, int* value)
 {
     unsigned char i;
     int multiplier = 1;
@@ -138,7 +138,7 @@ exit:
 }
 
 
-static int readPacket(Client* c, MQTTFixedHeader *fixedHeader)
+static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
 {
     int rc = FAILURE;
     MQTTHeader header = {0};
@@ -199,7 +199,7 @@ static char isTopicMatched(char* topicFilter, MQTTString* topicName)
 }
 
 
-static int deliverMessage(Client* c, MQTTString* topicName, MQTTMessage* message)
+static int deliverMessage(InstaMsg* c, MQTTString* topicName, MQTTMessage* message)
 {
     int i;
     int rc = FAILURE;
@@ -234,7 +234,7 @@ static int deliverMessage(Client* c, MQTTString* topicName, MQTTMessage* message
 }
 
 
-static int fireResultHandlerUsingMsgIdAsTheKey(Client *c)
+static int fireResultHandlerUsingMsgIdAsTheKey(InstaMsg *c)
 {
     int msgId = -1;
 
@@ -249,7 +249,7 @@ static int fireResultHandlerUsingMsgIdAsTheKey(Client *c)
 }
 
 
-void* clientTimerThread(Client *c)
+void* clientTimerThread(InstaMsg *c)
 {
     while(1)
     {
@@ -282,7 +282,7 @@ void* clientTimerThread(Client *c)
 }
 
 
-void* keepAliveThread(Client *c)
+void* keepAliveThread(InstaMsg *c)
 {
     while(1)
     {
@@ -298,10 +298,11 @@ void* keepAliveThread(Client *c)
 }
 
 
-void MQTTClient(Client* c,
+//self, clientId, authKey, connectHandler, disConnectHandler, oneToOneMessageHandler, options={})
+void MQTTClient(InstaMsg* c,
                 Network* network,
                 unsigned int command_timeout_ms,
-                int (*onConnect)())
+                int (*connectHandler)())
 {
     int i;
     c->ipstack = network;
@@ -320,7 +321,7 @@ void MQTTClient(Client* c,
     c->keepAliveInterval = 0;
     c->defaultMessageHandler = NULL;
     c->next_packetid = MAX_PACKET_ID;
-    c->onConnectCallback = onConnect;
+    c->onConnectCallback = connectHandler;
 
     c->sendPacketMutex = get_new_mutex();
     c->messageHandlersMutex = get_new_mutex();
@@ -329,7 +330,7 @@ void MQTTClient(Client* c,
 }
 
 
-void readPacketThread(Client* c)
+void readPacketThread(InstaMsg* c)
 {
     while(1)
     {
@@ -477,7 +478,7 @@ exit:
 }
 
 
-int MQTTConnect(Client* c, MQTTPacket_connectData* options)
+int MQTTConnect(InstaMsg* c, MQTTPacket_connectData* options)
 {
     int rc = FAILURE;
     char buf[MAX_BUFFER_SIZE];
@@ -504,7 +505,7 @@ exit:
 }
 
 
-int MQTTSubscribe(Client* c,
+int MQTTSubscribe(InstaMsg* c,
                   const char* topicName,
                   const enum QoS qos,
                   messageHandler messageHandler,
@@ -561,7 +562,7 @@ exit:
 }
 
 
-int MQTTUnsubscribe(Client* c, const char* topicFilter)
+int MQTTUnsubscribe(InstaMsg* c, const char* topicFilter)
 {
     int rc = FAILURE;
     char buf[MAX_BUFFER_SIZE];
@@ -583,7 +584,7 @@ exit:
 }
 
 
-int MQTTPublish(Client* c,
+int MQTTPublish(InstaMsg* c,
                 const char* topicName,
                 const char* payload,
                 const enum QoS qos,
@@ -633,7 +634,7 @@ exit:
 }
 
 
-int MQTTDisconnect(Client* c)
+int MQTTDisconnect(InstaMsg* c)
 {
     int rc = FAILURE;
     char buf[MAX_BUFFER_SIZE];
