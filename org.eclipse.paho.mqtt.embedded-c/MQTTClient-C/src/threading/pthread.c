@@ -1,7 +1,7 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include "../include/clientthreading.h"
+#include "include/threading.h"
 
 void create_and_init_thread(void *start_func, void *arg)
 {

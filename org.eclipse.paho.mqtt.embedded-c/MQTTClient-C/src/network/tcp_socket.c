@@ -34,7 +34,7 @@
 #include <string.h>
 #include <signal.h>
 
-#include "../include/clientnetwork.h"
+#include "include/network.h"
 
 
 

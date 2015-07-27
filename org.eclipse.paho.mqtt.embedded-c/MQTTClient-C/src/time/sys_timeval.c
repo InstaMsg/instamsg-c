@@ -18,7 +18,7 @@
 #include <sys/time.h>
 #include <stdlib.h>
 
-#include "../include/clienttime.h"
+#include "include/time.h"
 
 
 struct TimerObj {

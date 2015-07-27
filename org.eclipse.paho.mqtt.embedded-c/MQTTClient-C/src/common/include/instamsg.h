@@ -18,9 +18,9 @@
 #define __MQTT_CLIENT_C_
 
 #include "../../../../MQTTPacket/src/MQTTPacket.h"
-#include "../../specific/include/clienttime.h"
-#include "../../specific/include/clientnetwork.h"
-#include "../../specific/include/clientthreading.h"
+#include "../../time/include/time.h"
+#include "../../network/include/network.h"
+#include "../../threading/include/threading.h"
 
 #include "stdio.h"
 

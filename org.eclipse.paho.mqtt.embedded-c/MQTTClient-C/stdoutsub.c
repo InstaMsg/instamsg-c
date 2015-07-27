@@ -42,7 +42,7 @@
 */
 #include <stdio.h>
 #include "src/common/include/instamsg.h"
-#include "src/specific/include/clientthreading.h"
+#include "src/threading/include/threading.h"
 
 #include <stdio.h>
 #include <signal.h>
