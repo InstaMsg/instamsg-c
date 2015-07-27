@@ -282,7 +282,7 @@ int main(int argc, char** argv)
 	NewNetwork(&n);
 	ConnectNetwork(&n, opts.host, opts.port);
 
-	initInstaMsg(&c, &n, 100, onConnect, onDisconnect);
+	initInstaMsg(&c, &n, 100, onConnect, onDisconnect, NULL);
 	MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
 	data.willFlag = 0;
 	data.MQTTVersion = 3;
@@ -305,7 +305,6 @@ int main(int argc, char** argv)
         thread_sleep(120);
 	}
 
-    printf("Now I am disconnecting :(\n");
 	MQTTDisconnect(&c);
 	n.disconnect(&n);
 }

@@ -75,6 +75,7 @@ struct InstaMsg {
     void (*defaultMessageHandler) (MessageData*);
     int (*onConnectCallback)();
     int (*onDisconnectCallback)();
+    int (*oneToOneMessageCallback)();
 
     struct Mutex *sendPacketMutex;
     struct Mutex *messageHandlersMutex;
@@ -112,7 +113,8 @@ void initInstaMsg(InstaMsg *c,
                   Network* network,
                   unsigned int command_timeout_ms,
                   int (*connectHandler)(),
-                  int (*disconnectHandler)());
+                  int (*disconnectHandler)(),
+                  int (*oneToOneMessageHandler)());
 
 void* clientTimerThread(InstaMsg *c);
 void* keepAliveThread(InstaMsg *c);
