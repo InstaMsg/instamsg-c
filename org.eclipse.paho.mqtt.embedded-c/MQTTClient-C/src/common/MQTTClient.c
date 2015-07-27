@@ -302,13 +302,12 @@ int deliverMessage(Client* c, MQTTString* topicName, MQTTMessage* message)
 }
 
 
-void cycle(Client* c)
+void readPacketThread(Client* c)
 {
     while(1)
     {
         int len = 0;
 
-        // read the socket, see what work is due
         MQTTFixedHeader fixedHeader;
         int rc = readPacket(c, &fixedHeader);
 

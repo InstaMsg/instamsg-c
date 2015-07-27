@@ -270,7 +270,7 @@ int main(int argc, char** argv)
 
     create_and_init_thread(clientTimerThread, &c);
     create_and_init_thread(keepAliveThread, &c);
-    create_and_init_thread(cycle, &c);
+    create_and_init_thread(readPacketThread, &c);
 
 	while (!toStop)
 	{
