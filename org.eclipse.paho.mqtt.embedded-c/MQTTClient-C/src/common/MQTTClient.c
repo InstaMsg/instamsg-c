@@ -466,8 +466,7 @@ void readPacketThread(Client* c)
         }
 
 exit:
-
-    continue;
+        continue;
     }
 }
 
