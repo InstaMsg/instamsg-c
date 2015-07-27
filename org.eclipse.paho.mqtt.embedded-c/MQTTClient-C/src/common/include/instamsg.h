@@ -27,6 +27,8 @@
 #define MAX_PACKET_ID 30000
 #define MAX_MESSAGE_HANDLERS 5
 #define MAX_BUFFER_SIZE 100
+#define KEEP_ALIVE_INTERVAL_SECS 10
+#define INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS 10
 
 
 void NewTimer(Timer*);
@@ -54,7 +56,6 @@ typedef struct InstaMsg InstaMsg;
 struct InstaMsg {
     unsigned int next_packetid;
     unsigned char readbuf[MAX_BUFFER_SIZE];
-    unsigned int keepAliveInterval;
     int isconnected;
 
     struct MessageHandlers
@@ -108,8 +109,10 @@ int MQTTUnsubscribe (InstaMsg*, const char*);
 int MQTTDisconnect (InstaMsg*);
 void setDefaultMessageHandler(InstaMsg*, messageHandler);
 
-void initInstaMsg(InstaMsg *c,
+void initInstaMsg(InstaMsg* c,
                   Network* network,
+                  char *clientId,
+                  char *authKey,
                   int (*connectHandler)(),
                   int (*disconnectHandler)(),
                   int (*oneToOneMessageHandler)());
@@ -117,8 +120,6 @@ void initInstaMsg(InstaMsg *c,
 void* clientTimerThread(InstaMsg *c);
 void* keepAliveThread(InstaMsg *c);
 void readPacketThread(InstaMsg *c);
-
-extern unsigned int INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS;
 
 #define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}
 #endif

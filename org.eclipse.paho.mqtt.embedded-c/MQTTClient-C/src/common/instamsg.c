@@ -17,7 +17,6 @@
 #include "include/instamsg.h"
 #include <string.h>
 
-unsigned int INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS = 10;
 
 static void publishQoS2CycleCompleted(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
@@ -291,7 +290,7 @@ void* keepAliveThread(InstaMsg *c)
             sendPacket(c, buf, len);
         }
 
-        thread_sleep(c->keepAliveInterval);
+        thread_sleep(KEEP_ALIVE_INTERVAL_SECS);
     }
 }
 
@@ -299,11 +298,16 @@ void* keepAliveThread(InstaMsg *c)
 //self, clientId, authKey, connectHandler, disConnectHandler, oneToOneMessageHandler, options={})
 void initInstaMsg(InstaMsg* c,
                   Network* network,
+                  char *clientId,
+                  char *authKey,
                   int (*connectHandler)(),
                   int (*disconnectHandler)(),
                   int (*oneToOneMessageHandler)())
 {
     int i;
+    char clientIdMachine[MAX_BUFFER_SIZE] = {0};
+    char username[MAX_BUFFER_SIZE] = {0};
+
     c->ipstack = network;
 
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
@@ -316,7 +320,6 @@ void initInstaMsg(InstaMsg* c,
     }
 
     c->isconnected = 0;
-    c->keepAliveInterval = 0;
     c->defaultMessageHandler = NULL;
     c->next_packetid = MAX_PACKET_ID;
     c->onConnectCallback = connectHandler;
@@ -326,6 +329,22 @@ void initInstaMsg(InstaMsg* c,
     c->sendPacketMutex = get_new_mutex();
     c->messageHandlersMutex = get_new_mutex();
     c->resultHandlersMutex = get_new_mutex();
+
+
+	MQTTPacket_connectData connectOptions = MQTTPacket_connectData_initializer;
+	connectOptions.willFlag = 0;
+	connectOptions.MQTTVersion = 3;
+
+    strncpy(clientIdMachine, clientId, 23);
+	connectOptions.clientID.cstring = clientIdMachine;
+
+    strcpy(username, clientId + 24);
+	connectOptions.username.cstring = username;
+
+	connectOptions.password.cstring = authKey;
+	connectOptions.cleansession = 1;
+
+    MQTTConnect(c, &connectOptions);
 }
 
 
@@ -490,8 +509,6 @@ int MQTTConnect(InstaMsg* c, MQTTPacket_connectData* options)
 
     if (options == 0)
         options = &default_options; // set default options if none were supplied
-
-    c->keepAliveInterval = options->keepAliveInterval;
 
     if ((len = MQTTSerialize_connect(buf, MAX_BUFFER_SIZE, options)) <= 0)
         goto exit;

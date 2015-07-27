@@ -65,7 +65,6 @@ struct opts_struct
 	int nodelimiter;
 	char* delimiter;
 	enum QoS qos;
-	char* username;
 	char* password;
 	char* host;
 	int port;
@@ -76,7 +75,7 @@ struct opts_struct
 	char msg[100];
 } opts =
 {
-	(char*)"stdout-subscriber", 0, (char*)"\n", QOS2, NULL, NULL, (char*)"localhost", 1883, 0, 0, 0
+	(char*)"stdout-subscriber", 0, (char*)"\n", QOS2, NULL, (char*)"localhost", 1883, 0, 0, 0
 };
 
 
@@ -147,7 +146,6 @@ void usage()
 	printf("  --qos <qos> (default is 2)\n");
 	printf("  --delimiter <delim> (default is \\n)\n");
 	printf("  --clientid <clientid> (default is hostname+timestamp)\n");
-	printf("  --username none\n");
 	printf("  --password none\n");
 	printf("  --showtopics <on or off> (default is on if the topic has a wildcard, else off)\n");
 	exit(-1);
@@ -201,13 +199,6 @@ void getopts(int argc, char** argv)
 		{
 			if (++count < argc)
 				opts.clientid = argv[count];
-			else
-				usage();
-		}
-		else if (strcmp(argv[count], "--username") == 0)
-		{
-			if (++count < argc)
-				opts.username = argv[count];
 			else
 				usage();
 		}
@@ -282,19 +273,7 @@ int main(int argc, char** argv)
 	NewNetwork(&n);
 	ConnectNetwork(&n, opts.host, opts.port);
 
-	initInstaMsg(&c, &n, onConnect, onDisconnect, NULL);
-	MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
-	data.willFlag = 0;
-	data.MQTTVersion = 3;
-	data.clientID.cstring = opts.clientid;
-	data.username.cstring = opts.username;
-	data.password.cstring = opts.password;
-
-	data.keepAliveInterval = 10;
-	data.cleansession = 1;
-	printf("Connecting to %s %d\n", opts.host, opts.port);
-
-	rc = MQTTConnect(&c, &data);
+	initInstaMsg(&c, &n, opts.clientid, opts.password, onConnect, onDisconnect, NULL);
 
     create_and_init_thread(clientTimerThread, &c);
     create_and_init_thread(keepAliveThread, &c);
