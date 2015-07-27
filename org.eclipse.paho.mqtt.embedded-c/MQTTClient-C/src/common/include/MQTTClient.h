@@ -74,6 +74,7 @@ struct InstaMsg {
 
     void (*defaultMessageHandler) (MessageData*);
     int (*onConnectCallback)();
+    int (*onDisconnectCallback)();
 
     struct Mutex *sendPacketMutex;
     struct Mutex *messageHandlersMutex;
@@ -110,7 +111,8 @@ void setDefaultMessageHandler(InstaMsg*, messageHandler);
 void MQTTClient(InstaMsg *c,
                 Network* network,
                 unsigned int command_timeout_ms,
-                int (*connectHandler)());
+                int (*connectHandler)(),
+                int (*disconnectHandler)());
 
 void* clientTimerThread(InstaMsg *c);
 void* keepAliveThread(InstaMsg *c);

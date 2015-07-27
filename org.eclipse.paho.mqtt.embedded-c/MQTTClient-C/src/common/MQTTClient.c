@@ -302,7 +302,8 @@ void* keepAliveThread(InstaMsg *c)
 void MQTTClient(InstaMsg* c,
                 Network* network,
                 unsigned int command_timeout_ms,
-                int (*connectHandler)())
+                int (*connectHandler)(),
+                int (*disconnectHandler)())
 {
     int i;
     c->ipstack = network;
@@ -322,6 +323,7 @@ void MQTTClient(InstaMsg* c,
     c->defaultMessageHandler = NULL;
     c->next_packetid = MAX_PACKET_ID;
     c->onConnectCallback = connectHandler;
+    c->onDisconnectCallback = disconnectHandler;
 
     c->sendPacketMutex = get_new_mutex();
     c->messageHandlersMutex = get_new_mutex();
@@ -644,6 +646,7 @@ int MQTTDisconnect(InstaMsg* c)
         rc = sendPacket(c, buf, len);            // send the disconnect packet
 
     c->isconnected = 0;
+    c->onDisconnectCallback();
 
     return rc;
 }

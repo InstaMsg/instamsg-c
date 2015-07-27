@@ -125,10 +125,17 @@ static int onConnect()
 		printf("Published %d\n", rc);
 	}
 
-
 	return 0;
 }
 
+
+static int onDisconnect()
+{
+    printf("Disconnect \"callback\" called.. not really needed, as MQTT-Disconnect does not get any response from server. "
+           "So, no async-callback required as such.\n");
+
+	return 0;
+}
 
 
 void usage()
@@ -275,7 +282,7 @@ int main(int argc, char** argv)
 	NewNetwork(&n);
 	ConnectNetwork(&n, opts.host, opts.port);
 
-	MQTTClient(&c, &n, 100, onConnect);
+	MQTTClient(&c, &n, 100, onConnect, onDisconnect);
 	MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
 	data.willFlag = 0;
 	data.MQTTVersion = 3;
