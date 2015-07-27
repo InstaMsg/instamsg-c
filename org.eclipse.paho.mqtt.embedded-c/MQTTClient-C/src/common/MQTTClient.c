@@ -27,6 +27,8 @@ void* clientTimerThread(Client *c)
         thread_sleep(sleepIntervalSeconds);
 
         int i;
+
+        c->resultHandlersMutex->lock(c->resultHandlersMutex);
         for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
         {
             if (c->resultHandlers[i].msgId > 0)
@@ -44,6 +46,7 @@ void* clientTimerThread(Client *c)
                 break;
             }
         }
+        c->resultHandlersMutex->unlock(c->resultHandlersMutex);
     }
 
 }
@@ -77,6 +80,8 @@ int getNextPacketId(Client *c) {
 void attachResultHandler(Client *c, int msgId, unsigned int timeout, void (*resultHandler)(MQTTFixedHeaderPlusMsgId *))
 {
     int i;
+
+    c->resultHandlersMutex->lock(c->resultHandlersMutex);
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {
         if (c->resultHandlers[i].msgId == 0)
@@ -88,11 +93,14 @@ void attachResultHandler(Client *c, int msgId, unsigned int timeout, void (*resu
             break;
         }
     }
+    c->resultHandlersMutex->unlock(c->resultHandlersMutex);
 }
 
 void fireResultHandlerAndRemove(Client *c, MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
     int i;
+
+    c->resultHandlersMutex->lock(c->resultHandlersMutex);
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {
         if (c->resultHandlers[i].msgId == fixedHeaderPlusMsgId->msgId)
@@ -103,11 +111,12 @@ void fireResultHandlerAndRemove(Client *c, MQTTFixedHeaderPlusMsgId *fixedHeader
             break;
                                                                                                                                                         }
     }
+    c->resultHandlersMutex->unlock(c->resultHandlersMutex);
 }
 
 int sendPacket(Client *c, unsigned char *buf, int length)
 {
-    c->mtx->lock(c->mtx);
+    c->sendPacketMutex->lock(c->sendPacketMutex);
 
     int rc = FAILURE,
         sent = 0;
@@ -132,7 +141,7 @@ int sendPacket(Client *c, unsigned char *buf, int length)
         rc = FAILURE;
     }
 
-    c->mtx->unlock(c->mtx);
+    c->sendPacketMutex->unlock(c->sendPacketMutex);
     return rc;
 }
 
@@ -162,7 +171,10 @@ void MQTTClient(Client* c, Network* network, unsigned int command_timeout_ms,
     c->defaultMessageHandler = NULL;
     c->next_packetid = MAX_PACKET_ID;
     c->onConnectCallback = onConnect;
-    c->mtx = get_new_mutex();
+
+    c->sendPacketMutex = get_new_mutex();
+    c->messageHandlersMutex = get_new_mutex();
+    c->resultHandlersMutex = get_new_mutex();
 
 }
 
@@ -262,6 +274,7 @@ int deliverMessage(Client* c, MQTTString* topicName, MQTTMessage* message)
     int rc = FAILURE;
 
     // we have to find the right message handler - indexed by topic
+    c->messageHandlersMutex->lock(c->messageHandlersMutex);
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {
         if (c->messageHandlers[i].topicFilter != 0 && (MQTTPacket_equals(topicName, (char*)c->messageHandlers[i].topicFilter) ||
@@ -276,6 +289,7 @@ int deliverMessage(Client* c, MQTTString* topicName, MQTTMessage* message)
             }
         }
     }
+    c->messageHandlersMutex->unlock(c->messageHandlersMutex);
 
     if (rc == FAILURE && c->defaultMessageHandler != NULL)
     {
@@ -345,6 +359,8 @@ void cycle(Client* c)
                 if (rc == 0x80)
                 {
                     int i;
+
+                    c->messageHandlersMutex->lock(c->messageHandlersMutex);
                     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
                     {
                         if (c->messageHandlers[i].msgId == msgId)
@@ -353,6 +369,7 @@ void cycle(Client* c)
                             break;
                         }
                     }
+                    c->messageHandlersMutex->unlock(c->messageHandlersMutex);
                 }
 
                 break;
@@ -489,6 +506,8 @@ int MQTTSubscribe(Client* c,
      */
     {
         int i;
+
+        c->messageHandlersMutex->lock(c->messageHandlersMutex);
         for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
         {
             if (c->messageHandlers[i].topicFilter == 0)
@@ -500,6 +519,7 @@ int MQTTSubscribe(Client* c,
                 break;
             }
          }
+        c->messageHandlersMutex->unlock(c->messageHandlersMutex);
     }
 
     if ((rc = sendPacket(c, buf, len)) != SUCCESS) // send the subscribe packet

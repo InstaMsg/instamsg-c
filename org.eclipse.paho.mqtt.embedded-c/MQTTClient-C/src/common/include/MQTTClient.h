@@ -104,7 +104,10 @@ struct Client {
 
     void (*defaultMessageHandler) (MessageData*);
     int (*onConnectCallback)();
-    struct Mutex *mtx;
+
+    struct Mutex *sendPacketMutex;
+    struct Mutex *messageHandlersMutex;
+    struct Mutex *resultHandlersMutex;
 
     Network* ipstack;
 };
