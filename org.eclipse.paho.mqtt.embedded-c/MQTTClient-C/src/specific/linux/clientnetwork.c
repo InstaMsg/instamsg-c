@@ -40,7 +40,6 @@
 
 int linux_read(Network*, unsigned char*, int);
 int linux_write(Network*, unsigned char*, int);
-void linux_disconnect(Network*);
 
 
 #define GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network) ((int *)(network->physical_medium))
@@ -75,12 +74,6 @@ int linux_write(Network* n, unsigned char* buffer, int len)
 {
 	int	rc = write(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)), buffer, len);
 	return rc;
-}
-
-
-void linux_disconnect(Network* n)
-{
-	close(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)));
 }
 
 
@@ -143,7 +136,6 @@ Network* get_new_network()
 
 	network->mqttread = linux_read;
 	network->mqttwrite = linux_write;
-	network->disconnect = linux_disconnect;
 
     ConnectNetwork(network);
 
@@ -152,6 +144,10 @@ Network* get_new_network()
 
 void release_network(Network *n)
 {
+    // Close the socket
+    close(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)));
+
+    // Free the dynamically-allocated memory
     free(n->physical_medium);
     free(n);
 
