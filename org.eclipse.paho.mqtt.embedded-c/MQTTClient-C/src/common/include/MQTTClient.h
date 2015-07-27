@@ -115,6 +115,8 @@ void* clientTimerThread(Client *c);
 void* keepAliveThread(Client *c);
 void readPacketThread(Client *c);
 
-#define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}
+extern unsigned int INSTAMSG_RESULT_HANDLER_TIMEOUT;
+#define SEND_BUFFER_SIZE 100
 
+#define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}
 #endif

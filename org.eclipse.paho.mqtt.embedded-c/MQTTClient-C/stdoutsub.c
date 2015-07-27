@@ -53,7 +53,6 @@
 
 
 volatile int toStop = 0;
-unsigned int INSTAMSG_RESULT_HANDLER_TIMEOUT = 10;
 
 Network n;
 Client c;

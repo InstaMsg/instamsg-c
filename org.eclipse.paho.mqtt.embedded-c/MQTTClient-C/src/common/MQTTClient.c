@@ -17,7 +17,8 @@
 #include "./include/MQTTClient.h"
 #include <string.h>
 
-#define SEND_BUFFER_SIZE 100
+
+unsigned int INSTAMSG_RESULT_HANDLER_TIMEOUT = 10;
 
 void* clientTimerThread(Client *c)
 {
@@ -65,6 +66,12 @@ void* keepAliveThread(Client *c)
         thread_sleep(c->keepAliveInterval);
     }
 }
+
+void publishQoS2CycleCompleted(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
+{
+    printf("PUBCOMP received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
+}
+
 
 void NewMessageData(MessageData* md, MQTTString* aTopicName, MQTTMessage* aMessgage) {
     md->topicName = aTopicName;
@@ -350,7 +357,6 @@ void readPacketThread(Client* c)
             case PUBACK:
             {
                 fireResultHandlerUsingMsgIdAsTheKey(c);
-
                 break;
             }
 
@@ -431,8 +437,11 @@ void readPacketThread(Client* c)
                 if ((len = MQTTSerialize_ack(buf, SEND_BUFFER_SIZE, PUBREL, 0, msgId)) <= 0)
                 {
                     rc = FAILURE;
+                    goto exit;
                 }
-                else if ((rc = sendPacket(c, buf, len)) != SUCCESS) // send the PUBREL packet
+                attachResultHandler(c, msgId, INSTAMSG_RESULT_HANDLER_TIMEOUT, publishQoS2CycleCompleted);
+
+                if ((rc = sendPacket(c, buf, len)) != SUCCESS) // send the PUBREL packet
                 {
                     rc = FAILURE; // there was a problem
                 }
@@ -445,13 +454,13 @@ void readPacketThread(Client* c)
 
             case PUBCOMP:
             {
+                fireResultHandlerUsingMsgIdAsTheKey(c);
                 break;
             }
 
             case PINGRESP:
             {
                 printf("PINGRESP received... relations are intact !!\n");
-
                 break;
             }
         }
