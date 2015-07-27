@@ -77,13 +77,12 @@ int MQTTYield (Client*, int);
 
 void setDefaultMessageHandler(Client*, messageHandler);
 
-void MQTTClient(Client*, Network*, unsigned int, unsigned char*, size_t, unsigned char*, size_t, int (*onConnect)());
+void MQTTClient(Client*, Network*, unsigned int, unsigned char*, size_t, int (*onConnect)());
 
 struct Client {
     unsigned int next_packetid;
     unsigned int command_timeout_ms;
-    size_t buf_size, readbuf_size;
-    unsigned char *buf;
+    size_t readbuf_size;
     unsigned char *readbuf;
     unsigned int keepAliveInterval;
     char ping_outstanding;
