@@ -20,71 +20,26 @@
 
 unsigned int INSTAMSG_RESULT_HANDLER_TIMEOUT = 10;
 
-void* clientTimerThread(Client *c)
-{
-    while(1)
-    {
-        unsigned int sleepIntervalSeconds = 1;
-        thread_sleep(sleepIntervalSeconds);
 
-        int i;
-
-        c->resultHandlersMutex->lock(c->resultHandlersMutex);
-        for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
-        {
-            if (c->resultHandlers[i].msgId > 0)
-            {
-                if(c->resultHandlers[i].timeout > (sleepIntervalSeconds * 1000))
-                {
-                    c->resultHandlers[i].timeout = c->resultHandlers[i].timeout - (sleepIntervalSeconds * 1000);
-                }
-                else
-                {
-                    printf("No result obtained for msgId [%u] in the specified period\n", c->resultHandlers[i].msgId);
-                    c->resultHandlers[i].msgId = 0;
-                }
-
-                break;
-            }
-        }
-        c->resultHandlersMutex->unlock(c->resultHandlersMutex);
-    }
-
-}
-
-void* keepAliveThread(Client *c)
-{
-    while(1)
-    {
-        unsigned char buf[1000];
-        int len = MQTTSerialize_pingreq(buf, 1000);
-        if (len > 0)
-        {
-            sendPacket(c, buf, len);
-        }
-
-        thread_sleep(c->keepAliveInterval);
-    }
-}
-
-void publishQoS2CycleCompleted(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
+static void publishQoS2CycleCompleted(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
     printf("PUBCOMP received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
 }
 
 
-void NewMessageData(MessageData* md, MQTTString* aTopicName, MQTTMessage* aMessgage) {
+static void NewMessageData(MessageData* md, MQTTString* aTopicName, MQTTMessage* aMessgage) {
     md->topicName = aTopicName;
     md->message = aMessgage;
 }
 
 
-int getNextPacketId(Client *c) {
+static int getNextPacketId(Client *c) {
     int id = c->next_packetid = (c->next_packetid == MAX_PACKET_ID) ? 1 : c->next_packetid + 1;
     return id;
 }
 
-void attachResultHandler(Client *c, int msgId, unsigned int timeout, void (*resultHandler)(MQTTFixedHeaderPlusMsgId *))
+
+static void attachResultHandler(Client *c, int msgId, unsigned int timeout, void (*resultHandler)(MQTTFixedHeaderPlusMsgId *))
 {
     int i;
 
@@ -103,7 +58,8 @@ void attachResultHandler(Client *c, int msgId, unsigned int timeout, void (*resu
     c->resultHandlersMutex->unlock(c->resultHandlersMutex);
 }
 
-void fireResultHandlerAndRemove(Client *c, MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
+
+static void fireResultHandlerAndRemove(Client *c, MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
     int i;
 
@@ -121,7 +77,8 @@ void fireResultHandlerAndRemove(Client *c, MQTTFixedHeaderPlusMsgId *fixedHeader
     c->resultHandlersMutex->unlock(c->resultHandlersMutex);
 }
 
-int sendPacket(Client *c, unsigned char *buf, int length)
+
+static int sendPacket(Client *c, unsigned char *buf, int length)
 {
     c->sendPacketMutex->lock(c->sendPacketMutex);
 
@@ -153,39 +110,7 @@ int sendPacket(Client *c, unsigned char *buf, int length)
 }
 
 
-void MQTTClient(Client* c, Network* network, unsigned int command_timeout_ms,
-                unsigned char* readbuf, size_t readbuf_size,
-                int (*onConnect)())
-{
-    int i;
-    c->ipstack = network;
-
-    for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
-    {
-        c->messageHandlers[i].msgId = 0;
-        c->messageHandlers[i].topicFilter = 0;
-
-        c->resultHandlers[i].msgId = 0;
-        c->resultHandlers[i].timeout = 0;
-    }
-
-    c->command_timeout_ms = command_timeout_ms;
-    c->readbuf = readbuf;
-    c->readbuf_size = readbuf_size;
-    c->isconnected = 0;
-    c->keepAliveInterval = 0;
-    c->defaultMessageHandler = NULL;
-    c->next_packetid = MAX_PACKET_ID;
-    c->onConnectCallback = onConnect;
-
-    c->sendPacketMutex = get_new_mutex();
-    c->messageHandlersMutex = get_new_mutex();
-    c->resultHandlersMutex = get_new_mutex();
-
-}
-
-
-int decodePacket(Client* c, int* value)
+static int decodePacket(Client* c, int* value)
 {
     unsigned char i;
     int multiplier = 1;
@@ -213,7 +138,7 @@ exit:
 }
 
 
-int readPacket(Client* c, MQTTFixedHeader *fixedHeader)
+static int readPacket(Client* c, MQTTFixedHeader *fixedHeader)
 {
     int rc = FAILURE;
     MQTTHeader header = {0};
@@ -246,7 +171,7 @@ exit:
 // assume topic filter and name is in correct format
 // # can only be at end
 // + and # can only be next to separator
-char isTopicMatched(char* topicFilter, MQTTString* topicName)
+static char isTopicMatched(char* topicFilter, MQTTString* topicName)
 {
     char* curf = topicFilter;
     char* curn = topicName->lenstring.data;
@@ -274,7 +199,7 @@ char isTopicMatched(char* topicFilter, MQTTString* topicName)
 }
 
 
-int deliverMessage(Client* c, MQTTString* topicName, MQTTMessage* message)
+static int deliverMessage(Client* c, MQTTString* topicName, MQTTMessage* message)
 {
     int i;
     int rc = FAILURE;
@@ -308,7 +233,8 @@ int deliverMessage(Client* c, MQTTString* topicName, MQTTMessage* message)
     return rc;
 }
 
-int fireResultHandlerUsingMsgIdAsTheKey(Client *c)
+
+static int fireResultHandlerUsingMsgIdAsTheKey(Client *c)
 {
     int msgId = -1;
 
@@ -320,6 +246,87 @@ int fireResultHandlerUsingMsgIdAsTheKey(Client *c)
     }
 
     return msgId;
+}
+
+
+void* clientTimerThread(Client *c)
+{
+    while(1)
+    {
+        unsigned int sleepIntervalSeconds = 1;
+        thread_sleep(sleepIntervalSeconds);
+
+        int i;
+
+        c->resultHandlersMutex->lock(c->resultHandlersMutex);
+        for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
+        {
+            if (c->resultHandlers[i].msgId > 0)
+            {
+                if(c->resultHandlers[i].timeout > (sleepIntervalSeconds * 1000))
+                {
+                    c->resultHandlers[i].timeout = c->resultHandlers[i].timeout - (sleepIntervalSeconds * 1000);
+                }
+                else
+                {
+                    printf("No result obtained for msgId [%u] in the specified period\n", c->resultHandlers[i].msgId);
+                    c->resultHandlers[i].msgId = 0;
+                }
+
+                break;
+            }
+        }
+        c->resultHandlersMutex->unlock(c->resultHandlersMutex);
+    }
+
+}
+
+
+void* keepAliveThread(Client *c)
+{
+    while(1)
+    {
+        unsigned char buf[1000];
+        int len = MQTTSerialize_pingreq(buf, 1000);
+        if (len > 0)
+        {
+            sendPacket(c, buf, len);
+        }
+
+        thread_sleep(c->keepAliveInterval);
+    }
+}
+
+
+void MQTTClient(Client* c, Network* network, unsigned int command_timeout_ms,
+                unsigned char* readbuf, size_t readbuf_size,
+                int (*onConnect)())
+{
+    int i;
+    c->ipstack = network;
+
+    for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
+    {
+        c->messageHandlers[i].msgId = 0;
+        c->messageHandlers[i].topicFilter = 0;
+
+        c->resultHandlers[i].msgId = 0;
+        c->resultHandlers[i].timeout = 0;
+    }
+
+    c->command_timeout_ms = command_timeout_ms;
+    c->readbuf = readbuf;
+    c->readbuf_size = readbuf_size;
+    c->isconnected = 0;
+    c->keepAliveInterval = 0;
+    c->defaultMessageHandler = NULL;
+    c->next_packetid = MAX_PACKET_ID;
+    c->onConnectCallback = onConnect;
+
+    c->sendPacketMutex = get_new_mutex();
+    c->messageHandlersMutex = get_new_mutex();
+    c->resultHandlersMutex = get_new_mutex();
+
 }
 
 
