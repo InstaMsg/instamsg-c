@@ -1,3 +1,6 @@
+#ifndef INSTAMSG_TIME
+#define INSTAMSG_TIME
+
 typedef struct Timer Timer;
 struct Timer
 {
@@ -13,3 +16,5 @@ struct Timer
 
 Timer* get_new_timer();
 void release_timer(Timer*);
+
+#endif

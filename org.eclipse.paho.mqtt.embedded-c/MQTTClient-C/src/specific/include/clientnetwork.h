@@ -1,5 +1,6 @@
-#ifndef MQTT_NETWORK
-#define MQTT_NETWORK
+#ifndef INSTAMSG_NETWORK
+#define INSTAMSG_NETWORK
+
 typedef struct Network Network;
 struct Network
 {
@@ -11,4 +12,5 @@ struct Network
 
 Network* get_new_network();
 void release_network(Network*);
+
 #endif
