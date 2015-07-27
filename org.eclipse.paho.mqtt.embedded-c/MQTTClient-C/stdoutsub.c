@@ -114,14 +114,14 @@ static int onConnect()
 	if(opts.subscribe == 1)
 	{
     	printf("Subscribing to %s\n", topic);
-		rc = MQTTSubscribe(&c, topic, opts.qos, messageArrived, subscribeAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT);
+		rc = MQTTSubscribe(&c, topic, opts.qos, messageArrived, subscribeAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS);
 		printf("Subscribed %d\n", rc);
 	}
 
 	if(opts.publish == 1)
 	{
 		printf("Publishing message [%s] to %s\n", opts.msg, topic);
-		rc = MQTTPublish(&c, topic, (const char*)opts.msg, opts.qos, 0, publishAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT, 0, 1);
+		rc = MQTTPublish(&c, topic, (const char*)opts.msg, opts.qos, 0, publishAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS, 0, 1);
 		printf("Published %d\n", rc);
 	}
 
@@ -282,7 +282,7 @@ int main(int argc, char** argv)
 	NewNetwork(&n);
 	ConnectNetwork(&n, opts.host, opts.port);
 
-	initInstaMsg(&c, &n, 100, onConnect, onDisconnect, NULL);
+	initInstaMsg(&c, &n, onConnect, onDisconnect, NULL);
 	MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
 	data.willFlag = 0;
 	data.MQTTVersion = 3;

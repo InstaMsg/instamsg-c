@@ -17,9 +17,7 @@
 #include "include/instamsg.h"
 #include <string.h>
 
-
-unsigned int INSTAMSG_RESULT_HANDLER_TIMEOUT = 10;
-
+unsigned int INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS = 10;
 
 static void publishQoS2CycleCompleted(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
@@ -301,7 +299,6 @@ void* keepAliveThread(InstaMsg *c)
 //self, clientId, authKey, connectHandler, disConnectHandler, oneToOneMessageHandler, options={})
 void initInstaMsg(InstaMsg* c,
                   Network* network,
-                  unsigned int command_timeout_ms,
                   int (*connectHandler)(),
                   int (*disconnectHandler)(),
                   int (*oneToOneMessageHandler)())
@@ -318,7 +315,6 @@ void initInstaMsg(InstaMsg* c,
         c->resultHandlers[i].timeout = 0;
     }
 
-    c->command_timeout_ms = command_timeout_ms;
     c->isconnected = 0;
     c->keepAliveInterval = 0;
     c->defaultMessageHandler = NULL;
@@ -330,7 +326,6 @@ void initInstaMsg(InstaMsg* c,
     c->sendPacketMutex = get_new_mutex();
     c->messageHandlersMutex = get_new_mutex();
     c->resultHandlersMutex = get_new_mutex();
-
 }
 
 
@@ -450,7 +445,7 @@ void readPacketThread(InstaMsg* c)
                     rc = FAILURE;
                     goto exit;
                 }
-                attachResultHandler(c, msgId, INSTAMSG_RESULT_HANDLER_TIMEOUT, publishQoS2CycleCompleted);
+                attachResultHandler(c, msgId, INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS, publishQoS2CycleCompleted);
 
                 if ((rc = sendPacket(c, buf, len)) != SUCCESS) // send the PUBREL packet
                 {

@@ -53,7 +53,6 @@ typedef void (*messageHandler)(MessageData*);
 typedef struct InstaMsg InstaMsg;
 struct InstaMsg {
     unsigned int next_packetid;
-    unsigned int command_timeout_ms;
     unsigned char readbuf[MAX_BUFFER_SIZE];
     unsigned int keepAliveInterval;
     int isconnected;
@@ -111,7 +110,6 @@ void setDefaultMessageHandler(InstaMsg*, messageHandler);
 
 void initInstaMsg(InstaMsg *c,
                   Network* network,
-                  unsigned int command_timeout_ms,
                   int (*connectHandler)(),
                   int (*disconnectHandler)(),
                   int (*oneToOneMessageHandler)());
@@ -120,7 +118,7 @@ void* clientTimerThread(InstaMsg *c);
 void* keepAliveThread(InstaMsg *c);
 void readPacketThread(InstaMsg *c);
 
-extern unsigned int INSTAMSG_RESULT_HANDLER_TIMEOUT;
+extern unsigned int INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS;
 
 #define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}
 #endif
