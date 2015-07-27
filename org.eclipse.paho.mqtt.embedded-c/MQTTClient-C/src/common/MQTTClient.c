@@ -301,6 +301,20 @@ int deliverMessage(Client* c, MQTTString* topicName, MQTTMessage* message)
     return rc;
 }
 
+int fireResultHandlerUsingMsgIdAsTheKey(Client *c)
+{
+    int msgId = -1;
+
+    MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
+    if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, c->readbuf, c->readbuf_size) == SUCCESS)
+    {
+        msgId = fixedHeaderPlusMsgId.msgId;
+        fireResultHandlerAndRemove(c, &fixedHeaderPlusMsgId);
+    }
+
+    return msgId;
+}
+
 
 void readPacketThread(Client* c)
 {
@@ -334,16 +348,15 @@ void readPacketThread(Client* c)
             }
 
             case PUBACK:
-            case SUBACK:
             {
-                /*
-                * Fire the result-handler
-                */
-                MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
-                if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, c->readbuf, c->readbuf_size) == SUCCESS)
-                {
-                    fireResultHandlerAndRemove(c, &fixedHeaderPlusMsgId);
-                }
+                fireResultHandlerUsingMsgIdAsTheKey(c);
+
+                break;
+            }
+
+           case SUBACK:
+            {
+                fireResultHandlerUsingMsgIdAsTheKey(c);
 
                 /*
                 * Remove the message-handlers, if the server was unable to process the subscription-request.
@@ -412,21 +425,10 @@ void readPacketThread(Client* c)
 
             case PUBREC:
             {
-                MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
+                int msgId = fireResultHandlerUsingMsgIdAsTheKey(c);
+
                 char buf[SEND_BUFFER_SIZE];
-
-                if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, c->readbuf, c->readbuf_size) == SUCCESS)
-                {
-                    fireResultHandlerAndRemove(c, &fixedHeaderPlusMsgId);
-                }
-                else
-                {
-                    rc = FAILURE;
-                    goto exit;
-                }
-
-
-                if ((len = MQTTSerialize_ack(buf, SEND_BUFFER_SIZE, PUBREL, 0, fixedHeaderPlusMsgId.msgId)) <= 0)
+                if ((len = MQTTSerialize_ack(buf, SEND_BUFFER_SIZE, PUBREL, 0, msgId)) <= 0)
                 {
                     rc = FAILURE;
                 }
