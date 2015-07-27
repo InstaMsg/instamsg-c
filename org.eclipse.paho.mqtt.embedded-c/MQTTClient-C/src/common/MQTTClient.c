@@ -415,12 +415,26 @@ void readPacketThread(Client* c)
                 MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
                 char buf[SEND_BUFFER_SIZE];
 
-                if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, c->readbuf, c->readbuf_size) != SUCCESS)
+                if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, c->readbuf, c->readbuf_size) == SUCCESS)
+                {
+                    fireResultHandlerAndRemove(c, &fixedHeaderPlusMsgId);
+                }
+                else
+                {
                     rc = FAILURE;
-                else if ((len = MQTTSerialize_ack(buf, SEND_BUFFER_SIZE, PUBREL, 0, fixedHeaderPlusMsgId.msgId)) <= 0)
+                    goto exit;
+                }
+
+
+                if ((len = MQTTSerialize_ack(buf, SEND_BUFFER_SIZE, PUBREL, 0, fixedHeaderPlusMsgId.msgId)) <= 0)
+                {
                     rc = FAILURE;
+                }
                 else if ((rc = sendPacket(c, buf, len)) != SUCCESS) // send the PUBREL packet
+                {
                     rc = FAILURE; // there was a problem
+                }
+
                 if (rc == FAILURE)
                     goto exit; // there was a problem
 
