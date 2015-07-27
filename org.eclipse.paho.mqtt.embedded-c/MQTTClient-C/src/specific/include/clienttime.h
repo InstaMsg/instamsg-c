@@ -1,5 +1,4 @@
 typedef struct Timer Timer;
-
 struct Timer
 {
 

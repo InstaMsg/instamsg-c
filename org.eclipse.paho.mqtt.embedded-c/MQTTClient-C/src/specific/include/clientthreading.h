@@ -3,15 +3,16 @@ void thread_sleep(int seconds);
 
 #ifndef MQTT_MUTEX
 #define MQTT_MUTEX
+typedef struct Mutex Mutex;
 struct Mutex
 {
     void *obj;
 
-    void (*lock)(struct Mutex*);
-    void (*unlock)(struct Mutex*);
+    void (*lock)(Mutex*);
+    void (*unlock)(Mutex*);
 };
 
 
-struct Mutex* get_new_mutex();
-void release_mutex(struct Mutex*);
+Mutex* get_new_mutex();
+void release_mutex(Mutex*);
 #endif

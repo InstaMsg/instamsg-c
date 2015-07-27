@@ -43,6 +43,10 @@ int linux_write(Network*, unsigned char*, int);
 void linux_disconnect(Network*);
 
 
+#define GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network) ((int *)(network->physical_medium))
+#define HOSTNAME "localhost"
+#define PORT 1883
+
 #endif
 
 
@@ -51,7 +55,7 @@ int linux_read(Network* n, unsigned char* buffer, int len)
 	int bytes = 0;
 	while (bytes < len)
 	{
-		int rc = recv(n->my_socket, &buffer[bytes], (size_t)(len - bytes), 0);
+		int rc = recv(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)), &buffer[bytes], (size_t)(len - bytes), 0);
 		if (rc == -1)
 		{
 			if (errno != ENOTCONN && errno != ECONNRESET)
@@ -69,27 +73,18 @@ int linux_read(Network* n, unsigned char* buffer, int len)
 
 int linux_write(Network* n, unsigned char* buffer, int len)
 {
-	int	rc = write(n->my_socket, buffer, len);
+	int	rc = write(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)), buffer, len);
 	return rc;
 }
 
 
 void linux_disconnect(Network* n)
 {
-	close(n->my_socket);
+	close(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)));
 }
 
 
-void NewNetwork(Network* n)
-{
-	n->my_socket = 0;
-	n->mqttread = linux_read;
-	n->mqttwrite = linux_write;
-	n->disconnect = linux_disconnect;
-}
-
-
-int ConnectNetwork(Network* n, char* addr, int port)
+static int ConnectNetwork(Network* network)
 {
 	int type = SOCK_STREAM;
 	struct sockaddr_in address;
@@ -98,7 +93,7 @@ int ConnectNetwork(Network* n, char* addr, int port)
 	struct addrinfo *result = NULL;
 	struct addrinfo hints = {0, AF_UNSPEC, SOCK_STREAM, IPPROTO_TCP, 0, NULL, NULL, NULL};
 
-	if ((rc = getaddrinfo(addr, NULL, &hints, &result)) == 0)
+	if ((rc = getaddrinfo(HOSTNAME, NULL, &hints, &result)) == 0)
 	{
 		struct addrinfo* res = result;
 
@@ -115,7 +110,7 @@ int ConnectNetwork(Network* n, char* addr, int port)
 
 		if (result->ai_family == AF_INET)
 		{
-			address.sin_port = htons(port);
+			address.sin_port = htons(PORT);
 			address.sin_family = family = AF_INET;
 			address.sin_addr = ((struct sockaddr_in*)(result->ai_addr))->sin_addr;
 		}
@@ -127,13 +122,38 @@ int ConnectNetwork(Network* n, char* addr, int port)
 
 	if (rc == 0)
 	{
-		n->my_socket = socket(family, type, 0);
-		if (n->my_socket != -1)
+		*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)) = socket(family, type, 0);
+		if (*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)) != -1)
 		{
-			int opt = 1;			
-			rc = connect(n->my_socket, (struct sockaddr*)&address, sizeof(address));
+			int opt = 1;
+			rc = connect(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)), (struct sockaddr*)&address, sizeof(address));
 		}
 	}
 
 	return rc;
+}
+
+
+Network* get_new_network()
+{
+    Network *network = (Network*)malloc(sizeof(Network));
+
+    // Here, physical medium is a socket, and this represents the socket-id
+	network->physical_medium = malloc(sizeof(int));
+
+	network->mqttread = linux_read;
+	network->mqttwrite = linux_write;
+	network->disconnect = linux_disconnect;
+
+    ConnectNetwork(network);
+
+    return network;
+}
+
+void release_network(Network *n)
+{
+    free(n->physical_medium);
+    free(n);
+
+    printf("Complete Network, including the underlying physical-medium.. cleaned !!!!!\n");
 }

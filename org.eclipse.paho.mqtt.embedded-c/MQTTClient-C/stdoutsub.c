@@ -54,7 +54,6 @@
 
 volatile int toStop = 0;
 
-Network n;
 InstaMsg c;
 char *topic;
 
@@ -270,10 +269,8 @@ int main(int argc, char** argv)
 	signal(SIGINT, cfinish);
 	signal(SIGTERM, cfinish);
 
-	NewNetwork(&n);
-	ConnectNetwork(&n, opts.host, opts.port);
-
-	initInstaMsg(&c, &n, opts.clientid, opts.password, onConnect, onDisconnect, NULL);
+	Network *network = get_new_network();
+	initInstaMsg(&c, network, opts.clientid, opts.password, onConnect, onDisconnect, NULL);
 
     create_and_init_thread(clientTimerThread, &c);
     create_and_init_thread(keepAliveThread, &c);
@@ -285,6 +282,5 @@ int main(int argc, char** argv)
 	}
 
 	MQTTDisconnect(&c);
-	n.disconnect(&n);
 }
 

@@ -660,6 +660,8 @@ int MQTTDisconnect(InstaMsg* c)
         rc = sendPacket(c, buf, len);            // send the disconnect packet
 
     c->isconnected = 0;
+
+    release_network(c->ipstack);
     c->onDisconnectCallback();
 
     return rc;
