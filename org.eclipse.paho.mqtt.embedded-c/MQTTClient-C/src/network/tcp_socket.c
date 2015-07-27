@@ -35,6 +35,8 @@
 #include <signal.h>
 
 #include "include/network.h"
+#include "../threading/include/threading.h"
+#include "../../MQTTPacket/src/common.h"
 
 
 
@@ -77,11 +79,13 @@ int linux_write(Network* n, unsigned char* buffer, int len)
 }
 
 
-static int ConnectNetwork(Network* network)
+static void ConnectNetwork(Network* network)
 {
 	int type = SOCK_STREAM;
 	struct sockaddr_in address;
-	int rc = -1;
+
+	int rc = SUCCESS;
+
 	sa_family_t family = AF_INET;
 	struct addrinfo *result = NULL;
 	struct addrinfo hints = {0, AF_UNSPEC, SOCK_STREAM, IPPROTO_TCP, 0, NULL, NULL, NULL};
@@ -108,22 +112,24 @@ static int ConnectNetwork(Network* network)
 			address.sin_addr = ((struct sockaddr_in*)(result->ai_addr))->sin_addr;
 		}
 		else
-			rc = -1;
+			rc = FAILURE;
 
 		freeaddrinfo(result);
 	}
 
-	if (rc == 0)
+	if (rc == SUCCESS)
 	{
 		*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)) = socket(family, type, 0);
 		if (*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)) != -1)
 		{
 			int opt = 1;
-			rc = connect(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)), (struct sockaddr*)&address, sizeof(address));
+            while(connect(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)), (struct sockaddr*)&address, sizeof(address)) != 0)
+            {
+                printf("Could not connect to the network ... retrying\n");
+                thread_sleep(1);
+            }
 		}
 	}
-
-	return rc;
 }
 
 

@@ -33,7 +33,7 @@ extern "C" {
   #define DLLExport  
 #endif
 
-enum returnCode { BUFFER_OVERFLOW = -2, FAILURE = -1, SUCCESS = 0 };
+#include "common.h"
 enum QoS { QOS0, QOS1, QOS2 };
 
 enum errors
