@@ -233,8 +233,6 @@ void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 int main(int argc, char** argv)
 {
 	int rc = 0;
-	unsigned char buf[100];
-	unsigned char readbuf[100];
 
 	if (argc < 2)
 		usage();
@@ -253,7 +251,7 @@ int main(int argc, char** argv)
 	NewNetwork(&n);
 	ConnectNetwork(&n, opts.host, opts.port);
 
-	MQTTClient(&c, &n, 100, readbuf, 100, onConnect);
+	MQTTClient(&c, &n, 100, onConnect);
 	MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
 	data.willFlag = 0;
 	data.MQTTVersion = 3;

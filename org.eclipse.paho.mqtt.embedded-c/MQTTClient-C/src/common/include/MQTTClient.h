@@ -26,6 +26,7 @@
 
 #define MAX_PACKET_ID 30000
 #define MAX_MESSAGE_HANDLERS 5
+#define MAX_BUFFER_SIZE 100
 
 
 void NewTimer(Timer*);
@@ -53,8 +54,7 @@ typedef struct Client Client;
 struct Client {
     unsigned int next_packetid;
     unsigned int command_timeout_ms;
-    size_t readbuf_size;
-    unsigned char *readbuf;
+    unsigned char readbuf[MAX_BUFFER_SIZE];
     unsigned int keepAliveInterval;
     int isconnected;
 
@@ -105,18 +105,18 @@ int MQTTSubscribe(Client* c,
 
 int MQTTUnsubscribe (Client*, const char*);
 int MQTTDisconnect (Client*);
-int MQTTYield (Client*, int);
-
 void setDefaultMessageHandler(Client*, messageHandler);
 
-void MQTTClient(Client*, Network*, unsigned int, unsigned char*, size_t, int (*onConnect)());
+void MQTTClient(Client* c,
+                Network* network,
+                unsigned int command_timeout_ms,
+                int (*onConnect)());
 
 void* clientTimerThread(Client *c);
 void* keepAliveThread(Client *c);
 void readPacketThread(Client *c);
 
 extern unsigned int INSTAMSG_RESULT_HANDLER_TIMEOUT;
-#define SEND_BUFFER_SIZE 100
 
 #define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}
 #endif

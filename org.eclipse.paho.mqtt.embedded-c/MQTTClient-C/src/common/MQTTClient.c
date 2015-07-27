@@ -239,7 +239,7 @@ static int fireResultHandlerUsingMsgIdAsTheKey(Client *c)
     int msgId = -1;
 
     MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
-    if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, c->readbuf, c->readbuf_size) == SUCCESS)
+    if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, c->readbuf, MAX_BUFFER_SIZE) == SUCCESS)
     {
         msgId = fixedHeaderPlusMsgId.msgId;
         fireResultHandlerAndRemove(c, &fixedHeaderPlusMsgId);
@@ -298,8 +298,9 @@ void* keepAliveThread(Client *c)
 }
 
 
-void MQTTClient(Client* c, Network* network, unsigned int command_timeout_ms,
-                unsigned char* readbuf, size_t readbuf_size,
+void MQTTClient(Client* c,
+                Network* network,
+                unsigned int command_timeout_ms,
                 int (*onConnect)())
 {
     int i;
@@ -315,8 +316,6 @@ void MQTTClient(Client* c, Network* network, unsigned int command_timeout_ms,
     }
 
     c->command_timeout_ms = command_timeout_ms;
-    c->readbuf = readbuf;
-    c->readbuf_size = readbuf_size;
     c->isconnected = 0;
     c->keepAliveInterval = 0;
     c->defaultMessageHandler = NULL;
@@ -345,7 +344,7 @@ void readPacketThread(Client* c)
             {
                 unsigned char connack_rc = 255;
                 char sessionPresent = 0;
-                if (MQTTDeserialize_connack((unsigned char*)&sessionPresent, &connack_rc, c->readbuf, c->readbuf_size) == 1)
+                if (MQTTDeserialize_connack((unsigned char*)&sessionPresent, &connack_rc, c->readbuf, MAX_BUFFER_SIZE) == 1)
                 {
                     if(connack_rc == 0x00)  // Connection Accepted
                     {
@@ -377,7 +376,7 @@ void readPacketThread(Client* c)
                 int count = 0, grantedQoS = -1;
                 unsigned short msgId;
 
-                if (MQTTDeserialize_suback(&msgId, 1, &count, &grantedQoS, c->readbuf, c->readbuf_size) == 1)
+                if (MQTTDeserialize_suback(&msgId, 1, &count, &grantedQoS, c->readbuf, MAX_BUFFER_SIZE) == 1)
                     rc = grantedQoS; // 0, 1, 2 or 0x80
 
                 if (rc == 0x80)
@@ -408,7 +407,7 @@ void readPacketThread(Client* c)
                                             (unsigned char**)&msg.payload,
                                             (int*)&msg.payloadlen,
                                             c->readbuf,
-                                            c->readbuf_size) != SUCCESS)
+                                            MAX_BUFFER_SIZE) != SUCCESS)
                 {
                     goto exit;
                 }
@@ -418,12 +417,12 @@ void readPacketThread(Client* c)
                 enum QoS qos = msg.fixedHeaderPlusMsgId.fixedHeader.qos;
                 if (qos != QOS0)
                 {
-                    char buf[SEND_BUFFER_SIZE];
+                    char buf[MAX_BUFFER_SIZE];
 
                     if (qos == QOS1)
-                        len = MQTTSerialize_ack(buf, SEND_BUFFER_SIZE, PUBACK, 0, msg.fixedHeaderPlusMsgId.msgId);
+                        len = MQTTSerialize_ack(buf, MAX_BUFFER_SIZE, PUBACK, 0, msg.fixedHeaderPlusMsgId.msgId);
                     else if (qos == QOS2)
-                        len = MQTTSerialize_ack(buf, SEND_BUFFER_SIZE, PUBREC, 0, msg.fixedHeaderPlusMsgId.msgId);
+                        len = MQTTSerialize_ack(buf, MAX_BUFFER_SIZE, PUBREC, 0, msg.fixedHeaderPlusMsgId.msgId);
                     if (len <= 0)
                         rc = FAILURE;
                     else
@@ -440,8 +439,8 @@ void readPacketThread(Client* c)
             {
                 int msgId = fireResultHandlerUsingMsgIdAsTheKey(c);
 
-                char buf[SEND_BUFFER_SIZE];
-                if ((len = MQTTSerialize_ack(buf, SEND_BUFFER_SIZE, PUBREL, 0, msgId)) <= 0)
+                char buf[MAX_BUFFER_SIZE];
+                if ((len = MQTTSerialize_ack(buf, MAX_BUFFER_SIZE, PUBREL, 0, msgId)) <= 0)
                 {
                     rc = FAILURE;
                     goto exit;
@@ -481,7 +480,7 @@ exit:
 int MQTTConnect(Client* c, MQTTPacket_connectData* options)
 {
     int rc = FAILURE;
-    char buf[SEND_BUFFER_SIZE];
+    char buf[MAX_BUFFER_SIZE];
 
     MQTTPacket_connectData default_options = MQTTPacket_connectData_initializer;
     int len = 0;
@@ -494,7 +493,7 @@ int MQTTConnect(Client* c, MQTTPacket_connectData* options)
 
     c->keepAliveInterval = options->keepAliveInterval;
 
-    if ((len = MQTTSerialize_connect(buf, SEND_BUFFER_SIZE, options)) <= 0)
+    if ((len = MQTTSerialize_connect(buf, MAX_BUFFER_SIZE, options)) <= 0)
         goto exit;
     if ((rc = sendPacket(c, buf, len)) != SUCCESS)  // send the connect packet
         goto exit; // there was a problem
@@ -515,7 +514,7 @@ int MQTTSubscribe(Client* c,
     int rc = FAILURE;
     int len = 0;
     int id;
-    char buf[SEND_BUFFER_SIZE];
+    char buf[MAX_BUFFER_SIZE];
 
     MQTTString topic = MQTTString_initializer;
     topic.cstring = (char *)topicName;
@@ -524,7 +523,7 @@ int MQTTSubscribe(Client* c,
         goto exit;
 
     id = getNextPacketId(c);
-    len = MQTTSerialize_subscribe(buf, SEND_BUFFER_SIZE, 0, id, 1, &topic, (int*)&qos);
+    len = MQTTSerialize_subscribe(buf, MAX_BUFFER_SIZE, 0, id, 1, &topic, (int*)&qos);
     if (len <= 0)
         goto exit;
 
@@ -565,7 +564,7 @@ exit:
 int MQTTUnsubscribe(Client* c, const char* topicFilter)
 {
     int rc = FAILURE;
-    char buf[SEND_BUFFER_SIZE];
+    char buf[MAX_BUFFER_SIZE];
 
     MQTTString topic = MQTTString_initializer;
     topic.cstring = (char *)topicFilter;
@@ -574,7 +573,7 @@ int MQTTUnsubscribe(Client* c, const char* topicFilter)
     if (!c->isconnected)
         goto exit;
 
-    if ((len = MQTTSerialize_unsubscribe(buf, SEND_BUFFER_SIZE, 0, getNextPacketId(c), 1, &topic)) <= 0)
+    if ((len = MQTTSerialize_unsubscribe(buf, MAX_BUFFER_SIZE, 0, getNextPacketId(c), 1, &topic)) <= 0)
         goto exit;
     if ((rc = sendPacket(c, buf, len)) != SUCCESS) // send the subscribe packet
         goto exit; // there was a problem
@@ -595,7 +594,7 @@ int MQTTPublish(Client* c,
                 const char logging)
 {
     int rc = FAILURE;
-    char buf[SEND_BUFFER_SIZE];
+    char buf[MAX_BUFFER_SIZE];
 
     MQTTString topic = MQTTString_initializer;
     topic.cstring = (char *)topicName;
@@ -616,7 +615,7 @@ int MQTTPublish(Client* c,
         attachResultHandler(c, id, resultHandlerTimeout, resultHandler);
     }
 
-    len = MQTTSerialize_publish(buf, SEND_BUFFER_SIZE, 0, qos, retain, id, topic, (unsigned char*)payload, strlen(payload) + 1);
+    len = MQTTSerialize_publish(buf, MAX_BUFFER_SIZE, 0, qos, retain, id, topic, (unsigned char*)payload, strlen(payload) + 1);
     if (len <= 0)
         goto exit;
     if ((rc = sendPacket(c, buf, len)) != SUCCESS) // send the subscribe packet
@@ -637,9 +636,9 @@ exit:
 int MQTTDisconnect(Client* c)
 {
     int rc = FAILURE;
-    char buf[SEND_BUFFER_SIZE];
+    char buf[MAX_BUFFER_SIZE];
 
-    int len = MQTTSerialize_disconnect(buf, SEND_BUFFER_SIZE);
+    int len = MQTTSerialize_disconnect(buf, MAX_BUFFER_SIZE);
     if (len > 0)
         rc = sendPacket(c, buf, len);            // send the disconnect packet
 
