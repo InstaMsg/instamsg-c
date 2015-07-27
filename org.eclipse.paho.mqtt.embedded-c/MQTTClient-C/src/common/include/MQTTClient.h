@@ -50,35 +50,6 @@ struct MessageData
 typedef void (*messageHandler)(MessageData*);
 
 typedef struct Client Client;
-
-int MQTTConnect (Client*, MQTTPacket_connectData*);
-
-int MQTTPublish(Client* c,
-                const char* topicName,
-                const char* payload,
-                const enum QoS qos,
-                const char dup,
-                void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
-                unsigned int resultHandlerTimeout,
-                const char retain,
-                const char logging);
-
-
-int MQTTSubscribe(Client* c,
-                  const char* topicName,
-                  const enum QoS qos,
-                  messageHandler messageHandler,
-                  void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
-                  unsigned int resultHandlerTimeout);
-
-int MQTTUnsubscribe (Client*, const char*);
-int MQTTDisconnect (Client*);
-int MQTTYield (Client*, int);
-
-void setDefaultMessageHandler(Client*, messageHandler);
-
-void MQTTClient(Client*, Network*, unsigned int, unsigned char*, size_t, int (*onConnect)());
-
 struct Client {
     unsigned int next_packetid;
     unsigned int command_timeout_ms;
@@ -110,6 +81,35 @@ struct Client {
 
     Network* ipstack;
 };
+
+
+int MQTTConnect (Client*, MQTTPacket_connectData*);
+
+int MQTTPublish(Client* c,
+                const char* topicName,
+                const char* payload,
+                const enum QoS qos,
+                const char dup,
+                void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
+                unsigned int resultHandlerTimeout,
+                const char retain,
+                const char logging);
+
+
+int MQTTSubscribe(Client* c,
+                  const char* topicName,
+                  const enum QoS qos,
+                  messageHandler messageHandler,
+                  void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
+                  unsigned int resultHandlerTimeout);
+
+int MQTTUnsubscribe (Client*, const char*);
+int MQTTDisconnect (Client*);
+int MQTTYield (Client*, int);
+
+void setDefaultMessageHandler(Client*, messageHandler);
+
+void MQTTClient(Client*, Network*, unsigned int, unsigned char*, size_t, int (*onConnect)());
 
 void* clientTimerThread(Client *c);
 void* keepAliveThread(Client *c);
