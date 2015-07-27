@@ -354,7 +354,7 @@ void readPacketThread(Client* c)
                 break;
             }
 
-           case SUBACK:
+            case SUBACK:
             {
                 fireResultHandlerUsingMsgIdAsTheKey(c);
 
@@ -444,8 +444,9 @@ void readPacketThread(Client* c)
             }
 
             case PUBCOMP:
-
+            {
                 break;
+            }
 
             case PINGRESP:
             {
