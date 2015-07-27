@@ -108,11 +108,11 @@ int MQTTUnsubscribe (InstaMsg*, const char*);
 int MQTTDisconnect (InstaMsg*);
 void setDefaultMessageHandler(InstaMsg*, messageHandler);
 
-void MQTTClient(InstaMsg *c,
-                Network* network,
-                unsigned int command_timeout_ms,
-                int (*connectHandler)(),
-                int (*disconnectHandler)());
+void initInstaMsg(InstaMsg *c,
+                  Network* network,
+                  unsigned int command_timeout_ms,
+                  int (*connectHandler)(),
+                  int (*disconnectHandler)());
 
 void* clientTimerThread(InstaMsg *c);
 void* keepAliveThread(InstaMsg *c);

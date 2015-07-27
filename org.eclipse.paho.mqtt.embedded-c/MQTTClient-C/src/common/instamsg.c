@@ -14,7 +14,7 @@
  *    Allan Stockdill-Mander/Ian Craggs - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-#include "./include/MQTTClient.h"
+#include "include/instamsg.h"
 #include <string.h>
 
 
@@ -299,11 +299,11 @@ void* keepAliveThread(InstaMsg *c)
 
 
 //self, clientId, authKey, connectHandler, disConnectHandler, oneToOneMessageHandler, options={})
-void MQTTClient(InstaMsg* c,
-                Network* network,
-                unsigned int command_timeout_ms,
-                int (*connectHandler)(),
-                int (*disconnectHandler)())
+void initInstaMsg(InstaMsg* c,
+                  Network* network,
+                  unsigned int command_timeout_ms,
+                  int (*connectHandler)(),
+                  int (*disconnectHandler)())
 {
     int i;
     c->ipstack = network;

@@ -41,7 +41,7 @@
 
 */
 #include <stdio.h>
-#include "src/common/include/MQTTClient.h"
+#include "src/common/include/instamsg.h"
 #include "src/specific/include/clientthreading.h"
 
 #include <stdio.h>
@@ -282,7 +282,7 @@ int main(int argc, char** argv)
 	NewNetwork(&n);
 	ConnectNetwork(&n, opts.host, opts.port);
 
-	MQTTClient(&c, &n, 100, onConnect, onDisconnect);
+	initInstaMsg(&c, &n, 100, onConnect, onDisconnect);
 	MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
 	data.willFlag = 0;
 	data.MQTTVersion = 3;
