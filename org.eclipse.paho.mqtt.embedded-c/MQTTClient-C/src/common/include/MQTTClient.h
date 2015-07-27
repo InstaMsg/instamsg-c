@@ -85,7 +85,6 @@ struct Client {
     size_t readbuf_size;
     unsigned char *readbuf;
     unsigned int keepAliveInterval;
-    char ping_outstanding;
     int isconnected;
 
     struct MessageHandlers

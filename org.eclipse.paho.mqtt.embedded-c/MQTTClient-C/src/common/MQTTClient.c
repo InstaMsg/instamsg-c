@@ -167,7 +167,6 @@ void MQTTClient(Client* c, Network* network, unsigned int command_timeout_ms,
     c->readbuf_size = readbuf_size;
     c->isconnected = 0;
     c->keepAliveInterval = 0;
-    c->ping_outstanding = 0;
     c->defaultMessageHandler = NULL;
     c->next_packetid = MAX_PACKET_ID;
     c->onConnectCallback = onConnect;
@@ -434,9 +433,11 @@ void cycle(Client* c)
                 break;
 
             case PINGRESP:
-                c->ping_outstanding = 0;
+            {
+                printf("PINGRESP received... relations are intact !!\n");
 
                 break;
+            }
         }
 
 exit:
