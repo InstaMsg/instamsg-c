@@ -87,7 +87,7 @@ struct InstaMsg {
 };
 
 
-void MQTTConnect (InstaMsg*, MQTTPacket_connectData*);
+void MQTTConnect (InstaMsg*);
 
 int MQTTPublish(InstaMsg *c,
                 const char *topicName,

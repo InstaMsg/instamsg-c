@@ -333,7 +333,7 @@ void initInstaMsg(InstaMsg* c,
 	c->connectOptions.password.cstring = authKey;
 	c->connectOptions.cleansession = 1;
 
-    MQTTConnect(c, &(c->connectOptions));
+    MQTTConnect(c);
 }
 
 
@@ -481,11 +481,9 @@ exit:
 }
 
 
-void MQTTConnect(InstaMsg* c, MQTTPacket_connectData* options)
+void MQTTConnect(InstaMsg* c)
 {
     char buf[MAX_BUFFER_SIZE];
-
-    MQTTPacket_connectData default_options = MQTTPacket_connectData_initializer;
     int len = 0;
 
     if (c->isconnected) // don't send connect packet again if we are already connected
@@ -494,10 +492,7 @@ void MQTTConnect(InstaMsg* c, MQTTPacket_connectData* options)
         return;
     }
 
-    if (options == 0)
-        options = &default_options; // set default options if none were supplied
-
-    if ((len = MQTTSerialize_connect(buf, MAX_BUFFER_SIZE, options)) <= 0)
+    if ((len = MQTTSerialize_connect(buf, MAX_BUFFER_SIZE, &(c->connectOptions))) <= 0)
     {
         return;
     }
