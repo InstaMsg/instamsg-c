@@ -14,9 +14,6 @@
  *    Allan Stockdill-Mander - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-#ifndef __MQTT_LINUX_
-#define __MQTT_LINUX_
-
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/param.h>
@@ -34,7 +31,7 @@
 #include <string.h>
 #include <signal.h>
 
-#include "include/network.h"
+#include "include/tcp_socket.h"
 #include "../threading/include/threading.h"
 #include "../../MQTTPacket/src/common.h"
 
@@ -44,11 +41,10 @@ static void linux_read(Network* n, unsigned char* buffer, int len);
 static void linux_write(Network* n, unsigned char* buffer, int len);
 
 
-#define GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network) ((int *)(network->physical_medium))
+#define GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network) ((int *)(network->medium))
 #define HOSTNAME "localhost"
 #define PORT 1883
 
-#endif
 
 
 static void connect_underlying_medium_guaranteed(Network* network)
@@ -173,7 +169,7 @@ Network* get_new_network()
     Network *network = (Network*)malloc(sizeof(Network));
 
     // Here, physical medium is a socket, and this represents the socket-id
-	network->physical_medium = malloc(sizeof(int));
+	network->medium = malloc(sizeof(int));
 
     // Register read-callback.
 	network->read = linux_read;
@@ -194,7 +190,7 @@ void release_network(Network *n)
     close(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)));
 
     // Free the dynamically-allocated memory
-    free(n->physical_medium);
+    free(n->medium);
     free(n);
 
     printf("Complete Network, including the underlying physical-medium.. cleaned !!!!!\n");

@@ -19,7 +19,7 @@
 
 #include "../../../../MQTTPacket/src/MQTTPacket.h"
 #include "../../time/include/time.h"
-#include "../../network/include/network.h"
+#include "../../communication/include/tcp_socket.h"
 #include "../../threading/include/threading.h"
 
 #include "stdio.h"
