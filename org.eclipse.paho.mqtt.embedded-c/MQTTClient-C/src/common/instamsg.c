@@ -321,20 +321,19 @@ void initInstaMsg(InstaMsg* c,
     c->resultHandlersMutex = get_new_mutex();
 
 
-	MQTTPacket_connectData connectOptions = MQTTPacket_connectData_initializer;
-	connectOptions.willFlag = 0;
-	connectOptions.MQTTVersion = 3;
+	c->connectOptions.willFlag = 0;
+	c->connectOptions.MQTTVersion = 3;
 
     strncpy(clientIdMachine, clientId, 23);
-	connectOptions.clientID.cstring = clientIdMachine;
+	c->connectOptions.clientID.cstring = clientIdMachine;
 
     strcpy(username, clientId + 24);
-	connectOptions.username.cstring = username;
+	c->connectOptions.username.cstring = username;
 
-	connectOptions.password.cstring = authKey;
-	connectOptions.cleansession = 1;
+	c->connectOptions.password.cstring = authKey;
+	c->connectOptions.cleansession = 1;
 
-    MQTTConnect(c, &connectOptions);
+    MQTTConnect(c, &(c->connectOptions));
 }
 
 

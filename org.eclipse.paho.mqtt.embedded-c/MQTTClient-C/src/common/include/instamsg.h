@@ -82,6 +82,8 @@ struct InstaMsg {
     struct Mutex *resultHandlersMutex;
 
     Network* ipstack;
+
+    MQTTPacket_connectData connectOptions;
 };
 
 

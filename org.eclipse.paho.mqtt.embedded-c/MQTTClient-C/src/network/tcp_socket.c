@@ -177,7 +177,6 @@ void linux_write_guaranteed(Network* n, unsigned char* buffer, int len)
 }
 
 
-
 Network* get_new_network()
 {
     Network *network = (Network*)malloc(sizeof(Network));
@@ -192,6 +191,7 @@ Network* get_new_network()
 
     return network;
 }
+
 
 void release_network(Network *n)
 {
