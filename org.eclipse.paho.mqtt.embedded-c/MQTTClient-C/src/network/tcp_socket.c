@@ -118,6 +118,7 @@ static void reinit_underlying_medium(int *bytes, Network *n, const char *mode)
 
     release_underlying_medium(n);
     connect_underlying_medium_guaranteed(n);
+    n->appInitCallback(n->appInitCallbackArg);
 }
 
 
@@ -177,16 +178,24 @@ void linux_write_guaranteed(Network* n, unsigned char* buffer, int len)
 }
 
 
-Network* get_new_network()
+Network* get_new_network(void* (*appInitCallback)(void *arg), void *appInitCallbackArg)
 {
     Network *network = (Network*)malloc(sizeof(Network));
 
     // Here, physical medium is a socket, and this represents the socket-id
 	network->physical_medium = malloc(sizeof(int));
 
+    // Must register the app-init-callback.
+    network->appInitCallback = appInitCallback;
+    network->appInitCallbackArg = appInitCallbackArg;
+
+    // Register read-callback.
 	network->read = linux_read;
+
+    // Register write-callback.
 	network->write_guaranteed = linux_write_guaranteed;
 
+    // Connect the medium (socket).
     connect_underlying_medium_guaranteed(network);
 
     return network;

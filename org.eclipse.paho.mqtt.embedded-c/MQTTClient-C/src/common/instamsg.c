@@ -123,7 +123,6 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     int len = 0;
     int rem_len = 0;
 
-    c->networkPhysicalMediumMutex->lock(c->networkPhysicalMediumMutex);
 
     /* 1. read the header byte.  This has the packet type in it
      *    (note that this function is guaranteed to succeed, since "ensure_guarantee has been passed as 1
@@ -150,7 +149,6 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     rc = SUCCESS;
 
 exit:
-    c->networkPhysicalMediumMutex->unlock(c->networkPhysicalMediumMutex);
     return rc;
 }
 
@@ -309,7 +307,6 @@ void initInstaMsg(InstaMsg* c,
         c->resultHandlers[i].timeout = 0;
     }
 
-    c->isconnected = 0;
     c->defaultMessageHandler = NULL;
     c->next_packetid = MAX_PACKET_ID;
     c->onConnectCallback = connectHandler;
@@ -356,7 +353,6 @@ void readPacketThread(InstaMsg* c)
                 {
                     if(connack_rc == 0x00)  // Connection Accepted
                     {
-                        c->isconnected = 1;
                         c->onConnectCallback();
                     }
                     else
@@ -481,23 +477,20 @@ exit:
 }
 
 
-void MQTTConnect(InstaMsg* c)
+void* MQTTConnect(void* arg)
 {
     char buf[MAX_BUFFER_SIZE];
     int len = 0;
 
-    if (c->isconnected) // don't send connect packet again if we are already connected
-    {
-        printf("Client is already connected.. not re-connecting\n");
-        return;
-    }
-
+    InstaMsg *c = (InstaMsg *)arg;
     if ((len = MQTTSerialize_connect(buf, MAX_BUFFER_SIZE, &(c->connectOptions))) <= 0)
     {
         return;
     }
 
     sendPacket(c, buf, len);
+
+    return NULL;
 }
 
 
@@ -515,9 +508,6 @@ int MQTTSubscribe(InstaMsg* c,
 
     MQTTString topic = MQTTString_initializer;
     topic.cstring = (char *)topicName;
-
-    if (!c->isconnected)
-        goto exit;
 
     id = getNextPacketId(c);
     len = MQTTSerialize_subscribe(buf, MAX_BUFFER_SIZE, 0, id, 1, &topic, (int*)&qos);
@@ -567,9 +557,6 @@ int MQTTUnsubscribe(InstaMsg* c, const char* topicFilter)
     topic.cstring = (char *)topicFilter;
     int len = 0;
 
-    if (!c->isconnected)
-        goto exit;
-
     if ((len = MQTTSerialize_unsubscribe(buf, MAX_BUFFER_SIZE, 0, getNextPacketId(c), 1, &topic)) <= 0)
         goto exit;
     if ((rc = sendPacket(c, buf, len)) != SUCCESS) // send the subscribe packet
@@ -597,9 +584,6 @@ int MQTTPublish(InstaMsg* c,
     topic.cstring = (char *)topicName;
     int len = 0;
     int id;
-
-    if (!c->isconnected)
-        goto exit;
 
     if (qos == QOS1 || qos == QOS2)
     {
@@ -638,8 +622,6 @@ int MQTTDisconnect(InstaMsg* c)
     int len = MQTTSerialize_disconnect(buf, MAX_BUFFER_SIZE);
     if (len > 0)
         rc = sendPacket(c, buf, len);            // send the disconnect packet
-
-    c->isconnected = 0;
 
     release_network(c->ipstack);
     c->onDisconnectCallback();

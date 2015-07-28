@@ -56,7 +56,6 @@ typedef struct InstaMsg InstaMsg;
 struct InstaMsg {
     unsigned int next_packetid;
     unsigned char readbuf[MAX_BUFFER_SIZE];
-    int isconnected;
 
     struct MessageHandlers
     {
@@ -87,7 +86,7 @@ struct InstaMsg {
 };
 
 
-void MQTTConnect (InstaMsg*);
+void* MQTTConnect(void* arg);
 
 int MQTTPublish(InstaMsg *c,
                 const char *topicName,

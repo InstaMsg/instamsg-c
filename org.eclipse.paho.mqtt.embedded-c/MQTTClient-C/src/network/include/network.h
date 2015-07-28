@@ -6,6 +6,9 @@ struct Network
 {
         void *physical_medium;
 
+        void* (*appInitCallback)(void*);
+        void *appInitCallbackArg;
+
         /*
          * While reading a packet, we do not know before hand how many bytes we wish to
          * read to read a complete packet (this happens in all TLV-based packet-formats.
@@ -35,7 +38,7 @@ struct Network
         void (*write_guaranteed)(Network* n, unsigned char* buffer, int len);
 };
 
-Network* get_new_network();
+Network* get_new_network(void* (*appInitCallback)(void *arg), void *appInitCallbackArg);
 void release_network(Network*);
 
 #endif

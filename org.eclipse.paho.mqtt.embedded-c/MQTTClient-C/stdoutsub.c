@@ -103,7 +103,7 @@ static void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 }
 
 
-static int onConnect()
+void* onConnectHandler(void *arg)
 {
     int rc;
     printf("Connected successfully\n");
@@ -118,12 +118,29 @@ static int onConnect()
 
 	if(opts.publish == 1)
 	{
-		printf("Publishing message [%s] to %s\n", opts.msg, topic);
-		rc = MQTTPublish(&c, topic, (const char*)opts.msg, opts.qos, 0, publishAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS, 0, 1);
-		printf("Published %d\n", rc);
+        while(1)
+        {
+            char buf[MAX_BUFFER_SIZE] = {0};
+
+            static int counter;
+            counter++;
+            sprintf(buf, "%s %d", opts.msg, counter);
+
+		    printf("Publishing message [%s] to %s\n", buf, topic);
+		    rc = MQTTPublish(&c, topic, (const char*)buf, opts.qos, 0, publishAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS, 0, 1);
+		    printf("Published %d\n", rc);
+
+            thread_sleep(3);
+        }
 	}
 
-	return 0;
+	return NULL;
+}
+
+
+static int onConnect()
+{
+    create_and_init_thread(onConnectHandler, NULL);
 }
 
 
@@ -269,7 +286,7 @@ int main(int argc, char** argv)
 	signal(SIGINT, cfinish);
 	signal(SIGTERM, cfinish);
 
-	Network *network = get_new_network();
+	Network *network = get_new_network(MQTTConnect, &c);
 	initInstaMsg(&c, network, opts.clientid, opts.password, onConnect, onDisconnect, NULL);
 
     create_and_init_thread(clientTimerThread, &c);
