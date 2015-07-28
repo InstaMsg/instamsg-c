@@ -31,7 +31,7 @@
 #include <string.h>
 #include <signal.h>
 
-#include "../include/tcp_socket.h"
+#include "../include/network.h"
 #include "../../threading/include/threading.h"
 #include "../../../../MQTTPacket/src/common.h"
 
