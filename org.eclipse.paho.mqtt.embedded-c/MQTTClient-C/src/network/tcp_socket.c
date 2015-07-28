@@ -40,8 +40,8 @@
 
 
 
-void linux_read(Network* n, unsigned char* buffer, int len);
-void linux_write(Network* n, unsigned char* buffer, int len);
+static void linux_read(Network* n, unsigned char* buffer, int len);
+static void linux_write(Network* n, unsigned char* buffer, int len);
 
 
 #define GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network) ((int *)(network->physical_medium))
@@ -116,7 +116,7 @@ static void connect_underlying_medium_guaranteed(Network* network)
 }
 
 
-void linux_read(Network* n, unsigned char* buffer, int len)
+static void linux_read(Network* n, unsigned char* buffer, int len)
 {
 	int bytes = 0;
     int rc = 0;
@@ -142,7 +142,7 @@ void linux_read(Network* n, unsigned char* buffer, int len)
 }
 
 
-void linux_write(Network* n, unsigned char* buffer, int len)
+static void linux_write(Network* n, unsigned char* buffer, int len)
 {
     int bytes = 0;
     int rc = 0;
