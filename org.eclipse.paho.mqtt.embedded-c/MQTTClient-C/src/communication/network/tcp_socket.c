@@ -31,14 +31,14 @@
 #include <string.h>
 #include <signal.h>
 
-#include "include/tcp_socket.h"
-#include "../threading/include/threading.h"
-#include "../../MQTTPacket/src/common.h"
+#include "../include/tcp_socket.h"
+#include "../../threading/include/threading.h"
+#include "../../../../MQTTPacket/src/common.h"
 
 
 
-static void linux_read(Network* n, unsigned char* buffer, int len);
-static void linux_write(Network* n, unsigned char* buffer, int len);
+static void tcp_socket_read(Network* n, unsigned char* buffer, int len);
+static void tcp_socket_write(Network* n, unsigned char* buffer, int len);
 
 
 #define GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network) ((int *)(network->medium))
@@ -112,7 +112,7 @@ static void connect_underlying_medium_guaranteed(Network* network)
 }
 
 
-static void linux_read(Network* n, unsigned char* buffer, int len)
+static void tcp_socket_read(Network* n, unsigned char* buffer, int len)
 {
 	int bytes = 0;
     int rc = 0;
@@ -138,7 +138,7 @@ static void linux_read(Network* n, unsigned char* buffer, int len)
 }
 
 
-static void linux_write(Network* n, unsigned char* buffer, int len)
+static void tcp_socket_write(Network* n, unsigned char* buffer, int len)
 {
     int bytes = 0;
     int rc = 0;
@@ -172,10 +172,10 @@ Network* get_new_network()
 	network->medium = malloc(sizeof(int));
 
     // Register read-callback.
-	network->read = linux_read;
+	network->read = tcp_socket_read;
 
     // Register write-callback.
-	network->write = linux_write;
+	network->write = tcp_socket_write;
 
     // Connect the medium (socket).
     connect_underlying_medium_guaranteed(network);
