@@ -137,7 +137,15 @@ int linux_read(Network* n, unsigned char* buffer, int len, char ensure_guarantee
             }
         }
 
-        bytes = bytes + rc;
+        // STRANGE: On Ubuntu 14.04, if "n" bytes are received successfully as one chunk, rc is 0 (and not "n") :(
+        if(rc == 0)
+        {
+            bytes = len;
+        }
+        else
+        {
+            bytes = bytes + rc;
+        }
 	}
 
     return SUCCESS;
@@ -156,7 +164,15 @@ void linux_write_guaranteed(Network* n, unsigned char* buffer, int len)
             reinit_underlying_medium(&bytes, n, "WRITING");
         }
 
-        bytes = bytes + rc;
+        // STRANGE: On Ubuntu 14.04, if "n" bytes are sent successfully as one chunk, rc is 0 (and not "n") :(
+        if(rc == 0)
+        {
+            bytes = len;
+        }
+        else
+        {
+            bytes = bytes + rc;
+        }
     }
 }
 

@@ -250,9 +250,9 @@ void* clientTimerThread(InstaMsg *c)
         {
             if (c->resultHandlers[i].msgId > 0)
             {
-                if(c->resultHandlers[i].timeout > (sleepIntervalSeconds * 1000))
+                if(c->resultHandlers[i].timeout > (sleepIntervalSeconds))
                 {
-                    c->resultHandlers[i].timeout = c->resultHandlers[i].timeout - (sleepIntervalSeconds * 1000);
+                    c->resultHandlers[i].timeout = c->resultHandlers[i].timeout - (sleepIntervalSeconds);
                 }
                 else
                 {
@@ -482,28 +482,28 @@ exit:
 }
 
 
-int MQTTConnect(InstaMsg* c, MQTTPacket_connectData* options)
+void MQTTConnect(InstaMsg* c, MQTTPacket_connectData* options)
 {
-    int rc = FAILURE;
     char buf[MAX_BUFFER_SIZE];
 
     MQTTPacket_connectData default_options = MQTTPacket_connectData_initializer;
     int len = 0;
 
     if (c->isconnected) // don't send connect packet again if we are already connected
-        goto exit;
+    {
+        printf("Client is already connected.. not re-connecting\n");
+        return;
+    }
 
     if (options == 0)
         options = &default_options; // set default options if none were supplied
 
     if ((len = MQTTSerialize_connect(buf, MAX_BUFFER_SIZE, options)) <= 0)
-        goto exit;
-    if ((rc = sendPacket(c, buf, len)) != SUCCESS)  // send the connect packet
-        goto exit; // there was a problem
+    {
+        return;
+    }
 
-
-exit:
-    return rc;
+    sendPacket(c, buf, len);
 }
 
 
