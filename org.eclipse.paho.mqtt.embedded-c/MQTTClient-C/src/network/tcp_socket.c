@@ -50,6 +50,8 @@ void linux_write_guaranteed(Network* n, unsigned char* buffer, int len);
 
 #endif
 
+static volatile int reinitInProgress;
+
 static void release_underlying_medium(Network *n)
 {
     // Close the socket
@@ -57,10 +59,18 @@ static void release_underlying_medium(Network *n)
 }
 
 
-static void connect_underlying_medium_guaranteed(Network* network)
+static void connect_underlying_medium_guaranteed(Network* network, char doCallback)
 {
 	int type = SOCK_STREAM;
 	struct sockaddr_in address;
+
+    if(reinitInProgress == 1)
+    {
+        printf("Reinit already in progress.. returning\n");
+        return;
+    }
+
+    reinitInProgress = 1;
 
 	int rc = SUCCESS;
 
@@ -97,17 +107,34 @@ static void connect_underlying_medium_guaranteed(Network* network)
 
 	if (rc == SUCCESS)
 	{
-		*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)) = socket(family, type, 0);
-		if (*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)) != -1)
-		{
-			int opt = 1;
-            while(connect(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)), (struct sockaddr*)&address, sizeof(address)) != 0)
-            {
-                printf("Could not connect to the network ... retrying\n");
-                thread_sleep(1);
-            }
-		}
+        while(1)
+        {
+		    *(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)) = socket(family, type, 0);
+		    if (*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)) != -1)
+		    {
+			    int opt = 1;
+                if(connect(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)), (struct sockaddr*)&address, sizeof(address)) != 0)
+                {
+                    release_underlying_medium(network);
+                    printf("Could not connect to the network ... retrying, sock_id = [%d]\n", 
+                           *(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)));
+                    thread_sleep(1);
+                }
+                else
+                {
+                    break;
+                }
+		    }
+        }
 	}
+
+    if(doCallback == 1)
+    {
+        network->appInitCallback(network->appInitCallbackArg);
+    }
+
+    printf("REINIT SUCCESSFUL !!!!!!!!!!!!\n");
+    reinitInProgress = 0;
 }
 
 
@@ -117,8 +144,7 @@ static void reinit_underlying_medium(int *bytes, Network *n, const char *mode)
     printf("Problem occurred at socket level while %s ... recreating socket ..\n", mode);
 
     release_underlying_medium(n);
-    connect_underlying_medium_guaranteed(n);
-    n->appInitCallback(n->appInitCallbackArg);
+    connect_underlying_medium_guaranteed(n, 1);
 }
 
 
@@ -131,7 +157,9 @@ int linux_read(Network* n, unsigned char* buffer, int len, char ensure_guarantee
 	{
 		while(rc = recv(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)), &buffer[bytes], (size_t)(len - bytes), 0) < 0)
         {
+            thread_sleep(1);
             reinit_underlying_medium(&bytes, n, "READING");
+
             if(ensure_guarantee == 0)
             {
                 return FAILURE;
@@ -162,6 +190,7 @@ void linux_write_guaranteed(Network* n, unsigned char* buffer, int len)
     {
 	    while(rc = write(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)), &buffer[bytes], (size_t)(len - bytes)) < 0)
         {
+            thread_sleep(1);
             reinit_underlying_medium(&bytes, n, "WRITING");
         }
 
@@ -196,7 +225,7 @@ Network* get_new_network(void* (*appInitCallback)(void *arg), void *appInitCallb
 	network->write_guaranteed = linux_write_guaranteed;
 
     // Connect the medium (socket).
-    connect_underlying_medium_guaranteed(network);
+    connect_underlying_medium_guaranteed(network, 0);
 
     return network;
 }

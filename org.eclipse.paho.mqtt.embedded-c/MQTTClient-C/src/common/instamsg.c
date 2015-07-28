@@ -16,6 +16,7 @@
 
 #include "include/instamsg.h"
 #include <string.h>
+#include <signal.h>
 
 
 static void publishQoS2CycleCompleted(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
@@ -75,13 +76,19 @@ static void fireResultHandlerAndRemove(InstaMsg *c, MQTTFixedHeaderPlusMsgId *fi
 }
 
 
-static int sendPacket(InstaMsg *c, unsigned char *buf, int length)
+static int sendPacket(InstaMsg *c, unsigned char *buf, int length, char lock)
 {
-    c->networkPhysicalMediumMutex->lock(c->networkPhysicalMediumMutex);
+    if(lock == 1)
+    {
+        c->networkPhysicalMediumMutex->lock(c->networkPhysicalMediumMutex);
+    }
 
     c->ipstack->write_guaranteed(c->ipstack, buf, length);
 
-    c->networkPhysicalMediumMutex->unlock(c->networkPhysicalMediumMutex);
+    if(lock == 1)
+    {
+        c->networkPhysicalMediumMutex->unlock(c->networkPhysicalMediumMutex);
+    }
     return SUCCESS;
 }
 
@@ -275,7 +282,7 @@ void* keepAliveThread(InstaMsg *c)
         int len = MQTTSerialize_pingreq(buf, 1000);
         if (len > 0)
         {
-            sendPacket(c, buf, len);
+            sendPacket(c, buf, len, 1);
         }
 
         thread_sleep(KEEP_ALIVE_INTERVAL_SECS);
@@ -295,6 +302,11 @@ void initInstaMsg(InstaMsg* c,
     int i;
     char clientIdMachine[MAX_BUFFER_SIZE] = {0};
     char username[MAX_BUFFER_SIZE] = {0};
+
+    /*
+     * VERY IMPORTANT: If this is not done, the "write" on an invalid socket will cause program-crash
+     */
+    signal(SIGPIPE,SIG_IGN);
 
     c->ipstack = network;
 
@@ -435,7 +447,7 @@ void readPacketThread(InstaMsg* c)
                     }
                     else
                     {
-                        sendPacket(c, buf, len);
+                        sendPacket(c, buf, len, 1);
                     }
                 }
 
@@ -453,7 +465,7 @@ void readPacketThread(InstaMsg* c)
                 }
 
                 attachResultHandler(c, msgId, INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS, publishQoS2CycleCompleted);
-                sendPacket(c, buf, len); // send the PUBREL packet
+                sendPacket(c, buf, len, 1); // send the PUBREL packet
 
                 break;
             }
@@ -488,7 +500,7 @@ void* MQTTConnect(void* arg)
         return;
     }
 
-    sendPacket(c, buf, len);
+    sendPacket(c, buf, len, 0);
 
     return NULL;
 }
@@ -540,7 +552,7 @@ int MQTTSubscribe(InstaMsg* c,
         c->messageHandlersMutex->unlock(c->messageHandlersMutex);
     }
 
-    if ((rc = sendPacket(c, buf, len)) != SUCCESS) // send the subscribe packet
+    if ((rc = sendPacket(c, buf, len, 1)) != SUCCESS) // send the subscribe packet
         goto exit;             // there was a problem
 
 exit:
@@ -559,7 +571,7 @@ int MQTTUnsubscribe(InstaMsg* c, const char* topicFilter)
 
     if ((len = MQTTSerialize_unsubscribe(buf, MAX_BUFFER_SIZE, 0, getNextPacketId(c), 1, &topic)) <= 0)
         goto exit;
-    if ((rc = sendPacket(c, buf, len)) != SUCCESS) // send the subscribe packet
+    if ((rc = sendPacket(c, buf, len, 1)) != SUCCESS) // send the subscribe packet
         goto exit; // there was a problem
 
 exit:
@@ -599,7 +611,7 @@ int MQTTPublish(InstaMsg* c,
     len = MQTTSerialize_publish(buf, MAX_BUFFER_SIZE, 0, qos, retain, id, topic, (unsigned char*)payload, strlen(payload) + 1);
     if (len <= 0)
         goto exit;
-    if ((rc = sendPacket(c, buf, len)) != SUCCESS) // send the subscribe packet
+    if ((rc = sendPacket(c, buf, len, 1)) != SUCCESS) // send the subscribe packet
         goto exit; // there was a problem
 
     if (qos == QOS1)
@@ -621,7 +633,7 @@ int MQTTDisconnect(InstaMsg* c)
 
     int len = MQTTSerialize_disconnect(buf, MAX_BUFFER_SIZE);
     if (len > 0)
-        rc = sendPacket(c, buf, len);            // send the disconnect packet
+        rc = sendPacket(c, buf, len, 1);            // send the disconnect packet
 
     release_network(c->ipstack);
     c->onDisconnectCallback();
