@@ -18,6 +18,7 @@
 #include <string.h>
 #include <signal.h>
 
+unsigned int terminateCurrentInstance;
 
 static void publishQoS2CycleCompleted(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
@@ -83,7 +84,7 @@ static int sendPacket(InstaMsg *c, unsigned char *buf, int length, char lock)
         c->networkPhysicalMediumMutex->lock(c->networkPhysicalMediumMutex);
     }
 
-    c->ipstack->write_guaranteed(c->ipstack, buf, length);
+    c->ipstack->write(c->ipstack, buf, length);
 
     if(lock == 1)
     {
@@ -104,17 +105,8 @@ static int decodePacket(InstaMsg* c, int* value)
     {
         int rc = MQTTPACKET_READ_ERROR;
 
-        /*
-        if (++len > MAX_NO_OF_REMAINING_LENGTH_BYTES)
-        {
-            rc = MQTTPACKET_READ_ERROR; // bad data
-            goto exit;
-        }
-         */
-        if(c->ipstack->read(c->ipstack, &i, 1, 0) == FAILURE)
-        {
-            return FAILURE;
-        }
+        c->ipstack->read(c->ipstack, &i, 1);
+
         *value += (i & 127) * multiplier;
         multiplier *= 128;
     } while ((i & 128) != 0);
@@ -134,7 +126,7 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     /* 1. read the header byte.  This has the packet type in it
      *    (note that this function is guaranteed to succeed, since "ensure_guarantee has been passed as 1
      */
-    c->ipstack->read(c->ipstack, c->readbuf, 1, 1);
+    c->ipstack->read(c->ipstack, c->readbuf, 1);
 
     len = 1;
     /* 2. read the remaining length.  This is variable in itself
@@ -147,8 +139,10 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     len += MQTTPacket_encode(c->readbuf + 1, rem_len); /* put the original remaining length back into the buffer */
 
     /* 3. read the rest of the buffer using a callback to supply the rest of the data */
-    if (rem_len > 0 && ((c->ipstack->read(c->ipstack, c->readbuf + len, rem_len, 0) == FAILURE)))
-        goto exit;
+    if (rem_len > 0)
+    {
+       c->ipstack->read(c->ipstack, c->readbuf + len, rem_len);
+    }
 
     header.byte = c->readbuf[0];
     fillFixedHeaderFieldsFromPacketHeader(fixedHeader, &header);
@@ -245,6 +239,12 @@ void* clientTimerThread(InstaMsg *c)
 {
     while(1)
     {
+        if(terminateCurrentInstance == 1)
+        {
+            printf("Terminating clientTimerThread\n");
+            return;
+        }
+
         unsigned int sleepIntervalSeconds = 1;
         thread_sleep(sleepIntervalSeconds);
 
@@ -278,6 +278,12 @@ void* keepAliveThread(InstaMsg *c)
 {
     while(1)
     {
+        if(terminateCurrentInstance == 1)
+        {
+            printf("Terminating keepAliveThread\n");
+            return;
+        }
+
         unsigned char buf[1000];
         int len = MQTTSerialize_pingreq(buf, 1000);
         if (len > 0)
@@ -290,9 +296,7 @@ void* keepAliveThread(InstaMsg *c)
 }
 
 
-//self, clientId, authKey, connectHandler, disConnectHandler, oneToOneMessageHandler, options={})
 void initInstaMsg(InstaMsg* c,
-                  Network* network,
                   char *clientId,
                   char *authKey,
                   int (*connectHandler)(),
@@ -307,8 +311,7 @@ void initInstaMsg(InstaMsg* c,
      * VERY IMPORTANT: If this is not done, the "write" on an invalid socket will cause program-crash
      */
     signal(SIGPIPE,SIG_IGN);
-
-    c->ipstack = network;
+	c->ipstack = get_new_network(MQTTConnect, &c);
 
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {
@@ -346,10 +349,28 @@ void initInstaMsg(InstaMsg* c,
 }
 
 
+void cleanInstaMsgObject(InstaMsg *c)
+{
+	MQTTDisconnect(c);
+
+    release_mutex(c->resultHandlersMutex);
+    release_mutex(c->messageHandlersMutex);
+    release_mutex(c->networkPhysicalMediumMutex);
+
+    release_network(c->ipstack);
+}
+
+
 void readPacketThread(InstaMsg* c)
 {
     while(1)
     {
+        if(terminateCurrentInstance == 1)
+        {
+            printf("Terminating readPacketThread\n");
+            return;
+        }
+
         int len = 0;
 
         MQTTFixedHeader fixedHeader;

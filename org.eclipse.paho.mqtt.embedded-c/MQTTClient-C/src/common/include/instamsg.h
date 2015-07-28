@@ -111,16 +111,18 @@ int MQTTDisconnect (InstaMsg*);
 void setDefaultMessageHandler(InstaMsg*, messageHandler);
 
 void initInstaMsg(InstaMsg* c,
-                  Network* network,
                   char *clientId,
                   char *authKey,
                   int (*connectHandler)(),
                   int (*disconnectHandler)(),
                   int (*oneToOneMessageHandler)());
 
+void cleanInstaMsgObject(InstaMsg *c);
+
 void* clientTimerThread(InstaMsg *c);
 void* keepAliveThread(InstaMsg *c);
 void readPacketThread(InstaMsg *c);
+
 
 #define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}
 #endif

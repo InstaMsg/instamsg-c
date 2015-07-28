@@ -120,6 +120,12 @@ void* onConnectHandler(void *arg)
 	{
         while(1)
         {
+            if(terminateCurrentInstance == 1)
+            {
+                printf("Terminating onConnectHandler Thread\n");
+                return NULL;
+            }
+
             char buf[MAX_BUFFER_SIZE] = {0};
 
             static int counter;
@@ -268,6 +274,16 @@ void getopts(int argc, char** argv)
 }
 
 
+void init_system()
+{
+	initInstaMsg(&c, opts.clientid, opts.password, onConnect, onDisconnect, NULL);
+
+    create_and_init_thread(clientTimerThread, &c);
+    create_and_init_thread(keepAliveThread, &c);
+    create_and_init_thread(readPacketThread, &c);
+}
+
+
 int main(int argc, char** argv)
 {
 	int rc = 0;
@@ -286,18 +302,20 @@ int main(int argc, char** argv)
 	signal(SIGINT, cfinish);
 	signal(SIGTERM, cfinish);
 
-	Network *network = get_new_network(MQTTConnect, &c);
-	initInstaMsg(&c, network, opts.clientid, opts.password, onConnect, onDisconnect, NULL);
-
-    create_and_init_thread(clientTimerThread, &c);
-    create_and_init_thread(keepAliveThread, &c);
-    create_and_init_thread(readPacketThread, &c);
+    terminateCurrentInstance = 1;
 
 	while (!toStop)
 	{
-        thread_sleep(120);
-	}
+        if(terminateCurrentInstance == 1)
+        {
+            printf("Sleeping for 5 seconds, before re-initializing the system\n");
+            thread_sleep(5);
 
-	MQTTDisconnect(&c);
+            terminateCurrentInstance = 0;
+            init_system();
+        }
+
+        thread_sleep(1);
+	}
 }
 

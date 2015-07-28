@@ -40,8 +40,8 @@
 
 
 
-int linux_read(Network* n, unsigned char* buffer, int len, char ensure_guarantee);
-void linux_write_guaranteed(Network* n, unsigned char* buffer, int len);
+void linux_read(Network* n, unsigned char* buffer, int len);
+void linux_write(Network* n, unsigned char* buffer, int len);
 
 
 #define GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network) ((int *)(network->physical_medium))
@@ -50,27 +50,11 @@ void linux_write_guaranteed(Network* n, unsigned char* buffer, int len);
 
 #endif
 
-static volatile int reinitInProgress;
 
-static void release_underlying_medium(Network *n)
-{
-    // Close the socket
-    close(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)));
-}
-
-
-static void connect_underlying_medium_guaranteed(Network* network, char doCallback)
+static void connect_underlying_medium_guaranteed(Network* network)
 {
 	int type = SOCK_STREAM;
 	struct sockaddr_in address;
-
-    if(reinitInProgress == 1)
-    {
-        printf("Reinit already in progress.. returning\n");
-        return;
-    }
-
-    reinitInProgress = 1;
 
 	int rc = SUCCESS;
 
@@ -115,9 +99,9 @@ static void connect_underlying_medium_guaranteed(Network* network, char doCallba
 			    int opt = 1;
                 if(connect(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)), (struct sockaddr*)&address, sizeof(address)) != 0)
                 {
-                    release_underlying_medium(network);
-                    printf("Could not connect to the network ... retrying, sock_id = [%d]\n", 
-                           *(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)));
+                    close(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)));
+                    printf("Could not connect to the network ... retrying\n");
+
                     thread_sleep(1);
                 }
                 else
@@ -128,27 +112,11 @@ static void connect_underlying_medium_guaranteed(Network* network, char doCallba
         }
 	}
 
-    if(doCallback == 1)
-    {
-        network->appInitCallback(network->appInitCallbackArg);
-    }
-
-    printf("REINIT SUCCESSFUL !!!!!!!!!!!!\n");
-    reinitInProgress = 0;
+    printf("NETWORK UNDERLYING MEDIUM INIT SUCCESSFUL !!!!!!!!!!!!\n");
 }
 
 
-static void reinit_underlying_medium(int *bytes, Network *n, const char *mode)
-{
-    *bytes = 0;
-    printf("Problem occurred at socket level while %s ... recreating socket ..\n", mode);
-
-    release_underlying_medium(n);
-    connect_underlying_medium_guaranteed(n, 1);
-}
-
-
-int linux_read(Network* n, unsigned char* buffer, int len, char ensure_guarantee)
+void linux_read(Network* n, unsigned char* buffer, int len)
 {
 	int bytes = 0;
     int rc = 0;
@@ -157,13 +125,8 @@ int linux_read(Network* n, unsigned char* buffer, int len, char ensure_guarantee
 	{
 		while(rc = recv(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)), &buffer[bytes], (size_t)(len - bytes), 0) < 0)
         {
-            thread_sleep(1);
-            reinit_underlying_medium(&bytes, n, "READING");
-
-            if(ensure_guarantee == 0)
-            {
-                return FAILURE;
-            }
+            terminateCurrentInstance = 1;
+            return;
         }
 
         // STRANGE: On Ubuntu 14.04, if "n" bytes are received successfully as one chunk, rc is 0 (and not "n") :(
@@ -176,12 +139,10 @@ int linux_read(Network* n, unsigned char* buffer, int len, char ensure_guarantee
             bytes = bytes + rc;
         }
 	}
-
-    return SUCCESS;
 }
 
 
-void linux_write_guaranteed(Network* n, unsigned char* buffer, int len)
+void linux_write(Network* n, unsigned char* buffer, int len)
 {
     int bytes = 0;
     int rc = 0;
@@ -190,8 +151,8 @@ void linux_write_guaranteed(Network* n, unsigned char* buffer, int len)
     {
 	    while(rc = write(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)), &buffer[bytes], (size_t)(len - bytes)) < 0)
         {
-            thread_sleep(1);
-            reinit_underlying_medium(&bytes, n, "WRITING");
+            terminateCurrentInstance = 1;
+            return;
         }
 
         // STRANGE: On Ubuntu 14.04, if "n" bytes are sent successfully as one chunk, rc is 0 (and not "n") :(
@@ -207,25 +168,21 @@ void linux_write_guaranteed(Network* n, unsigned char* buffer, int len)
 }
 
 
-Network* get_new_network(void* (*appInitCallback)(void *arg), void *appInitCallbackArg)
+Network* get_new_network()
 {
     Network *network = (Network*)malloc(sizeof(Network));
 
     // Here, physical medium is a socket, and this represents the socket-id
 	network->physical_medium = malloc(sizeof(int));
 
-    // Must register the app-init-callback.
-    network->appInitCallback = appInitCallback;
-    network->appInitCallbackArg = appInitCallbackArg;
-
     // Register read-callback.
 	network->read = linux_read;
 
     // Register write-callback.
-	network->write_guaranteed = linux_write_guaranteed;
+	network->write = linux_write;
 
     // Connect the medium (socket).
-    connect_underlying_medium_guaranteed(network, 0);
+    connect_underlying_medium_guaranteed(network);
 
     return network;
 }
@@ -233,6 +190,9 @@ Network* get_new_network(void* (*appInitCallback)(void *arg), void *appInitCallb
 
 void release_network(Network *n)
 {
+    // Close the socket
+    close(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)));
+
     // Free the dynamically-allocated memory
     free(n->physical_medium);
     free(n);
