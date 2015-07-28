@@ -77,33 +77,12 @@ static void fireResultHandlerAndRemove(InstaMsg *c, MQTTFixedHeaderPlusMsgId *fi
 
 static int sendPacket(InstaMsg *c, unsigned char *buf, int length)
 {
-    c->sendPacketMutex->lock(c->sendPacketMutex);
+    c->networkPhysicalMediumMutex->lock(c->networkPhysicalMediumMutex);
 
-    int rc = FAILURE,
-        sent = 0;
+    c->ipstack->write_guaranteed(c->ipstack, buf, length);
 
-    while (sent < length)
-    {
-        rc = c->ipstack->mqttwrite(c->ipstack, &(buf[sent]), length);
-        if (rc < 0)  // there was an error writing the data
-        {
-            break;
-        }
-
-        sent += rc;
-    }
-
-    if (sent == length)
-    {
-        rc = SUCCESS;
-    }
-    else
-    {
-        rc = FAILURE;
-    }
-
-    c->sendPacketMutex->unlock(c->sendPacketMutex);
-    return rc;
+    c->networkPhysicalMediumMutex->unlock(c->networkPhysicalMediumMutex);
+    return SUCCESS;
 }
 
 
@@ -111,7 +90,6 @@ static int decodePacket(InstaMsg* c, int* value)
 {
     unsigned char i;
     int multiplier = 1;
-    int len = 0;
     const int MAX_NO_OF_REMAINING_LENGTH_BYTES = 4;
 
     *value = 0;
@@ -119,40 +97,51 @@ static int decodePacket(InstaMsg* c, int* value)
     {
         int rc = MQTTPACKET_READ_ERROR;
 
+        /*
         if (++len > MAX_NO_OF_REMAINING_LENGTH_BYTES)
         {
-            rc = MQTTPACKET_READ_ERROR; /* bad data */
+            rc = MQTTPACKET_READ_ERROR; // bad data
             goto exit;
         }
-        rc = c->ipstack->mqttread(c->ipstack, &i, 1);
-        if (rc != 1)
-            goto exit;
+         */
+        if(c->ipstack->read(c->ipstack, &i, 1, 0) == FAILURE)
+        {
+            return FAILURE;
+        }
         *value += (i & 127) * multiplier;
         multiplier *= 128;
     } while ((i & 128) != 0);
-exit:
-    return len;
+
+    return SUCCESS;
 }
 
 
 static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
 {
-    int rc = FAILURE;
     MQTTHeader header = {0};
+    int rc = FAILURE;
     int len = 0;
     int rem_len = 0;
 
-    /* 1. read the header byte.  This has the packet type in it */
-    if (c->ipstack->mqttread(c->ipstack, c->readbuf, 1) != 1)
-        goto exit;
+    c->networkPhysicalMediumMutex->lock(c->networkPhysicalMediumMutex);
+
+    /* 1. read the header byte.  This has the packet type in it
+     *    (note that this function is guaranteed to succeed, since "ensure_guarantee has been passed as 1
+     */
+    c->ipstack->read(c->ipstack, c->readbuf, 1, 1);
 
     len = 1;
-    /* 2. read the remaining length.  This is variable in itself */
-    decodePacket(c, &rem_len);
+    /* 2. read the remaining length.  This is variable in itself
+     */
+    if(decodePacket(c, &rem_len) == FAILURE)
+    {
+        goto exit;
+    }
+
     len += MQTTPacket_encode(c->readbuf + 1, rem_len); /* put the original remaining length back into the buffer */
 
     /* 3. read the rest of the buffer using a callback to supply the rest of the data */
-    if (rem_len > 0 && (c->ipstack->mqttread(c->ipstack, c->readbuf + len, rem_len) != rem_len))
+    if (rem_len > 0 && ((c->ipstack->read(c->ipstack, c->readbuf + len, rem_len, 0) == FAILURE)))
         goto exit;
 
     header.byte = c->readbuf[0];
@@ -161,6 +150,7 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     rc = SUCCESS;
 
 exit:
+    c->networkPhysicalMediumMutex->unlock(c->networkPhysicalMediumMutex);
     return rc;
 }
 
@@ -326,7 +316,7 @@ void initInstaMsg(InstaMsg* c,
     c->onDisconnectCallback = disconnectHandler;
     c->oneToOneMessageCallback = oneToOneMessageHandler;
 
-    c->sendPacketMutex = get_new_mutex();
+    c->networkPhysicalMediumMutex = get_new_mutex();
     c->messageHandlersMutex = get_new_mutex();
     c->resultHandlersMutex = get_new_mutex();
 
@@ -355,7 +345,7 @@ void readPacketThread(InstaMsg* c)
         int len = 0;
 
         MQTTFixedHeader fixedHeader;
-        int rc = readPacket(c, &fixedHeader);
+        readPacket(c, &fixedHeader);
 
         switch (fixedHeader.packetType)
         {
@@ -395,10 +385,12 @@ void readPacketThread(InstaMsg* c)
                 int count = 0, grantedQoS = -1;
                 unsigned short msgId;
 
-                if (MQTTDeserialize_suback(&msgId, 1, &count, &grantedQoS, c->readbuf, MAX_BUFFER_SIZE) == 1)
-                    rc = grantedQoS; // 0, 1, 2 or 0x80
+                if (MQTTDeserialize_suback(&msgId, 1, &count, &grantedQoS, c->readbuf, MAX_BUFFER_SIZE) != 1)
+                {
+                    goto exit;
+                }
 
-                if (rc == 0x80)
+                if (grantedQoS == 0x80)
                 {
                     int i;
 
@@ -443,12 +435,13 @@ void readPacketThread(InstaMsg* c)
                     else if (qos == QOS2)
                         len = MQTTSerialize_ack(buf, MAX_BUFFER_SIZE, PUBREC, 0, msg.fixedHeaderPlusMsgId.msgId);
                     if (len <= 0)
-                        rc = FAILURE;
+                    {
+                        goto exit;
+                    }
                     else
-                        rc = sendPacket(c, buf, len);
-
-                    if (rc == FAILURE)
-                        goto exit; // there was a problem
+                    {
+                        sendPacket(c, buf, len);
+                    }
                 }
 
                 break;
@@ -461,18 +454,11 @@ void readPacketThread(InstaMsg* c)
                 char buf[MAX_BUFFER_SIZE];
                 if ((len = MQTTSerialize_ack(buf, MAX_BUFFER_SIZE, PUBREL, 0, msgId)) <= 0)
                 {
-                    rc = FAILURE;
                     goto exit;
                 }
+
                 attachResultHandler(c, msgId, INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS, publishQoS2CycleCompleted);
-
-                if ((rc = sendPacket(c, buf, len)) != SUCCESS) // send the PUBREL packet
-                {
-                    rc = FAILURE; // there was a problem
-                }
-
-                if (rc == FAILURE)
-                    goto exit; // there was a problem
+                sendPacket(c, buf, len); // send the PUBREL packet
 
                 break;
             }

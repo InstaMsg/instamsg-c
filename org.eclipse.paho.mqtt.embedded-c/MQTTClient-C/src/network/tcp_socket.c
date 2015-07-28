@@ -40,8 +40,8 @@
 
 
 
-int linux_read(Network*, unsigned char*, int);
-int linux_write(Network*, unsigned char*, int);
+int linux_read(Network* n, unsigned char* buffer, int len, char ensure_guarantee);
+void linux_write_guaranteed(Network* n, unsigned char* buffer, int len);
 
 
 #define GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network) ((int *)(network->physical_medium))
@@ -50,36 +50,14 @@ int linux_write(Network*, unsigned char*, int);
 
 #endif
 
-
-int linux_read(Network* n, unsigned char* buffer, int len)
+static void release_underlying_medium(Network *n)
 {
-	int bytes = 0;
-	while (bytes < len)
-	{
-		int rc = recv(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)), &buffer[bytes], (size_t)(len - bytes), 0);
-		if (rc == -1)
-		{
-			if (errno != ENOTCONN && errno != ECONNRESET)
-			{
-				bytes = -1;
-				break;
-			}
-		}
-		else
-			bytes += rc;
-	}
-	return bytes;
+    // Close the socket
+    close(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)));
 }
 
 
-int linux_write(Network* n, unsigned char* buffer, int len)
-{
-	int	rc = write(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)), buffer, len);
-	return rc;
-}
-
-
-static void ConnectNetwork(Network* network)
+static void connect_underlying_medium_guaranteed(Network* network)
 {
 	int type = SOCK_STREAM;
 	struct sockaddr_in address;
@@ -133,6 +111,57 @@ static void ConnectNetwork(Network* network)
 }
 
 
+static void reinit_underlying_medium(int *bytes, Network *n, const char *mode)
+{
+    *bytes = 0;
+    printf("Problem occurred at socket level while %s ... recreating socket ..\n", mode);
+
+    release_underlying_medium(n);
+    connect_underlying_medium_guaranteed(n);
+}
+
+
+int linux_read(Network* n, unsigned char* buffer, int len, char ensure_guarantee)
+{
+	int bytes = 0;
+    int rc = 0;
+
+	while (bytes < len)
+	{
+		while(rc = recv(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)), &buffer[bytes], (size_t)(len - bytes), 0) < 0)
+        {
+            reinit_underlying_medium(&bytes, n, "READING");
+            if(ensure_guarantee == 0)
+            {
+                return FAILURE;
+            }
+        }
+
+        bytes = bytes + rc;
+	}
+
+    return SUCCESS;
+}
+
+
+void linux_write_guaranteed(Network* n, unsigned char* buffer, int len)
+{
+    int bytes = 0;
+    int rc = 0;
+
+    while(bytes < len)
+    {
+	    while(rc = write(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)), &buffer[bytes], (size_t)(len - bytes)) < 0)
+        {
+            reinit_underlying_medium(&bytes, n, "WRITING");
+        }
+
+        bytes = bytes + rc;
+    }
+}
+
+
+
 Network* get_new_network()
 {
     Network *network = (Network*)malloc(sizeof(Network));
@@ -140,19 +169,16 @@ Network* get_new_network()
     // Here, physical medium is a socket, and this represents the socket-id
 	network->physical_medium = malloc(sizeof(int));
 
-	network->mqttread = linux_read;
-	network->mqttwrite = linux_write;
+	network->read = linux_read;
+	network->write_guaranteed = linux_write_guaranteed;
 
-    ConnectNetwork(network);
+    connect_underlying_medium_guaranteed(network);
 
     return network;
 }
 
 void release_network(Network *n)
 {
-    // Close the socket
-    close(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)));
-
     // Free the dynamically-allocated memory
     free(n->physical_medium);
     free(n);

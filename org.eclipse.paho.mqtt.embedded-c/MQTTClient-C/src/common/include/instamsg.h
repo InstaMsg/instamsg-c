@@ -77,7 +77,7 @@ struct InstaMsg {
     int (*onDisconnectCallback)();
     int (*oneToOneMessageCallback)();
 
-    struct Mutex *sendPacketMutex;
+    struct Mutex *networkPhysicalMediumMutex;
     struct Mutex *messageHandlersMutex;
     struct Mutex *resultHandlersMutex;
 
