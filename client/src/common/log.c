@@ -24,7 +24,7 @@
 #define MAX_LENGTH_LOG_ALLOWED 1000
 
 #define LOG_COMMON_CODE(level)                                                                      \
-    if(level < currentLogLevel)                                                                     \
+    if(level > currentLogLevel)                                                                     \
         return;                                                                                     \
                                                                                                     \
     unsigned char formatted_string[MAX_LENGTH_LOG_ALLOWED];                                         \
@@ -50,13 +50,11 @@ Logger* get_new_logger(void *arg)
 
 void release_logger(Logger *logger)
 {
+    info_log(logger, "Freeing the LOG resources ... \n");
     release_file_system(logger->medium);
 
     // Free the dynamically-allocated memory
     free(logger);
-
-    // TODO: This printf statement should not be here.
-    printf("Complete LOG structure, including the underlying physical-medium.. cleaned.\n");
 }
 
 

@@ -21,7 +21,7 @@
 
 static void publishQoS2CycleCompleted(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
-    printf("PUBCOMP received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
+    debug_log(instaMsg.logger, "PUBCOMP received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
 }
 
 
@@ -58,7 +58,7 @@ void prepareThreadTerminationIfApplicable(const char *threadName)
 {
     if(terminateCurrentInstance == 1)
     {
-        printf("Terminating %s\n", threadName);
+        info_log(instaMsg.logger, "Terminating %s\n", threadName);
         incrementOrDecrementThreadCount(0);
     }
 }
@@ -306,7 +306,7 @@ void* clientTimerThread(InstaMsg *c)
                 }
                 else
                 {
-                    printf("No result obtained for msgId [%u] in the specified period\n", c->resultHandlers[i].msgId);
+                    info_log(instaMsg.logger, "No result obtained for msgId [%u] in the specified period\n", c->resultHandlers[i].msgId);
                     c->resultHandlers[i].msgId = 0;
                 }
 
@@ -356,8 +356,8 @@ void initInstaMsg(InstaMsg* c,
     // VERY IMPORTANT: If this is not done, the "write" on an invalid socket will cause program-crash
     signal(SIGPIPE,SIG_IGN);
 
-	c->ipstack = get_new_network(NULL);
     c->logger = get_new_logger(opts->logFilePath);
+	c->ipstack = get_new_network(NULL);
 
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {
@@ -436,7 +436,7 @@ void readPacketThread(InstaMsg* c)
                     }
                     else
                     {
-                        printf("Client-Connection failed with code [%d]\n", connack_rc);
+                        info_log(instaMsg.logger, "Client-Connection failed with code [%d]\n", connack_rc);
                     }
                 }
 
@@ -545,7 +545,7 @@ void readPacketThread(InstaMsg* c)
 
             case PINGRESP:
             {
-                printf("PINGRESP received... relations are intact !!\n");
+                debug_log(instaMsg.logger, "PINGRESP received... relations are intact !!\n");
                 break;
             }
         }

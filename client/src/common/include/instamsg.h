@@ -32,6 +32,7 @@
 #define INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS 10
 
 
+
 unsigned char terminateCurrentInstance;
 unsigned int threadCount;
 Mutex *threadCountMutex;
@@ -108,6 +109,7 @@ struct InstaMsg {
     MQTTPacket_connectData connectOptions;
 };
 
+InstaMsg instaMsg;
 
 void* MQTTConnect(void* arg);
 

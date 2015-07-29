@@ -58,7 +58,6 @@ int left_ms(Timer* timer)
 	struct timeval now, res;
 	gettimeofday(&now, NULL);
 	timersub(&GET_IMPLEMENTATION_SPECIFIC_TIMER_OBJ(timer)->end_time, &now, &res);
-	//printf("left %d ms\n", (res.tv_sec < 0) ? 0 : res.tv_sec * 1000 + res.tv_usec / 1000);
 	return (res.tv_sec < 0) ? 0 : res.tv_sec * 1000 + res.tv_usec / 1000;
 }
 

@@ -32,6 +32,7 @@
 #include <signal.h>
 
 #include "../include/network.h"
+#include "../../common/include/instamsg.h"
 #include "../../threading/include/threading.h"
 #include "../../../../MQTTPacket/src/common.h"
 
@@ -103,7 +104,7 @@ static void connect_underlying_medium_guaranteed(Network* network)
                 if(connect(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)), (struct sockaddr*)&address, sizeof(address)) != 0)
                 {
                     release_underlying_medium_guaranteed(network);
-                    printf("Could not connect to the network ... retrying\n");
+                    info_log(instaMsg.logger, "Could not connect to the network ... retrying\n");
 
                     thread_sleep(1);
                 }
@@ -115,7 +116,7 @@ static void connect_underlying_medium_guaranteed(Network* network)
         }
 	}
 
-    printf("TCP-SOCKET structure underlying physical-medium initiated.\n");
+    info_log(instaMsg.logger, "TCP-SOCKET structure underlying physical-medium initiated.\n");
 }
 
 
@@ -201,5 +202,5 @@ void release_network(Network *n)
     free(n->medium);
     free(n);
 
-    printf("Complete TCP-SOCKET structure, including the underlying physical-medium.. cleaned !!!!!\n");
+    info_log(instaMsg.logger, "Complete TCP-SOCKET structure, including the underlying physical-medium.. cleaned !!!!!\n");
 }

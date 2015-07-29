@@ -55,7 +55,6 @@
 
 volatile int toStop = 0;
 
-InstaMsg c;
 char *topic;
 struct opts_struct *opts_p;
 
@@ -65,37 +64,37 @@ static void messageArrived(MessageData* md)
 	MQTTMessage* message = md->message;
 
 	if (opts_p->showtopics)
-		printf("%.*s\t", md->topicName->lenstring.len, md->topicName->lenstring.data);
+		info_log(instaMsg.logger, "%.*s\t", md->topicName->lenstring.len, md->topicName->lenstring.data);
 	if (opts_p->nodelimiter)
-		printf("%.*s", (int)message->payloadlen, (char*)message->payload);
+		info_log(instaMsg.logger, "%.*s", (int)message->payloadlen, (char*)message->payload);
 	else
-		printf("%.*s%s", (int)message->payloadlen, (char*)message->payload, opts_p->delimiter);
+		info_log(instaMsg.logger, "%.*s%s", (int)message->payloadlen, (char*)message->payload, opts_p->delimiter);
 }
 
 
 static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
-    printf("PUBACK received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
+    debug_log(instaMsg.logger, "PUBACK received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
 }
 
 
 static void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
-    printf("SUBACK received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
+    debug_log(instaMsg.logger, "SUBACK received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
 }
 
 
 void* onConnectHandler(void *arg)
 {
     int rc;
-    printf("Connected successfully\n");
+    info_log(instaMsg.logger, "Connected successfully\n");
 
 
 	if(opts_p->subscribe == 1)
 	{
-    	printf("Subscribing to %s\n", topic);
-		rc = MQTTSubscribe(&c, topic, opts_p->qos, messageArrived, subscribeAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS);
-		printf("Subscribed %d\n", rc);
+    	info_log(instaMsg.logger, "Subscribing to %s\n", topic);
+		rc = MQTTSubscribe(&instaMsg, topic, opts_p->qos, messageArrived, subscribeAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS);
+		info_log(instaMsg.logger, "Subscribed %d\n", rc);
 	}
 
 	if(opts_p->publish == 1)
@@ -104,7 +103,7 @@ void* onConnectHandler(void *arg)
         {
             if(terminateCurrentInstance == 1)
             {
-                printf("Terminating onConnectHandler Thread\n");
+                info_log(instaMsg.logger, "Terminating onConnectHandler Thread\n");
                 break;
             }
 
@@ -114,9 +113,10 @@ void* onConnectHandler(void *arg)
             counter++;
             sprintf(buf, "%s %d", opts_p->msg, counter);
 
-		    printf("Publishing message [%s] to %s\n", buf, topic);
-		    rc = MQTTPublish(&c, topic, (const char*)buf, opts_p->qos, 0, publishAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS, 0, 1);
-		    printf("Published %d\n", rc);
+		    debug_log(instaMsg.logger, "Publishing message [%s] to %s\n", buf, topic);
+		    rc = MQTTPublish(&instaMsg, topic, (const char*)buf, opts_p->qos, 0,
+                             publishAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS, 0, 1);
+		    debug_log(instaMsg.logger, "Published %d\n", rc);
 
             thread_sleep(3);
         }
@@ -136,7 +136,7 @@ static int onConnect()
 
 static int onDisconnect()
 {
-    printf("Disconnect \"callback\" called.. not really needed, as MQTT-Disconnect does not get any response from server. "
+    info_log(instaMsg.logger, "Disconnect \"callback\" called.. not really needed, as MQTT-Disconnect does not get any response from server. "
            "So, no async-callback required as such.\n");
 
 	return 0;
@@ -266,15 +266,15 @@ void getopts(int argc, char** argv, struct opts_struct *opts)
 
 void init_system(struct opts_struct *opts)
 {
-	initInstaMsg(&c, opts->clientid, opts->password, onConnect, onDisconnect, NULL, opts);
+	initInstaMsg(&instaMsg, opts->clientid, opts->password, onConnect, onDisconnect, NULL, opts);
 
-    create_and_init_thread(clientTimerThread, &c);
+    create_and_init_thread(clientTimerThread, &instaMsg);
     incrementOrDecrementThreadCount(1);
 
-    create_and_init_thread(keepAliveThread, &c);
+    create_and_init_thread(keepAliveThread, &instaMsg);
     incrementOrDecrementThreadCount(1);
 
-    create_and_init_thread(readPacketThread, &c);
+    create_and_init_thread(readPacketThread, &instaMsg);
     incrementOrDecrementThreadCount(1);
 }
 

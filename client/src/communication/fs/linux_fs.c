@@ -19,6 +19,7 @@
 #include <stdlib.h>
 
 #include "../include/fs.h"
+#include "../../common/include/instamsg.h"
 #include "../../../../MQTTPacket/src/common.h"
 
 
@@ -50,7 +51,7 @@ static void connect_underlying_medium_guaranteed(FileSystem* fs, const char *fil
 
 static int linux_fs_read(FileSystem* fs, unsigned char* buffer, int len)
 {
-    if(fread(buffer, sizeof(buffer[0]), sizeof(buffer)/sizeof(buffer[0]), fs->medium) < len)
+    if(fread(buffer, sizeof(buffer[0]), len, fs->medium) < len)
     {
         return FAILURE;
     }
@@ -61,10 +62,11 @@ static int linux_fs_read(FileSystem* fs, unsigned char* buffer, int len)
 
 static int linux_fs_write(FileSystem* fs, unsigned char* buffer, int len)
 {
-    if(fwrite(buffer, sizeof(buffer[0]), sizeof(buffer)/sizeof(buffer[0]), fs->medium) < len)
+    if(fwrite(buffer, sizeof(buffer[0]), len, fs->medium) < len)
     {
         return FAILURE;
     }
+    fflush(fs->medium);
 
     return SUCCESS;
 }
@@ -99,5 +101,5 @@ void release_file_system(FileSystem *fs)
     free(fs->medium);
     free(fs);
 
-    printf("Complete LINUX-FS structure, including the underlying physical-medium.. cleaned.\n");
+    info_log(instaMsg.logger, "Complete LINUX-FS structure, including the underlying physical-medium.. cleaned.\n");
 }
