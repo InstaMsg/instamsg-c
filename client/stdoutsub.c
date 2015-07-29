@@ -40,10 +40,11 @@
     stdoutsub topic/of/interest --host iot.eclipse.org
 
 */
-#include <stdio.h>
 #include "src/common/include/instamsg.h"
+#include "src/common/include/log.h"
 #include "src/threading/include/threading.h"
 
+#include <stdio.h>
 #include <stdio.h>
 #include <signal.h>
 #include <memory.h>
@@ -311,6 +312,9 @@ int main(int argc, char** argv)
 
     threadCountMutex = get_new_mutex();
     terminateCurrentInstance = 1;
+
+    // TODO: This has to be read from config.
+    currentLogLevel = INSTAMSG_LOG_LEVEL_DEBUG;
 
 	while (!toStop)
 	{

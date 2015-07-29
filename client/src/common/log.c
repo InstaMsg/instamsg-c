@@ -16,8 +16,25 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
 
 #include "./include/log.h"
+
+#define MAX_LENGTH_LOG_ALLOWED 1000
+
+#define LOG_COMMON_CODE(level)                                                                      \
+    if(level < currentLogLevel)                                                                     \
+        return;                                                                                     \
+                                                                                                    \
+    unsigned char formatted_string[MAX_LENGTH_LOG_ALLOWED];                                         \
+    va_list argptr;                                                                                 \
+                                                                                                    \
+    va_start(argptr, fmt);                                                                          \
+    vsnprintf(formatted_string, MAX_LENGTH_LOG_ALLOWED, fmt, argptr);                               \
+    va_end(argptr);                                                                                 \
+                                                                                                    \
+    logger->medium->write(logger->medium, formatted_string, strlen(formatted_string));
 
 
 Logger* get_new_logger(void *arg)
@@ -40,4 +57,22 @@ void release_logger(Logger *logger)
 
     // TODO: This printf statement should not be here.
     printf("Complete LOG structure, including the underlying physical-medium.. cleaned.\n");
+}
+
+
+void info_log(Logger *logger, char *fmt, ...)
+{
+    LOG_COMMON_CODE(INSTAMSG_LOG_LEVEL_INFO)
+}
+
+
+void error_log(Logger *logger, char *fmt, ...)
+{
+    LOG_COMMON_CODE(INSTAMSG_LOG_LEVEL_ERROR)
+}
+
+
+void debug_log(Logger *logger, char *fmt, ...)
+{
+    LOG_COMMON_CODE(INSTAMSG_LOG_LEVEL_DEBUG)
 }
