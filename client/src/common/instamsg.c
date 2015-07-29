@@ -356,7 +356,7 @@ void initInstaMsg(InstaMsg* c,
      * VERY IMPORTANT: If this is not done, the "write" on an invalid socket will cause program-crash
      */
     signal(SIGPIPE,SIG_IGN);
-	c->ipstack = get_new_network(MQTTConnect, &c);
+	c->ipstack = get_new_network(NULL);
 
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {

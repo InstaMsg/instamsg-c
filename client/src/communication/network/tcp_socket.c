@@ -48,7 +48,8 @@ static int tcp_socket_write(Network* n, unsigned char* buffer, int len);
 
 static void release_underlying_medium_guaranteed(Network* network)
 {
-    // Close the socket
+    // Close the socket.
+    //
     close(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)));
 }
 
@@ -114,7 +115,7 @@ static void connect_underlying_medium_guaranteed(Network* network)
         }
 	}
 
-    printf("NETWORK UNDERLYING MEDIUM INIT SUCCESSFUL !!!!!!!!!!!!\n");
+    printf("TCP-SOCKET structure underlying physical-medium initiated.\n");
 }
 
 
@@ -172,7 +173,7 @@ static int tcp_socket_write(Network* n, unsigned char* buffer, int len)
 }
 
 
-Network* get_new_network()
+Network* get_new_network(void *arg)
 {
     Network *network = (Network*)malloc(sizeof(Network));
 
@@ -200,5 +201,5 @@ void release_network(Network *n)
     free(n->medium);
     free(n);
 
-    printf("Complete Network, including the underlying physical-medium.. cleaned !!!!!\n");
+    printf("Complete TCP-SOCKET structure, including the underlying physical-medium.. cleaned !!!!!\n");
 }

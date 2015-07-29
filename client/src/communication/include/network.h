@@ -1,15 +1,16 @@
 #ifndef INSTAMSG_NETWORK
 #define INSTAMSG_NETWORK
 
-#include "./common.h"
-
 typedef struct Network Network;
 struct Network
 {
-    COMMUNICATION_FIELDS
+    void *medium;
+
+    int (*read)(Network *network, unsigned char* buffer, int len);
+    int (*write)(Network *network, unsigned char* buffer, int len);
 };
 
-Network* get_new_network();
+Network* get_new_network(void *arg);
 void release_network(Network*);
 
 #endif
