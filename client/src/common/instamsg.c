@@ -18,7 +18,6 @@
 #include <string.h>
 #include <signal.h>
 
-unsigned int terminateCurrentInstance;
 
 static void publishQoS2CycleCompleted(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
@@ -35,6 +34,33 @@ static void NewMessageData(MessageData* md, MQTTString* aTopicName, MQTTMessage*
 static int getNextPacketId(InstaMsg *c) {
     int id = c->next_packetid = (c->next_packetid == MAX_PACKET_ID) ? 1 : c->next_packetid + 1;
     return id;
+}
+
+
+void incrementOrDecrementThreadCount(char increment)
+{
+    threadCountMutex->lock(threadCountMutex);
+
+    if(increment == 1)
+    {
+        threadCount++;
+    }
+    else
+    {
+        threadCount--;
+    }
+
+    threadCountMutex->unlock(threadCountMutex);
+}
+
+
+void prepareThreadTerminationIfApplicable(const char *threadName)
+{
+    if(terminateCurrentInstance == 1)
+    {
+        printf("Terminating %s\n", threadName);
+        incrementOrDecrementThreadCount(0);
+    }
 }
 
 
@@ -79,18 +105,25 @@ static void fireResultHandlerAndRemove(InstaMsg *c, MQTTFixedHeaderPlusMsgId *fi
 
 static int sendPacket(InstaMsg *c, unsigned char *buf, int length, char lock)
 {
+    int rc = SUCCESS;
+
     if(lock == 1)
     {
         c->networkPhysicalMediumMutex->lock(c->networkPhysicalMediumMutex);
     }
 
-    c->ipstack->write(c->ipstack, buf, length);
+    if(c->ipstack->write(c->ipstack, buf, length) == FAILURE)
+    {
+        terminateCurrentInstance = 1;
+        rc = FAILURE;
+    }
 
     if(lock == 1)
     {
         c->networkPhysicalMediumMutex->unlock(c->networkPhysicalMediumMutex);
     }
-    return SUCCESS;
+
+    return rc;
 }
 
 
@@ -105,7 +138,11 @@ static int decodePacket(InstaMsg* c, int* value)
     {
         int rc = MQTTPACKET_READ_ERROR;
 
-        c->ipstack->read(c->ipstack, &i, 1);
+        if(c->ipstack->read(c->ipstack, &i, 1) == FAILURE)
+        {
+            terminateCurrentInstance = 1;
+            return FAILURE;
+        }
 
         *value += (i & 127) * multiplier;
         multiplier *= 128;
@@ -126,7 +163,11 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     /* 1. read the header byte.  This has the packet type in it
      *    (note that this function is guaranteed to succeed, since "ensure_guarantee has been passed as 1
      */
-    c->ipstack->read(c->ipstack, c->readbuf, 1);
+    if(c->ipstack->read(c->ipstack, c->readbuf, 1) == FAILURE)
+    {
+        terminateCurrentInstance = 1;
+        return FAILURE;
+    }
 
     len = 1;
     /* 2. read the remaining length.  This is variable in itself
@@ -141,7 +182,11 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     /* 3. read the rest of the buffer using a callback to supply the rest of the data */
     if (rem_len > 0)
     {
-       c->ipstack->read(c->ipstack, c->readbuf + len, rem_len);
+        if(c->ipstack->read(c->ipstack, c->readbuf + len, rem_len) == FAILURE)
+        {
+            terminateCurrentInstance = 1;
+            return FAILURE;
+        }
     }
 
     header.byte = c->readbuf[0];
@@ -241,7 +286,7 @@ void* clientTimerThread(InstaMsg *c)
     {
         if(terminateCurrentInstance == 1)
         {
-            printf("Terminating clientTimerThread\n");
+            prepareThreadTerminationIfApplicable("clientTimerThread");
             return;
         }
 
@@ -280,7 +325,7 @@ void* keepAliveThread(InstaMsg *c)
     {
         if(terminateCurrentInstance == 1)
         {
-            printf("Terminating keepAliveThread\n");
+            prepareThreadTerminationIfApplicable("keepAliveThread");
             return;
         }
 
@@ -367,7 +412,7 @@ void readPacketThread(InstaMsg* c)
     {
         if(terminateCurrentInstance == 1)
         {
-            printf("Terminating readPacketThread\n");
+            prepareThreadTerminationIfApplicable("readPacketThread");
             return;
         }
 

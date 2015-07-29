@@ -123,7 +123,7 @@ void* onConnectHandler(void *arg)
             if(terminateCurrentInstance == 1)
             {
                 printf("Terminating onConnectHandler Thread\n");
-                return NULL;
+                break;
             }
 
             char buf[MAX_BUFFER_SIZE] = {0};
@@ -140,6 +140,7 @@ void* onConnectHandler(void *arg)
         }
 	}
 
+    incrementOrDecrementThreadCount(0);
 	return NULL;
 }
 
@@ -147,6 +148,7 @@ void* onConnectHandler(void *arg)
 static int onConnect()
 {
     create_and_init_thread(onConnectHandler, NULL);
+    incrementOrDecrementThreadCount(1);
 }
 
 
@@ -279,8 +281,13 @@ void init_system()
 	initInstaMsg(&c, opts.clientid, opts.password, onConnect, onDisconnect, NULL);
 
     create_and_init_thread(clientTimerThread, &c);
+    incrementOrDecrementThreadCount(1);
+
     create_and_init_thread(keepAliveThread, &c);
+    incrementOrDecrementThreadCount(1);
+
     create_and_init_thread(readPacketThread, &c);
+    incrementOrDecrementThreadCount(1);
 }
 
 
@@ -302,17 +309,28 @@ int main(int argc, char** argv)
 	signal(SIGINT, cfinish);
 	signal(SIGTERM, cfinish);
 
+    threadCountMutex = get_new_mutex();
     terminateCurrentInstance = 1;
 
 	while (!toStop)
 	{
-        if(terminateCurrentInstance == 1)
+        while(terminateCurrentInstance == 1)
         {
-            printf("Sleeping for 5 seconds, before re-initializing the system\n");
-            thread_sleep(5);
+            threadCountMutex->lock(threadCountMutex);
 
-            terminateCurrentInstance = 0;
-            init_system();
+            if(threadCount == 0)
+            {
+                terminateCurrentInstance = 0;
+
+                threadCountMutex->unlock(threadCountMutex);
+                init_system();
+            }
+            else
+            {
+                threadCountMutex->unlock(threadCountMutex);
+            }
+
+            thread_sleep(1);
         }
 
         thread_sleep(1);

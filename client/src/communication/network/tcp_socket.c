@@ -37,8 +37,8 @@
 
 
 
-static void tcp_socket_read(Network* n, unsigned char* buffer, int len);
-static void tcp_socket_write(Network* n, unsigned char* buffer, int len);
+static int tcp_socket_read(Network* n, unsigned char* buffer, int len);
+static int tcp_socket_write(Network* n, unsigned char* buffer, int len);
 
 
 #define GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network) ((int *)(network->medium))
@@ -112,7 +112,7 @@ static void connect_underlying_medium_guaranteed(Network* network)
 }
 
 
-static void tcp_socket_read(Network* n, unsigned char* buffer, int len)
+static int tcp_socket_read(Network* n, unsigned char* buffer, int len)
 {
 	int bytes = 0;
     int rc = 0;
@@ -121,8 +121,7 @@ static void tcp_socket_read(Network* n, unsigned char* buffer, int len)
 	{
 		while(rc = recv(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)), &buffer[bytes], (size_t)(len - bytes), 0) < 0)
         {
-            terminateCurrentInstance = 1;
-            return;
+            return FAILURE;
         }
 
         // STRANGE: On Ubuntu 14.04, if "n" bytes are received successfully as one chunk, rc is 0 (and not "n") :(
@@ -135,10 +134,12 @@ static void tcp_socket_read(Network* n, unsigned char* buffer, int len)
             bytes = bytes + rc;
         }
 	}
+
+    return SUCCESS;
 }
 
 
-static void tcp_socket_write(Network* n, unsigned char* buffer, int len)
+static int tcp_socket_write(Network* n, unsigned char* buffer, int len)
 {
     int bytes = 0;
     int rc = 0;
@@ -147,8 +148,7 @@ static void tcp_socket_write(Network* n, unsigned char* buffer, int len)
     {
 	    while(rc = write(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)), &buffer[bytes], (size_t)(len - bytes)) < 0)
         {
-            terminateCurrentInstance = 1;
-            return;
+            return FAILURE;
         }
 
         // STRANGE: On Ubuntu 14.04, if "n" bytes are sent successfully as one chunk, rc is 0 (and not "n") :(
@@ -161,6 +161,8 @@ static void tcp_socket_write(Network* n, unsigned char* buffer, int len)
             bytes = bytes + rc;
         }
     }
+
+    return SUCCESS;
 }
 
 

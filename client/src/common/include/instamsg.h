@@ -31,6 +31,10 @@
 #define INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS 10
 
 
+unsigned char terminateCurrentInstance;
+unsigned int threadCount;
+Mutex *threadCountMutex;
+
 void NewTimer(Timer*);
 
 typedef struct MQTTMessage MQTTMessage;
@@ -123,6 +127,8 @@ void* clientTimerThread(InstaMsg *c);
 void* keepAliveThread(InstaMsg *c);
 void readPacketThread(InstaMsg *c);
 
+void prepareThreadTerminationIfApplicable(const char *threadName);
+void incrementOrDecrementThreadCount(char increment);
 
 #define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}
 #endif
