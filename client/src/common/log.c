@@ -54,7 +54,10 @@ void release_logger(Logger *logger)
     release_file_system(logger->medium);
 
     // Free the dynamically-allocated memory
-    free(logger);
+    if(logger != NULL)
+    {
+        free(logger);
+    }
 }
 
 

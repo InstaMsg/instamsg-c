@@ -199,8 +199,15 @@ void release_network(Network *n)
     release_underlying_medium_guaranteed(n);
 
     // Free the dynamically-allocated memory
-    free(n->medium);
-    free(n);
+    if(n != NULL)
+    {
+        if(n->medium != NULL)
+        {
+            free(n->medium);
+        }
+
+        free(n);
+    }
 
     info_log(instaMsg.logger, "Complete TCP-SOCKET structure, including the underlying physical-medium.. cleaned !!!!!\n");
 }

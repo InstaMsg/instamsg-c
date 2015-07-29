@@ -404,6 +404,7 @@ void cleanInstaMsgObject(InstaMsg *c)
     release_mutex(c->networkPhysicalMediumMutex);
 
     release_network(c->ipstack);
+    release_logger(c->logger);
 }
 
 
@@ -702,8 +703,6 @@ int MQTTDisconnect(InstaMsg* c)
     if (len > 0)
         rc = sendPacket(c, buf, len, 1);            // send the disconnect packet
 
-    release_logger(c->logger);
-    release_network(c->ipstack);
     c->onDisconnectCallback();
 
     return rc;

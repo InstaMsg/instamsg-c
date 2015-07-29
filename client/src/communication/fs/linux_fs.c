@@ -98,8 +98,13 @@ void release_file_system(FileSystem *fs)
     release_underlying_medium_guaranteed(fs);
 
     // Free the dynamically-allocated memory
-    free(fs->medium);
-    free(fs);
+    if(fs != NULL)
+    {
+        if(fs->medium != NULL)
+        {
+            free(fs->medium);
+        }
 
-    info_log(instaMsg.logger, "Complete LINUX-FS structure, including the underlying physical-medium.. cleaned.\n");
+        free(fs);
+    }
 }

@@ -319,8 +319,8 @@ int main(int argc, char** argv)
             if(threadCount == 0)
             {
                 terminateCurrentInstance = 0;
-
                 threadCountMutex->unlock(threadCountMutex);
+
                 init_system(&opts);
             }
             else
