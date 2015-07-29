@@ -103,7 +103,6 @@ static void connect_underlying_medium_guaranteed(Network* network)
 			    int opt = 1;
                 if(connect(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)), (struct sockaddr*)&address, sizeof(address)) != 0)
                 {
-                    release_underlying_medium_guaranteed(network);
                     info_log(instaMsg.logger, "Could not connect to the network ... retrying\n");
 
                     thread_sleep(1);
@@ -209,5 +208,5 @@ void release_network(Network *n)
         free(n);
     }
 
-    info_log(instaMsg.logger, "Complete TCP-SOCKET structure, including the underlying physical-medium.. cleaned !!!!!\n");
+    info_log(instaMsg.logger, "COMPLETE [TCP-SOCKET] STRUCTURE, INCLUDING THE UNDERLYING MEDIUM (SOCKET) CLEANED.\n");
 }

@@ -50,7 +50,7 @@ Logger* get_new_logger(void *arg)
 
 void release_logger(Logger *logger)
 {
-    info_log(logger, "Freeing the LOG resources ... \n");
+    info_log(logger, "FREEING [LOG] RESOURCES.\n");
     release_file_system(logger->medium);
 
     // Free the dynamically-allocated memory

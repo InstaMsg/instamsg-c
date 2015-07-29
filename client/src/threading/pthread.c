@@ -43,7 +43,14 @@ struct Mutex* get_new_mutex()
 
 void release_mutex(struct Mutex* mtx)
 {
-    free(mtx->obj);
-    free(mtx);
+    if(mtx != NULL)
+    {
+        if(mtx->obj != NULL)
+        {
+            free(mtx->obj);
+        }
+
+        free(mtx);
+    }
 }
 

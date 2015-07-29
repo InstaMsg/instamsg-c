@@ -83,6 +83,13 @@ Timer* get_new_timer()
 
 void release_timer(Timer* timer)
 {
-	free(timer->obj);
-	free(timer);
+    if(timer != NULL)
+    {
+        if(timer->obj != NULL)
+        {
+	        free(timer->obj);
+        }
+
+	    free(timer);
+    }
 }

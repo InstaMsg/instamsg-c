@@ -287,6 +287,7 @@ int main(int argc, char** argv)
     };
 
 	int rc = 0;
+    char firstTimeStart = 1;
 
 	if (argc < 2)
 		usage();
@@ -320,6 +321,12 @@ int main(int argc, char** argv)
             {
                 terminateCurrentInstance = 0;
                 threadCountMutex->unlock(threadCountMutex);
+
+                if(firstTimeStart == 0)
+                {
+                    cleanInstaMsgObject(&instaMsg);
+                }
+                firstTimeStart = 0;
 
                 init_system(&opts);
             }
