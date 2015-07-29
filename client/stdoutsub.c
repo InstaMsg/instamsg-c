@@ -57,38 +57,19 @@ volatile int toStop = 0;
 
 InstaMsg c;
 char *topic;
-
-
-struct opts_struct
-{
-	char* clientid;
-	int nodelimiter;
-	char* delimiter;
-	enum QoS qos;
-	char* password;
-	char* host;
-	int port;
-	int showtopics;
-
-	int subscribe;
-	int publish;
-	char msg[100];
-} opts =
-{
-	(char*)"stdout-subscriber", 0, (char*)"\n", QOS2, NULL, (char*)"localhost", 1883, 0, 0, 0
-};
+struct opts_struct *opts_p;
 
 
 static void messageArrived(MessageData* md)
 {
 	MQTTMessage* message = md->message;
 
-	if (opts.showtopics)
+	if (opts_p->showtopics)
 		printf("%.*s\t", md->topicName->lenstring.len, md->topicName->lenstring.data);
-	if (opts.nodelimiter)
+	if (opts_p->nodelimiter)
 		printf("%.*s", (int)message->payloadlen, (char*)message->payload);
 	else
-		printf("%.*s%s", (int)message->payloadlen, (char*)message->payload, opts.delimiter);
+		printf("%.*s%s", (int)message->payloadlen, (char*)message->payload, opts_p->delimiter);
 }
 
 
@@ -110,14 +91,14 @@ void* onConnectHandler(void *arg)
     printf("Connected successfully\n");
 
 
-	if(opts.subscribe == 1)
+	if(opts_p->subscribe == 1)
 	{
     	printf("Subscribing to %s\n", topic);
-		rc = MQTTSubscribe(&c, topic, opts.qos, messageArrived, subscribeAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS);
+		rc = MQTTSubscribe(&c, topic, opts_p->qos, messageArrived, subscribeAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS);
 		printf("Subscribed %d\n", rc);
 	}
 
-	if(opts.publish == 1)
+	if(opts_p->publish == 1)
 	{
         while(1)
         {
@@ -131,10 +112,10 @@ void* onConnectHandler(void *arg)
 
             static int counter;
             counter++;
-            sprintf(buf, "%s %d", opts.msg, counter);
+            sprintf(buf, "%s %d", opts_p->msg, counter);
 
 		    printf("Publishing message [%s] to %s\n", buf, topic);
-		    rc = MQTTPublish(&c, topic, (const char*)buf, opts.qos, 0, publishAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS, 0, 1);
+		    rc = MQTTPublish(&c, topic, (const char*)buf, opts_p->qos, 0, publishAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS, 0, 1);
 		    printf("Published %d\n", rc);
 
             thread_sleep(3);
@@ -184,7 +165,7 @@ void cfinish(int sig)
 }
 
 
-void getopts(int argc, char** argv)
+void getopts(int argc, char** argv, struct opts_struct opts)
 {
 	int count = 2;
 
@@ -263,23 +244,29 @@ void getopts(int argc, char** argv)
 		{
 			opts.publish = 1;
 		}
-                else if (strcmp(argv[count], "--msg") == 0)
-                {
-                        if (++count < argc)
-                                strcpy(opts.msg, argv[count]);
-                        else
-                                usage();
-                }
-
+        else if (strcmp(argv[count], "--msg") == 0)
+        {
+            if (++count < argc)
+                strcpy(opts.msg, argv[count]);
+            else
+                usage();
+        }
+    	else if (strcmp(argv[count], "--log") == 0)
+		{
+			if (++count < argc)
+				opts.logFilePath = argv[count];
+			else
+				usage();
+		}
 
 		count++;
 	}
 }
 
 
-void init_system()
+void init_system(struct opts_struct opts)
 {
-	initInstaMsg(&c, opts.clientid, opts.password, onConnect, onDisconnect, NULL);
+	initInstaMsg(&c, opts.clientid, opts.password, onConnect, onDisconnect, NULL, opts);
 
     create_and_init_thread(clientTimerThread, &c);
     incrementOrDecrementThreadCount(1);
@@ -294,6 +281,11 @@ void init_system()
 
 int main(int argc, char** argv)
 {
+    struct opts_struct opts =
+    {
+        (char*)"stdout-subscriber", 0, (char*)"\n", QOS2, NULL, (char*)"localhost", 1883, 0, 0, 0, ""
+    };
+
 	int rc = 0;
 
 	if (argc < 2)
@@ -306,7 +298,9 @@ int main(int argc, char** argv)
 	if (opts.showtopics)
 		printf("topic is %s\n", topic);
 
-	getopts(argc, argv);
+	getopts(argc, argv, opts);
+    opts_p = &opts;
+
 	signal(SIGINT, cfinish);
 	signal(SIGTERM, cfinish);
 
@@ -327,7 +321,7 @@ int main(int argc, char** argv)
                 terminateCurrentInstance = 0;
 
                 threadCountMutex->unlock(threadCountMutex);
-                init_system();
+                init_system(opts);
             }
             else
             {

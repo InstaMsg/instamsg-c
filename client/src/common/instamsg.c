@@ -346,17 +346,18 @@ void initInstaMsg(InstaMsg* c,
                   char *authKey,
                   int (*connectHandler)(),
                   int (*disconnectHandler)(),
-                  int (*oneToOneMessageHandler)())
+                  int (*oneToOneMessageHandler)(),
+                  struct opts_struct opts)
 {
     int i;
     char clientIdMachine[MAX_BUFFER_SIZE] = {0};
     char username[MAX_BUFFER_SIZE] = {0};
 
-    /*
-     * VERY IMPORTANT: If this is not done, the "write" on an invalid socket will cause program-crash
-     */
+    // VERY IMPORTANT: If this is not done, the "write" on an invalid socket will cause program-crash
     signal(SIGPIPE,SIG_IGN);
+
 	c->ipstack = get_new_network(NULL);
+    //c->logger = get_new_logger(opts.logFilePath);
 
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {

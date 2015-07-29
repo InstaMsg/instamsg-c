@@ -14,13 +14,14 @@
  *    Allan Stockdill-Mander/Ian Craggs - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-#ifndef __MQTT_CLIENT_C_
-#define __MQTT_CLIENT_C_
+#ifndef INSTAMSG
+#define INSTAMSG
 
-#include "../../../../MQTTPacket/src/MQTTPacket.h"
+#include "./log.h"
 #include "../../time/include/time.h"
 #include "../../communication/include/network.h"
 #include "../../threading/include/threading.h"
+#include "../../../../MQTTPacket/src/MQTTPacket.h"
 
 #include "stdio.h"
 
@@ -56,6 +57,23 @@ struct MessageData
 
 typedef void (*messageHandler)(MessageData*);
 
+struct opts_struct
+{
+	char* clientid;
+	int nodelimiter;
+	char* delimiter;
+	enum QoS qos;
+	char* password;
+	char* host;
+	int port;
+	int showtopics;
+
+	int subscribe;
+	int publish;
+	char msg[100];
+    char *logFilePath;
+};
+
 typedef struct InstaMsg InstaMsg;
 struct InstaMsg {
     unsigned int next_packetid;
@@ -84,7 +102,8 @@ struct InstaMsg {
     struct Mutex *messageHandlersMutex;
     struct Mutex *resultHandlersMutex;
 
-    Network* ipstack;
+    Network *ipstack;
+    Logger *logger;
 
     MQTTPacket_connectData connectOptions;
 };
@@ -119,7 +138,8 @@ void initInstaMsg(InstaMsg* c,
                   char *authKey,
                   int (*connectHandler)(),
                   int (*disconnectHandler)(),
-                  int (*oneToOneMessageHandler)());
+                  int (*oneToOneMessageHandler)(),
+                  struct opts_struct opts);
 
 void cleanInstaMsgObject(InstaMsg *c);
 
