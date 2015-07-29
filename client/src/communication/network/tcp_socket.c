@@ -46,6 +46,12 @@ static int tcp_socket_write(Network* n, unsigned char* buffer, int len);
 #define PORT 1883
 
 
+static void release_underlying_medium_guaranteed(Network* network)
+{
+    // Close the socket
+    close(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)));
+}
+
 
 static void connect_underlying_medium_guaranteed(Network* network)
 {
@@ -95,7 +101,7 @@ static void connect_underlying_medium_guaranteed(Network* network)
 			    int opt = 1;
                 if(connect(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)), (struct sockaddr*)&address, sizeof(address)) != 0)
                 {
-                    close(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)));
+                    release_underlying_medium_guaranteed(network);
                     printf("Could not connect to the network ... retrying\n");
 
                     thread_sleep(1);
@@ -188,8 +194,7 @@ Network* get_new_network()
 
 void release_network(Network *n)
 {
-    // Close the socket
-    close(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)));
+    release_underlying_medium_guaranteed(n);
 
     // Free the dynamically-allocated memory
     free(n->medium);
