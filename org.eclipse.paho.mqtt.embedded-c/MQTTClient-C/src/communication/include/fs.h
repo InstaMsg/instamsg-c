@@ -10,6 +10,6 @@ struct FileSystem
 };
 
 FS* get_new_file_system();
-void release_network(FileSystem*);
+void release_file_system(FileSystem*);
 
 #endif
