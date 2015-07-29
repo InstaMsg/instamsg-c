@@ -397,8 +397,6 @@ void initInstaMsg(InstaMsg* c,
 
 void cleanInstaMsgObject(InstaMsg *c)
 {
-	MQTTDisconnect(c);
-
     release_mutex(c->resultHandlersMutex);
     release_mutex(c->messageHandlersMutex);
     release_mutex(c->networkPhysicalMediumMutex);

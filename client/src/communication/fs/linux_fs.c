@@ -100,11 +100,6 @@ void release_file_system(FileSystem *fs)
     // Free the dynamically-allocated memory
     if(fs != NULL)
     {
-        if(fs->medium != NULL)
-        {
-            free(fs->medium);
-        }
-
         free(fs);
     }
 }
