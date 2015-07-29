@@ -31,4 +31,4 @@
 # Debug files
 *.dSYM/
 
-org.eclipse.paho.mqtt.embedded-c/MQTTClient-C/stdoutsub
+client/stdoutsub
