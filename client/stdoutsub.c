@@ -165,7 +165,7 @@ void cfinish(int sig)
 }
 
 
-void getopts(int argc, char** argv, struct opts_struct opts)
+void getopts(int argc, char** argv, struct opts_struct *opts)
 {
 	int count = 2;
 
@@ -176,11 +176,11 @@ void getopts(int argc, char** argv, struct opts_struct opts)
 			if (++count < argc)
 			{
 				if (strcmp(argv[count], "0") == 0)
-					opts.qos = QOS0;
+					opts->qos = QOS0;
 				else if (strcmp(argv[count], "1") == 0)
-					opts.qos = QOS1;
+					opts->qos = QOS1;
 				else if (strcmp(argv[count], "2") == 0)
-					opts.qos = QOS2;
+					opts->qos = QOS2;
 				else
 					usage();
 			}
@@ -190,46 +190,46 @@ void getopts(int argc, char** argv, struct opts_struct opts)
 		else if (strcmp(argv[count], "--host") == 0)
 		{
 			if (++count < argc)
-				opts.host = argv[count];
+				opts->host = argv[count];
 			else
 				usage();
 		}
 		else if (strcmp(argv[count], "--port") == 0)
 		{
 			if (++count < argc)
-				opts.port = atoi(argv[count]);
+				opts->port = atoi(argv[count]);
 			else
 				usage();
 		}
 		else if (strcmp(argv[count], "--clientid") == 0)
 		{
 			if (++count < argc)
-				opts.clientid = argv[count];
+				opts->clientid = argv[count];
 			else
 				usage();
 		}
 		else if (strcmp(argv[count], "--password") == 0)
 		{
 			if (++count < argc)
-				opts.password = argv[count];
+				opts->password = argv[count];
 			else
 				usage();
 		}
 		else if (strcmp(argv[count], "--delimiter") == 0)
 		{
 			if (++count < argc)
-				opts.delimiter = argv[count];
+				opts->delimiter = argv[count];
 			else
-				opts.nodelimiter = 1;
+				opts->nodelimiter = 1;
 		}
 		else if (strcmp(argv[count], "--showtopics") == 0)
 		{
 			if (++count < argc)
 			{
 				if (strcmp(argv[count], "on") == 0)
-					opts.showtopics = 1;
+					opts->showtopics = 1;
 				else if (strcmp(argv[count], "off") == 0)
-					opts.showtopics = 0;
+					opts->showtopics = 0;
 				else
 					usage();
 			}
@@ -238,23 +238,23 @@ void getopts(int argc, char** argv, struct opts_struct opts)
 		}
 		else if (strcmp(argv[count], "--sub") == 0)
 		{
-			opts.subscribe = 1;
+			opts->subscribe = 1;
 		}
 		else if (strcmp(argv[count], "--pub") == 0)
 		{
-			opts.publish = 1;
+			opts->publish = 1;
 		}
         else if (strcmp(argv[count], "--msg") == 0)
         {
             if (++count < argc)
-                strcpy(opts.msg, argv[count]);
+                strcpy(opts->msg, argv[count]);
             else
                 usage();
         }
     	else if (strcmp(argv[count], "--log") == 0)
 		{
 			if (++count < argc)
-				opts.logFilePath = argv[count];
+				opts->logFilePath = argv[count];
 			else
 				usage();
 		}
@@ -264,9 +264,9 @@ void getopts(int argc, char** argv, struct opts_struct opts)
 }
 
 
-void init_system(struct opts_struct opts)
+void init_system(struct opts_struct *opts)
 {
-	initInstaMsg(&c, opts.clientid, opts.password, onConnect, onDisconnect, NULL, opts);
+	initInstaMsg(&c, opts->clientid, opts->password, onConnect, onDisconnect, NULL, opts);
 
     create_and_init_thread(clientTimerThread, &c);
     incrementOrDecrementThreadCount(1);
@@ -298,7 +298,7 @@ int main(int argc, char** argv)
 	if (opts.showtopics)
 		printf("topic is %s\n", topic);
 
-	getopts(argc, argv, opts);
+	getopts(argc, argv, &opts);
     opts_p = &opts;
 
 	signal(SIGINT, cfinish);
@@ -321,7 +321,7 @@ int main(int argc, char** argv)
                 terminateCurrentInstance = 0;
 
                 threadCountMutex->unlock(threadCountMutex);
-                init_system(opts);
+                init_system(&opts);
             }
             else
             {

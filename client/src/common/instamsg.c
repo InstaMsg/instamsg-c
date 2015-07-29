@@ -347,7 +347,7 @@ void initInstaMsg(InstaMsg* c,
                   int (*connectHandler)(),
                   int (*disconnectHandler)(),
                   int (*oneToOneMessageHandler)(),
-                  struct opts_struct opts)
+                  struct opts_struct *opts)
 {
     int i;
     char clientIdMachine[MAX_BUFFER_SIZE] = {0};
@@ -357,7 +357,7 @@ void initInstaMsg(InstaMsg* c,
     signal(SIGPIPE,SIG_IGN);
 
 	c->ipstack = get_new_network(NULL);
-    //c->logger = get_new_logger(opts.logFilePath);
+    c->logger = get_new_logger(opts->logFilePath);
 
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {
@@ -702,6 +702,7 @@ int MQTTDisconnect(InstaMsg* c)
     if (len > 0)
         rc = sendPacket(c, buf, len, 1);            // send the disconnect packet
 
+    release_logger(c->logger);
     release_network(c->ipstack);
     c->onDisconnectCallback();
 

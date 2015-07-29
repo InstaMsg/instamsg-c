@@ -139,7 +139,7 @@ void initInstaMsg(InstaMsg* c,
                   int (*connectHandler)(),
                   int (*disconnectHandler)(),
                   int (*oneToOneMessageHandler)(),
-                  struct opts_struct opts);
+                  struct opts_struct *opts);
 
 void cleanInstaMsgObject(InstaMsg *c);
 
