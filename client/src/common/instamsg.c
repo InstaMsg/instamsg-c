@@ -15,14 +15,16 @@
  *    Ajay Garg <ajay.garg@sensegrow.com>
  *******************************************************************************/
 
+#include "include/config.h"
 #include "include/instamsg.h"
+
 #include <string.h>
 #include <signal.h>
 
 
 static void publishQoS2CycleCompleted(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
-    debug_log(instaMsg.logger, "PUBCOMP received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
+    debug_log(logger, "PUBCOMP received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
 }
 
 
@@ -59,7 +61,7 @@ void prepareThreadTerminationIfApplicable(const char *threadName)
 {
     if(terminateCurrentInstance == 1)
     {
-        info_log(instaMsg.logger, "Terminating %s\n", threadName);
+        info_log(logger, "Terminating %s\n", threadName);
         incrementOrDecrementThreadCount(0);
     }
 }
@@ -307,7 +309,7 @@ void* clientTimerThread(InstaMsg *c)
                 }
                 else
                 {
-                    info_log(instaMsg.logger, "No result obtained for msgId [%u] in the specified period\n", c->resultHandlers[i].msgId);
+                    info_log(logger, "No result obtained for msgId [%u] in the specified period\n", c->resultHandlers[i].msgId);
                     c->resultHandlers[i].msgId = 0;
                 }
 
@@ -357,9 +359,9 @@ void initInstaMsg(InstaMsg* c,
     // VERY IMPORTANT: If this is not done, the "write" on an invalid socket will cause program-crash
     signal(SIGPIPE,SIG_IGN);
 
-    c->logger = get_new_logger(opts->logFilePath);
-    readConfig(config, c->logger, "LOG_LEVEL", INTEGER, &currentLogLevel);
+    readConfig(config, logger, "LOG_LEVEL", INTEGER, &currentLogLevel);
 
+    logger = get_new_logger(opts->logFilePath);
 	c->ipstack = get_new_network(NULL);
 
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
@@ -405,7 +407,7 @@ void cleanInstaMsgObject(InstaMsg *c)
     release_mutex(c->networkPhysicalMediumMutex);
 
     release_network(c->ipstack);
-    release_logger(c->logger);
+    release_logger(logger);
 }
 
 
@@ -438,7 +440,7 @@ void readPacketThread(InstaMsg* c)
                     }
                     else
                     {
-                        info_log(instaMsg.logger, "Client-Connection failed with code [%d]\n", connack_rc);
+                        info_log(logger, "Client-Connection failed with code [%d]\n", connack_rc);
                     }
                 }
 
@@ -547,7 +549,7 @@ void readPacketThread(InstaMsg* c)
 
             case PINGRESP:
             {
-                debug_log(instaMsg.logger, "PINGRESP received... relations are intact !!\n");
+                debug_log(logger, "PINGRESP received... relations are intact !!\n");
                 break;
             }
         }

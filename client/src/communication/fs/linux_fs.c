@@ -12,8 +12,7 @@
 #include <stdlib.h>
 
 #include "../include/fs.h"
-#include "../../common/include/instamsg.h"
-#include "../../../../MQTTPacket/src/common.h"
+#include "../../common/include/globals.h"
 
 
 

@@ -105,7 +105,6 @@ struct InstaMsg {
     struct Mutex *resultHandlersMutex;
 
     Network *ipstack;
-    Logger *logger;
 
     MQTTPacket_connectData connectOptions;
 };

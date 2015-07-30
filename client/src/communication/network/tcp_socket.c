@@ -25,9 +25,8 @@
 #include <signal.h>
 
 #include "../include/network.h"
-#include "../../common/include/instamsg.h"
+#include "../../common/include/config.h"
 #include "../../threading/include/threading.h"
-#include "../../../../MQTTPacket/src/common.h"
 
 
 
@@ -58,7 +57,7 @@ static void connect_underlying_medium_guaranteed(Network* network)
 	struct addrinfo hints = {0, AF_UNSPEC, SOCK_STREAM, IPPROTO_TCP, 0, NULL, NULL, NULL};
 
     char hostName[MAX_BUFFER_SIZE] = {0};
-    readConfig(config, instaMsg.logger, "SERVER_IP", STRING, hostName);
+    readConfig(config, logger, "SERVER_IP", STRING, hostName);
 	if ((rc = getaddrinfo(hostName, NULL, &hints, &result)) == 0)
 	{
 		struct addrinfo* res = result;
@@ -78,7 +77,7 @@ static void connect_underlying_medium_guaranteed(Network* network)
 		{
 
             int port;
-            readConfig(config, instaMsg.logger, "SERVER_PORT", INTEGER, &port);
+            readConfig(config, logger, "SERVER_PORT", INTEGER, &port);
 
 			address.sin_port = htons(port);
 			address.sin_family = family = AF_INET;
@@ -100,7 +99,7 @@ static void connect_underlying_medium_guaranteed(Network* network)
 			    int opt = 1;
                 if(connect(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)), (struct sockaddr*)&address, sizeof(address)) != 0)
                 {
-                    info_log(instaMsg.logger, "Could not connect to the network ... retrying\n");
+                    info_log(logger, "Could not connect to the network ... retrying\n");
 
                     thread_sleep(1);
                 }
@@ -112,7 +111,7 @@ static void connect_underlying_medium_guaranteed(Network* network)
         }
 	}
 
-    info_log(instaMsg.logger, "TCP-SOCKET structure underlying physical-medium initiated.\n");
+    info_log(logger, "TCP-SOCKET structure underlying physical-medium initiated.\n");
 }
 
 
@@ -205,5 +204,5 @@ void release_network(Network *n)
         free(n);
     }
 
-    info_log(instaMsg.logger, "COMPLETE [TCP-SOCKET] STRUCTURE, INCLUDING THE UNDERLYING MEDIUM (SOCKET) CLEANED.\n");
+    info_log(logger, "COMPLETE [TCP-SOCKET] STRUCTURE, INCLUDING THE UNDERLYING MEDIUM (SOCKET) CLEANED.\n");
 }

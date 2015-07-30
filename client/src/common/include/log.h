@@ -22,7 +22,8 @@ void info_log(Logger *logger, char *fmt, ...);
 void error_log(Logger *logger, char *fmt, ...);
 void debug_log(Logger *logger, char *fmt, ...);
 
-
 int currentLogLevel;
+
+Logger *logger;
 
 #endif

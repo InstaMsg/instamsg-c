@@ -1,9 +1,21 @@
 #ifndef INSTAMSG_GLOBALS
 #define INSTAMSG_GLOBALS
 
-#include "./config.h"
-
 #define MAX_BUFFER_SIZE 100
-Config *config;
+
+enum returnCode
+{
+   BUFFER_OVERFLOW = -2,
+   FAILURE = -1,
+   SUCCESS = 0
+};
+
+typedef enum ValueType ValueType;
+enum ValueType
+{
+    STRING = 0,
+    INTEGER
+};
+
 
 #endif
