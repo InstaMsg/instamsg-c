@@ -43,8 +43,6 @@ static int tcp_socket_write(Network* n, unsigned char* buffer, int len);
 
 
 #define GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network) ((int *)(network->medium))
-#define HOSTNAME "localhost"
-#define PORT 1883
 
 
 static void release_underlying_medium_guaranteed(Network* network)
@@ -66,7 +64,9 @@ static void connect_underlying_medium_guaranteed(Network* network)
 	struct addrinfo *result = NULL;
 	struct addrinfo hints = {0, AF_UNSPEC, SOCK_STREAM, IPPROTO_TCP, 0, NULL, NULL, NULL};
 
-	if ((rc = getaddrinfo(HOSTNAME, NULL, &hints, &result)) == 0)
+    char hostName[MAX_BUFFER_SIZE] = {0};
+    readConfig(config, instaMsg.logger, "SERVER_IP", STRING, hostName);
+	if ((rc = getaddrinfo(hostName, NULL, &hints, &result)) == 0)
 	{
 		struct addrinfo* res = result;
 
@@ -83,7 +83,11 @@ static void connect_underlying_medium_guaranteed(Network* network)
 
 		if (result->ai_family == AF_INET)
 		{
-			address.sin_port = htons(PORT);
+
+            int port;
+            readConfig(config, instaMsg.logger, "SERVER_PORT", INTEGER, &port);
+
+			address.sin_port = htons(port);
 			address.sin_family = family = AF_INET;
 			address.sin_addr = ((struct sockaddr_in*)(result->ai_addr))->sin_addr;
 		}
