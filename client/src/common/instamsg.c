@@ -12,6 +12,7 @@
  *
  * Contributors:
  *    Allan Stockdill-Mander/Ian Craggs - initial API and implementation and/or initial documentation
+ *    Ajay Garg <ajay.garg@sensegrow.com>
  *******************************************************************************/
 
 #include "include/instamsg.h"
