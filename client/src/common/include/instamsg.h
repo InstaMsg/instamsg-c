@@ -17,6 +17,7 @@
 #ifndef INSTAMSG
 #define INSTAMSG
 
+#include "./globals.h"
 #include "./log.h"
 #include "../../time/include/time.h"
 #include "../../communication/include/network.h"
@@ -27,7 +28,6 @@
 
 #define MAX_PACKET_ID 30000
 #define MAX_MESSAGE_HANDLERS 5
-#define MAX_BUFFER_SIZE 100
 #define KEEP_ALIVE_INTERVAL_SECS 10
 #define INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS 10
 
