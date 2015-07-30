@@ -312,9 +312,6 @@ int main(int argc, char** argv)
     threadCountMutex = get_new_mutex();
     terminateCurrentInstance = 1;
 
-    // TODO: This has to be read from config.
-    currentLogLevel = INSTAMSG_LOG_LEVEL_DEBUG;
-
 	while (!toStop)
 	{
         while(terminateCurrentInstance == 1)

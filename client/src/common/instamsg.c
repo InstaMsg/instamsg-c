@@ -357,6 +357,8 @@ void initInstaMsg(InstaMsg* c,
     signal(SIGPIPE,SIG_IGN);
 
     c->logger = get_new_logger(opts->logFilePath);
+    readConfig(config, c->logger, "LOG_LEVEL", INTEGER, &currentLogLevel);
+
 	c->ipstack = get_new_network(NULL);
 
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
