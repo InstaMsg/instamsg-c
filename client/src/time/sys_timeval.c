@@ -19,7 +19,7 @@ struct TimerObj {
 
 #define GET_IMPLEMENTATION_SPECIFIC_TIMER_OBJ(timer) ((struct TimerObj*)(timer->obj))
 
-void getTimeIn_YYYYmmdd4HHMMSS(Timer *timer, unsigned char *buf, int maxValueLenAllowed)
+static void getTimeIn_YYYYmmdd4HHMMSS(Timer *timer, unsigned char *buf, int maxValueLenAllowed)
 {
     time_t time_t_time;
     struct tm* tm_info;
@@ -31,7 +31,7 @@ void getTimeIn_YYYYmmdd4HHMMSS(Timer *timer, unsigned char *buf, int maxValueLen
 }
 
 
-void getOffset(Timer *timer, unsigned char *buf, int maxValueLenAllowed)
+static void getOffset(Timer *timer, unsigned char *buf, int maxValueLenAllowed)
 {
     snprintf(buf, maxValueLenAllowed, "19800");
 }
