@@ -6,6 +6,7 @@ SYSTEM_INCLUDES=`echo                                               \
         -I/usr/include `
 
 THREAD_IMPL="pthread"
+SYSTEM_IMPL="linux_desktop"
 TIME_IMPL="sys_timeval"
 NETWORK_COMMUNICATION_IMPL="tcp_socket"
 FS_COMMUNICATION_IMPL="linux_fs"
@@ -34,6 +35,7 @@ gcc -nostdinc                                                       \
         ../MQTTPacket/src/MQTTUnsubscribeClient.c                   \
                                                                     \
         src/threading/${THREAD_IMPL}.c                              \
+        src/system/${SYSTEM_IMPL}.c                                 \
         src/time/${TIME_IMPL}.c                                     \
         src/communication/network/${NETWORK_COMMUNICATION_IMPL}.c   \
         src/communication/fs/${FS_COMMUNICATION_IMPL}.c             \
