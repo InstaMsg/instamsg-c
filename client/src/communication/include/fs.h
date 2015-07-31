@@ -5,16 +5,20 @@
  *
  *******************************************************************************/
 
+/*
+ * Interface for sending/receiving bytes between the instamg-client (on the device) and the device-file(system).
+ */
+
+
 #ifndef INSTAMSG_FS
 #define INSTAMSG_FS
+
+#include "./common.h"
 
 typedef struct FileSystem FileSystem;
 struct FileSystem
 {
-    void *medium;
-
-    int (*read)(FileSystem *fs, unsigned char* buffer, int len);
-    int (*write)(FileSystem *fs, unsigned char* buffer, int len);
+    COMMUNICATION_INTERFACE(FileSystem)
 };
 
 FileSystem* get_new_file_system(void *arg);
