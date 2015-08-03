@@ -44,4 +44,5 @@ embedded-flash-environment/share/
 embedded-flash-environment/tiva-template/
 embedded-flash-environment/tivaware/
 
+client/tiva_blinky_bootstrap_example/tiva_build/
 client/src/communication/fs/test_tiva_tm4c123gxl_serial_uart/tiva_build/
