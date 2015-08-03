@@ -10,7 +10,6 @@ enum returnCode
    SUCCESS = 0
 };
 
-typedef enum ValueType ValueType;
 enum ValueType
 {
     STRING = 0,

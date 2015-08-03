@@ -14,7 +14,7 @@ struct Config
 Config* get_new_config(void *arg);
 void release_config(Config*);
 
-void readConfig(Config *config, Logger *logger, const unsigned char *key, ValueType valueType, void *value);
+void readConfig(Config *config, Logger *logger, const unsigned char *key, enum ValueType valueType, void *value);
 
 Config *config;
 
