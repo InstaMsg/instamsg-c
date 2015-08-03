@@ -15,32 +15,22 @@
 #include "./include/config.h"
 #include "./include/globals.h"
 
-Config* get_new_config(void *arg)
+void init_config(Config *config, void *arg)
 {
-    Config *config = (Config*)malloc(sizeof(Config));
-
     // Here, physical medium is a file-system.
-	config->medium = get_new_file_system(arg);
-
-    return config;
+	init_file_system(&(config->fs), arg);
 }
 
 
 void release_config(Config *config)
 {
-    release_file_system(config->medium);
-
-    // Free the dynamically-allocated memory
-    if(config != NULL)
-    {
-        free(config);
-    }
+    release_file_system(&(config->fs));
 }
 
 
 void readConfig(Config *config, Logger *logger, const unsigned char *key, enum ValueType valueType, void *value)
 {
-    rewind(config->medium->medium);
+    rewind((config->fs).fp);
 
     while(1)
     {
@@ -55,7 +45,7 @@ void readConfig(Config *config, Logger *logger, const unsigned char *key, enum V
         {
             char ch = EOF;
 
-            config->medium->read(config->medium, &ch, 1);
+            (config->fs).read(&(config->fs), &ch, 1);
 
 
             // We reached the end of file, but we were not done yet :(
@@ -108,19 +98,3 @@ void readConfig(Config *config, Logger *logger, const unsigned char *key, enum V
     }
 
 }
-
-/*
-int main()
-{
-    Logger *logger = get_new_logger("./test_logger");
-    Config *config = get_new_config("./config.txt");
-
-    char value[MAX_BUFFER_SIZE] = {0};
-    readConfig(config, logger, "ajay", STRING, value);
-    printf("Value read == [%s]\n", value);
-
-    int age;
-    readConfig(config, logger, "age", INTEGER, &age);
-    printf("Value read == [%d]\n", age);
-}
-*/

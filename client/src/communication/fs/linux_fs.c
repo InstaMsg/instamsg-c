@@ -11,23 +11,14 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "../include/fs.h"
+#include "instamsg_vendor.h"
 #include "../../common/include/globals.h"
 
 
 
-static int linux_fs_read(FileSystem* fs, unsigned char* buffer, int len);
-static int linux_fs_write(FileSystem* fs, unsigned char* buffer, int len);
-
-
-#define GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(fs) ((FILE *)(fs->medium))
-
-
 static void release_underlying_medium_guaranteed(FileSystem* fs)
 {
-    // Close the file-pointer.
-    //
-    FILE *fp = GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(fs);
+    FILE *fp = fs->fp;
     if(fp != NULL)
     {
         fclose(fp);
@@ -37,13 +28,13 @@ static void release_underlying_medium_guaranteed(FileSystem* fs)
 
 static void connect_underlying_medium_guaranteed(FileSystem* fs, const char *fileName)
 {
-    fs->medium = fopen(fileName, "a+");
+    fs->fp = fopen(fileName, "a+");
 }
 
 
 static int linux_fs_read(FileSystem* fs, unsigned char* buffer, int len)
 {
-    if(fread(buffer, sizeof(buffer[0]), len, fs->medium) < len)
+    if(fread(buffer, sizeof(buffer[0]), len, fs->fp) < len)
     {
         return FAILURE;
     }
@@ -54,23 +45,18 @@ static int linux_fs_read(FileSystem* fs, unsigned char* buffer, int len)
 
 static int linux_fs_write(FileSystem* fs, unsigned char* buffer, int len)
 {
-    if(fwrite(buffer, sizeof(buffer[0]), len, fs->medium) < len)
+    if(fwrite(buffer, sizeof(buffer[0]), len, fs->fp) < len)
     {
         return FAILURE;
     }
-    fflush(fs->medium);
+    fflush(fs->fp);
 
     return SUCCESS;
 }
 
 
-FileSystem* get_new_file_system(void *arg)
+void init_file_system(FileSystem *fs, void *arg)
 {
-    FileSystem *fs = (FileSystem*)malloc(sizeof(FileSystem));
-
-    // Here, physical medium is a file-pointer.
-	fs->medium = malloc(sizeof(FILE *));
-
     // Register read-callback.
 	fs->read = linux_fs_read;
 
@@ -80,18 +66,10 @@ FileSystem* get_new_file_system(void *arg)
     // Connect the medium (file-pointer).
     const char *fileName = (const char*)arg;
     connect_underlying_medium_guaranteed(fs, fileName);
-
-    return fs;
 }
 
 
 void release_file_system(FileSystem *fs)
 {
     release_underlying_medium_guaranteed(fs);
-
-    // Free the dynamically-allocated memory
-    if(fs != NULL)
-    {
-        free(fs);
-    }
 }

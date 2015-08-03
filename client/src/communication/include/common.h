@@ -50,10 +50,37 @@
 
 #define COMMUNICATION_INTERFACE(type)                                                           \
                                                                                                 \
-    void *medium;                                                                               \
-                                                                                                \
     int (*read) (type *interface, unsigned char* buffer, int len);                              \
     int (*write)(type *interface, unsigned char* buffer, int len);
+
+
+/*
+ * Interface for sending/receiving bytes between the device and instamsg-server.
+ */
+typedef struct Network Network;
+void init_network(Network *network, void *arg);
+void release_network(Network *network);
+
+
+/*
+ * Interface for sending/receiving bytes between the instamg-client (on the device) and the device-file(system).
+ */
+typedef struct FileSystem FileSystem;
+void init_file_system(FileSystem *fs, void *arg);
+void release_file_system(FileSystem *fs);
+
+
+/*
+ * Interface for sending/receiving bytes between the instamg-client (on the device) and the device-command-interface.
+ *
+ * Generally, the interface would be a serial-port, through which the instamsg-client can send the command-bytes, and
+ * receive the command-response-bytes.
+ */
+typedef struct Command Command;
+void init_command_interface(Command *command, void *arg);
+void release_command_interface(Command *command);
+
+
 
 #endif
 

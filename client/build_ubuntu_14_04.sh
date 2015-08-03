@@ -5,6 +5,8 @@ SYSTEM_INCLUDES=`echo                                               \
         -I/usr/include/i386-linux-gnu                               \
         -I/usr/include `
 
+VENDOR="linux_desktop"
+
 THREAD_IMPL="pthread"
 SYSTEM_IMPL="linux_desktop"
 TIME_IMPL="sys_timeval"
@@ -18,6 +20,7 @@ gcc -nostdinc                                                       \
         stdoutsub.c                                                 \
                                                                     \
         ${SYSTEM_INCLUDES}                                          \
+        -Isrc/communication/include/vendors/${VENDOR}/              \
         -I ../MQTTPacket/src                                        \
                                                                     \
         src/common/instamsg.c                                       \

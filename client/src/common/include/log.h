@@ -1,12 +1,12 @@
 #ifndef INSTAMSG_LOGGER
 #define INSTAMSG_LOGGER
 
-#include "../../communication/include/fs.h"
+#include "instamsg_vendor.h"
 
 typedef struct Logger Logger;
 struct Logger
 {
-    FileSystem *medium;
+    FileSystem fs;
 };
 
 #define INSTAMSG_LOG_LEVEL_DISABLED 0
@@ -15,7 +15,7 @@ struct Logger
 #define INSTAMSG_LOG_LEVEL_DEBUG    3
 
 
-Logger* get_new_logger(void *arg);
+void init_logger(Logger *logger, void *arg);
 void release_logger(Logger*);
 
 void info_log(Logger *logger, char *fmt, ...);
@@ -24,6 +24,6 @@ void debug_log(Logger *logger, char *fmt, ...);
 
 int currentLogLevel;
 
-Logger *logger;
+Logger logger;
 
 #endif

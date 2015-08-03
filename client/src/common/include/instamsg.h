@@ -21,7 +21,6 @@
 #include "./globals.h"
 #include "./log.h"
 #include "../../time/include/time.h"
-#include "../../communication/include/network.h"
 #include "../../threading/include/threading.h"
 #include "../../../../MQTTPacket/src/MQTTPacket.h"
 
@@ -104,8 +103,7 @@ struct InstaMsg {
     struct Mutex *messageHandlersMutex;
     struct Mutex *resultHandlersMutex;
 
-    Network *ipstack;
-
+    Network ipstack;
     MQTTPacket_connectData connectOptions;
 };
 

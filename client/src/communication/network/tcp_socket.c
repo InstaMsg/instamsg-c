@@ -15,32 +15,15 @@
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <string.h>
-#include <signal.h>
 
-#include "../include/network.h"
+#include "instamsg_vendor.h"
 #include "../../common/include/config.h"
 #include "../../threading/include/threading.h"
 
 
-
-static int tcp_socket_read(Network* n, unsigned char* buffer, int len);
-static int tcp_socket_write(Network* n, unsigned char* buffer, int len);
-
-
-#define GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network) ((int *)(network->medium))
-
-
 static void release_underlying_medium_guaranteed(Network* network)
 {
-    // Close the socket.
-    //
-    close(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)));
+    close(network->socket);
 }
 
 
@@ -56,7 +39,7 @@ static void connect_underlying_medium_guaranteed(Network* network)
 	struct addrinfo hints = {0, AF_UNSPEC, SOCK_STREAM, IPPROTO_TCP, 0, NULL, NULL, NULL};
 
     char hostName[MAX_BUFFER_SIZE] = {0};
-    readConfig(config, logger, "SERVER_IP", STRING, hostName);
+    readConfig(&config, &logger, "SERVER_IP", STRING, hostName);
 	if ((rc = getaddrinfo(hostName, NULL, &hints, &result)) == 0)
 	{
 		struct addrinfo* res = result;
@@ -76,7 +59,7 @@ static void connect_underlying_medium_guaranteed(Network* network)
 		{
 
             int port;
-            readConfig(config, logger, "SERVER_PORT", INTEGER, &port);
+            readConfig(&config, &logger, "SERVER_PORT", INTEGER, &port);
 
 			address.sin_port = htons(port);
 			address.sin_family = family = AF_INET;
@@ -92,13 +75,13 @@ static void connect_underlying_medium_guaranteed(Network* network)
 	{
         while(1)
         {
-		    *(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)) = socket(family, type, 0);
-		    if (*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)) != -1)
+		    network->socket = socket(family, type, 0);
+		    if (network->socket != -1)
 		    {
 			    int opt = 1;
-                if(connect(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(network)), (struct sockaddr*)&address, sizeof(address)) != 0)
+                if(connect(network->socket, (struct sockaddr*)&address, sizeof(address)) != 0)
                 {
-                    info_log(logger, "Could not connect to the network ... retrying\n");
+                    info_log(&logger, "Could not connect to the network ... retrying\n");
 
                     thread_sleep(1);
                 }
@@ -110,18 +93,18 @@ static void connect_underlying_medium_guaranteed(Network* network)
         }
 	}
 
-    info_log(logger, "TCP-SOCKET structure underlying physical-medium initiated.\n");
+    info_log(&logger, "TCP-SOCKET structure underlying physical-medium initiated.\n");
 }
 
 
-static int tcp_socket_read(Network* n, unsigned char* buffer, int len)
+static int tcp_socket_read(Network* network, unsigned char* buffer, int len)
 {
 	int bytes = 0;
     int rc = 0;
 
 	while (bytes < len)
 	{
-		while(rc = recv(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)), &buffer[bytes], (size_t)(len - bytes), 0) < 0)
+		while(rc = recv(network->socket, &buffer[bytes], (size_t)(len - bytes), 0) < 0)
         {
             return FAILURE;
         }
@@ -141,14 +124,14 @@ static int tcp_socket_read(Network* n, unsigned char* buffer, int len)
 }
 
 
-static int tcp_socket_write(Network* n, unsigned char* buffer, int len)
+static int tcp_socket_write(Network* network, unsigned char* buffer, int len)
 {
     int bytes = 0;
     int rc = 0;
 
     while(bytes < len)
     {
-	    while(rc = write(*(GET_IMPLEMENTATION_SPECIFIC_MEDIUM_OBJ(n)), &buffer[bytes], (size_t)(len - bytes)) < 0)
+	    while(rc = write(network->socket, &buffer[bytes], (size_t)(len - bytes)) < 0)
         {
             return FAILURE;
         }
@@ -168,13 +151,8 @@ static int tcp_socket_write(Network* n, unsigned char* buffer, int len)
 }
 
 
-Network* get_new_network(void *arg)
+void init_network(Network *network, void *arg)
 {
-    Network *network = (Network*)malloc(sizeof(Network));
-
-    // Here, physical medium is a socket, and this represents the socket-id
-	network->medium = malloc(sizeof(int));
-
     // Register read-callback.
 	network->read = tcp_socket_read;
 
@@ -183,8 +161,6 @@ Network* get_new_network(void *arg)
 
     // Connect the medium (socket).
     connect_underlying_medium_guaranteed(network);
-
-    return network;
 }
 
 
@@ -192,16 +168,5 @@ void release_network(Network *n)
 {
     release_underlying_medium_guaranteed(n);
 
-    // Free the dynamically-allocated memory
-    if(n != NULL)
-    {
-        if(n->medium != NULL)
-        {
-            free(n->medium);
-        }
-
-        free(n);
-    }
-
-    info_log(logger, "COMPLETE [TCP-SOCKET] STRUCTURE, INCLUDING THE UNDERLYING MEDIUM (SOCKET) CLEANED.\n");
+    info_log(&logger, "COMPLETE [TCP-SOCKET] STRUCTURE, INCLUDING THE UNDERLYING MEDIUM (SOCKET) CLEANED.\n");
 }

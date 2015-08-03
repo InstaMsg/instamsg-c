@@ -27,30 +27,21 @@
     vsnprintf(formatted_string, MAX_LENGTH_LOG_ALLOWED, fmt, argptr);                               \
     va_end(argptr);                                                                                 \
                                                                                                     \
-    logger->medium->write(logger->medium, formatted_string, strlen(formatted_string));
+    (logger->fs).write(&(logger->fs), formatted_string, strlen(formatted_string));
 
 
-Logger* get_new_logger(void *arg)
+void init_logger(Logger *logger, void *arg)
 {
-    Logger *logger = (Logger*)malloc(sizeof(Logger));
-
     // Here, physical medium is a file-system.
-	logger->medium = get_new_file_system(arg);
-
-    return logger;
+	init_file_system(&(logger->fs), arg);
 }
 
 
 void release_logger(Logger *logger)
 {
     info_log(logger, "FREEING [LOG] RESOURCES.\n");
-    release_file_system(logger->medium);
 
-    // Free the dynamically-allocated memory
-    if(logger != NULL)
-    {
-        free(logger);
-    }
+    release_file_system(&(logger->fs));
 }
 
 
