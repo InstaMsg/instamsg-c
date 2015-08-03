@@ -47,5 +47,5 @@ embedded-flash-environment/tivaware/
 client/subscriber.sh
 client/publisher.sh
 
-client/tiva_blinky_bootstrap_example/tiva_build/
+client/tiva_tm4c123GXL_blinky/tiva_build/
 client/src/communication/fs/test_tiva_tm4c123gxl_serial_uart/tiva_build/
