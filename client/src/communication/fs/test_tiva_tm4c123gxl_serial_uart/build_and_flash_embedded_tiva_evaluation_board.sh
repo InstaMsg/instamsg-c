@@ -31,7 +31,7 @@ LDFLAGS=" -T ${LD_SCRIPT} --entry ResetISR --gc-sections "
 
 for source in ${SOURCES}
 do
-    basename=`echo "${source}" | cut -d/ -f2`
+    basename=`echo "${source}" | rev | cut -d/ -f1`
     ${CC} ${CFLAGS} ${INCLUDES} -c "${source}.c" -o "tiva_build/${basename}.o"
 done
 
