@@ -20,7 +20,7 @@ gcc -nostdinc                                                       \
         stdoutsub.c                                                 \
                                                                     \
         ${SYSTEM_INCLUDES}                                          \
-        -Isrc/communication/include/vendors/${VENDOR}/              \
+        -Isrc/vendors/${VENDOR}/                                    \
         -I ../MQTTPacket/src                                        \
                                                                     \
         src/common/instamsg.c                                       \
