@@ -24,7 +24,7 @@ LD="arm-none-eabi-ld"
 OBJCOPY="arm-none-eabi-objcopy"
 LD_SCRIPT="../../../../../embedded-flash-environment/tiva-template/${MCU}.ld"
 
-CFLAGS=" -g -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -Os -ffunction-sections -fdata-sections -MD -std=c99 -Wall -pedantic -DPART_${MCU} -c -I${TIVAWARE_PATH} -DTARGET_IS_BLIZZARD_RA1 "
+CFLAGS=" -g -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -Os -ffunction-sections -fdata-sections -MD -std=c99 -Wall -pedantic -DPART_${MCU} -c -I${TIVAWARE_PATH} -I../../../vendors/test_tiva_evaluation_board -DTARGET_IS_BLIZZARD_RA1 "
 LDFLAGS=" -T ${LD_SCRIPT} --entry ResetISR --gc-sections "
 
 

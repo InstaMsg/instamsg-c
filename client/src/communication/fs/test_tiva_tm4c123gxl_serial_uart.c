@@ -21,7 +21,7 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
 
-#include "../include/fs.h"
+#include "instamsg_vendor.h"
 #include "../../common/include/globals.h"
 
 
@@ -150,9 +150,6 @@ static void init(void)
 }
 
 
-FileSystem fs;
-
-
 static int tiva_serial_read(FileSystem* fs, unsigned char* buffer, int len)
 {
     int pos = 0;
@@ -173,17 +170,15 @@ static int tiva_serial_write(FileSystem* fs, unsigned char* buffer, int len)
 }
 
 
-FileSystem* get_new_file_system(void *arg)
+void init_file_system(FileSystem *fs, void *arg)
 {
     init();
 
     // Register read-callback.
-	fs.read = tiva_serial_read;
+	fs->read = tiva_serial_read;
 
     // Register write-callback.
-	fs.write = tiva_serial_write;
-
-    return &fs;
+	fs->write = tiva_serial_write;
 }
 
 
