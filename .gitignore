@@ -31,4 +31,15 @@
 # Debug files
 *.dSYM/
 
+# Generated build files
 client/stdoutsub
+client/tiva_build
+
+# Generated-Files while setting up the embedded-environment
+embedded-flash-environment/bin/
+embedded-flash-environment/gcc-arm-none-eabi-4_9-2015q2/
+embedded-flash-environment/lm4tools/
+embedded-flash-environment/openocd/
+embedded-flash-environment/share/
+embedded-flash-environment/tiva-template/
+embedded-flash-environment/tivaware/
