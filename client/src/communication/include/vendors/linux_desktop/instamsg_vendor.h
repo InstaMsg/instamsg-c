@@ -41,4 +41,10 @@ struct Timer
     TIMER_INTERFACE
 };
 
+
+struct System
+{
+    SYSTEM_INTERFACE
+};
+
 #endif

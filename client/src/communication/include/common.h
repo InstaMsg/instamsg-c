@@ -130,7 +130,30 @@ void release_mutex(Mutex *mutex);
 
 typedef struct Timer Timer;
 void init_timer(Timer *timer);
-void release_timer(Timer*);
+void release_timer(Timer *timer);
+
+
+/*
+ * System-Utilities Interface
+ */
+#define SYSTEM_INTERFACE                                                                                            \
+    /*                                                                                                              \
+     * Note that the "buf" will be all-0-initialized from the callee, so the vendor-implementation                  \
+     * does not need to bother about that.                                                                          \
+     */                                                                                                             \
+    void (*getManufacturer)(System *system, unsigned char *buf, int maxValueLenAllowed);                            \
+                                                                                                                    \
+                                                                                                                    \
+    /*                                                                                                              \
+     * Note that the "buf" will be all-0-initialized from the callee, so the vendor-implementation                  \
+     * does not need to bother about that.                                                                          \
+     */                                                                                                             \
+    void (*getSerialNumber)(System *system, unsigned char *buf, int maxValueLenAllowed);
+
+typedef struct System System;
+void init_system_utils(System *system);
+void release_system_utils(System *system);
+
 
 #endif
 

@@ -8,8 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "include/system.h"
-
+#include "instamsg_vendor.h"
 
 static void getManufacturer(System *system, unsigned char *buf, int maxValueLenAllowed)
 {
@@ -23,21 +22,13 @@ static void getSerialNumber(System *system, unsigned char *buf, int maxValueLenA
 }
 
 
-System* get_new_system()
+void init_system_utils(System *system)
 {
-	System *system = (System*) malloc(sizeof(System));
-
     system->getManufacturer = getManufacturer;
     system->getSerialNumber = getSerialNumber;
-
-    return system;
 }
 
 
-void release_system(System* system)
+void release_system_utils(System *system)
 {
-    if(system != NULL)
-    {
-	    free(system);
-    }
 }
