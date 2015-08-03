@@ -14,7 +14,7 @@ TIVAWARE_PATH="../../../../../embedded-flash-environment/tivaware"
 
 SOURCES=`echo   tiva_startup_gcc                                        \
                 tiva_main                                               \
-                ../test_tiva_tm4c123gxl_serial_uart `
+                ../tiva_tm4c123gxl_serial_uart `
 
 EXTRA_OBJECT_FILES=`echo    gpio.o `
 EXTRA_OBJECT_FILES_FOLDER="../../../../../embedded-flash-environment/tivaware/driverlib/gcc"
