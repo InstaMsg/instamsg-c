@@ -2,13 +2,14 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#include "include/threading.h"
+#include "instamsg_vendor.h"
 
 void create_and_init_thread(void *start_func, void *arg)
 {
     pthread_t thrId;
     pthread_create(&thrId, NULL, start_func, arg);
 }
+
 
 void thread_sleep(int seconds)
 {
@@ -17,41 +18,28 @@ void thread_sleep(int seconds)
 
 
 
-#define GET_IMPLEMENTATION_SPECIFIC_MUTEX_OBJ(mtx) ((pthread_mutex_t *)(mtx->obj))
-
-void lock(struct Mutex *mtx)
+static void lock(struct Mutex *mutex)
 {
-    pthread_mutex_lock(GET_IMPLEMENTATION_SPECIFIC_MUTEX_OBJ(mtx));
+    pthread_mutex_lock(&(mutex->mtx));
 }
 
-void unlock(struct Mutex *mtx)
+
+static void unlock(struct Mutex *mutex)
 {
-    pthread_mutex_unlock(GET_IMPLEMENTATION_SPECIFIC_MUTEX_OBJ(mtx));
+    pthread_mutex_unlock(&(mutex->mtx));
 }
 
-struct Mutex* get_new_mutex()
+
+void init_mutex(struct Mutex *mutex)
 {
-    struct Mutex *mtx = (struct Mutex*) malloc(sizeof(struct Mutex));
+    pthread_mutex_init(&(mutex->mtx), NULL);
 
-    mtx->obj = malloc(sizeof(pthread_mutex_t));
-    pthread_mutex_init(GET_IMPLEMENTATION_SPECIFIC_MUTEX_OBJ(mtx), NULL);
-
-    mtx->lock = lock;
-    mtx->unlock = unlock;
-
-    return mtx;
+    mutex->lock = lock;
+    mutex->unlock = unlock;
 }
+
 
 void release_mutex(struct Mutex* mtx)
 {
-    if(mtx != NULL)
-    {
-        if(mtx->obj != NULL)
-        {
-            free(mtx->obj);
-        }
-
-        free(mtx);
-    }
 }
 

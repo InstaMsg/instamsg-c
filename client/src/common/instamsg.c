@@ -42,7 +42,7 @@ static int getNextPacketId(InstaMsg *c) {
 
 void incrementOrDecrementThreadCount(char increment)
 {
-    threadCountMutex->lock(threadCountMutex);
+    threadCountMutex.lock(&threadCountMutex);
 
     if(increment == 1)
     {
@@ -53,7 +53,7 @@ void incrementOrDecrementThreadCount(char increment)
         threadCount--;
     }
 
-    threadCountMutex->unlock(threadCountMutex);
+    threadCountMutex.unlock(&threadCountMutex);
 }
 
 
@@ -71,7 +71,7 @@ static void attachResultHandler(InstaMsg *c, int msgId, unsigned int timeout, vo
 {
     int i;
 
-    c->resultHandlersMutex->lock(c->resultHandlersMutex);
+    (c->resultHandlersMutex).lock(&(c->resultHandlersMutex));
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {
         if (c->resultHandlers[i].msgId == 0)
@@ -83,7 +83,7 @@ static void attachResultHandler(InstaMsg *c, int msgId, unsigned int timeout, vo
             break;
         }
     }
-    c->resultHandlersMutex->unlock(c->resultHandlersMutex);
+    (c->resultHandlersMutex).unlock(&(c->resultHandlersMutex));
 }
 
 
@@ -91,7 +91,7 @@ static void fireResultHandlerAndRemove(InstaMsg *c, MQTTFixedHeaderPlusMsgId *fi
 {
     int i;
 
-    c->resultHandlersMutex->lock(c->resultHandlersMutex);
+    (c->resultHandlersMutex).lock(&(c->resultHandlersMutex));
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {
         if (c->resultHandlers[i].msgId == fixedHeaderPlusMsgId->msgId)
@@ -102,7 +102,7 @@ static void fireResultHandlerAndRemove(InstaMsg *c, MQTTFixedHeaderPlusMsgId *fi
             break;
                                                                                                                                                         }
     }
-    c->resultHandlersMutex->unlock(c->resultHandlersMutex);
+    (c->resultHandlersMutex).unlock(&(c->resultHandlersMutex));
 }
 
 
@@ -112,7 +112,7 @@ static int sendPacket(InstaMsg *c, unsigned char *buf, int length, char lock)
 
     if(lock == 1)
     {
-        c->networkPhysicalMediumMutex->lock(c->networkPhysicalMediumMutex);
+        (c->networkPhysicalMediumMutex).lock(&(c->networkPhysicalMediumMutex));
     }
 
     if((c->ipstack).write(&(c->ipstack), buf, length) == FAILURE)
@@ -123,7 +123,7 @@ static int sendPacket(InstaMsg *c, unsigned char *buf, int length, char lock)
 
     if(lock == 1)
     {
-        c->networkPhysicalMediumMutex->unlock(c->networkPhysicalMediumMutex);
+        (c->networkPhysicalMediumMutex).unlock(&(c->networkPhysicalMediumMutex));
     }
 
     return rc;
@@ -239,7 +239,7 @@ static int deliverMessage(InstaMsg* c, MQTTString* topicName, MQTTMessage* messa
     int rc = FAILURE;
 
     // we have to find the right message handler - indexed by topic
-    c->messageHandlersMutex->lock(c->messageHandlersMutex);
+    (c->messageHandlersMutex).lock(&(c->messageHandlersMutex));
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {
         if (c->messageHandlers[i].topicFilter != 0 && (MQTTPacket_equals(topicName, (char*)c->messageHandlers[i].topicFilter) ||
@@ -254,7 +254,7 @@ static int deliverMessage(InstaMsg* c, MQTTString* topicName, MQTTMessage* messa
             }
         }
     }
-    c->messageHandlersMutex->unlock(c->messageHandlersMutex);
+    (c->messageHandlersMutex).unlock(&(c->messageHandlersMutex));
 
     if (rc == FAILURE && c->defaultMessageHandler != NULL)
     {
@@ -298,7 +298,7 @@ void* clientTimerThread(InstaMsg *c)
 
         int i;
 
-        c->resultHandlersMutex->lock(c->resultHandlersMutex);
+        (c->resultHandlersMutex).lock(&(c->resultHandlersMutex));
         for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
         {
             if (c->resultHandlers[i].msgId > 0)
@@ -316,7 +316,7 @@ void* clientTimerThread(InstaMsg *c)
                 break;
             }
         }
-        c->resultHandlersMutex->unlock(c->resultHandlersMutex);
+        (c->resultHandlersMutex).unlock(&(c->resultHandlersMutex));
     }
 
 }
@@ -379,9 +379,9 @@ void initInstaMsg(InstaMsg* c,
     c->onDisconnectCallback = disconnectHandler;
     c->oneToOneMessageCallback = oneToOneMessageHandler;
 
-    c->networkPhysicalMediumMutex = get_new_mutex();
-    c->messageHandlersMutex = get_new_mutex();
-    c->resultHandlersMutex = get_new_mutex();
+    init_mutex(&(c->networkPhysicalMediumMutex));
+    init_mutex(&(c->messageHandlersMutex));
+    init_mutex(&(c->resultHandlersMutex));
 
 
 	c->connectOptions.willFlag = 0;
@@ -402,9 +402,9 @@ void initInstaMsg(InstaMsg* c,
 
 void cleanInstaMsgObject(InstaMsg *c)
 {
-    release_mutex(c->resultHandlersMutex);
-    release_mutex(c->messageHandlersMutex);
-    release_mutex(c->networkPhysicalMediumMutex);
+    release_mutex(&(c->resultHandlersMutex));
+    release_mutex(&(c->messageHandlersMutex));
+    release_mutex(&(c->networkPhysicalMediumMutex));
 
     release_network(&(c->ipstack));
     release_logger(&logger);
@@ -472,7 +472,7 @@ void readPacketThread(InstaMsg* c)
                 {
                     int i;
 
-                    c->messageHandlersMutex->lock(c->messageHandlersMutex);
+                    (c->messageHandlersMutex).lock(&(c->messageHandlersMutex));
                     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
                     {
                         if (c->messageHandlers[i].msgId == msgId)
@@ -481,7 +481,7 @@ void readPacketThread(InstaMsg* c)
                             break;
                         }
                     }
-                    c->messageHandlersMutex->unlock(c->messageHandlersMutex);
+                    (c->messageHandlersMutex).unlock(&(c->messageHandlersMutex));
                 }
 
                 break;
@@ -608,7 +608,7 @@ int MQTTSubscribe(InstaMsg* c,
     {
         int i;
 
-        c->messageHandlersMutex->lock(c->messageHandlersMutex);
+        (c->messageHandlersMutex).lock(&(c->messageHandlersMutex));
         for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
         {
             if (c->messageHandlers[i].topicFilter == 0)
@@ -620,7 +620,7 @@ int MQTTSubscribe(InstaMsg* c,
                 break;
             }
          }
-        c->messageHandlersMutex->unlock(c->messageHandlersMutex);
+        (c->messageHandlersMutex).unlock(&(c->messageHandlersMutex));
     }
 
     if ((rc = sendPacket(c, buf, len, 1)) != SUCCESS) // send the subscribe packet

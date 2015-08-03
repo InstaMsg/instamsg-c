@@ -81,6 +81,21 @@ void init_command_interface(Command *command, void *arg);
 void release_command_interface(Command *command);
 
 
+/*
+ * Threading-Interface
+ */
+void create_and_init_thread(void *start_func, void *arg);
+void thread_sleep(int seconds);
+
+
+/*
+ * Mutex-Interface
+ */
+typedef struct Mutex Mutex;
+void init_mutex(Mutex *mutex);
+void release_mutex(Mutex *mutex);
+
+
 
 #endif
 

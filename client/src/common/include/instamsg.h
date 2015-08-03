@@ -21,7 +21,6 @@
 #include "./globals.h"
 #include "./log.h"
 #include "../../time/include/time.h"
-#include "../../threading/include/threading.h"
 #include "../../../../MQTTPacket/src/MQTTPacket.h"
 
 #include "stdio.h"
@@ -35,7 +34,7 @@
 
 unsigned char terminateCurrentInstance;
 unsigned int threadCount;
-Mutex *threadCountMutex;
+Mutex threadCountMutex;
 
 void NewTimer(Timer*);
 
@@ -99,9 +98,9 @@ struct InstaMsg {
     int (*onDisconnectCallback)();
     int (*oneToOneMessageCallback)();
 
-    struct Mutex *networkPhysicalMediumMutex;
-    struct Mutex *messageHandlersMutex;
-    struct Mutex *resultHandlersMutex;
+    struct Mutex networkPhysicalMediumMutex;
+    struct Mutex messageHandlersMutex;
+    struct Mutex resultHandlersMutex;
 
     Network ipstack;
     MQTTPacket_connectData connectOptions;

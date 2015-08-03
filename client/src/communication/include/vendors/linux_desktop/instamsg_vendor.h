@@ -23,4 +23,15 @@ struct Command
     COMMUNICATION_INTERFACE(Command)
 };
 
+
+#include <pthread.h>
+struct Mutex
+{
+    pthread_mutex_t mtx;
+
+    void (*lock)(Mutex *mutex);
+    void (*unlock)(Mutex *mutex);
+};
+
+
 #endif

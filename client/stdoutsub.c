@@ -44,7 +44,6 @@
 #include "src/common/include/log.h"
 #include "src/common/include/config.h"
 #include "src/common/include/globals.h"
-#include "src/threading/include/threading.h"
 
 #include <stdio.h>
 #include <stdio.h>
@@ -309,19 +308,19 @@ int main(int argc, char** argv)
 	signal(SIGINT, cfinish);
 	signal(SIGTERM, cfinish);
 
-    threadCountMutex = get_new_mutex();
+    init_mutex(&threadCountMutex);
     terminateCurrentInstance = 1;
 
 	while (!toStop)
 	{
         while(terminateCurrentInstance == 1)
         {
-            threadCountMutex->lock(threadCountMutex);
+            threadCountMutex.lock(&threadCountMutex);
 
             if(threadCount == 0)
             {
                 terminateCurrentInstance = 0;
-                threadCountMutex->unlock(threadCountMutex);
+                threadCountMutex.unlock(&threadCountMutex);
 
                 if(firstTimeStart == 0)
                 {
@@ -333,7 +332,7 @@ int main(int argc, char** argv)
             }
             else
             {
-                threadCountMutex->unlock(threadCountMutex);
+                threadCountMutex.unlock(&threadCountMutex);
             }
 
             thread_sleep(1);

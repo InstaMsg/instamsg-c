@@ -18,7 +18,6 @@
 
 #include "instamsg_vendor.h"
 #include "../../common/include/config.h"
-#include "../../threading/include/threading.h"
 
 
 static void release_underlying_medium_guaranteed(Network* network)
