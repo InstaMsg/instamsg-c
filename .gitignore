@@ -43,3 +43,5 @@ embedded-flash-environment/openocd/
 embedded-flash-environment/share/
 embedded-flash-environment/tiva-template/
 embedded-flash-environment/tivaware/
+
+client/src/communication/fs/test_tiva_tm4c123gxl_serial_uart/tiva_build/
