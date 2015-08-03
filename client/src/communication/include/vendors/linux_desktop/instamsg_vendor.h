@@ -34,4 +34,11 @@ struct Mutex
 };
 
 
+#include <sys/time.h>
+struct Timer
+{
+    struct timeval end_time;
+    TIMER_INTERFACE
+};
+
 #endif

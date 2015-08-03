@@ -10,14 +10,8 @@
 #include <stdio.h>
 #include <time.h>
 
-#include "include/time.h"
+#include "instamsg_vendor.h"
 
-
-struct TimerObj {
-        struct timeval end_time;
-};
-
-#define GET_IMPLEMENTATION_SPECIFIC_TIMER_OBJ(timer) ((struct TimerObj*)(timer->obj))
 
 static void getTimeIn_YYYYmmdd4HHMMSS(Timer *timer, unsigned char *buf, int maxValueLenAllowed)
 {
@@ -37,11 +31,8 @@ static void getOffset(Timer *timer, unsigned char *buf, int maxValueLenAllowed)
 }
 
 
-Timer* get_new_timer()
+void init_timer(Timer *timer)
 {
-	Timer *timer = (Timer*) malloc(sizeof(Timer));
-	timer->obj = malloc(sizeof(struct TimerObj));
-
     timer->getTimeIn_YYYYmmdd4HHMMSS = getTimeIn_YYYYmmdd4HHMMSS;
     timer->getOffset = getOffset;
 }
@@ -49,13 +40,4 @@ Timer* get_new_timer()
 
 void release_timer(Timer* timer)
 {
-    if(timer != NULL)
-    {
-        if(timer->obj != NULL)
-        {
-	        free(timer->obj);
-        }
-
-	    free(timer);
-    }
 }
