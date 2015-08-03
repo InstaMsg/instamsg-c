@@ -1,27 +1,11 @@
-//*****************************************************************************
-//
-// uart_echo.c - Example for reading data from and writing data to the UART in
-//               an interrupt driven fashion.
-//
-// Copyright (c) 2012-2015 Texas Instruments Incorporated.  All rights reserved.
-// Software License Agreement
-// 
-// Texas Instruments (TI) is supplying this software for use solely and
-// exclusively on TI's microcontroller products. The software is owned by
-// TI and/or its suppliers, and is protected under applicable copyright
-// laws. You may not combine this software with "viral" open-source
-// software in order to form a larger program.
-// 
-// THIS SOFTWARE IS PROVIDED "AS IS" AND WITH ALL FAULTS.
-// NO WARRANTIES, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT
-// NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. TI SHALL NOT, UNDER ANY
-// CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR CONSEQUENTIAL
-// DAMAGES, FOR ANY REASON WHATSOEVER.
-// 
-// This is part of revision 2.1.1.71 of the EK-TM4C123GXL Firmware Package.
-//
-//*****************************************************************************
+/*******************************************************************************
+ * Contributors:
+ *
+ *      Ajay Garg <ajay.garg@sensegrow.com>
+ *
+ *******************************************************************************/
+
+
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -37,17 +21,10 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
 
-//*****************************************************************************
-//
-//! \addtogroup example_list
-//! <h1>UART Echo (uart_echo)</h1>
-//!
-//! This example application utilizes the UART to echo text.  The first UART
-//! (connected to the USB debug virtual serial port on the evaluation board)
-//! will be configured in 115,200 baud, 8-n-1 mode.  All characters received on
-//! the UART are transmitted back to the UART.
-//
-//*****************************************************************************
+#include "../include/fs.h"
+#include "../../common/include/globals.h"
+
+
 
 //*****************************************************************************
 //
@@ -61,16 +38,17 @@ __error__(char *pcFilename, uint32_t ui32Line)
 }
 #endif
 
-//*****************************************************************************
-//
-// The UART interrupt handler.
-//
-//*****************************************************************************
-void
-UARTIntHandler(void)
+static char UARTRead(void)
 {
     uint32_t ui32Status;
+    char ch;
 
+    /*
+     * This code was picked up, where this method was called upon interrupts.
+     * But here, this is being called synchronously.
+     *
+     * TODO: Clean this interrupt-related code.
+     */
     //
     // Get the interrrupt status.
     //
@@ -84,30 +62,15 @@ UARTIntHandler(void)
     //
     // Loop while there are characters in the receive FIFO.
     //
-    while(ROM_UARTCharsAvail(UART0_BASE))
+    if(1)
     {
-        //
-        // Read the next character from the UART and write it back to the UART.
-        //
-        ROM_UARTCharPut(UART0_BASE,
-                                   ROM_UARTCharGetNonBlocking(UART0_BASE));
-
-        //
-        // Blink the LED to show a character transfer is occuring.
-        //
-        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, GPIO_PIN_2);
-
-        //
-        // Delay for 1 millisecond.  Each SysCtlDelay is about 3 clocks.
-        //
-        SysCtlDelay(SysCtlClockGet() / (1000 * 3));
-
-        //
-        // Turn off the LED
-        //
-        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, 0);
-
+        /*
+         * Get the character in a blocking-manner.
+         */
+        ch = ROM_UARTCharGet(UART0_BASE);
     }
+
+    return ch;
 }
 
 //*****************************************************************************
@@ -115,8 +78,7 @@ UARTIntHandler(void)
 // Send a string to the UART.
 //
 //*****************************************************************************
-void
-UARTSend(const char *string)
+static void UARTSend(const unsigned char *string)
 {
     while(*string != 0)
     {
@@ -133,8 +95,7 @@ UARTSend(const char *string)
 // This example demonstrates how to send a string of data to the UART.
 //
 //*****************************************************************************
-int
-main(void)
+static void init(void)
 {
     //
     // Enable lazy stacking for interrupt handlers.  This allows floating-point
@@ -179,7 +140,7 @@ main(void)
     ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
 
     //
-    // Configure the UART for 115,200, 8-N-1 operation.
+    // Configure the UART for 9600, 8-N-1 operation.
     //
     ROM_UARTConfigSetExpClk(UART0_BASE, ROM_SysCtlClockGet(), 9600,
                             (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
@@ -190,18 +151,56 @@ main(void)
     //
     ROM_IntEnable(INT_UART0);
     ROM_UARTIntEnable(UART0_BASE, UART_INT_RX | UART_INT_RT);
-
-    //
-    // Prompt for text to be entered.
-    //
-    const char *str = "This is a really loooooooooooooooooooooooomnnnnnnnngggggg string :): ";
-    UARTSend(str);
-
-    //
-    // Loop forever echoing data through the UART.
-    //
-    while(1)
-    {
-        UARTIntHandler();
-    }
 }
+
+
+FileSystem fs;
+
+static int tiva_serial_read(FileSystem* fs, unsigned char* buffer, int len);
+static int tiva_serial_write(FileSystem* fs, unsigned char* buffer, int len);
+
+
+static int tiva_serial_read(FileSystem* fs, unsigned char* buffer, int len)
+{
+    int pos = 0;
+    while(len-- > 0)
+    {
+        char ch = UARTRead();
+        buffer[pos++] = ch;
+    }
+
+    return SUCCESS;
+}
+
+
+static int tiva_serial_write(FileSystem* fs, unsigned char* buffer, int len)
+{
+    UARTSend(buffer);
+    return SUCCESS;
+}
+
+
+FileSystem* get_new_file_system(void *arg)
+{
+    init();
+
+    // Register read-callback.
+	fs.read = tiva_serial_read;
+
+    // Register write-callback.
+	fs.write = tiva_serial_write;
+
+    return &fs;
+}
+
+
+void release_file_system(FileSystem *fs)
+{
+    /*
+     * Nothing to be done as such.
+     * Multiple re-inits (without any so-called previous cleanups) SHOULD not cause any issues.
+     */
+}
+
+
+
