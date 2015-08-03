@@ -1,11 +1,12 @@
 #include "../../include/fs.h"
+#include <string.h>
 
 int main()
 {
     FileSystem *fs = get_new_file_system("");
 
-    unsigned char *str = (unsigned char*)"BEGIN ::";
-    fs->write(fs, str, 8);
+    unsigned char *str = (unsigned char*)"REALLY LONG STRING TO BEGIN WITH ::";
+    fs->write(fs, str, strlen((const char*)str));
 
     while(1)
     {
