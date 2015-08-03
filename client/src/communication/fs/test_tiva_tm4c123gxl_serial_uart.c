@@ -90,11 +90,7 @@ static void UARTSend(const unsigned char *string)
     }
 }
 
-//*****************************************************************************
-//
-// This example demonstrates how to send a string of data to the UART.
-//
-//*****************************************************************************
+
 static void init(void)
 {
     //
@@ -155,9 +151,6 @@ static void init(void)
 
 
 FileSystem fs;
-
-static int tiva_serial_read(FileSystem* fs, unsigned char* buffer, int len);
-static int tiva_serial_write(FileSystem* fs, unsigned char* buffer, int len);
 
 
 static int tiva_serial_read(FileSystem* fs, unsigned char* buffer, int len)
