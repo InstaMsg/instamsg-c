@@ -48,4 +48,4 @@ client/subscriber.sh
 client/publisher.sh
 
 client/tiva_tm4c123gxl_blinky/tiva_build/
-client/src/communication/fs/tiva_tm4c123gxl_serial_uart/tiva_build/
+client/src/communication/serial/tiva_tm4c123gxl_uart/tiva_build/
