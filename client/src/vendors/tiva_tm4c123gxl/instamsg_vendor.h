@@ -3,9 +3,9 @@
 
 #include "../../common/include/instamsg_vendor_common.h"
 
-struct FileSystem
+struct Serial
 {
-    COMMUNICATION_INTERFACE(FileSystem)
+    COMMUNICATION_INTERFACE(Serial)
 };
 
 #endif

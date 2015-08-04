@@ -150,7 +150,7 @@ static void init(void)
 }
 
 
-static int tiva_serial_read(FileSystem* fs, unsigned char* buffer, int len)
+static int tiva_serial_read(Serial* serial, unsigned char* buffer, int len)
 {
     int pos = 0;
     while(len-- > 0)
@@ -163,32 +163,29 @@ static int tiva_serial_read(FileSystem* fs, unsigned char* buffer, int len)
 }
 
 
-static int tiva_serial_write(FileSystem* fs, unsigned char* buffer, int len)
+static int tiva_serial_write(Serial* serial, unsigned char* buffer, int len)
 {
     UARTSend(buffer);
     return SUCCESS;
 }
 
 
-void init_file_system(FileSystem *fs, void *arg)
+void init_serial_interface(Serial *serial, void *arg)
 {
     init();
 
     // Register read-callback.
-	fs->read = tiva_serial_read;
+	serial->read = tiva_serial_read;
 
     // Register write-callback.
-	fs->write = tiva_serial_write;
+	serial->write = tiva_serial_write;
 }
 
 
-void release_file_system(FileSystem *fs)
+void release_serial_interface(Serial *serial)
 {
     /*
      * Nothing to be done as such.
      * Multiple re-inits (without any so-called previous cleanups) SHOULD not cause any issues.
      */
 }
-
-
-

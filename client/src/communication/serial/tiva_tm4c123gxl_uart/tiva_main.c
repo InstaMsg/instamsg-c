@@ -6,19 +6,19 @@
 
 int main()
 {
-    FileSystem fs;
-    init_file_system(&fs, "");
+    Serial serial;
+    init_serial_interface(&serial, NULL);
 
-    unsigned char *str = (unsigned char*)"REALLY LONG STRING TO BEGIN WITH ::";
-    fs.write(&fs, str, strlen((const char*)str));
+    unsigned char *str = (unsigned char*)"TREATING UART AS SERIAL NOW (and not as FS) :: ";
+    serial.write(&serial, str, strlen((const char*)str));
 
     while(1)
     {
         unsigned char buf[2] = {0};
-        fs.read(&fs, buf, 1);
-        fs.write(&fs, buf, 1);
+        serial.read(&serial, buf, 1);
+        serial.write(&serial, buf, 1);
     }
 
-    release_file_system(&fs);
+    release_serial_interface(&serial);
     return 0;
 }
