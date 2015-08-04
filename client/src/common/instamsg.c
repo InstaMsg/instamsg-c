@@ -24,7 +24,7 @@
 
 static void publishQoS2CycleCompleted(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
-    debug_log(&logger, "PUBCOMP received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
+    debug_log("PUBCOMP received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
 }
 
 
@@ -61,7 +61,7 @@ void prepareThreadTerminationIfApplicable(const char *threadName)
 {
     if(terminateCurrentInstance == 1)
     {
-        info_log(&logger, "Terminating %s\n", threadName);
+        info_log("Terminating %s\n", threadName);
         incrementOrDecrementThreadCount(0);
     }
 }
@@ -309,7 +309,7 @@ void* clientTimerThread(InstaMsg *c)
                 }
                 else
                 {
-                    info_log(&logger, "No result obtained for msgId [%u] in the specified period\n", c->resultHandlers[i].msgId);
+                    info_log("No result obtained for msgId [%u] in the specified period\n", c->resultHandlers[i].msgId);
                     c->resultHandlers[i].msgId = 0;
                 }
 
@@ -359,9 +359,13 @@ void initInstaMsg(InstaMsg* c,
     // VERY IMPORTANT: If this is not done, the "write" on an invalid socket will cause program-crash
     signal(SIGPIPE,SIG_IGN);
 
-    readConfig(&config, &logger, "LOG_LEVEL", INTEGER, &currentLogLevel);
+    readConfig(&config, "LOG_LEVEL", INTEGER, &currentLogLevel);
 
-    init_logger(&logger, opts->logFilePath);
+    // TODO: Add the logic for properly selecting File-Based-Logger or Serial-Based-Logger.
+    init_file_logger(&fileLogger, opts->logFilePath);
+    logger_write_func = (void *) &(fileLogger.fs.write);
+    logger_medium = &(fileLogger.fs);
+
 	init_network(&(c->ipstack), NULL);
 
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
@@ -407,7 +411,9 @@ void cleanInstaMsgObject(InstaMsg *c)
     release_mutex(&(c->networkPhysicalMediumMutex));
 
     release_network(&(c->ipstack));
-    release_logger(&logger);
+
+    // TODO: Release the appropriate logger
+    release_file_logger(&fileLogger);
 }
 
 
@@ -440,7 +446,7 @@ void readPacketThread(InstaMsg* c)
                     }
                     else
                     {
-                        info_log(&logger, "Client-Connection failed with code [%d]\n", connack_rc);
+                        info_log("Client-Connection failed with code [%d]\n", connack_rc);
                     }
                 }
 
@@ -549,7 +555,7 @@ void readPacketThread(InstaMsg* c)
 
             case PINGRESP:
             {
-                debug_log(&logger, "PINGRESP received... relations are intact !!\n");
+                debug_log("PINGRESP received... relations are intact !!\n");
                 break;
             }
         }

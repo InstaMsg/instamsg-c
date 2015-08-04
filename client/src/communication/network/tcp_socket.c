@@ -38,7 +38,7 @@ static void connect_underlying_medium_guaranteed(Network* network)
 	struct addrinfo hints = {0, AF_UNSPEC, SOCK_STREAM, IPPROTO_TCP, 0, NULL, NULL, NULL};
 
     char hostName[MAX_BUFFER_SIZE] = {0};
-    readConfig(&config, &logger, "SERVER_IP", STRING, hostName);
+    readConfig(&config, "SERVER_IP", STRING, hostName);
 	if ((rc = getaddrinfo(hostName, NULL, &hints, &result)) == 0)
 	{
 		struct addrinfo* res = result;
@@ -58,7 +58,7 @@ static void connect_underlying_medium_guaranteed(Network* network)
 		{
 
             int port;
-            readConfig(&config, &logger, "SERVER_PORT", INTEGER, &port);
+            readConfig(&config, "SERVER_PORT", INTEGER, &port);
 
 			address.sin_port = htons(port);
 			address.sin_family = family = AF_INET;
@@ -80,7 +80,7 @@ static void connect_underlying_medium_guaranteed(Network* network)
 			    int opt = 1;
                 if(connect(network->socket, (struct sockaddr*)&address, sizeof(address)) != 0)
                 {
-                    info_log(&logger, "Could not connect to the network ... retrying\n");
+                    info_log("Could not connect to the network ... retrying\n");
 
                     thread_sleep(1);
                 }
@@ -92,7 +92,7 @@ static void connect_underlying_medium_guaranteed(Network* network)
         }
 	}
 
-    info_log(&logger, "TCP-SOCKET structure underlying physical-medium initiated.\n");
+    info_log("TCP-SOCKET structure underlying physical-medium initiated.\n");
 }
 
 
@@ -167,5 +167,5 @@ void release_network(Network *n)
 {
     release_underlying_medium_guaranteed(n);
 
-    info_log(&logger, "COMPLETE [TCP-SOCKET] STRUCTURE, INCLUDING THE UNDERLYING MEDIUM (SOCKET) CLEANED.\n");
+    info_log("COMPLETE [TCP-SOCKET] STRUCTURE, INCLUDING THE UNDERLYING MEDIUM (SOCKET) CLEANED.\n");
 }

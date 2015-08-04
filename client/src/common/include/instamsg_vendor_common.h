@@ -71,6 +71,14 @@ void release_file_system(FileSystem *fs);
 
 
 /*
+ * Interface for sending/receiving bytes over a serial-interface (eg. UART).
+ */
+typedef struct Serial Serial;
+void init_serial_interface(Serial *serial, void *arg);
+void release_serial_interface(Serial *Serial);
+
+
+/*
  * Interface for sending/receiving bytes between the instamg-client (on the device) and the device-command-interface.
  *
  * Generally, the interface would be a serial-port, through which the instamsg-client can send the command-bytes, and

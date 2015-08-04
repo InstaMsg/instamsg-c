@@ -18,6 +18,12 @@ struct FileSystem
 };
 
 
+struct Serial
+{
+    COMMUNICATION_INTERFACE(Serial)
+};
+
+
 struct Command
 {
     COMMUNICATION_INTERFACE(Command)

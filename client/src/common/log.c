@@ -27,37 +27,52 @@
     vsnprintf(formatted_string, MAX_LENGTH_LOG_ALLOWED, fmt, argptr);                               \
     va_end(argptr);                                                                                 \
                                                                                                     \
-    (logger->fs).write(&(logger->fs), formatted_string, strlen(formatted_string));
+    (*logger_write_func)(logger_medium, formatted_string, strlen(formatted_string));
 
 
-void init_logger(Logger *logger, void *arg)
+void init_file_logger(FileLogger *fileLogger, void *arg)
 {
     // Here, physical medium is a file-system.
-	init_file_system(&(logger->fs), arg);
+	init_file_system(&(fileLogger->fs), arg);
 }
 
 
-void release_logger(Logger *logger)
+void release_file_logger(FileLogger *fileLogger)
 {
-    info_log(logger, "FREEING [LOG] RESOURCES.\n");
+    info_log("FREEING [LOG] RESOURCES (FILE-BASED).\n");
 
-    release_file_system(&(logger->fs));
+    release_file_system(&(fileLogger->fs));
 }
 
 
-void info_log(Logger *logger, char *fmt, ...)
+void init_serial_logger(SerialLogger *serialLogger, void *arg)
+{
+    // Here, physical medium is a serial-interface.
+	init_serial_interface(&(serialLogger->serial), arg);
+}
+
+
+void release_serial_logger(SerialLogger *serialLogger)
+{
+    info_log("FREEING [LOG] RESOURCES (SERIAL-BASES).\n");
+
+    release_serial_interface(&(serialLogger->serial));
+}
+
+
+void info_log(char *fmt, ...)
 {
     LOG_COMMON_CODE(INSTAMSG_LOG_LEVEL_INFO)
 }
 
 
-void error_log(Logger *logger, char *fmt, ...)
+void error_log(char *fmt, ...)
 {
     LOG_COMMON_CODE(INSTAMSG_LOG_LEVEL_ERROR)
 }
 
 
-void debug_log(Logger *logger, char *fmt, ...)
+void debug_log(char *fmt, ...)
 {
     LOG_COMMON_CODE(INSTAMSG_LOG_LEVEL_DEBUG)
 }

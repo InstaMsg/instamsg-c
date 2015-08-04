@@ -46,7 +46,6 @@
 #include "src/common/include/globals.h"
 
 #include <stdio.h>
-#include <stdio.h>
 #include <signal.h>
 #include <string.h>
 #include <stdlib.h>
@@ -66,37 +65,37 @@ static void messageArrived(MessageData* md)
 	MQTTMessage* message = md->message;
 
 	if (opts_p->showtopics)
-		info_log(&logger, "%.*s\t", md->topicName->lenstring.len, md->topicName->lenstring.data);
+		info_log("%.*s\t", md->topicName->lenstring.len, md->topicName->lenstring.data);
 	if (opts_p->nodelimiter)
-		info_log(&logger, "%.*s", (int)message->payloadlen, (char*)message->payload);
+		info_log("%.*s", (int)message->payloadlen, (char*)message->payload);
 	else
-		info_log(&logger, "%.*s%s", (int)message->payloadlen, (char*)message->payload, opts_p->delimiter);
+		info_log("%.*s%s", (int)message->payloadlen, (char*)message->payload, opts_p->delimiter);
 }
 
 
 static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
-    debug_log(&logger, "PUBACK received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
+    debug_log("PUBACK received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
 }
 
 
 static void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
-    debug_log(&logger, "SUBACK received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
+    debug_log("SUBACK received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
 }
 
 
 void* onConnectHandler(void *arg)
 {
     int rc;
-    info_log(&logger, "Connected successfully\n");
+    info_log("Connected successfully\n");
 
 
 	if(opts_p->subscribe == 1)
 	{
-    	info_log(&logger, "Subscribing to %s\n", topic);
+    	info_log("Subscribing to %s\n", topic);
 		rc = MQTTSubscribe(&instaMsg, topic, opts_p->qos, messageArrived, subscribeAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS);
-		info_log(&logger, "Subscribed %d\n", rc);
+		info_log("Subscribed %d\n", rc);
 	}
 
 	if(opts_p->publish == 1)
@@ -105,7 +104,7 @@ void* onConnectHandler(void *arg)
         {
             if(terminateCurrentInstance == 1)
             {
-                info_log(&logger, "Terminating onConnectHandler Thread\n");
+                info_log("Terminating onConnectHandler Thread\n");
                 break;
             }
 
@@ -115,10 +114,10 @@ void* onConnectHandler(void *arg)
             counter++;
             sprintf(buf, "%s %d", opts_p->msg, counter);
 
-		    debug_log(&logger, "Publishing message [%s] to %s\n", buf, topic);
+		    debug_log("Publishing message [%s] to %s\n", buf, topic);
 		    rc = MQTTPublish(&instaMsg, topic, (const char*)buf, opts_p->qos, 0,
                              publishAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS, 0, 1);
-		    debug_log(&logger, "Published %d\n", rc);
+		    debug_log("Published %d\n", rc);
 
             thread_sleep(3);
         }
@@ -138,7 +137,7 @@ static int onConnect()
 
 static int onDisconnect()
 {
-    info_log(&logger, "Disconnect \"callback\" called.. not really needed, as MQTT-Disconnect does not get any response from server. "
+    info_log("Disconnect \"callback\" called.. not really needed, as MQTT-Disconnect does not get any response from server. "
            "So, no async-callback required as such.\n");
 
 	return 0;

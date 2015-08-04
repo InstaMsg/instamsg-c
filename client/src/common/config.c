@@ -28,7 +28,7 @@ void release_config(Config *config)
 }
 
 
-void readConfig(Config *config, Logger *logger, const unsigned char *key, enum ValueType valueType, void *value)
+void readConfig(Config *config, const unsigned char *key, enum ValueType valueType, void *value)
 {
     rewind((config->fs).fp);
 
@@ -51,7 +51,7 @@ void readConfig(Config *config, Logger *logger, const unsigned char *key, enum V
             // We reached the end of file, but we were not done yet :(
             if(ch == EOF)
             {
-                error_log(logger, "[%s] could not be read from config :( ", key);
+                error_log("[%s] could not be read from config :( ", key);
                 return;
             }
 

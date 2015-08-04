@@ -13,6 +13,7 @@ TIME_IMPL="sys_timeval"
 NETWORK_COMMUNICATION_IMPL="tcp_socket"
 FS_COMMUNICATION_IMPL="linux_fs"
 COMMAND_COMMUNICATION_IMPL="linux_command_stub"
+SERIAL_COMMUNICATION_IMPL="linux_stub"
 
 EXTRA_LINK_LIBS="-lpthread"
 
@@ -44,6 +45,7 @@ gcc -nostdinc                                                       \
         src/communication/network/${NETWORK_COMMUNICATION_IMPL}.c   \
         src/communication/fs/${FS_COMMUNICATION_IMPL}.c             \
         src/communication/command/${COMMAND_COMMUNICATION_IMPL}.c   \
+        src/communication/serial/${SERIAL_COMMUNICATION_IMPL}.c   \
                                                                     \
         -o stdoutsub                                                \
                                                                     \
