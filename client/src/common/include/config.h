@@ -3,7 +3,6 @@
 
 #include "instamsg_vendor.h"
 
-#include "./log.h"
 #include "./globals.h"
 
 typedef struct Config Config;

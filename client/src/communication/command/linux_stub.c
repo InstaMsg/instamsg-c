@@ -5,8 +5,6 @@
  *
  *******************************************************************************/
 
-#include <stdlib.h>
-
 #include "instamsg_vendor.h"
 #include "../../common/include/globals.h"
 
