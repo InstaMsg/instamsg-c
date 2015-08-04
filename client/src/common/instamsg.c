@@ -361,10 +361,25 @@ void initInstaMsg(InstaMsg* c,
 
     readConfig(&config, "LOG_LEVEL", INTEGER, &currentLogLevel);
 
-    // TODO: Add the logic for properly selecting File-Based-Logger or Serial-Based-Logger.
-    init_file_logger(&fileLogger, opts->logFilePath);
-    logger_write_func = (void *) &(fileLogger.fs.write);
-    logger_medium = &(fileLogger.fs);
+    {
+        int serialLoggerEnabled = 0;
+        readConfig(&config, "USE_SERIAL_LOGGER", INTEGER, &serialLoggerEnabled);
+
+        if(serialLoggerEnabled == 1)
+        {
+            init_serial_logger(&serialLogger, opts->logFilePath);
+
+            logger_write_func = (void *) &(serialLogger.serial.write);
+            logger_medium = &(serialLogger.serial);
+        }
+        else
+        {
+            init_file_logger(&fileLogger, opts->logFilePath);
+
+            logger_write_func = (void *) &(fileLogger.fs.write);
+            logger_medium = &(fileLogger.fs);
+        }
+    }
 
 	init_network(&(c->ipstack), NULL);
 
