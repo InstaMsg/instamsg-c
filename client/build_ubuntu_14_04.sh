@@ -12,7 +12,7 @@ SYSTEM_IMPL="linux_desktop"
 TIME_IMPL="sys_timeval"
 NETWORK_COMMUNICATION_IMPL="tcp_socket"
 FS_COMMUNICATION_IMPL="linux_fs"
-COMMAND_COMMUNICATION_IMPL="linux_command_stub"
+COMMAND_COMMUNICATION_IMPL="linux_stub"
 SERIAL_COMMUNICATION_IMPL="linux_stub"
 
 EXTRA_LINK_LIBS="-lpthread"

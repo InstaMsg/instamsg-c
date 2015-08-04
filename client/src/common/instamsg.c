@@ -233,7 +233,7 @@ static char isTopicMatched(char* topicFilter, MQTTString* topicName)
 }
 
 
-static int deliverMessage(InstaMsg* c, MQTTString* topicName, MQTTMessage* message)
+static int deliverMessageToSelf(InstaMsg* c, MQTTString* topicName, MQTTMessage* message)
 {
     int i;
     int rc = FAILURE;
@@ -262,6 +262,30 @@ static int deliverMessage(InstaMsg* c, MQTTString* topicName, MQTTMessage* messa
         NewMessageData(&md, topicName, message);
         c->defaultMessageHandler(&md);
         rc = SUCCESS;
+    }
+
+    /*
+     * Send the ACK to the server too, if applicable
+     */
+    enum QoS qos = (message->fixedHeaderPlusMsgId).fixedHeader.qos;
+    if (qos != QOS0)
+    {
+        char buf[MAX_BUFFER_SIZE];
+        int len;
+
+        if (qos == QOS1)
+        {
+            len = MQTTSerialize_ack(buf, MAX_BUFFER_SIZE, PUBACK, 0, (message->fixedHeaderPlusMsgId).msgId);
+        }
+        else if (qos == QOS2)
+        {
+            len = MQTTSerialize_ack(buf, MAX_BUFFER_SIZE, PUBREC, 0, (message->fixedHeaderPlusMsgId).msgId);
+        }
+
+        if (len > 0)
+        {
+            rc = sendPacket(c, buf, len, 1);
+        }
     }
 
     return rc;
@@ -522,25 +546,9 @@ void readPacketThread(InstaMsg* c)
                     goto exit;
                 }
 
-                deliverMessage(c, &topicName, &msg);
-
-                enum QoS qos = msg.fixedHeaderPlusMsgId.fixedHeader.qos;
-                if (qos != QOS0)
+                if(1)
                 {
-                    char buf[MAX_BUFFER_SIZE];
-
-                    if (qos == QOS1)
-                        len = MQTTSerialize_ack(buf, MAX_BUFFER_SIZE, PUBACK, 0, msg.fixedHeaderPlusMsgId.msgId);
-                    else if (qos == QOS2)
-                        len = MQTTSerialize_ack(buf, MAX_BUFFER_SIZE, PUBREC, 0, msg.fixedHeaderPlusMsgId.msgId);
-                    if (len <= 0)
-                    {
-                        goto exit;
-                    }
-                    else
-                    {
-                        sendPacket(c, buf, len, 1);
-                    }
+                    deliverMessageToSelf(c, &topicName, &msg);
                 }
 
                 break;
