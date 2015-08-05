@@ -426,6 +426,9 @@ void initInstaMsg(InstaMsg* c,
     init_mutex(&(c->messageHandlersMutex));
     init_mutex(&(c->resultHandlersMutex));
 
+    memset(c->filesTopic, 0, MAX_BUFFER_SIZE);
+    sprintf(c->filesTopic, "instamsg/clients/%s/files", clientId);
+
 
 	c->connectOptions.willFlag = 0;
 	c->connectOptions.MQTTVersion = 3;
@@ -546,7 +549,15 @@ void readPacketThread(InstaMsg* c)
                     goto exit;
                 }
 
-                if(1)
+                /*
+                 * At this point, "msg.payload" contains the real-stuff that is passed from the peer ....
+                 */
+                unsigned char *peerMessage = (unsigned char*) msg.payload;
+
+                if(strcmp(topicName.cstring, c->filesTopic) == 0)
+                {
+                }
+                else
                 {
                     deliverMessageToSelf(c, &topicName, &msg);
                 }
