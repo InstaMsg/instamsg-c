@@ -22,6 +22,7 @@ static void release_underlying_medium_guaranteed(FileSystem* fs)
     if(fp != NULL)
     {
         fclose(fp);
+        fp = NULL;      // This helps to keep track if a file is closed already.
     }
 }
 
@@ -66,6 +67,12 @@ void init_file_system(FileSystem *fs, void *arg)
     // Connect the medium (file-pointer).
     const char *fileName = (const char*)arg;
     connect_underlying_medium_guaranteed(fs, fileName);
+}
+
+
+void delete_file_system(const char *filePath)
+{
+    remove(filePath);
 }
 
 

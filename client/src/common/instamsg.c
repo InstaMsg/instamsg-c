@@ -406,7 +406,13 @@ void initInstaMsg(InstaMsg* c,
         }
     }
 
-	init_network(&(c->ipstack), NULL);
+    {
+        NetworkParameters networkParametrs;
+        readConfig(&config, "SERVER_IP", STRING, &(networkParametrs.hostName));
+        readConfig(&config, "SERVER_PORT", INTEGER, &(networkParametrs.port));
+
+	    init_network(&(c->ipstack), &networkParametrs);
+    }
 
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {

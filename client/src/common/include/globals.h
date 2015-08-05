@@ -17,4 +17,10 @@ enum ValueType
 };
 
 
+typedef struct NetworkParameters NetworkParameters;
+struct NetworkParameters
+{
+    unsigned char hostName[MAX_BUFFER_SIZE];
+    int port;
+};
 #endif

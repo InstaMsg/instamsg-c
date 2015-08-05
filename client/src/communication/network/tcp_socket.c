@@ -17,7 +17,7 @@
 #include <netdb.h>
 
 #include "instamsg_vendor.h"
-#include "../../common/include/config.h"
+#include "../../common/include/globals.h"
 
 
 static void release_underlying_medium_guaranteed(Network* network)
@@ -26,7 +26,7 @@ static void release_underlying_medium_guaranteed(Network* network)
 }
 
 
-static void connect_underlying_medium_guaranteed(Network* network)
+static void connect_underlying_medium_guaranteed(Network* network, unsigned char *hostName, int port)
 {
 	int type = SOCK_STREAM;
 	struct sockaddr_in address;
@@ -37,8 +37,6 @@ static void connect_underlying_medium_guaranteed(Network* network)
 	struct addrinfo *result = NULL;
 	struct addrinfo hints = {0, AF_UNSPEC, SOCK_STREAM, IPPROTO_TCP, 0, NULL, NULL, NULL};
 
-    char hostName[MAX_BUFFER_SIZE] = {0};
-    readConfig(&config, "SERVER_IP", STRING, hostName);
 	if ((rc = getaddrinfo(hostName, NULL, &hints, &result)) == 0)
 	{
 		struct addrinfo* res = result;
@@ -56,10 +54,6 @@ static void connect_underlying_medium_guaranteed(Network* network)
 
 		if (result->ai_family == AF_INET)
 		{
-
-            int port;
-            readConfig(&config, "SERVER_PORT", INTEGER, &port);
-
 			address.sin_port = htons(port);
 			address.sin_family = family = AF_INET;
 			address.sin_addr = ((struct sockaddr_in*)(result->ai_addr))->sin_addr;
@@ -159,7 +153,8 @@ void init_network(Network *network, void *arg)
 	network->write = tcp_socket_write;
 
     // Connect the medium (socket).
-    connect_underlying_medium_guaranteed(network);
+    NetworkParameters *params = (NetworkParameters *)arg;
+    connect_underlying_medium_guaranteed(network, params->hostName, params->port);
 }
 
 

@@ -27,6 +27,7 @@ gcc -nostdinc                                                       \
         src/common/instamsg.c                                       \
         src/common/log.c                                            \
         src/common/config.c                                         \
+        src/common/httpclient.c                                     \
                                                                     \
         ../MQTTPacket/src/MQTTFormat.c                              \
         ../MQTTPacket/src/MQTTPacket.c                              \
