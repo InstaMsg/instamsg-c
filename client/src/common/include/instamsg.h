@@ -150,5 +150,13 @@ void readPacketThread(InstaMsg *c);
 void prepareThreadTerminationIfApplicable(const char *threadName);
 void incrementOrDecrementThreadCount(char increment);
 
+typedef struct JSONParseStuff JSONParseStuff;
+struct JSONParseStuff
+{
+    const char *key;
+    const char *value;
+    unsigned int mandatory;
+};
+
 #define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}
 #endif

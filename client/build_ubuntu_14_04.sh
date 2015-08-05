@@ -15,7 +15,7 @@ FS_COMMUNICATION_IMPL="linux_fs"
 COMMAND_COMMUNICATION_IMPL="linux_stub"
 SERIAL_COMMUNICATION_IMPL="linux_stub"
 
-EXTRA_LINK_LIBS="-lpthread"
+EXTRA_LINK_LIBS="-lpthread -lm"
 
 gcc -nostdinc                                                       \
         stdoutsub.c                                                 \
@@ -38,6 +38,8 @@ gcc -nostdinc                                                       \
         ../MQTTPacket/src/MQTTSubscribeServer.c                     \
         ../MQTTPacket/src/MQTTUnsubscribeServer.c                   \
         ../MQTTPacket/src/MQTTUnsubscribeClient.c                   \
+                                                                    \
+        ../cJSON/cJSON.c                                            \
                                                                     \
         src/threading/${THREAD_IMPL}.c                              \
         src/system/${SYSTEM_IMPL}.c                                 \

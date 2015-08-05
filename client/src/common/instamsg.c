@@ -17,6 +17,7 @@
 
 #include "include/config.h"
 #include "include/instamsg.h"
+#include "../../../cJSON/cJSON.h"
 
 #include <string.h>
 #include <signal.h>
@@ -459,6 +460,122 @@ void cleanInstaMsgObject(InstaMsg *c)
 }
 
 
+static void getStringFromInstamsgJSON(cJSON *json, const char *key, const char **value)
+{
+    cJSON *objectItem = cJSON_GetObjectItem(json, key);
+    if(objectItem != NULL)
+    {
+        *value = objectItem->valuestring;
+    }
+}
+
+
+static const char* getValueFromParsedJSONStuff(JSONParseStuff *jsonStuff, int items, const char *key)
+{
+    int i;
+    for(i = 0; i < items; i++)
+    {
+        if(strcmp(jsonStuff[i].key, key) == 0)
+        {
+            return jsonStuff[i].value;
+        }
+    }
+}
+
+
+static void handleFileTransfer(MQTTMessage *msg)
+{
+    cJSON *json = cJSON_Parse(msg->payload);
+    if(json == NULL)
+    {
+        error_log("Payload [%s] could not be parsed successfully :( ... not doing anything further", msg->payload);
+        return;
+    }
+
+    JSONParseStuff jsonStuff[] = \
+                        {
+                            {
+                                "reply_topic",
+                                NULL,
+                                1
+                            },
+                            {
+                                "message_id",
+                                 NULL,
+                                 1
+                            },
+                            {
+                                "method",
+                                NULL,
+                                1
+                            },
+                            {
+                                "url",
+                                NULL,
+                                0
+                            },
+                            {
+                                "filename",
+                                NULL,
+                                0
+                            },
+
+                        };
+
+    int jsonStuffLength = sizeof(jsonStuff) / sizeof(jsonStuff[0]);
+    int i;
+
+    for(i = 0; i < jsonStuffLength; i++)
+    {
+        getStringFromInstamsgJSON(json, jsonStuff[i].key, &(jsonStuff[i].value));
+        if(jsonStuff[i].value == NULL)
+        {
+            if(jsonStuff[i].mandatory == 1)
+            {
+                error_log("Could not find field [%s] in the JSON-payload [%s] ... not proceeding further", jsonStuff[i].key, msg->payload);
+                return;
+            }
+            else
+            {
+                debug_log("Could not find field [%s] in the JSON-payload [%s]", jsonStuff[i].key, msg->payload);
+            }
+        }
+        else
+        {
+            debug_log("Found value ::  Key = [%s], Value = [%s] in the JSON-payload [%s]", jsonStuff[i].key, jsonStuff[i].value, msg->payload);
+        }
+    }
+
+    cJSON_Delete(json); // IMPORTANT, else there will be memory-leak.
+
+
+    /*
+     * If we reach till here, we have successfully parsed the parameters.
+     */
+
+    /*
+     * TODO: Right now following functionalities are handled ::
+     *
+     *      File-Download
+     *
+     * Following are present in Instamsg-Python... integrate in Instamsg-C too
+     *
+     *      File-Upload
+     *      File-Listings
+     *      File-Deletion
+     */
+    const char *method = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, "method");
+    const char *filename = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, "filename");
+    const char *url = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, "url");
+
+    if( (   (strcmp(method, "POST") == 0) || (strcmp(method, "PUT") == 0)   ) &&
+            (filename != NULL) &&
+            (url != NULL)   )
+    {
+    }
+}
+
+
 void readPacketThread(InstaMsg* c)
 {
     while(1)
@@ -556,6 +673,7 @@ void readPacketThread(InstaMsg* c)
 
                 if(strcmp(topicName.cstring, c->filesTopic) == 0)
                 {
+                    handleFileTransfer(&msg);
                 }
                 else
                 {
