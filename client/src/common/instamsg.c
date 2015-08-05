@@ -669,16 +669,19 @@ void readPacketThread(InstaMsg* c)
                 /*
                  * At this point, "msg.payload" contains the real-stuff that is passed from the peer ....
                  */
-                unsigned char *peerMessage = (unsigned char*) msg.payload;
+                if(topicName.cstring != NULL)
+                {
+                    if(strcmp(topicName.cstring, c->filesTopic) == 0)
+                    {
+                        handleFileTransfer(&msg);
+                        break;
+                    }
+                }
 
-                if(strcmp(topicName.cstring, c->filesTopic) == 0)
-                {
-                    handleFileTransfer(&msg);
-                }
-                else
-                {
-                    deliverMessageToSelf(c, &topicName, &msg);
-                }
+                /*
+                 * This is the last-ditch effort... if we reach till here... call this method
+                 */
+                deliverMessageToSelf(c, &topicName, &msg);
 
                 break;
             }
