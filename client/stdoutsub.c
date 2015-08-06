@@ -94,7 +94,7 @@ void* onConnectHandler(void *arg)
 	if(opts_p->subscribe == 1)
 	{
     	info_log("Subscribing to %s\n", topic);
-		rc = MQTTSubscribe(&instaMsg, topic, opts_p->qos, messageArrived, subscribeAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS);
+		rc = MQTTSubscribe(&instaMsg, topic, opts_p->qos, messageArrived, subscribeAckReceived, MQTT_RESULT_HANDLER_TIMEOUT);
 		info_log("Subscribed %d\n", rc);
 	}
 
@@ -116,7 +116,7 @@ void* onConnectHandler(void *arg)
 
 		    debug_log("Publishing message [%s] to %s\n", buf, topic);
 		    rc = MQTTPublish(&instaMsg, topic, (const char*)buf, opts_p->qos, 0,
-                             publishAckReceived, INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS, 0, 1);
+                             publishAckReceived, MQTT_RESULT_HANDLER_TIMEOUT, 0, 1);
 		    debug_log("Published %d\n", rc);
 
             thread_sleep(3);

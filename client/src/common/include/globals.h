@@ -23,4 +23,7 @@ struct NetworkParameters
     unsigned char hostName[MAX_BUFFER_SIZE];
     int port;
 };
+
+#define HTTP_FILE_DOWNLOAD_SUCCESS 200
+
 #endif

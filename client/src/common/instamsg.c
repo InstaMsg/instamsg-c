@@ -17,6 +17,7 @@
 
 #include "include/config.h"
 #include "include/instamsg.h"
+#include "include/httpclient.h"
 #include "../../../cJSON/cJSON.h"
 
 #include <string.h>
@@ -497,8 +498,14 @@ static const char* getValueFromParsedJSONStuff(JSONParseStuff *jsonStuff, int it
 }
 
 
-static void handleFileTransfer(MQTTMessage *msg)
+static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
 {
+    const char *REPLY_TOPIC = "reply_topic";
+    const char *MESSAGE_ID = "message_id";
+    const char *METHOD = "method";
+    const char *URL = "url";
+    const char *FILENAME = "filename";
+
     cJSON *json = cJSON_Parse(msg->payload);
     if(json == NULL)
     {
@@ -509,27 +516,27 @@ static void handleFileTransfer(MQTTMessage *msg)
     JSONParseStuff jsonStuff[] = \
                         {
                             {
-                                "reply_topic",
+                                REPLY_TOPIC,
                                 NULL,
                                 1
                             },
                             {
-                                "message_id",
+                                MESSAGE_ID,
                                  NULL,
                                  1
                             },
                             {
-                                "method",
+                                METHOD,
                                 NULL,
                                 1
                             },
                             {
-                                "url",
+                                URL,
                                 NULL,
                                 0
                             },
                             {
-                                "filename",
+                                FILENAME,
                                 NULL,
                                 0
                             },
@@ -578,14 +585,38 @@ static void handleFileTransfer(MQTTMessage *msg)
      *      File-Listings
      *      File-Deletion
      */
-    const char *method = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, "method");
-    const char *filename = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, "filename");
-    const char *url = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, "url");
+    const char *replyTopic = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, REPLY_TOPIC);
+    const char *messageId = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, MESSAGE_ID);
+    const char *method = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, METHOD);
+    const char *filename = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, FILENAME);
+    const char *url = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, URL);
 
     if( (   (strcmp(method, "POST") == 0) || (strcmp(method, "PUT") == 0)   ) &&
             (filename != NULL) &&
             (url != NULL)   )
     {
+        char ackMessage[MAX_BUFFER_SIZE] = {0};
+        int ackStatus = 0;
+
+        int status = downloadFile(&(c->httpClient), url, filename, 10);
+        if(status == HTTP_FILE_DOWNLOAD_SUCCESS)
+        {
+            ackStatus = 1;
+        }
+        sprintf(ackMessage, "{\"response_id\": %s, \"status\": %d}", messageId, ackStatus);
+
+        /*
+         * Send the acknowledgement, along with the ackStatus (success/failure).
+         */
+        MQTTPublish(c,
+                    replyTopic,
+                    ackMessage,
+                    (msg->fixedHeaderPlusMsgId).fixedHeader.qos,
+                    (msg->fixedHeaderPlusMsgId).fixedHeader.dup,
+                    NULL,
+                    MQTT_RESULT_HANDLER_TIMEOUT,
+                    0,
+                    1);
     }
 }
 
@@ -687,7 +718,7 @@ void readPacketThread(InstaMsg* c)
                 {
                     if(strcmp(topicName.cstring, c->filesTopic) == 0)
                     {
-                        handleFileTransfer(&msg);
+                        handleFileTransfer(c, &msg);
                         break;
                     }
                 }
@@ -710,7 +741,7 @@ void readPacketThread(InstaMsg* c)
                     goto exit;
                 }
 
-                attachResultHandler(c, msgId, INSTAMSG_RESULT_HANDLER_TIMEOUT_SECS, publishQoS2CycleCompleted);
+                attachResultHandler(c, msgId, MQTT_RESULT_HANDLER_TIMEOUT, publishQoS2CycleCompleted);
                 sendPacket(c, buf, len, 1); // send the PUBREL packet
 
                 break;

@@ -56,7 +56,7 @@ static void getNextLine(Network *network, unsigned char *buf)
  *
  * echo "hi ajay"
 */
-void downLoadFile(Network *network, const char *url, const char *downloadedFileName, unsigned int timeout)
+int downloadFile(Network *network, const char *url, const char *downloadedFileName, unsigned int timeout)
 {
     char request[MAX_BUFFER_SIZE] = {0};
     sprintf(request, "GET %s HTTP/1.0\r\n\r\n", url);
@@ -130,7 +130,7 @@ void downLoadFile(Network *network, const char *url, const char *downloadedFileN
                     terminateCurrentInstance = 1;
                     release_file_system(&fs);
 
-                    return;
+                    return FAILURE;
                 }
 
                 fs.write(&fs, ch, 1);
@@ -145,7 +145,8 @@ void downLoadFile(Network *network, const char *url, const char *downloadedFileN
             rename_file_system(tempFileName, downloadedFileName);
             info_log("File [%s] successfully moved to [%s]", tempFileName, downloadedFileName);
 
-            break;
+            // TODO: Ideally, parse this 200 from the response.
+            return HTTP_FILE_DOWNLOAD_SUCCESS;
         }
     }
 }
