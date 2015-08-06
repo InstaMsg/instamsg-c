@@ -86,7 +86,8 @@ static void connect_underlying_medium_guaranteed(Network* network, unsigned char
         }
 	}
 
-    info_log("TCP-SOCKET structure underlying physical-medium initiated.\n");
+    info_log("TCP-SOCKET UNDERLYING_MEDIUM INITIATED FOR HOST = [%s], PORT = [%d].\n",
+             network->host, network->port);
 }
 
 
@@ -152,15 +153,20 @@ void init_network(Network *network, void *arg)
     // Register write-callback.
 	network->write = tcp_socket_write;
 
-    // Connect the medium (socket).
+    // Keep a copy of connection-parameters, for easy book-keeping.
     NetworkParameters *params = (NetworkParameters *)arg;
-    connect_underlying_medium_guaranteed(network, params->hostName, params->port);
+    snprintf(network->host, MAX_BUFFER_SIZE - 1, "%s", params->hostName);
+    network->port = params->port;
+
+    // Connect the medium (socket).
+    connect_underlying_medium_guaranteed(network, network->host, network->port);
 }
 
 
-void release_network(Network *n)
+void release_network(Network *network)
 {
-    release_underlying_medium_guaranteed(n);
+    release_underlying_medium_guaranteed(network);
 
-    info_log("COMPLETE [TCP-SOCKET] STRUCTURE, INCLUDING THE UNDERLYING MEDIUM (SOCKET) CLEANED.\n");
+    info_log("COMPLETE [TCP-SOCKET] STRUCTURE, INCLUDING THE UNDERLYING MEDIUM (SOCKET) CLEANED FOR HOST = [%s], PORT = [%d].\n",
+             network->host, network->port);
 }

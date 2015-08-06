@@ -1,11 +1,16 @@
 #ifndef INSTAMSG_VENDOR
 #define INSTAMSG_VENDOR
 
+#include "../../common/include/globals.h"
 #include "../../common/include/instamsg_vendor_common.h"
 
 struct Network
 {
     int socket;
+
+    unsigned char host[MAX_BUFFER_SIZE];
+    int port;
+
     COMMUNICATION_INTERFACE(Network)
 };
 
