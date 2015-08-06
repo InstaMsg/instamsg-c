@@ -622,6 +622,45 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     {
         int ackStatus = 0;
 
+        /*
+         * Behaviour of File-Download Status-Notification to user
+         * (as per the scenario tested, when a browser-client uploads file, and a C-client downloads the file).
+         * ====================================================================================================
+         *
+         * While browser-client uploads the file to server, "Uploading %" is shown.
+         *
+         * Once the upload is complete, the C-client starts downloading, and the browser-client sees a "Waiting .."
+         * note .. (in the browser-lower panel).
+         *
+         * Now, following scenarios arise ::
+         *
+         * a)
+         * C-client finishes the downloading, returns status 200 and the ACK-message is sent to server
+         * with status 1.
+         *
+         * In this case, the "Waiting .." message disappears (as expected), and an additional ioEYE-message
+         * "File uploaded successfully" is displayed to browser-client.
+         *
+         *
+         * b)
+         * C-client might or might not finish downloading, but it returns a status other than 200, and the ACK-message
+         * is sent to server with status 0.
+         *
+         * In this case, the "Waiting .." message disappears (as expected), but no additional ioEYE message is displayed.
+         * (MAY BE, SOME ERROR-NOTIFICATION SHOULD BE SHOWN TO THE BROWSER-CLIENT).
+         *
+         *
+         * c)
+         * C-client might or might not finish downloading, but no ACK-message is sent to the server whatsoever.
+         *
+         * In this case, the "Waiting .." message is kept showing on the browser-client (posssibly timing out after
+         * a long time).
+         *
+         *
+         * ALL IN ALL, IF THE "Waiting .." MESSAGE DISAPPEARS, AND THE "File uploaded succcessfully" MESSAGE IS SEEN,
+         * IT MEANS THE FILE-TRANSFER COMPLETED, AND THAT TOO PERFECTLY SUCCESSFULLY.
+         *
+         */
         int status = downloadFile(&(c->httpClient), url, filename, 10);
         if(status == HTTP_FILE_DOWNLOAD_SUCCESS)
         {
