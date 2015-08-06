@@ -67,7 +67,8 @@ void release_network(Network *network);
  */
 typedef struct FileSystem FileSystem;
 void init_file_system(FileSystem *fs, void *arg);
-void delete_file_system(const char *filePath);
+int rename_file_system(const char *oldPath, const char *newPath);
+int delete_file_system(const char *filePath);
 void release_file_system(FileSystem *fs);
 
 

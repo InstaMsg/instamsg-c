@@ -408,10 +408,18 @@ void initInstaMsg(InstaMsg* c,
 
     {
         NetworkParameters networkParametrs;
-        readConfig(&config, "SERVER_IP", STRING, &(networkParametrs.hostName));
-        readConfig(&config, "SERVER_PORT", INTEGER, &(networkParametrs.port));
+        readConfig(&config, "INSTAMSG_HOST", STRING, &(networkParametrs.hostName));
+        readConfig(&config, "INSTAMSG_PORT", INTEGER, &(networkParametrs.port));
 
 	    init_network(&(c->ipstack), &networkParametrs);
+    }
+
+    {
+        NetworkParameters networkParametrs;
+        readConfig(&config, "INSTAMSG_HTTP_HOST", STRING, &(networkParametrs.hostName));
+        readConfig(&config, "INSTAMSG_HTTP_PORT", INTEGER, &(networkParametrs.port));
+
+	    init_network(&(c->httpClient), &networkParametrs);
     }
 
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)

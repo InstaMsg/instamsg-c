@@ -104,6 +104,7 @@ struct InstaMsg {
     unsigned char filesTopic[MAX_BUFFER_SIZE];
 
     Network ipstack;
+    Network httpClient;
     MQTTPacket_connectData connectOptions;
 };
 
