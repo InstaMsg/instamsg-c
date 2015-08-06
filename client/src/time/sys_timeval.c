@@ -31,7 +31,7 @@ static void getOffset(Timer *timer, unsigned char *buf, int maxValueLenAllowed)
 }
 
 
-void init_timer(Timer *timer)
+void init_timer(Timer *timer, void *arg)
 {
     timer->getTimeIn_YYYYmmdd4HHMMSS = getTimeIn_YYYYmmdd4HHMMSS;
     timer->getOffset = getOffset;

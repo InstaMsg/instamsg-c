@@ -48,7 +48,7 @@ gcc -nostdinc                                                       \
         src/communication/network/${NETWORK_COMMUNICATION_IMPL}.c   \
         src/communication/fs/${FS_COMMUNICATION_IMPL}.c             \
         src/communication/command/${COMMAND_COMMUNICATION_IMPL}.c   \
-        src/communication/serial/${SERIAL_COMMUNICATION_IMPL}.c   \
+        src/communication/serial/${SERIAL_COMMUNICATION_IMPL}.c     \
                                                                     \
         -o stdoutsub                                                \
                                                                     \

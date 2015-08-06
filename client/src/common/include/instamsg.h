@@ -106,6 +106,8 @@ struct InstaMsg {
     Network ipstack;
     Network httpClient;
 
+    System systemUtils;
+
     MQTTPacket_connectData connectOptions;
 };
 

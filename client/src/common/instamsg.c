@@ -427,6 +427,8 @@ void initInstaMsg(InstaMsg* c,
 	    init_network(&(c->httpClient), &networkParametrs);
     }
 
+    init_system_utils(&(c->systemUtils), NULL);
+
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {
         c->messageHandlers[i].msgId = 0;
@@ -471,6 +473,7 @@ void cleanInstaMsgObject(InstaMsg *c)
     /*
      * Releasing the resources in the reverse-order in which they were initiated.
      */
+    release_system_utils(&(c->systemUtils));
 
     release_network(&(c->httpClient));
     release_network(&(c->ipstack));
@@ -500,14 +503,15 @@ static void getStringFromInstamsgJSON(cJSON *json, const char *key, const char *
 }
 
 
-static const char* getValueFromParsedJSONStuff(JSONParseStuff *jsonStuff, int items, const char *key)
+static void getValueFromParsedJSONStuff(JSONParseStuff *jsonStuff, int items, const char *key, char **value)
 {
     int i;
+
     for(i = 0; i < items; i++)
     {
         if(strcmp(jsonStuff[i].key, key) == 0)
         {
-            return jsonStuff[i].value;
+            *value = (char*) jsonStuff[i].value;
         }
     }
 }
@@ -582,8 +586,6 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         }
     }
 
-    cJSON_Delete(json); // IMPORTANT, else there will be memory-leak.
-
 
     /*
      * If we reach till here, we have successfully parsed the parameters.
@@ -600,17 +602,25 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
      *      File-Listings
      *      File-Deletion
      */
-    const char *replyTopic = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, REPLY_TOPIC);
-    const char *messageId = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, MESSAGE_ID);
-    const char *method = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, METHOD);
-    const char *filename = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, FILENAME);
-    const char *url = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, URL);
+    char *replyTopic = NULL,
+         *messageId = NULL,
+         *method = NULL,
+         *filename = NULL,
+         *url = NULL;
+
+    getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, REPLY_TOPIC, &replyTopic);
+    getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, MESSAGE_ID, &messageId);
+    getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, METHOD, &method);
+    getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, FILENAME, &filename);
+    getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, URL, &url);
+
+
+    unsigned char ackMessage[MAX_BUFFER_SIZE] = {0};
 
     if( (   (strcmp(method, "POST") == 0) || (strcmp(method, "PUT") == 0)   ) &&
             (filename != NULL) &&
             (url != NULL)   )
     {
-        char ackMessage[MAX_BUFFER_SIZE] = {0};
         int ackStatus = 0;
 
         int status = downloadFile(&(c->httpClient), url, filename, 10);
@@ -618,21 +628,34 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         {
             ackStatus = 1;
         }
-        sprintf(ackMessage, "{\"response_id\": %s, \"status\": %d}", messageId, ackStatus);
+        sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": %d}", messageId, ackStatus);
 
-        /*
-         * Send the acknowledgement, along with the ackStatus (success/failure).
-         */
-        MQTTPublish(c,
-                    replyTopic,
-                    ackMessage,
-                    (msg->fixedHeaderPlusMsgId).fixedHeader.qos,
-                    (msg->fixedHeaderPlusMsgId).fixedHeader.dup,
-                    NULL,
-                    MQTT_RESULT_HANDLER_TIMEOUT,
-                    0,
-                    1);
     }
+    else if( (strcmp(method, "GET") == 0) && (filename == NULL))
+    {
+        unsigned char fileList[MAX_BUFFER_SIZE] = {0};
+        (c->systemUtils).getFileListing(&(c->systemUtils), fileList, MAX_BUFFER_SIZE, ".");
+
+        info_log("File-Listing :::::: [%s]", fileList);
+
+        sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"files\": %s}", messageId, fileList);
+    }
+
+
+    /*
+     * Send the acknowledgement, along with the ackStatus (success/failure).
+     */
+    MQTTPublish(c,
+                replyTopic,
+                ackMessage,
+                (msg->fixedHeaderPlusMsgId).fixedHeader.qos,
+                (msg->fixedHeaderPlusMsgId).fixedHeader.dup,
+                NULL,
+                MQTT_RESULT_HANDLER_TIMEOUT,
+                0,
+                1);
+
+    cJSON_Delete(json); // IMPORTANT, else there will be memory-leak.
 }
 
 

@@ -58,6 +58,12 @@ static void getNextLine(Network *network, unsigned char *buf)
 */
 int downloadFile(Network *network, const char *url, const char *downloadedFileName, unsigned int timeout)
 {
+    /*
+     * Either of the URLs form work ::
+     *
+     *      http://platform.instamsg.io:8081/files/d2f9d9e7-e98b-4777-989e-605073a55efd.0003-Missed-a-path-export.patch
+     *      /files/d2f9d9e7-e98b-4777-989e-605073a55efd.0003-Missed-a-path-export.patch
+     */
     char request[MAX_BUFFER_SIZE] = {0};
     sprintf(request, "GET %s HTTP/1.0\r\n\r\n", url);
 
@@ -70,10 +76,9 @@ int downloadFile(Network *network, const char *url, const char *downloadedFileNa
         return;
     }
 
-
+    long numBytes = 0;
     while(1)
     {
-        long numBytes = 0;
         char beginPayloadDownload = 0;
 
         char newLine[MAX_BUFFER_SIZE] = "";
@@ -102,6 +107,7 @@ int downloadFile(Network *network, const char *url, const char *downloadedFileNa
              */
             if(strcmp(headerKey, "Content-Length") == 0)
             {
+
                 numBytes = atol(headerValue);
             }
         }
@@ -120,6 +126,8 @@ int downloadFile(Network *network, const char *url, const char *downloadedFileNa
             init_file_system(&fs, (void *)tempFileName);
 
             // Now, we need to start reading the bytes
+            info_log("Beginning downloading of [%s] worth [%ld] bytes", downloadedFileName, numBytes);
+
             long i;
             for(i = 0; i < numBytes; i++)
             {
@@ -143,7 +151,7 @@ int downloadFile(Network *network, const char *url, const char *downloadedFileNa
              * So, move the "temp"-file to the actual file.
              */
             rename_file_system(tempFileName, downloadedFileName);
-            info_log("File [%s] successfully moved to [%s]", tempFileName, downloadedFileName);
+            info_log("File [%s] successfully moved to [%s] worth [%ld] bytes", tempFileName, downloadedFileName, numBytes);
 
             // TODO: Ideally, parse this 200 from the response.
             return HTTP_FILE_DOWNLOAD_SUCCESS;

@@ -139,7 +139,7 @@ void release_mutex(Mutex *mutex);
     void (*getOffset)(Timer *timer, unsigned char *buf, int maxValueLenAllowed);
 
 typedef struct Timer Timer;
-void init_timer(Timer *timer);
+void init_timer(Timer *timer, void *arg);
 void release_timer(Timer *timer);
 
 
@@ -158,10 +158,17 @@ void release_timer(Timer *timer);
      * Note that the "buf" will be all-0-initialized from the callee, so the vendor-implementation                  \
      * does not need to bother about that.                                                                          \
      */                                                                                                             \
-    void (*getSerialNumber)(System *system, unsigned char *buf, int maxValueLenAllowed);
+    void (*getSerialNumber)(System *system, unsigned char *buf, int maxValueLenAllowed);                            \
+                                                                                                                    \
+                                                                                                                    \
+    /*                                                                                                              \
+     * Note that the "buf" will be all-0-initialized from the callee, so the vendor-implementation                  \
+     * does not need to bother about that.                                                                          \
+     */                                                                                                             \
+    void (*getFileListing)(System *system, unsigned char *buf, int maxValueLenAllowed, const char *directoryPath);
 
 typedef struct System System;
-void init_system_utils(System *system);
+void init_system_utils(System *system, void *arg);
 void release_system_utils(System *system);
 
 
