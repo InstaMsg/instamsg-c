@@ -71,11 +71,19 @@ static void getFileListing(System *system, unsigned char *buf, int maxValueLenAl
 }
 
 
+static void rebootDevice(System *sys)
+{
+    info_log("Rebooting the system.");
+    system("/sbin/reboot");
+}
+
+
 void init_system_utils(System *system, void *arg)
 {
     system->getManufacturer = getManufacturer;
     system->getSerialNumber = getSerialNumber;
     system->getFileListing = getFileListing;
+    system->rebootDevice = rebootDevice;
 }
 
 

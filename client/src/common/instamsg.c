@@ -451,6 +451,8 @@ void initInstaMsg(InstaMsg* c,
     memset(c->filesTopic, 0, MAX_BUFFER_SIZE);
     sprintf(c->filesTopic, "instamsg/clients/%s/files", clientId);
 
+    memset(c->rebootTopic, 0, MAX_BUFFER_SIZE);
+    sprintf(c->rebootTopic, "instamsg/clients/%s/reboot", clientId);
 
 	c->connectOptions.willFlag = 0;
 	c->connectOptions.MQTTVersion = 3;
@@ -760,6 +762,11 @@ void readPacketThread(InstaMsg* c)
                     if(strcmp(topicName, c->filesTopic) == 0)
                     {
                         handleFileTransfer(c, &msg);
+                        break;
+                    }
+                    else if(strcmp(topicName, c->rebootTopic) == 0)
+                    {
+                        (c->systemUtils).rebootDevice(&(c->systemUtils));
                         break;
                     }
                 }

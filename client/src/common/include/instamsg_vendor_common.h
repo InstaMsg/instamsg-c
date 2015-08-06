@@ -165,7 +165,13 @@ void release_timer(Timer *timer);
      * Note that the "buf" will be all-0-initialized from the callee, so the vendor-implementation                  \
      * does not need to bother about that.                                                                          \
      */                                                                                                             \
-    void (*getFileListing)(System *system, unsigned char *buf, int maxValueLenAllowed, const char *directoryPath);
+    void (*getFileListing)(System *system, unsigned char *buf, int maxValueLenAllowed, const char *directoryPath);  \
+                                                                                                                    \
+                                                                                                                    \
+    /*                                                                                                              \
+     * Reboots the device.                                                                                          \
+     */                                                                                                             \
+    void (*rebootDevice)(System *system);
 
 typedef struct System System;
 void init_system_utils(System *system, void *arg);

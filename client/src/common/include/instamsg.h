@@ -102,6 +102,7 @@ struct InstaMsg {
     struct Mutex resultHandlersMutex;
 
     unsigned char filesTopic[MAX_BUFFER_SIZE];
+    unsigned char rebootTopic[MAX_BUFFER_SIZE];
 
     Network ipstack;
     Network httpClient;
