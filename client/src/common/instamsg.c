@@ -503,7 +503,7 @@ static void getStringFromInstamsgJSON(cJSON *json, const char *key, const char *
 }
 
 
-static void getValueFromParsedJSONStuff(JSONParseStuff *jsonStuff, int items, const char *key, char **value)
+static const char* getValueFromParsedJSONStuff(JSONParseStuff *jsonStuff, int items, const char *key)
 {
     int i;
 
@@ -511,9 +511,11 @@ static void getValueFromParsedJSONStuff(JSONParseStuff *jsonStuff, int items, co
     {
         if(strcmp(jsonStuff[i].key, key) == 0)
         {
-            *value = (char*) jsonStuff[i].value;
+            return jsonStuff[i].value;
         }
     }
+
+    return NULL;
 }
 
 
@@ -602,17 +604,12 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
      *      File-Listings
      *      File-Deletion
      */
-    char *replyTopic = NULL,
-         *messageId = NULL,
-         *method = NULL,
-         *filename = NULL,
-         *url = NULL;
 
-    getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, REPLY_TOPIC, &replyTopic);
-    getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, MESSAGE_ID, &messageId);
-    getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, METHOD, &method);
-    getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, FILENAME, &filename);
-    getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, URL, &url);
+    const char *replyTopic = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, REPLY_TOPIC);
+    const char *messageId = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, MESSAGE_ID);
+    const char *method =  getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, METHOD);
+    const char *filename = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, FILENAME);
+    const char *url = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, URL);
 
 
     unsigned char ackMessage[MAX_BUFFER_SIZE] = {0};
