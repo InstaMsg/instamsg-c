@@ -393,7 +393,6 @@ void initInstaMsg(InstaMsg* c,
     readConfig(&config, "LOG_LEVEL", INTEGER, &currentLogLevel);
 
     {
-        int serialLoggerEnabled = 0;
         readConfig(&config, "USE_SERIAL_LOGGER", INTEGER, &serialLoggerEnabled);
 
         if(serialLoggerEnabled == 1)
@@ -469,14 +468,25 @@ void initInstaMsg(InstaMsg* c,
 
 void cleanInstaMsgObject(InstaMsg *c)
 {
+    /*
+     * Releasing the resources in the reverse-order in which they were initiated.
+     */
+
+    release_network(&(c->httpClient));
+    release_network(&(c->ipstack));
+
     release_mutex(&(c->resultHandlersMutex));
     release_mutex(&(c->messageHandlersMutex));
     release_mutex(&(c->networkPhysicalMediumMutex));
 
-    release_network(&(c->ipstack));
-
-    // TODO: Release the appropriate logger
-    release_file_logger(&fileLogger);
+    if(serialLoggerEnabled == 1)
+    {
+        release_serial_logger(&serialLogger);
+    }
+    else
+    {
+        release_file_logger(&fileLogger);
+    }
 }
 
 

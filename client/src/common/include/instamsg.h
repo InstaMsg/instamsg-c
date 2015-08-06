@@ -105,6 +105,7 @@ struct InstaMsg {
 
     Network ipstack;
     Network httpClient;
+
     MQTTPacket_connectData connectOptions;
 };
 
@@ -158,6 +159,8 @@ struct JSONParseStuff
     const char *value;
     unsigned int mandatory;
 };
+
+char serialLoggerEnabled;
 
 #define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}
 #endif
