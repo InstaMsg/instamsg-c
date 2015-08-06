@@ -14,19 +14,18 @@
 
 #include "./include/log.h"
 
-#define MAX_LENGTH_LOG_ALLOWED 1000
-
 #define LOG_COMMON_CODE(level)                                                                      \
     if(level > currentLogLevel)                                                                     \
         return;                                                                                     \
                                                                                                     \
-    unsigned char formatted_string[MAX_LENGTH_LOG_ALLOWED];                                         \
+    unsigned char formatted_string[MAX_BUFFER_SIZE] = {0};                                          \
     va_list argptr;                                                                                 \
                                                                                                     \
     va_start(argptr, fmt);                                                                          \
-    vsnprintf(formatted_string, MAX_LENGTH_LOG_ALLOWED, fmt, argptr);                               \
+    vsnprintf(formatted_string, MAX_BUFFER_SIZE, fmt, argptr);                                      \
     va_end(argptr);                                                                                 \
                                                                                                     \
+    strcat(formatted_string, "\n");                                                                 \
     (*logger_write_func)(logger_medium, formatted_string, strlen(formatted_string));
 
 

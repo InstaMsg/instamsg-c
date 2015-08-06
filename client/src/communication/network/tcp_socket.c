@@ -74,7 +74,7 @@ static void connect_underlying_medium_guaranteed(Network* network, unsigned char
 			    int opt = 1;
                 if(connect(network->socket, (struct sockaddr*)&address, sizeof(address)) != 0)
                 {
-                    info_log("Could not connect to the network ... retrying\n");
+                    info_log("Could not connect to the network ... retrying");
 
                     thread_sleep(1);
                 }
@@ -86,7 +86,7 @@ static void connect_underlying_medium_guaranteed(Network* network, unsigned char
         }
 	}
 
-    info_log("TCP-SOCKET UNDERLYING_MEDIUM INITIATED FOR HOST = [%s], PORT = [%d].\n",
+    info_log("TCP-SOCKET UNDERLYING_MEDIUM INITIATED FOR HOST = [%s], PORT = [%d].",
              network->host, network->port);
 }
 
@@ -167,6 +167,6 @@ void release_network(Network *network)
 {
     release_underlying_medium_guaranteed(network);
 
-    info_log("COMPLETE [TCP-SOCKET] STRUCTURE, INCLUDING THE UNDERLYING MEDIUM (SOCKET) CLEANED FOR HOST = [%s], PORT = [%d].\n",
+    info_log("COMPLETE [TCP-SOCKET] STRUCTURE, INCLUDING THE UNDERLYING MEDIUM (SOCKET) CLEANED FOR HOST = [%s], PORT = [%d].",
              network->host, network->port);
 }

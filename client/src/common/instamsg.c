@@ -26,7 +26,7 @@
 
 static void publishQoS2CycleCompleted(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
-    debug_log("PUBCOMP received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
+    debug_log("PUBCOMP received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
 }
 
 
@@ -63,7 +63,7 @@ void prepareThreadTerminationIfApplicable(const char *threadName)
 {
     if(terminateCurrentInstance == 1)
     {
-        info_log("Terminating %s\n", threadName);
+        info_log("Terminating %s", threadName);
         incrementOrDecrementThreadCount(0);
     }
 }
@@ -340,7 +340,7 @@ void* clientTimerThread(InstaMsg *c)
                 }
                 else
                 {
-                    info_log("No result obtained for msgId [%u] in the specified period\n", c->resultHandlers[i].msgId);
+                    info_log("No result obtained for msgId [%u] in the specified period", c->resultHandlers[i].msgId);
                     c->resultHandlers[i].msgId = 0;
                 }
 
@@ -665,7 +665,7 @@ void readPacketThread(InstaMsg* c)
                     }
                     else
                     {
-                        info_log("Client-Connection failed with code [%d]\n", connack_rc);
+                        info_log("Client-Connection failed with code [%d]", connack_rc);
                     }
                 }
 
@@ -732,8 +732,8 @@ void readPacketThread(InstaMsg* c)
                 char topicName[MAX_BUFFER_SIZE] = {0};
                 snprintf(topicName, strlen(topicPlusPayload.lenstring.data) - strlen(msg.payload) + 1, "%s", topicPlusPayload.lenstring.data);
 
-                debug_log("PUBLISH-topic = [%s]\n", topicName);
-                debug_log("PUBLISH-message-payload = [%s]\n", msg.payload);
+                debug_log("PUBLISH-topic = [%s]", topicName);
+                debug_log("PUBLISH-message-payload = [%s]", msg.payload);
 
                 if(topicName != NULL)
                 {
@@ -776,7 +776,7 @@ void readPacketThread(InstaMsg* c)
 
             case PINGRESP:
             {
-                debug_log("PINGRESP received... relations are intact !!\n");
+                debug_log("PINGRESP received... relations are intact !!");
                 break;
             }
         }

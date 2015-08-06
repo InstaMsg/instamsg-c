@@ -1,7 +1,7 @@
 #ifndef INSTAMSG_GLOBALS
 #define INSTAMSG_GLOBALS
 
-#define MAX_BUFFER_SIZE 100
+#define MAX_BUFFER_SIZE 1000
 
 enum returnCode
 {
