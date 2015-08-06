@@ -71,6 +71,11 @@ void prepareThreadTerminationIfApplicable(const char *threadName)
 
 static void attachResultHandler(InstaMsg *c, int msgId, unsigned int timeout, void (*resultHandler)(MQTTFixedHeaderPlusMsgId *))
 {
+    if(resultHandler == NULL)
+    {
+        return;
+    }
+
     int i;
 
     (c->resultHandlersMutex).lock(&(c->resultHandlersMutex));
