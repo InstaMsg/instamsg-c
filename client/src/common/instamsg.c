@@ -515,7 +515,7 @@ static const char* getValueFromParsedJSONStuff(JSONParseStuff *jsonStuff, int it
 
 static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
 {
-    const char *REPLY_TOPIC = "reply_topic";
+    const char *REPLY_TOPIC = "reply_to";
     const char *MESSAGE_ID = "message_id";
     const char *METHOD = "method";
     const char *URL = "url";
@@ -714,10 +714,10 @@ void readPacketThread(InstaMsg* c)
 
             case PUBLISH:
             {
-                MQTTString topicName;
+                MQTTString topicPlusPayload;
                 MQTTMessage msg;
                 if (MQTTDeserialize_publish(&(msg.fixedHeaderPlusMsgId),
-                                            &topicName,
+                                            &topicPlusPayload,
                                             (unsigned char**)&msg.payload,
                                             (int*)&msg.payloadlen,
                                             c->readbuf,
@@ -729,9 +729,15 @@ void readPacketThread(InstaMsg* c)
                 /*
                  * At this point, "msg.payload" contains the real-stuff that is passed from the peer ....
                  */
-                if(topicName.lenstring.data != NULL)
+                char topicName[MAX_BUFFER_SIZE] = {0};
+                snprintf(topicName, strlen(topicPlusPayload.lenstring.data) - strlen(msg.payload) + 1, "%s", topicPlusPayload.lenstring.data);
+
+                debug_log("PUBLISH-topic = [%s]\n", topicName);
+                debug_log("PUBLISH-message-payload = [%s]\n", msg.payload);
+
+                if(topicName != NULL)
                 {
-                    if(strcmp(topicName.lenstring.data, c->filesTopic) == 0)
+                    if(strcmp(topicName, c->filesTopic) == 0)
                     {
                         handleFileTransfer(c, &msg);
                         break;
@@ -741,7 +747,7 @@ void readPacketThread(InstaMsg* c)
                 /*
                  * This is the last-ditch effort... if we reach till here... call this method
                  */
-                deliverMessageToSelf(c, &topicName, &msg);
+                deliverMessageToSelf(c, &topicPlusPayload, &msg);
 
                 break;
             }
