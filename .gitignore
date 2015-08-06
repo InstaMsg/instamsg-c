@@ -45,6 +45,7 @@ embedded-flash-environment/tiva-template/
 embedded-flash-environment/tivaware/
 
 client/subscriber.sh
+client/filetester.sh
 client/publisher.sh
 
 client/tiva_tm4c123gxl_blinky/tiva_build/
