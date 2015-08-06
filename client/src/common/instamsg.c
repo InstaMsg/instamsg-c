@@ -603,7 +603,6 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
      * Following are present in Instamsg-Python... integrate in Instamsg-C too
      *
      *      File-Upload
-     *      File-Listings
      *      File-Deletion
      */
 
