@@ -729,9 +729,9 @@ void readPacketThread(InstaMsg* c)
                 /*
                  * At this point, "msg.payload" contains the real-stuff that is passed from the peer ....
                  */
-                if(topicName.cstring != NULL)
+                if(topicName.lenstring.data != NULL)
                 {
-                    if(strcmp(topicName.cstring, c->filesTopic) == 0)
+                    if(strcmp(topicName.lenstring.data, c->filesTopic) == 0)
                     {
                         handleFileTransfer(c, &msg);
                         break;
