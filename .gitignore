@@ -47,6 +47,8 @@ embedded-flash-environment/tivaware/
 client/subscriber.sh
 client/filetester.sh
 client/publisher.sh
+
+client/config.txt
 client/config.txt_local_testing
 client/config.txt_filetester
 
