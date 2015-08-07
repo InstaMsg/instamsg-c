@@ -126,7 +126,7 @@ int downloadFile(Network *network, const char *url, const char *downloadedFileNa
             init_file_system(&fs, (void *)tempFileName);
 
             // Now, we need to start reading the bytes
-            info_log(FILE_DOWNLOAD "Beginning downloading of [%s] worth [%ld] bytes", downloadedFileName, numBytes);
+            info_log(FILE_DOWNLOAD "Beginning downloading of [%s] worth [%ld] bytes", tempFileName, numBytes);
 
             long i;
             for(i = 0; i < numBytes; i++)
