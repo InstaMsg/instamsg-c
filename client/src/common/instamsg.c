@@ -24,12 +24,21 @@
 #include <signal.h>
 
 
-static void getStringFromInstamsgJSON(cJSON *json, const char *key, const char **value)
+static void getValueFromInstamsgJSON(cJSON *json, JSONParseStuff *jsonStuff)
 {
-    cJSON *objectItem = cJSON_GetObjectItem(json, key);
+    cJSON *objectItem = cJSON_GetObjectItem(json, jsonStuff->key);
     if(objectItem != NULL)
     {
-        *value = objectItem->valuestring;
+        if(objectItem->valuestring != NULL)
+        {
+            jsonStuff->value = objectItem->valuestring;
+            jsonStuff->type = STRING;
+        }
+        else
+        {
+            jsonStuff->value = &(objectItem->valueint);
+            jsonStuff->type = INTEGER;
+        }
     }
 }
 
@@ -44,7 +53,7 @@ static int parseJSONKeyValues(cJSON *json, JSONParseStuff *jsonStuff, MQTTMessag
             break;
         }
 
-        getStringFromInstamsgJSON(json, jsonStuff[i].key, &(jsonStuff[i].value));
+        getValueFromInstamsgJSON(json, &(jsonStuff[i]));
         if(jsonStuff[i].value == NULL)
         {
             if(jsonStuff[i].mandatory == 1)
@@ -59,7 +68,16 @@ static int parseJSONKeyValues(cJSON *json, JSONParseStuff *jsonStuff, MQTTMessag
         }
         else
         {
-            debug_log("Found value ::  Key = [%s], Value = [%s] in the JSON-payload [%s]", jsonStuff[i].key, jsonStuff[i].value, msg->payload);
+            if(jsonStuff[i].type == STRING)
+            {
+                debug_log("Found value ::  Key = [%s], Value = [%s] in the JSON-payload [%s]", jsonStuff[i].key,
+                           jsonStuff[i].value, msg->payload);
+            }
+            else
+            {
+                debug_log("Found value ::  Key = [%s], Value = [%d] in the JSON-payload [%s]", jsonStuff[i].key,
+                           *((int*)(jsonStuff[i].value)), msg->payload);
+            }
         }
 
         i++;
@@ -69,7 +87,7 @@ static int parseJSONKeyValues(cJSON *json, JSONParseStuff *jsonStuff, MQTTMessag
 }
 
 
-static const char* getValueFromParsedJSONStuff(JSONParseStuff *jsonStuff, const char *key)
+static void* getValueFromParsedJSONStuff(JSONParseStuff *jsonStuff, const char *key)
 {
     int i = 0;
 
@@ -99,13 +117,32 @@ void messageArrived(MessageData* md)
 }
 
 
+static void replaceSingleQuotesWithDoubleQuotes(char *str)
+{
+    int i = 0;
+    for(i = 0; i < strlen(str); i++)
+    {
+        if(str[i] == '\'')
+        {
+            str[i] = '"';
+        }
+    }
+}
+
+
 static void serverLoggingTopicMessageArrived(MessageData *md)
 {
+    /*
+     * The payload is of the format ::
+     *              {'client_id':'cc366750-e286-11e4-ace1-bc764e102b63','logging':1}
+     */
+
     const char *CLIENT_ID = "client_id";
     const char *LOGGING = "logging";
 
     MQTTMessage *msg = md->message;
 
+    replaceSingleQuotesWithDoubleQuotes(msg->payload);
     cJSON *json = cJSON_Parse(msg->payload);
     if(json == NULL)
     {
@@ -136,18 +173,18 @@ static void serverLoggingTopicMessageArrived(MessageData *md)
     }
 
     const char *clientId = getValueFromParsedJSONStuff(jsonStuff, CLIENT_ID);
-    const char *logging = getValueFromParsedJSONStuff(jsonStuff, LOGGING);
+    int *logging = getValueFromParsedJSONStuff(jsonStuff, LOGGING);
     if( (clientId != NULL) && (logging != NULL) )
     {
-        if(strlen(logging) == 0)
-        {
-            md->c->serverLoggingEnabled = 0;
-            info_log(SERVER_LOGGING "Disabled.");
-        }
-        else
+        if(*logging == 1)
         {
             md->c->serverLoggingEnabled = 1;
             info_log(SERVER_LOGGING "Enabled.");
+        }
+        else
+        {
+            md->c->serverLoggingEnabled = 0;
+            info_log(SERVER_LOGGING "Disabled.");
         }
     }
 
@@ -833,17 +870,12 @@ void readPacketThread(InstaMsg* c)
                          */
 
                         // Instamsg-Specific processing
-                        /*
-                         * SEEMS THAT IT IS NOT REQUIRED TO SUBSCRIBE TO THIS TOPIC EXPLICITLY.
-                         */
-                        /*
 		                MQTTSubscribe(c,
                                       c->enableServerLoggingTopic,
                                       QOS1,
                                       serverLoggingTopicMessageArrived,
                                       subscribeAckReceived,
                                       MQTT_RESULT_HANDLER_TIMEOUT);
-                        */
 
                         // User-Specific "onConnectCallback"
                         c->onConnectCallback();

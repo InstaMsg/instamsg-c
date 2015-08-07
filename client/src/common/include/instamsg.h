@@ -165,8 +165,9 @@ typedef struct JSONParseStuff JSONParseStuff;
 struct JSONParseStuff
 {
     const char *key;
-    const char *value;
+    void *value;
     unsigned int mandatory;
+    unsigned char type;
 };
 
 char serialLoggerEnabled;
@@ -174,8 +175,8 @@ char serialLoggerEnabled;
 void messageArrived(MessageData* md);
 void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId);
 
-#define SERVER_LOGGING "[SERVER-LOGGING]"
-#define FILE_TRANSFER "[FILE-TRANSFER]"
+#define SERVER_LOGGING "[SERVER-LOGGING] "
+#define FILE_TRANSFER "[FILE-TRANSFER] "
 
 #define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}
 #endif
