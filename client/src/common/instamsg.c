@@ -867,20 +867,6 @@ void readPacketThread(InstaMsg* c)
                 {
                     if(connack_rc == 0x00)  // Connection Accepted
                     {
-                        /*
-                         * After the connection is established, do some instamsg-specific processing here.
-                         * Thereafter, call the user-specifiec "onConnectCallback".
-                         */
-
-                        // Instamsg-Specific processing
-		                MQTTSubscribe(c,
-                                      c->enableServerLoggingTopic,
-                                      QOS1,
-                                      serverLoggingTopicMessageArrived,
-                                      subscribeAckReceived,
-                                      MQTT_RESULT_HANDLER_TIMEOUT);
-
-                        // User-Specific "onConnectCallback"
                         c->onConnectCallback();
                     }
                     else
