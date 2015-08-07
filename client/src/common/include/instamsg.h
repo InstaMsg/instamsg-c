@@ -176,8 +176,11 @@ char serialLoggerEnabled;
 void messageArrived(MessageData* md);
 void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId);
 
-#define SERVER_LOGGING "[SERVER-LOGGING] "
-#define FILE_TRANSFER "[FILE-TRANSFER] "
+#define SERVER_LOGGING  "[SERVER-LOGGING] "
+#define FILE_TRANSFER   "[FILE-TRANSFER] "
+#define FILE_DOWNLOAD   "[FILE-DOWNLOAD] "
+#define FILE_LISTING    "[FILE-LISTING] "
+#define FILE_DELETE     "[FILE-DELETE] "
 
 #define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}
 #endif

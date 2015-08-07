@@ -126,7 +126,7 @@ int downloadFile(Network *network, const char *url, const char *downloadedFileNa
             init_file_system(&fs, (void *)tempFileName);
 
             // Now, we need to start reading the bytes
-            info_log("Beginning downloading of [%s] worth [%ld] bytes", downloadedFileName, numBytes);
+            info_log(FILE_DOWNLOAD "Beginning downloading of [%s] worth [%ld] bytes", downloadedFileName, numBytes);
 
             long i;
             for(i = 0; i < numBytes; i++)
@@ -151,7 +151,7 @@ int downloadFile(Network *network, const char *url, const char *downloadedFileNa
              * So, move the "temp"-file to the actual file.
              */
             rename_file_system(tempFileName, downloadedFileName);
-            info_log("File [%s] successfully moved to [%s] worth [%ld] bytes", tempFileName, downloadedFileName, numBytes);
+            info_log(FILE_DOWNLOAD "File [%s] successfully moved to [%s] worth [%ld] bytes", tempFileName, downloadedFileName, numBytes);
 
             // TODO: Ideally, parse this 200 from the response.
             return HTTP_FILE_DOWNLOAD_SUCCESS;

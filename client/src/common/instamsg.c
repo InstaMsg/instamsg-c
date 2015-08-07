@@ -819,9 +819,23 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         unsigned char fileList[MAX_BUFFER_SIZE] = {0};
         (c->systemUtils).getFileListing(&(c->systemUtils), fileList, MAX_BUFFER_SIZE, ".");
 
-        info_log("File-Listing :::::: [%s]", fileList);
+        info_log(FILE_LISTING ": [%s]", fileList);
 
         sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"files\": %s}", messageId, fileList);
+    }
+    else if( (strcmp(method, "DELETE") == 0) && (filename != NULL))
+    {
+        int status = delete_file_system(filename);
+        if(status == SUCCESS)
+        {
+            info_log(FILE_DELETE "[%s] deleted successfully.", filename);
+            sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1}", messageId);
+        }
+        else
+        {
+            error_log(FILE_DELETE "[%s] could not be deleted :(", filename);
+            sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 0, \"error_msg\":\"%s\"}", messageId, "File-Removal Failed :(");
+        }
     }
 
 
