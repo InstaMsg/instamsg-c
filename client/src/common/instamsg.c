@@ -638,6 +638,9 @@ void initInstaMsg(InstaMsg* c,
     memset(c->enableServerLoggingTopic, 0, MAX_BUFFER_SIZE);
     sprintf(c->enableServerLoggingTopic, "instamsg/clients/%s/enableServerLogging", clientId);
 
+    memset(c->serverLogsTopic, 0, MAX_BUFFER_SIZE);
+    sprintf(c->serverLogsTopic, "instamsg/clients/%s/logs", clientId);
+
     c->serverLoggingEnabled = 0;
 
 	c->connectOptions.willFlag = 0;
