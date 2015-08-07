@@ -796,7 +796,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
          * IT MEANS THE FILE-TRANSFER COMPLETED, AND THAT TOO PERFECTLY SUCCESSFULLY.
          *
          */
-        int status = downloadFile(&(c->httpClient), url, filename, NULL, NULL, 10);
+        int status = downloadFile(url, filename, NULL, NULL, 10);
         if(status == HTTP_FILE_DOWNLOAD_SUCCESS)
         {
             ackStatus = 1;

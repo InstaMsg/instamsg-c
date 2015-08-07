@@ -112,7 +112,6 @@ struct InstaMsg {
     unsigned char serverLoggingEnabled;
 
     Network ipstack;
-    Network httpClient;
 
     System systemUtils;
 

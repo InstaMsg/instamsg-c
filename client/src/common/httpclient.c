@@ -132,21 +132,21 @@ static void generateRequest(const char *requestType,
  *
  * echo "hi ajay"
 */
-int downloadFile(Network *network,
-                 const char *url,
+int downloadFile(const char *url,
                  const char *filename,
                  KeyValuePairs *params,
                  KeyValuePairs *headers,
                  unsigned int timeout)
 {
     int rc = FAILURE;
+    Network network;
 
     {
         NetworkParameters networkParametrs;
         readConfig(&config, "INSTAMSG_HTTP_HOST", STRING, &(networkParametrs.hostName));
         readConfig(&config, "INSTAMSG_HTTP_PORT", INTEGER, &(networkParametrs.port));
 
-	    init_network(network, &networkParametrs);
+	    init_network(&network, &networkParametrs);
     }
 
     /*
@@ -162,7 +162,7 @@ int downloadFile(Network *network,
     /*
      * Fire the request-bytes over the network-medium.
      */
-    if(network->write(network, request, strlen(request)) == FAILURE)
+    if(network.write(&network, request, strlen(request)) == FAILURE)
     {
         terminateCurrentInstance = 1;
         goto exit;
@@ -174,7 +174,7 @@ int downloadFile(Network *network,
         char beginPayloadDownload = 0;
 
         char newLine[MAX_BUFFER_SIZE] = "";
-        getNextLine(network, newLine);
+        getNextLine(&network, newLine);
 
         /*
          * The actual file-payload begins after we receive an empty line.
@@ -225,7 +225,7 @@ int downloadFile(Network *network,
             {
                 char ch[2] = {0};
 
-                if(network->read(network, ch, 1) == FAILURE)
+                if(network.read(&network, ch, 1) == FAILURE)
                 {
                     terminateCurrentInstance = 1;
                     release_file_system(&fs);
@@ -248,7 +248,7 @@ int downloadFile(Network *network,
             rc = HTTP_FILE_DOWNLOAD_SUCCESS;
 
 exit:
-            release_network(network);
+            release_network(&network);
 
             // TODO: Ideally, parse this 200 from the response.
             return rc;

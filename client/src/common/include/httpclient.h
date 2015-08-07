@@ -1,7 +1,6 @@
 #include "./instamsg_vendor_common.h"
 
-int downloadFile(Network *network,
-                 const char *url,
+int downloadFile(const char *url,
                  const char *downloadedFileName,
                  KeyValuePairs *params,
                  KeyValuePairs *headers,
