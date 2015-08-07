@@ -12,11 +12,10 @@
 #include <string.h>
 #include <stdarg.h>
 
+#include "./include/instamsg.h"
 #include "./include/log.h"
 
 #define LOG_COMMON_CODE(level)                                                                      \
-    if(level > currentLogLevel)                                                                     \
-        return;                                                                                     \
                                                                                                     \
     unsigned char formatted_string[MAX_BUFFER_SIZE] = {0};                                          \
     va_list argptr;                                                                                 \
@@ -26,7 +25,23 @@
     va_end(argptr);                                                                                 \
                                                                                                     \
     strcat(formatted_string, "\n");                                                                 \
-    (*logger_write_func)(logger_medium, formatted_string, strlen(formatted_string));
+                                                                                                    \
+    if(instaMsg.serverLoggingEnabled == 1)                                                          \
+    {                                                                                               \
+        MQTTPublish(&instaMsg,                                                                      \
+                    instaMsg.serverLogsTopic,                                                       \
+                    formatted_string,                                                               \
+                    QOS1,                                                                           \
+                    0,                                                                              \
+                    NULL,                                                                           \
+                    MQTT_RESULT_HANDLER_TIMEOUT,                                                    \
+                    0,                                                                              \
+                    0);                                                                             \
+    }                                                                                               \
+    else if(level <= currentLogLevel)                                                               \
+    {                                                                                               \
+        (*logger_write_func)(logger_medium, formatted_string, strlen(formatted_string));            \
+    }
 
 
 void init_file_logger(FileLogger *fileLogger, void *arg)
