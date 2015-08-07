@@ -34,28 +34,6 @@ static void getNextLine(Network *network, unsigned char *buf)
 }
 
 
-/*
- * BYTE-LEVEL-REQUEST ::
- * ======================
- *
- * GET /1.txt HTTP/1.0\r\n\r\n
- *
- *
- * BYTE-LEVEL-RESPONSE ::
- * =======================
- *
- * HTTP/1.1 200 OK
- * Date: Wed, 05 Aug 2015 09:43:26 GMT
- * Server: Apache/2.4.7 (Ubuntu)
- * Last-Modified: Wed, 05 Aug 2015 09:14:51 GMT
- * ETag: "f-51c8cd5d313d7"
- * Accept-Ranges: bytes
- * Content-Length: 15
- * Connection: close
- * Content-Type: text/plain
- *
- * echo "hi ajay"
-*/
 static void generateRequest(const char *requestType,
                             const char *url,
                             KeyValuePairs *params,
@@ -93,6 +71,8 @@ static void generateRequest(const char *requestType,
             strcat(buf, params[i].key);
             strcat(buf, "=");
             strcat(buf, params[i].value);
+
+            i++;
         }
     }
 
@@ -117,6 +97,8 @@ static void generateRequest(const char *requestType,
             strcat(buf, headers[i].key);
             strcat(buf, ": ");
             strcat(buf, headers[i].value);
+
+            i++;
         }
     }
 
@@ -127,9 +109,31 @@ static void generateRequest(const char *requestType,
 }
 
 
+/*
+ * BYTE-LEVEL-REQUEST ::
+ * ======================
+ *
+ * GET /1.txt HTTP/1.0\r\n\r\n
+ *
+ *
+ * BYTE-LEVEL-RESPONSE ::
+ * =======================
+ *
+ * HTTP/1.1 200 OK
+ * Date: Wed, 05 Aug 2015 09:43:26 GMT
+ * Server: Apache/2.4.7 (Ubuntu)
+ * Last-Modified: Wed, 05 Aug 2015 09:14:51 GMT
+ * ETag: "f-51c8cd5d313d7"
+ * Accept-Ranges: bytes
+ * Content-Length: 15
+ * Connection: close
+ * Content-Type: text/plain
+ *
+ * echo "hi ajay"
+*/
 int downloadFile(Network *network,
                  const char *url,
-                 const char *downloadedFileName,
+                 const char *filename,
                  KeyValuePairs *params,
                  KeyValuePairs *headers,
                  unsigned int timeout)
@@ -192,7 +196,7 @@ int downloadFile(Network *network,
         if(beginPayloadDownload == 1)
         {
             char tempFileName[MAX_BUFFER_SIZE] = {0};
-            sprintf(tempFileName, "~%s", downloadedFileName);
+            sprintf(tempFileName, "~%s", filename);
 
             /*
              * Delete the file (it might have been downloaded partially some other time).
@@ -227,8 +231,8 @@ int downloadFile(Network *network,
              * If we reach here, the file has been downloaded successfully.
              * So, move the "temp"-file to the actual file.
              */
-            rename_file_system(tempFileName, downloadedFileName);
-            info_log(FILE_DOWNLOAD "File [%s] successfully moved to [%s] worth [%ld] bytes", tempFileName, downloadedFileName, numBytes);
+            rename_file_system(tempFileName, filename);
+            info_log(FILE_DOWNLOAD "File [%s] successfully moved to [%s] worth [%ld] bytes", tempFileName, filename, numBytes);
 
             // TODO: Ideally, parse this 200 from the response.
             return HTTP_FILE_DOWNLOAD_SUCCESS;
