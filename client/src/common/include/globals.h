@@ -24,6 +24,15 @@ struct NetworkParameters
     int port;
 };
 
+
+typedef struct KeyValuePairs KeyValuePairs;
+struct KeyValuePairs
+{
+    char *key;
+    char *value;
+};
+
+
 #define HTTP_FILE_DOWNLOAD_SUCCESS 200
 
 #endif

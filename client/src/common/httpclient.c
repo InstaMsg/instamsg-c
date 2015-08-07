@@ -56,7 +56,83 @@ static void getNextLine(Network *network, unsigned char *buf)
  *
  * echo "hi ajay"
 */
-int downloadFile(Network *network, const char *url, const char *downloadedFileName, unsigned int timeout)
+static void generateRequest(const char *requestType,
+                            const char *url,
+                            KeyValuePairs *params,
+                            KeyValuePairs *headers,
+                            unsigned char *buf,
+                            int maxLenAllowed)
+{
+    /*
+     * Add the "GET" and "/1.txt"
+     */
+    sprintf(buf, "%s %s", requestType, url);
+
+    /*
+     * Append the parameters (if any).
+     */
+    if(params != NULL)
+    {
+        int i = 0;
+        while(1)
+        {
+            if(params[i].key == NULL)
+            {
+                break;
+            }
+
+            if(i == 0)
+            {
+                strcat(buf, "?");
+            }
+            else
+            {
+                strcat(buf, "&");
+            }
+
+            strcat(buf, params[i].key);
+            strcat(buf, "=");
+            strcat(buf, params[i].value);
+        }
+    }
+
+    /*
+     * Add the "HTTP/1.0\r\n" part.
+     */
+    strcat(buf, " HTTP/1.0\r\n");
+
+    /*
+     * Add the headers (if any)
+     */
+    if(headers != NULL)
+    {
+        int i = 0;
+        while(1)
+        {
+            if(headers[i].key == NULL)
+            {
+                break;
+            }
+
+            strcat(buf, headers[i].key);
+            strcat(buf, ": ");
+            strcat(buf, headers[i].value);
+        }
+    }
+
+    /*
+     * Finally, add the delimiter.
+     */
+    strcat(buf, "\r\n");
+}
+
+
+int downloadFile(Network *network,
+                 const char *url,
+                 const char *downloadedFileName,
+                 KeyValuePairs *params,
+                 KeyValuePairs *headers,
+                 unsigned int timeout)
 {
     /*
      * Either of the URLs form work ::
@@ -65,7 +141,8 @@ int downloadFile(Network *network, const char *url, const char *downloadedFileNa
      *      /files/d2f9d9e7-e98b-4777-989e-605073a55efd.0003-Missed-a-path-export.patch
      */
     char request[MAX_BUFFER_SIZE] = {0};
-    sprintf(request, "GET %s HTTP/1.0\r\n\r\n", url);
+    generateRequest("GET", url, params, headers, request, MAX_BUFFER_SIZE);
+    info_log(FILE_DOWNLOAD "Complete URL that will be hit : [%s]", request);
 
     /*
      * Fire the request-bytes over the network-medium.
