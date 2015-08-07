@@ -749,7 +749,6 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
      * Following are present in Instamsg-Python... integrate in Instamsg-C too
      *
      *      File-Upload
-     *      File-Deletion
      */
 
     const char *replyTopic = getValueFromParsedJSONStuff(jsonStuff, REPLY_TOPIC);
