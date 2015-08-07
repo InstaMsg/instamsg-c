@@ -38,8 +38,9 @@ Mutex threadCountMutex;
 void NewTimer(Timer*);
 
 typedef struct MQTTMessage MQTTMessage;
-
 typedef struct MessageData MessageData;
+typedef struct InstaMsg InstaMsg;
+
 
 struct MQTTMessage
 {
@@ -48,11 +49,14 @@ struct MQTTMessage
     size_t payloadlen;
 };
 
+
 struct MessageData
 {
+    InstaMsg *c;
     MQTTMessage* message;
     MQTTString* topicName;
 };
+
 
 typedef void (*messageHandler)(MessageData*);
 
@@ -73,7 +77,6 @@ struct opts_struct
     char *logFilePath;
 };
 
-typedef struct InstaMsg InstaMsg;
 struct InstaMsg {
     unsigned int next_packetid;
     unsigned char readbuf[MAX_BUFFER_SIZE];
@@ -103,6 +106,9 @@ struct InstaMsg {
 
     unsigned char filesTopic[MAX_BUFFER_SIZE];
     unsigned char rebootTopic[MAX_BUFFER_SIZE];
+    unsigned char enableServerLoggingTopic[MAX_BUFFER_SIZE];
+
+    unsigned char serverLoggingEnabled;
 
     Network ipstack;
     Network httpClient;
@@ -164,6 +170,12 @@ struct JSONParseStuff
 };
 
 char serialLoggerEnabled;
+
+void messageArrived(MessageData* md);
+void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId);
+
+#define SERVER_LOGGING "[SERVER-LOGGING]"
+#define FILE_TRANSFER "[FILE-TRANSFER]"
 
 #define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}
 #endif

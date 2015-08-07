@@ -24,13 +24,151 @@
 #include <signal.h>
 
 
+static void getStringFromInstamsgJSON(cJSON *json, const char *key, const char **value)
+{
+    cJSON *objectItem = cJSON_GetObjectItem(json, key);
+    if(objectItem != NULL)
+    {
+        *value = objectItem->valuestring;
+    }
+}
+
+
+static int parseJSONKeyValues(cJSON *json, JSONParseStuff *jsonStuff, MQTTMessage *msg)
+{
+    int i = 0;
+    while(1)
+    {
+        if(jsonStuff[i].key == NULL)
+        {
+            break;
+        }
+
+        getStringFromInstamsgJSON(json, jsonStuff[i].key, &(jsonStuff[i].value));
+        if(jsonStuff[i].value == NULL)
+        {
+            if(jsonStuff[i].mandatory == 1)
+            {
+                error_log("Could not find field [%s] in the JSON-payload [%s] ... not proceeding further", jsonStuff[i].key, msg->payload);
+                return FAILURE;
+            }
+            else
+            {
+                debug_log("Could not find field [%s] in the JSON-payload [%s]", jsonStuff[i].key, msg->payload);
+            }
+        }
+        else
+        {
+            debug_log("Found value ::  Key = [%s], Value = [%s] in the JSON-payload [%s]", jsonStuff[i].key, jsonStuff[i].value, msg->payload);
+        }
+
+        i++;
+    }
+
+    return SUCCESS;
+}
+
+
+static const char* getValueFromParsedJSONStuff(JSONParseStuff *jsonStuff, const char *key)
+{
+    int i = 0;
+
+    while(1)
+    {
+        if(jsonStuff[i].key == NULL)
+        {
+            break;
+        }
+
+        if(strcmp(jsonStuff[i].key, key) == 0)
+        {
+            return jsonStuff[i].value;
+        }
+
+        i++;
+    }
+
+    return NULL;
+}
+
+
+void messageArrived(MessageData* md)
+{
+	MQTTMessage* message = md->message;
+    info_log("%.*s", (int)message->payloadlen, (char*)message->payload);
+}
+
+
+static void serverLoggingTopicMessageArrived(MessageData *md)
+{
+    const char *CLIENT_ID = "client_id";
+    const char *LOGGING = "logging";
+
+    MQTTMessage *msg = md->message;
+
+    cJSON *json = cJSON_Parse(msg->payload);
+    if(json == NULL)
+    {
+        error_log(SERVER_LOGGING "Payload [%s] could not be parsed successfully :( ... not doing anything further", msg->payload);
+        return;
+    }
+
+    JSONParseStuff jsonStuff[] = \
+                        {
+                            {
+                                CLIENT_ID,
+                                NULL,
+                                0
+                            },
+                            {
+                                LOGGING,
+                                NULL,
+                                0
+                            },
+                            {
+                                0
+                            }
+                        };
+
+    if(parseJSONKeyValues(json, jsonStuff, msg) == FAILURE)
+    {
+        return;
+    }
+
+    const char *clientId = getValueFromParsedJSONStuff(jsonStuff, CLIENT_ID);
+    const char *logging = getValueFromParsedJSONStuff(jsonStuff, LOGGING);
+    if( (clientId != NULL) && (logging != NULL) )
+    {
+        if(strlen(logging) == 0)
+        {
+            md->c->serverLoggingEnabled = 0;
+            info_log(SERVER_LOGGING "Disabled.");
+        }
+        else
+        {
+            md->c->serverLoggingEnabled = 1;
+            info_log(SERVER_LOGGING "Enabled.");
+        }
+    }
+
+    cJSON_Delete(json); // IMPORTANT, else there will be memory-leak.
+}
+
+
+void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
+{
+    debug_log("SUBACK received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
+}
+
+
 static void publishQoS2CycleCompleted(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
     debug_log("PUBCOMP received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
 }
 
 
-static void NewMessageData(MessageData* md, MQTTString* aTopicName, MQTTMessage* aMessgage) {
+static void NewMessageData(MessageData* md, InstaMsg *c, MQTTString* aTopicName, MQTTMessage* aMessgage) {
+    md->c = c;
     md->topicName = aTopicName;
     md->message = aMessgage;
 }
@@ -169,6 +307,12 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     int len = 0;
     int rem_len = 0;
 
+    /*
+     * 0. Before reading the packet, memset the read-buffer to all-empty, else there will be issues
+     *    processing the buffer as a string.
+     */
+    memset(c->readbuf, 0, MAX_BUFFER_SIZE);
+
 
     /* 1. read the header byte.  This has the packet type in it
      *    (note that this function is guaranteed to succeed, since "ensure_guarantee has been passed as 1
@@ -255,7 +399,7 @@ static int deliverMessageToSelf(InstaMsg* c, MQTTString* topicName, MQTTMessage*
             if (c->messageHandlers[i].fp != NULL)
             {
                 MessageData md;
-                NewMessageData(&md, topicName, message);
+                NewMessageData(&md, c, topicName, message);
                 c->messageHandlers[i].fp(&md);
                 rc = SUCCESS;
             }
@@ -266,7 +410,7 @@ static int deliverMessageToSelf(InstaMsg* c, MQTTString* topicName, MQTTMessage*
     if (rc == FAILURE && c->defaultMessageHandler != NULL)
     {
         MessageData md;
-        NewMessageData(&md, topicName, message);
+        NewMessageData(&md, c, topicName, message);
         c->defaultMessageHandler(&md);
         rc = SUCCESS;
     }
@@ -454,6 +598,11 @@ void initInstaMsg(InstaMsg* c,
     memset(c->rebootTopic, 0, MAX_BUFFER_SIZE);
     sprintf(c->rebootTopic, "instamsg/clients/%s/reboot", clientId);
 
+    memset(c->enableServerLoggingTopic, 0, MAX_BUFFER_SIZE);
+    sprintf(c->enableServerLoggingTopic, "instamsg/clients/%s/enableServerLogging", clientId);
+
+    c->serverLoggingEnabled = 0;
+
 	c->connectOptions.willFlag = 0;
 	c->connectOptions.MQTTVersion = 3;
 
@@ -495,32 +644,6 @@ void cleanInstaMsgObject(InstaMsg *c)
 }
 
 
-static void getStringFromInstamsgJSON(cJSON *json, const char *key, const char **value)
-{
-    cJSON *objectItem = cJSON_GetObjectItem(json, key);
-    if(objectItem != NULL)
-    {
-        *value = objectItem->valuestring;
-    }
-}
-
-
-static const char* getValueFromParsedJSONStuff(JSONParseStuff *jsonStuff, int items, const char *key)
-{
-    int i;
-
-    for(i = 0; i < items; i++)
-    {
-        if(strcmp(jsonStuff[i].key, key) == 0)
-        {
-            return jsonStuff[i].value;
-        }
-    }
-
-    return NULL;
-}
-
-
 static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
 {
     const char *REPLY_TOPIC = "reply_to";
@@ -532,7 +655,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     cJSON *json = cJSON_Parse(msg->payload);
     if(json == NULL)
     {
-        error_log("Payload [%s] could not be parsed successfully :( ... not doing anything further", msg->payload);
+        error_log(FILE_TRANSFER "Payload [%s] could not be parsed successfully :( ... not doing anything further", msg->payload);
         return;
     }
 
@@ -563,31 +686,14 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
                                 NULL,
                                 0
                             },
-
+                            {
+                                0
+                            }
                         };
 
-    int jsonStuffLength = sizeof(jsonStuff) / sizeof(jsonStuff[0]);
-    int i;
-
-    for(i = 0; i < jsonStuffLength; i++)
+    if(parseJSONKeyValues(json, jsonStuff, msg) == FAILURE)
     {
-        getStringFromInstamsgJSON(json, jsonStuff[i].key, &(jsonStuff[i].value));
-        if(jsonStuff[i].value == NULL)
-        {
-            if(jsonStuff[i].mandatory == 1)
-            {
-                error_log("Could not find field [%s] in the JSON-payload [%s] ... not proceeding further", jsonStuff[i].key, msg->payload);
-                return;
-            }
-            else
-            {
-                debug_log("Could not find field [%s] in the JSON-payload [%s]", jsonStuff[i].key, msg->payload);
-            }
-        }
-        else
-        {
-            debug_log("Found value ::  Key = [%s], Value = [%s] in the JSON-payload [%s]", jsonStuff[i].key, jsonStuff[i].value, msg->payload);
-        }
+        return;
     }
 
 
@@ -606,11 +712,11 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
      *      File-Deletion
      */
 
-    const char *replyTopic = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, REPLY_TOPIC);
-    const char *messageId = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, MESSAGE_ID);
-    const char *method =  getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, METHOD);
-    const char *filename = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, FILENAME);
-    const char *url = getValueFromParsedJSONStuff(jsonStuff, jsonStuffLength, URL);
+    const char *replyTopic = getValueFromParsedJSONStuff(jsonStuff, REPLY_TOPIC);
+    const char *messageId = getValueFromParsedJSONStuff(jsonStuff, MESSAGE_ID);
+    const char *method =  getValueFromParsedJSONStuff(jsonStuff, METHOD);
+    const char *filename = getValueFromParsedJSONStuff(jsonStuff, FILENAME);
+    const char *url = getValueFromParsedJSONStuff(jsonStuff, URL);
 
 
     unsigned char ackMessage[MAX_BUFFER_SIZE] = {0};
@@ -721,6 +827,25 @@ void readPacketThread(InstaMsg* c)
                 {
                     if(connack_rc == 0x00)  // Connection Accepted
                     {
+                        /*
+                         * After the connection is established, do some instamsg-specific processing here.
+                         * Thereafter, call the user-specifiec "onConnectCallback".
+                         */
+
+                        // Instamsg-Specific processing
+                        /*
+                         * SEEMS THAT IT IS NOT REQUIRED TO SUBSCRIBE TO THIS TOPIC EXPLICITLY.
+                         */
+                        /*
+		                MQTTSubscribe(c,
+                                      c->enableServerLoggingTopic,
+                                      QOS1,
+                                      serverLoggingTopicMessageArrived,
+                                      subscribeAckReceived,
+                                      MQTT_RESULT_HANDLER_TIMEOUT);
+                        */
+
+                        // User-Specific "onConnectCallback"
                         c->onConnectCallback();
                     }
                     else
