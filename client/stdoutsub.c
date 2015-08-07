@@ -59,29 +59,9 @@ char *topic;
 
 struct opts_struct *opts_p;
 
-
-static void messageArrived(MessageData* md)
-{
-	MQTTMessage* message = md->message;
-
-	if (opts_p->showtopics)
-		info_log("%.*s\t", md->topicName->lenstring.len, md->topicName->lenstring.data);
-	if (opts_p->nodelimiter)
-		info_log("%.*s", (int)message->payloadlen, (char*)message->payload);
-	else
-		info_log("%.*s%s", (int)message->payloadlen, (char*)message->payload, opts_p->delimiter);
-}
-
-
 static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
     debug_log("PUBACK received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
-}
-
-
-static void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
-{
-    debug_log("SUBACK received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
 }
 
 
