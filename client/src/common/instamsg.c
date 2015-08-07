@@ -600,14 +600,6 @@ void initInstaMsg(InstaMsg* c,
 	    init_network(&(c->ipstack), &networkParametrs);
     }
 
-    {
-        NetworkParameters networkParametrs;
-        readConfig(&config, "INSTAMSG_HTTP_HOST", STRING, &(networkParametrs.hostName));
-        readConfig(&config, "INSTAMSG_HTTP_PORT", INTEGER, &(networkParametrs.port));
-
-	    init_network(&(c->httpClient), &networkParametrs);
-    }
-
     init_system_utils(&(c->systemUtils), NULL);
 
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
@@ -666,7 +658,6 @@ void cleanInstaMsgObject(InstaMsg *c)
      */
     release_system_utils(&(c->systemUtils));
 
-    release_network(&(c->httpClient));
     release_network(&(c->ipstack));
 
     release_mutex(&(c->resultHandlersMutex));

@@ -1,5 +1,6 @@
 #include "include/globals.h"
 #include "include/instamsg.h"
+#include "include/config.h"
 
 #include "include/instamsg_vendor_common.h"
 #include "instamsg_vendor.h"
@@ -138,6 +139,16 @@ int downloadFile(Network *network,
                  KeyValuePairs *headers,
                  unsigned int timeout)
 {
+    int rc = FAILURE;
+
+    {
+        NetworkParameters networkParametrs;
+        readConfig(&config, "INSTAMSG_HTTP_HOST", STRING, &(networkParametrs.hostName));
+        readConfig(&config, "INSTAMSG_HTTP_PORT", INTEGER, &(networkParametrs.port));
+
+	    init_network(network, &networkParametrs);
+    }
+
     /*
      * Either of the URLs form work ::
      *
@@ -154,7 +165,7 @@ int downloadFile(Network *network,
     if(network->write(network, request, strlen(request)) == FAILURE)
     {
         terminateCurrentInstance = 1;
-        return;
+        goto exit;
     }
 
     long numBytes = 0;
@@ -219,7 +230,7 @@ int downloadFile(Network *network,
                     terminateCurrentInstance = 1;
                     release_file_system(&fs);
 
-                    return FAILURE;
+                    goto exit;
                 }
 
                 fs.write(&fs, ch, 1);
@@ -234,8 +245,13 @@ int downloadFile(Network *network,
             rename_file_system(tempFileName, filename);
             info_log(FILE_DOWNLOAD "File [%s] successfully moved to [%s] worth [%ld] bytes", tempFileName, filename, numBytes);
 
+            rc = HTTP_FILE_DOWNLOAD_SUCCESS;
+
+exit:
+            release_network(network);
+
             // TODO: Ideally, parse this 200 from the response.
-            return HTTP_FILE_DOWNLOAD_SUCCESS;
+            return rc;
         }
     }
 }
