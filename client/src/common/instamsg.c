@@ -18,115 +18,15 @@
 #include "include/config.h"
 #include "include/instamsg.h"
 #include "include/httpclient.h"
-#include "../../../cJSON/cJSON.h"
 
 #include <string.h>
 #include <signal.h>
-
-
-static void getValueFromInstamsgJSON(cJSON *json, JSONParseStuff *jsonStuff)
-{
-    cJSON *objectItem = cJSON_GetObjectItem(json, jsonStuff->key);
-    if(objectItem != NULL)
-    {
-        if(objectItem->valuestring != NULL)
-        {
-            jsonStuff->value = objectItem->valuestring;
-            jsonStuff->type = STRING;
-        }
-        else
-        {
-            jsonStuff->value = &(objectItem->valueint);
-            jsonStuff->type = INTEGER;
-        }
-    }
-}
-
-
-static int parseJSONKeyValues(cJSON *json, JSONParseStuff *jsonStuff, MQTTMessage *msg)
-{
-    int i = 0;
-    while(1)
-    {
-        if(jsonStuff[i].key == NULL)
-        {
-            break;
-        }
-
-        getValueFromInstamsgJSON(json, &(jsonStuff[i]));
-        if(jsonStuff[i].value == NULL)
-        {
-            if(jsonStuff[i].mandatory == 1)
-            {
-                error_log("Could not find field [%s] in the JSON-payload [%s] ... not proceeding further", jsonStuff[i].key, msg->payload);
-                return FAILURE;
-            }
-            else
-            {
-                debug_log("Could not find field [%s] in the JSON-payload [%s]", jsonStuff[i].key, msg->payload);
-            }
-        }
-        else
-        {
-            if(jsonStuff[i].type == STRING)
-            {
-                debug_log("Found value ::  Key = [%s], Value = [%s] in the JSON-payload [%s]", jsonStuff[i].key,
-                           jsonStuff[i].value, msg->payload);
-            }
-            else
-            {
-                debug_log("Found value ::  Key = [%s], Value = [%d] in the JSON-payload [%s]", jsonStuff[i].key,
-                           *((int*)(jsonStuff[i].value)), msg->payload);
-            }
-        }
-
-        i++;
-    }
-
-    return SUCCESS;
-}
-
-
-static void* getValueFromParsedJSONStuff(JSONParseStuff *jsonStuff, const char *key)
-{
-    int i = 0;
-
-    while(1)
-    {
-        if(jsonStuff[i].key == NULL)
-        {
-            break;
-        }
-
-        if(strcmp(jsonStuff[i].key, key) == 0)
-        {
-            return jsonStuff[i].value;
-        }
-
-        i++;
-    }
-
-    return NULL;
-}
 
 
 void messageArrived(MessageData* md)
 {
 	MQTTMessage* message = md->message;
     info_log("%.*s", (int)message->payloadlen, (char*)message->payload);
-}
-
-
-static void replaceSingleQuotesWithDoubleQuotes(char *str)
-{
-    int i = 0;
-    for(i = 0; i < strlen(str); i++)
-    {
-        if(str[i] == '\'')
-        {
-            str[i] = '"';
-        }
-    }
 }
 
 
@@ -142,41 +42,15 @@ static void serverLoggingTopicMessageArrived(MessageData *md)
 
     MQTTMessage *msg = md->message;
 
-    replaceSingleQuotesWithDoubleQuotes(msg->payload);
-    cJSON *json = cJSON_Parse(msg->payload);
-    if(json == NULL)
-    {
-        error_log(SERVER_LOGGING "Payload [%s] could not be parsed successfully :( ... not doing anything further", msg->payload);
-        return;
-    }
+    char clientId[MAX_BUFFER_SIZE] = {0};
+    char logging[MAX_BUFFER_SIZE] = {0};
 
-    JSONParseStuff jsonStuff[] = \
-                        {
-                            {
-                                CLIENT_ID,
-                                NULL,
-                                0
-                            },
-                            {
-                                LOGGING,
-                                NULL,
-                                0
-                            },
-                            {
-                                0
-                            }
-                        };
+    getJsonKeyValueIfPresent(msg->payload, CLIENT_ID, clientId);
+    getJsonKeyValueIfPresent(msg->payload, LOGGING, logging);
 
-    if(parseJSONKeyValues(json, jsonStuff, msg) == FAILURE)
+    if( (strlen(clientId) > 0) && (strlen(logging) > 0) )
     {
-        return;
-    }
-
-    const char *clientId = getValueFromParsedJSONStuff(jsonStuff, CLIENT_ID);
-    int *logging = getValueFromParsedJSONStuff(jsonStuff, LOGGING);
-    if( (clientId != NULL) && (logging != NULL) )
-    {
-        if(*logging == 1)
+        if(atoi(logging) == 1)
         {
             md->c->serverLoggingEnabled = 1;
             info_log(SERVER_LOGGING "Enabled.");
@@ -187,8 +61,6 @@ static void serverLoggingTopicMessageArrived(MessageData *md)
             info_log(SERVER_LOGGING "Disabled.");
         }
     }
-
-    cJSON_Delete(json); // IMPORTANT, else there will be memory-leak.
 }
 
 
@@ -675,85 +547,56 @@ void cleanInstaMsgObject(InstaMsg *c)
 }
 
 
+static void logJsonFailureMessageAndReturn(const char *key, MQTTMessage *msg)
+{
+    error_log(FILE_TRANSFER "Could not find key [%s] in message-payload [%s] .. not proceeding further", key, msg->payload);
+}
+
+
 static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
 {
     const char *REPLY_TOPIC = "reply_to";
     const char *MESSAGE_ID = "message_id";
     const char *METHOD = "method";
-    const char *URL = "url";
-    const char *FILENAME = "filename";
 
-    cJSON *json = cJSON_Parse(msg->payload);
-    if(json == NULL)
+    char replyTopic[MAX_BUFFER_SIZE] = {0};
+    char messageId[MAX_BUFFER_SIZE] = {0};
+    char method[MAX_BUFFER_SIZE] = {0};
+    char url[MAX_BUFFER_SIZE] = {0};
+    char filename[MAX_BUFFER_SIZE] = {0};
+
+    getJsonKeyValueIfPresent(msg->payload, REPLY_TOPIC, replyTopic);
+    getJsonKeyValueIfPresent(msg->payload, MESSAGE_ID, messageId);
+    getJsonKeyValueIfPresent(msg->payload, METHOD, method);
+    getJsonKeyValueIfPresent(msg->payload, "url", url);
+    getJsonKeyValueIfPresent(msg->payload, "filename", filename);
+
+    if(strlen(replyTopic) > 0)
     {
-        error_log(FILE_TRANSFER "Payload [%s] could not be parsed successfully :( ... not doing anything further", msg->payload);
-        return;
+        return logJsonFailureMessageAndReturn(REPLY_TOPIC, msg);
+    }
+    if(strlen(messageId) > 0)
+    {
+        return logJsonFailureMessageAndReturn(MESSAGE_ID, msg);
+    }
+    if(strlen(method) > 0)
+    {
+        return logJsonFailureMessageAndReturn(METHOD, msg);
     }
 
-    JSONParseStuff jsonStuff[] = \
-                        {
-                            {
-                                REPLY_TOPIC,
-                                NULL,
-                                1
-                            },
-                            {
-                                MESSAGE_ID,
-                                 NULL,
-                                 1
-                            },
-                            {
-                                METHOD,
-                                NULL,
-                                1
-                            },
-                            {
-                                URL,
-                                NULL,
-                                0
-                            },
-                            {
-                                FILENAME,
-                                NULL,
-                                0
-                            },
-                            {
-                                0
-                            }
-                        };
-
-    if(parseJSONKeyValues(json, jsonStuff, msg) == FAILURE)
-    {
-        return;
-    }
-
-
     /*
-     * If we reach till here, we have successfully parsed the parameters.
-     */
-
-    /*
-     * TODO: Right now following functionalities are handled ::
-     *
-     *      File-Download
-     *
-     * Following are present in Instamsg-Python... integrate in Instamsg-C too
+     * TODO: Following are present in Instamsg-Python... integrate in Instamsg-C too
      *
      *      File-Upload
      */
 
-    const char *replyTopic = getValueFromParsedJSONStuff(jsonStuff, REPLY_TOPIC);
-    const char *messageId = getValueFromParsedJSONStuff(jsonStuff, MESSAGE_ID);
-    const char *method =  getValueFromParsedJSONStuff(jsonStuff, METHOD);
-    const char *filename = getValueFromParsedJSONStuff(jsonStuff, FILENAME);
-    const char *url = getValueFromParsedJSONStuff(jsonStuff, URL);
 
 
     unsigned char ackMessage[MAX_BUFFER_SIZE] = {0};
 
     if( (   (strcmp(method, "POST") == 0) || (strcmp(method, "PUT") == 0)   ) &&
-            (filename != NULL) &&
-            (url != NULL)   )
+            (strlen(filename) > 0) &&
+            (strlen(url) > 0)   )
     {
         int ackStatus = 0;
 
@@ -804,7 +647,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": %d}", messageId, ackStatus);
 
     }
-    else if( (strcmp(method, "GET") == 0) && (filename == NULL))
+    else if( (strcmp(method, "GET") == 0) && (strlen(filename) == 0))
     {
         unsigned char fileList[MAX_BUFFER_SIZE] = {0};
         (c->systemUtils).getFileListing(&(c->systemUtils), fileList, MAX_BUFFER_SIZE, ".");
@@ -813,7 +656,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
 
         sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"files\": %s}", messageId, fileList);
     }
-    else if( (strcmp(method, "DELETE") == 0) && (filename != NULL))
+    else if( (strcmp(method, "DELETE") == 0) && (strlen(filename) > 0))
     {
         int status = delete_file_system(filename);
         if(status == SUCCESS)
@@ -841,8 +684,6 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
                 MQTT_RESULT_HANDLER_TIMEOUT,
                 0,
                 1);
-
-    cJSON_Delete(json); // IMPORTANT, else there will be memory-leak.
 }
 
 

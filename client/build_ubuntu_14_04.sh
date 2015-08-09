@@ -28,6 +28,7 @@ gcc -nostdinc                                                       \
         src/common/log.c                                            \
         src/common/config.c                                         \
         src/common/httpclient.c                                     \
+        src/common/json.c                                           \
                                                                     \
         ../MQTTPacket/src/MQTTFormat.c                              \
         ../MQTTPacket/src/MQTTPacket.c                              \
@@ -39,8 +40,6 @@ gcc -nostdinc                                                       \
         ../MQTTPacket/src/MQTTSubscribeServer.c                     \
         ../MQTTPacket/src/MQTTUnsubscribeServer.c                   \
         ../MQTTPacket/src/MQTTUnsubscribeClient.c                   \
-                                                                    \
-        ../cJSON/cJSON.c                                            \
                                                                     \
         src/threading/${THREAD_IMPL}.c                              \
         src/system/${SYSTEM_IMPL}.c                                 \
