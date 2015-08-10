@@ -1,15 +1,28 @@
+#ifndef INSTAMSG_HTTPCLIENT
+#define INSTAMSG_HTTPCLIENT
+
+#include "./globals.h"
 #include "./instamsg_vendor_common.h"
 
-int downloadFile(const char *url,
-                 const char *downloadedFileName,
-                 KeyValuePairs *params,
-                 KeyValuePairs *headers,
-                 unsigned int timeout);
+typedef struct HTTPResponse HTTPResponse;
+struct HTTPResponse
+{
+    int status;
+    char body[MAX_BUFFER_SIZE];
+};
 
 
-int uploadFile(const char *url,
-                 const char *filename,
-                 KeyValuePairs *params,
-                 KeyValuePairs *headers,
-                 unsigned int timeout,
-                 unsigned char *urlValue);
+HTTPResponse downloadFile(const char *url,
+                          const char *downloadedFileName,
+                          KeyValuePairs *params,
+                          KeyValuePairs *headers,
+                          unsigned int timeout);
+
+
+HTTPResponse uploadFile(const char *url,
+                        const char *filename,
+                        KeyValuePairs *params,
+                        KeyValuePairs *headers,
+                        unsigned int timeout);
+
+#endif

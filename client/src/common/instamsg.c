@@ -643,8 +643,8 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
          * IT MEANS THE FILE-TRANSFER COMPLETED, AND THAT TOO PERFECTLY SUCCESSFULLY.
          *
          */
-        int status = downloadFile(url, filename, NULL, NULL, 10);
-        if(status == HTTP_FILE_DOWNLOAD_SUCCESS)
+        HTTPResponse response = downloadFile(url, filename, NULL, NULL, 10);
+        if(response.status == HTTP_FILE_DOWNLOAD_SUCCESS)
         {
             ackStatus = 1;
         }
@@ -701,11 +701,10 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
                                     }
                                   };
 
-        char urlValue[MAX_BUFFER_SIZE] = {0};
-        int status = uploadFile(c->fileUploadUrl, filename, NULL, headers, 10, urlValue);
-        if(status == HTTP_FILE_UPLOAD_SUCCESS)
+        HTTPResponse response = uploadFile(c->fileUploadUrl, filename, NULL, headers, 10);
+        if(response.status == HTTP_FILE_UPLOAD_SUCCESS)
         {
-            sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"url\": \"%s\"}", messageId, urlValue);
+            sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"url\": \"%s\"}", messageId, response.body);
         }
         else
         {

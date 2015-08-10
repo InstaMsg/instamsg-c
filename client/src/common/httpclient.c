@@ -1,6 +1,7 @@
 #include "include/globals.h"
 #include "include/instamsg.h"
 #include "include/config.h"
+#include "include/httpclient.h"
 
 #include "include/instamsg_vendor_common.h"
 #include "instamsg_vendor.h"
@@ -144,14 +145,15 @@ static void generateRequest(const char *requestType,
  *
  * echo "hi ajay"
 */
-int downloadFile(const char *url,
-                 const char *filename,
-                 KeyValuePairs *params,
-                 KeyValuePairs *headers,
-                 unsigned int timeout)
+HTTPResponse downloadFile(const char *url,
+                          const char *filename,
+                          KeyValuePairs *params,
+                          KeyValuePairs *headers,
+                          unsigned int timeout)
 {
     int rc = FAILURE;
     Network network;
+    HTTPResponse response;
 
     {
         NetworkParameters networkParametrs;
@@ -257,18 +259,18 @@ exit:
             release_network(&network);
 
             // TODO: Ideally, parse this 200 from the response.
-            return rc;
+            response.status = rc;
+            return response;
         }
     }
 }
 
 
-int uploadFile(const char *url,
-               const char *filename,
-               KeyValuePairs *params,
-               KeyValuePairs *headers,
-               unsigned int timeout,
-               unsigned char *urlValue)
+HTTPResponse uploadFile(const char *url,
+                        const char *filename,
+                        KeyValuePairs *params,
+                        KeyValuePairs *headers,
+                        unsigned int timeout)
 {
 
     /*
@@ -279,6 +281,7 @@ int uploadFile(const char *url,
 
     int rc = FAILURE;
     Network network;
+    HTTPResponse response;
 
     {
         NetworkParameters networkParametrs;
@@ -385,7 +388,6 @@ int uploadFile(const char *url,
     }
 
 
-    printf("\n\n file-upload returned \n\n");
     unsigned char readLast = 0;
     numBytes = 0;
     while(1)
@@ -394,7 +396,6 @@ int uploadFile(const char *url,
 
         char newLine[MAX_BUFFER_SIZE] = "";
         getNextLine(&network, newLine);
-        printf("\n new = [%s]\n", newLine);
 
         /*
          * The actual file-payload begins after we receive an empty line.
@@ -426,17 +427,18 @@ int uploadFile(const char *url,
 
         if(beginPayloadDownload == 1)
         {
-            network.read(&network, urlValue, numBytes);
+            network.read(&network, response.body, numBytes);
+            debug_log(FILE_UPLOAD "URL being provided to peer for uploaded file [%s] is [%s]", filename, response.body);
 
-            printf("\n\n URL = [%s]\n\n", urlValue);
             break;
         }
     }
 
     rc = HTTP_FILE_UPLOAD_SUCCESS;
 
-
 exit:
     release_network(&network);
-    return rc;
+
+    response.status = rc;
+    return response;
 }
