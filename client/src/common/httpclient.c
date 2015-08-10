@@ -114,6 +114,25 @@ static void generateRequest(const char *requestType,
 }
 
 
+static long getBytesIfContentLengthBytes(char *line)
+{
+    long numBytes = 0;
+
+    char *saveptr;
+    char *headerKey = strtok_r(line, ":", &saveptr);
+    char *headerValue = strtok_r(NULL, ":", &saveptr);
+
+    if(headerKey && headerValue)
+    {
+        if(strcmp(headerKey, CONTENT_LENGTH) == 0)
+        {
+            numBytes = atol(headerValue);
+        }
+    }
+
+    return numBytes;
+}
+
 
 /*
  * Either of the URLs form work ::
@@ -186,30 +205,15 @@ HTTPResponse downloadFile(const char *url,
 
         /*
          * The actual file-payload begins after we receive an empty line.
-         *
-         * We need to track this here itself, because later usage of "strtok_r"
-         * (to parse the tokens) destroys/modifies this string.
          */
         if(strlen(newLine) == 0)
         {
             beginPayloadDownload = 1;
         }
 
-        char *saveptr;
-        char *headerKey = strtok_r(newLine, ":", &saveptr);
-        char *headerValue = strtok_r(NULL, ":", &saveptr);
-
-        if(headerKey && headerValue)
+        if(numBytes == 0)
         {
-            /*
-             * After we have got the "Content-Length" header, we know the size of the
-             * file-payload to be downloaded.
-             */
-            if(strcmp(headerKey, CONTENT_LENGTH) == 0)
-            {
-
-                numBytes = atol(headerValue);
-            }
+            numBytes = getBytesIfContentLengthBytes(newLine);
         }
 
         if(beginPayloadDownload == 1)
@@ -266,6 +270,33 @@ exit:
 }
 
 
+/*
+ * BYTE-LEVEL-REQUEST ::
+ * ======================
+ *
+ * POST /api/beta/clients/00125580-e29a-11e4-ace1-bc764e102b63/files HTTP/1.0
+ * Authorization: password
+ * ClientId: 00125580-e29a-11e4-ace1-bc764e102b63
+ * Content-Type: multipart/form-data; boundary=-----------ThIs_Is_tHe_bouNdaRY_78564$!@
+ * Content-Length: 340
+ *
+ * -------------ThIs_Is_tHe_bouNdaRY_78564$!@
+ *  Content-Disposition: form-data; name="file"; filename="filetester.sh"
+ *  Content-Type: application/octet-stream
+ *
+ *  ./stdoutsub listener_topic --qos 2 --clientid 00125580-e29a-11e4-ace1-bc764e102b63 --password password --log /home/ajay/filetester --sub
+ *
+ *  -------------ThIs_Is_tHe_bouNdaRY_78564$!@--
+ *
+ *
+ * BYTE-LEVEL-RESPONSE ::
+ * =======================
+ *
+ * HTTP/1.0 200 OK
+ * Content-Length: 89
+ *
+ * http://platform.instamsg.io:8081/files/1325d1f4-a585-4dbd-84e7-d4c6cfa6fd9d.filetester.sh
+ */
 HTTPResponse uploadFile(const char *url,
                         const char *filename,
                         KeyValuePairs *params,
@@ -273,9 +304,6 @@ HTTPResponse uploadFile(const char *url,
                         unsigned int timeout)
 {
 
-    /*
-     * Check the headers contains a Content-Length field
-     */
     int i = 0;
     long numBytes = 0;
 
@@ -388,7 +416,6 @@ HTTPResponse uploadFile(const char *url,
     }
 
 
-    unsigned char readLast = 0;
     numBytes = 0;
     while(1)
     {
@@ -398,39 +425,31 @@ HTTPResponse uploadFile(const char *url,
         getNextLine(&network, newLine);
 
         /*
-         * The actual file-payload begins after we receive an empty line.
-         *
-         * We need to track this here itself, because later usage of "strtok_r"
-         * (to parse the tokens) destroys/modifies this string.
+         * The actual payload begins after we receive an empty line.
+         * Here, the payload contains the URL that needs to be passed to the peer.
          */
         if(strlen(newLine) == 0)
         {
             beginPayloadDownload = 1;
         }
 
-        char *saveptr;
-        char *headerKey = strtok_r(newLine, ":", &saveptr);
-        char *headerValue = strtok_r(NULL, ":", &saveptr);
-
-        if(headerKey && headerValue)
+        if(numBytes == 0)
         {
-            /*
-             * After we have got the "Content-Length" header, we know the size of the
-             * url-value to be downloaded.
-             */
-            if(strcmp(headerKey, CONTENT_LENGTH) == 0)
-            {
-
-                numBytes = atol(headerValue);
-            }
+            numBytes = getBytesIfContentLengthBytes(newLine);
         }
 
         if(beginPayloadDownload == 1)
         {
-            network.read(&network, response.body, numBytes);
-            debug_log(FILE_UPLOAD "URL being provided to peer for uploaded file [%s] is [%s]", filename, response.body);
-
-            break;
+            if(network.read(&network, response.body, numBytes) == FAILURE)
+            {
+                error_log(FILE_UPLOAD "Socket error while reading URL-payload for uploaded file [%s]", filename);
+                goto exit;
+            }
+            else
+            {
+                debug_log(FILE_UPLOAD "URL being provided to peer for uploaded file [%s] is [%s]", filename, response.body);
+                break;
+            }
         }
     }
 
