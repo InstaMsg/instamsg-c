@@ -571,15 +571,15 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     getJsonKeyValueIfPresent(msg->payload, "url", url);
     getJsonKeyValueIfPresent(msg->payload, "filename", filename);
 
-    if(strlen(replyTopic) > 0)
+    if(strlen(replyTopic) == 0)
     {
         return logJsonFailureMessageAndReturn(REPLY_TOPIC, msg);
     }
-    if(strlen(messageId) > 0)
+    if(strlen(messageId) == 0)
     {
         return logJsonFailureMessageAndReturn(MESSAGE_ID, msg);
     }
-    if(strlen(method) > 0)
+    if(strlen(method) == 0)
     {
         return logJsonFailureMessageAndReturn(METHOD, msg);
     }

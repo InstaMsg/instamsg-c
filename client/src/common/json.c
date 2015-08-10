@@ -17,6 +17,7 @@
 void getJsonKeyValueIfPresent(unsigned char *json, const unsigned char *key, unsigned char *buf)
 {
     unsigned char NOT_FOUND = ' ';
+    unsigned char *jsonStartingPointer = json;
 
     unsigned char parsedKeyToken[MAX_BUFFER_SIZE] = {0};
     unsigned char parsedValueToken[MAX_BUFFER_SIZE] = {0};
@@ -37,7 +38,9 @@ void getJsonKeyValueIfPresent(unsigned char *json, const unsigned char *key, uns
             // This means we need to start parsing the key now.
             keyWrapper = *json;
         }
-        else if((*json == keyWrapper) || (*json == ':') || (*json == '}'))
+        else if(    (*json == keyWrapper) ||
+                    ((*json == ':') && (keyWrapper == NOT_FOUND)) ||
+                    ((*json == '}') && (keyWrapper == NOT_FOUND)))
         {
             // We need to stop parsing the key now.
             keyWrapper = NOT_FOUND;
@@ -54,7 +57,7 @@ void getJsonKeyValueIfPresent(unsigned char *json, const unsigned char *key, uns
                 {
                     strcat(buf, parsedValueToken);
 
-                    debug_log("Found key [%s] and value [%s] in json [%s]", parsedKeyToken, parsedValueToken, json);
+                    debug_log("Found key [%s] and value [%s] in json [%s]", parsedKeyToken, parsedValueToken, jsonStartingPointer);
                     return;
                 }
 
