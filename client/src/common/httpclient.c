@@ -396,7 +396,7 @@ HTTPResponse uploadFile(const char *url,
         fs.read(&fs, ch, 1);
         if(network.write(&network, ch, 1) == FAILURE)
         {
-            error_log(FILE_UPLOAD "Error occurred while uploading file-byte(s) for [%s]", filename);
+            error_log(FILE_UPLOAD "Error occurred while uploading POST data (THIRD LEVEL) for [%s]", filename);
             terminateCurrentInstance = 1;
 
             release_file_system(&fs);
