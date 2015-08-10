@@ -588,13 +588,6 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         return logJsonFailureMessageAndReturn(METHOD, msg);
     }
 
-    /*
-     * TODO: Following are present in Instamsg-Python... integrate in Instamsg-C too
-     *
-     *      File-Upload
-     */
-
-
 
     unsigned char ackMessage[MAX_BUFFER_SIZE] = {0};
 
