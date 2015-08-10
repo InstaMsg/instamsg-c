@@ -34,5 +34,6 @@ struct KeyValuePairs
 
 
 #define HTTP_FILE_DOWNLOAD_SUCCESS 200
+#define HTTP_FILE_UPLOAD_SUCCESS 200
 
 #endif

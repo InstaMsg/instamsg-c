@@ -6,3 +6,9 @@ int downloadFile(const char *url,
                  KeyValuePairs *headers,
                  unsigned int timeout);
 
+
+int uploadFile(const char *url,
+                 const char *filename,
+                 KeyValuePairs *params,
+                 KeyValuePairs *headers,
+                 unsigned int timeout);
