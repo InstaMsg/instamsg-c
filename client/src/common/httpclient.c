@@ -267,7 +267,8 @@ int uploadFile(const char *url,
                const char *filename,
                KeyValuePairs *params,
                KeyValuePairs *headers,
-               unsigned int timeout)
+               unsigned int timeout,
+               unsigned char *urlValue)
 {
 
     /*
@@ -297,7 +298,7 @@ int uploadFile(const char *url,
      *          http://stackoverflow.com/questions/8659808/how-does-http-file-upload-work
      */
     char secondLevel[MAX_BUFFER_SIZE] = {0};
-    sprintf(secondLevel, "%s"                                                                   \
+    sprintf(secondLevel, "--%s"                                                                   \
                          "\r\n"                                                                 \
                          "Content-Disposition: form-data; name=\"file\"; filename=\"%s\""       \
                          "\r\n"                                                                 \
@@ -305,7 +306,7 @@ int uploadFile(const char *url,
                          "\r\n\r\n", POST_BOUNDARY, filename);
 
     char fourthLevel[MAX_BUFFER_SIZE] = {0};
-    sprintf(fourthLevel, "\r\n%s--", POST_BOUNDARY);
+    sprintf(fourthLevel, "\r\n--%s--", POST_BOUNDARY);
 
     /*
      * Add the "Content-Length header
@@ -374,6 +375,7 @@ int uploadFile(const char *url,
 
     info_log(FILE_UPLOAD "File [%s] successfully uploaded worth [%ld] bytes", filename, numBytes);
 
+    release_file_system(&fs);
     if(network.write(&network, fourthLevel, strlen(fourthLevel)) == FAILURE)
     {
         error_log(FILE_UPLOAD "Error occurred while uploading POST data (FOURTH LEVEL) for [%s]", filename);
@@ -382,16 +384,55 @@ int uploadFile(const char *url,
         goto exit;
     }
 
+
     printf("\n\n file-upload returned \n\n");
+    unsigned char readLast = 0;
+    numBytes = 0;
     while(1)
     {
-        char ch[2];
-        network.read(&network, ch, 1);
-        printf("%c", ch[0]);
-        thread_sleep(1);
+        char beginPayloadDownload = 0;
+
+        char newLine[MAX_BUFFER_SIZE] = "";
+        getNextLine(&network, newLine);
+        printf("\n new = [%s]\n", newLine);
+
+        /*
+         * The actual file-payload begins after we receive an empty line.
+         *
+         * We need to track this here itself, because later usage of "strtok_r"
+         * (to parse the tokens) destroys/modifies this string.
+         */
+        if(strlen(newLine) == 0)
+        {
+            beginPayloadDownload = 1;
+        }
+
+        char *saveptr;
+        char *headerKey = strtok_r(newLine, ":", &saveptr);
+        char *headerValue = strtok_r(NULL, ":", &saveptr);
+
+        if(headerKey && headerValue)
+        {
+            /*
+             * After we have got the "Content-Length" header, we know the size of the
+             * url-value to be downloaded.
+             */
+            if(strcmp(headerKey, CONTENT_LENGTH) == 0)
+            {
+
+                numBytes = atol(headerValue);
+            }
+        }
+
+        if(beginPayloadDownload == 1)
+        {
+            network.read(&network, urlValue, numBytes);
+
+            printf("\n\n URL = [%s]\n\n", urlValue);
+            break;
+        }
     }
 
-    release_file_system(&fs);
     rc = HTTP_FILE_UPLOAD_SUCCESS;
 
 

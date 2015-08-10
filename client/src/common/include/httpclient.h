@@ -11,4 +11,5 @@ int uploadFile(const char *url,
                  const char *filename,
                  KeyValuePairs *params,
                  KeyValuePairs *headers,
-                 unsigned int timeout);
+                 unsigned int timeout,
+                 unsigned char *urlValue);

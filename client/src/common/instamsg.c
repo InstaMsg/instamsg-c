@@ -701,10 +701,11 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
                                     }
                                   };
 
-        int status = uploadFile(c->fileUploadUrl, filename, NULL, headers, 10);
+        char urlValue[MAX_BUFFER_SIZE] = {0};
+        int status = uploadFile(c->fileUploadUrl, filename, NULL, headers, 10, urlValue);
         if(status == HTTP_FILE_UPLOAD_SUCCESS)
         {
-            sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"url\": \"%s\"}", messageId, "ajay");
+            sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"url\": \"%s\"}", messageId, urlValue);
         }
         else
         {
