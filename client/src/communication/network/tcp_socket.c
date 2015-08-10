@@ -125,6 +125,7 @@ static int tcp_socket_write(Network* network, unsigned char* buffer, int len)
 
     while(bytes < len)
     {
+        printf("%s", buffer);
 	    while(rc = write(network->socket, &buffer[bytes], (size_t)(len - bytes)) < 0)
         {
             return FAILURE;

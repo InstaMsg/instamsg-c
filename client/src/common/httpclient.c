@@ -8,6 +8,7 @@
 #include <string.h>
 
 
+
 static void getNextLine(Network *network, unsigned char *buf)
 {
     while(1)
@@ -40,7 +41,8 @@ static void generateRequest(const char *requestType,
                             KeyValuePairs *params,
                             KeyValuePairs *headers,
                             unsigned char *buf,
-                            int maxLenAllowed)
+                            int maxLenAllowed,
+                            unsigned char addFinalDelimiter)
 {
     /*
      * Add the "GET" and "/1.txt"
@@ -98,6 +100,7 @@ static void generateRequest(const char *requestType,
             strcat(buf, headers[i].key);
             strcat(buf, ": ");
             strcat(buf, headers[i].value);
+            strcat(buf, "\r\n");
 
             i++;
         }
@@ -108,6 +111,15 @@ static void generateRequest(const char *requestType,
      */
     strcat(buf, "\r\n");
 }
+
+
+
+/*
+ * Either of the URLs form work ::
+ *
+ *      http://platform.instamsg.io:8081/files/d2f9d9e7-e98b-4777-989e-605073a55efd.0003-Missed-a-path-export.patch
+ *      /files/d2f9d9e7-e98b-4777-989e-605073a55efd.0003-Missed-a-path-export.patch
+ */
 
 
 /*
@@ -149,14 +161,8 @@ int downloadFile(const char *url,
 	    init_network(&network, &networkParametrs);
     }
 
-    /*
-     * Either of the URLs form work ::
-     *
-     *      http://platform.instamsg.io:8081/files/d2f9d9e7-e98b-4777-989e-605073a55efd.0003-Missed-a-path-export.patch
-     *      /files/d2f9d9e7-e98b-4777-989e-605073a55efd.0003-Missed-a-path-export.patch
-     */
     char request[MAX_BUFFER_SIZE] = {0};
-    generateRequest("GET", url, params, headers, request, MAX_BUFFER_SIZE);
+    generateRequest("GET", url, params, headers, request, MAX_BUFFER_SIZE, 1);
     info_log(FILE_DOWNLOAD "Complete URL that will be hit : [%s]", request);
 
     /*
@@ -197,7 +203,7 @@ int downloadFile(const char *url,
              * After we have got the "Content-Length" header, we know the size of the
              * file-payload to be downloaded.
              */
-            if(strcmp(headerKey, "Content-Length") == 0)
+            if(strcmp(headerKey, CONTENT_LENGTH) == 0)
             {
 
                 numBytes = atol(headerValue);
@@ -254,4 +260,142 @@ exit:
             return rc;
         }
     }
+}
+
+
+int uploadFile(const char *url,
+               const char *filename,
+               KeyValuePairs *params,
+               KeyValuePairs *headers,
+               unsigned int timeout)
+{
+
+    /*
+     * Check the headers contains a Content-Length field
+     */
+    int i = 0;
+    long numBytes = 0;
+
+    int rc = FAILURE;
+    Network network;
+
+    {
+        NetworkParameters networkParametrs;
+        readConfig(&config, "INSTAMSG_HTTP_HOST", STRING, &(networkParametrs.hostName));
+        readConfig(&config, "INSTAMSG_HTTP_PORT", INTEGER, &(networkParametrs.port));
+
+	    init_network(&network, &networkParametrs);
+    }
+
+
+    char request[MAX_BUFFER_SIZE] = {0};
+
+
+    /* Now, generate the isecond-level (form) data
+     * Please consult ::
+     *
+     *          http://stackoverflow.com/questions/8659808/how-does-http-file-upload-work
+     */
+    char secondLevel[MAX_BUFFER_SIZE] = {0};
+    sprintf(secondLevel, "%s"                                                                   \
+                         "\r\n"                                                                 \
+                         "Content-Disposition: form-data; name=\"file\"; filename=\"%s\""       \
+                         "\r\n"                                                                 \
+                         "Content-Type: application/octet-stream"                               \
+                         "\r\n\r\n", POST_BOUNDARY, filename);
+
+    char fourthLevel[MAX_BUFFER_SIZE] = {0};
+    sprintf(fourthLevel, "\r\n%s--", POST_BOUNDARY);
+
+    /*
+     * Add the "Content-Length header
+     */
+    numBytes = instaMsg.systemUtils.getFileSize(&(instaMsg.systemUtils), filename);
+    long totalLength = strlen(secondLevel) + numBytes + strlen(fourthLevel);
+    i = 0;
+
+    while(1)
+    {
+        if(headers[i].key == NULL)
+        {
+            break;
+        }
+
+        if(strcmp(headers[i].key, CONTENT_LENGTH) == 0)
+        {
+            char value[MAX_BUFFER_SIZE] = {0};
+            sprintf(value, "%ld", totalLength);
+
+            headers[i].value = value;
+        }
+
+        i++;
+    }
+
+    generateRequest("POST", url, params, headers, request, MAX_BUFFER_SIZE, 0);
+    info_log(FILE_UPLOAD "First-stage URL that will be hit : [%s]", request);
+
+    if(network.write(&network, request, strlen(request)) == FAILURE)
+    {
+        error_log(FILE_UPLOAD "Error occurred while uploading POST data (FIRST LEVEL) for [%s]", filename);
+        terminateCurrentInstance = 1;
+
+        goto exit;
+    }
+
+    if(network.write(&network, secondLevel, strlen(secondLevel)) == FAILURE)
+    {
+        error_log(FILE_UPLOAD "Error occurred while uploading POST data (SECOND LEVEL) for [%s]", filename);
+        terminateCurrentInstance = 1;
+
+        goto exit;
+    }
+
+    /*
+     * Now, upload the actual file-data
+     */
+    FileSystem fs;
+    init_file_system(&fs, (void *)filename);
+
+    for(i = 0; i < numBytes; i++)
+    {
+        char ch[2] = {0};
+
+        fs.read(&fs, ch, 1);
+        if(network.write(&network, ch, 1) == FAILURE)
+        {
+            error_log(FILE_UPLOAD "Error occurred while uploading file-byte(s) for [%s]", filename);
+            terminateCurrentInstance = 1;
+
+            release_file_system(&fs);
+            goto exit;
+        }
+    }
+
+    info_log(FILE_UPLOAD "File [%s] successfully uploaded worth [%ld] bytes", filename, numBytes);
+
+    if(network.write(&network, fourthLevel, strlen(fourthLevel)) == FAILURE)
+    {
+        error_log(FILE_UPLOAD "Error occurred while uploading POST data (FOURTH LEVEL) for [%s]", filename);
+        terminateCurrentInstance = 1;
+
+        goto exit;
+    }
+
+    printf("\n\n file-upload returned \n\n");
+    while(1)
+    {
+        char ch[2];
+        network.read(&network, ch, 1);
+        printf("%c", ch[0]);
+        thread_sleep(1);
+    }
+
+    release_file_system(&fs);
+    rc = HTTP_FILE_UPLOAD_SUCCESS;
+
+
+exit:
+    release_network(&network);
+    return rc;
 }

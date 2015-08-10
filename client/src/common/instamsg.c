@@ -505,6 +505,9 @@ void initInstaMsg(InstaMsg* c,
     memset(c->serverLogsTopic, 0, MAX_BUFFER_SIZE);
     sprintf(c->serverLogsTopic, "instamsg/clients/%s/logs", clientId);
 
+    memset(c->fileUploadUrl, 0, MAX_BUFFER_SIZE);
+    sprintf(c->fileUploadUrl, "/api/beta/clients/%s/files", clientId);
+
     c->serverLoggingEnabled = 0;
 
 	c->connectOptions.willFlag = 0;
@@ -564,6 +567,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     char method[MAX_BUFFER_SIZE] = {0};
     char url[MAX_BUFFER_SIZE] = {0};
     char filename[MAX_BUFFER_SIZE] = {0};
+
 
     getJsonKeyValueIfPresent(msg->payload, REPLY_TOPIC, replyTopic);
     getJsonKeyValueIfPresent(msg->payload, MESSAGE_ID, messageId);
@@ -668,6 +672,43 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         {
             error_log(FILE_DELETE "[%s] could not be deleted :(", filename);
             sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 0, \"error_msg\":\"%s\"}", messageId, "File-Removal Failed :(");
+        }
+    }
+    else if( (strcmp(method, "GET") == 0) && (strlen(filename) > 0))
+    {
+        char clientIdNotSplitted[MAX_BUFFER_SIZE] = {0};
+        sprintf(clientIdNotSplitted, "%s-%s", c->connectOptions.clientID.cstring, c->connectOptions.username.cstring);
+
+        KeyValuePairs headers[] = {
+                                    {
+                                        "Authorization",
+                                        c->connectOptions.password.cstring
+                                    },
+                                    {
+                                        "ClientId",
+                                        clientIdNotSplitted
+                                    },
+                                    {
+                                        "Content-Type",
+                                        "multipart/form-data; boundary=" POST_BOUNDARY
+                                    },
+                                    {
+                                        CONTENT_LENGTH,
+                                        "0"                 // This will be updated to proper bytes later.
+                                    },
+                                    {
+                                        0
+                                    }
+                                  };
+
+        int status = uploadFile(c->fileUploadUrl, filename, NULL, headers, 10);
+        if(status == HTTP_FILE_UPLOAD_SUCCESS)
+        {
+            sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"url\": \"%s\"}", messageId, "ajay");
+        }
+        else
+        {
+            sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 0}", messageId);
         }
     }
 

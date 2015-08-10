@@ -36,4 +36,7 @@ struct KeyValuePairs
 #define HTTP_FILE_DOWNLOAD_SUCCESS 200
 #define HTTP_FILE_UPLOAD_SUCCESS 200
 
+#define CONTENT_LENGTH "Content-Length"
+#define POST_BOUNDARY "-----------ThIs_Is_tHe_bouNdaRY_78564$!@"
+
 #endif

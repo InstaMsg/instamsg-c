@@ -108,6 +108,7 @@ struct InstaMsg {
     unsigned char rebootTopic[MAX_BUFFER_SIZE];
     unsigned char enableServerLoggingTopic[MAX_BUFFER_SIZE];
     unsigned char serverLogsTopic[MAX_BUFFER_SIZE];
+    unsigned char fileUploadUrl[MAX_BUFFER_SIZE];
 
     unsigned char serverLoggingEnabled;
 
@@ -178,6 +179,7 @@ void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId);
 #define SERVER_LOGGING  "[SERVER-LOGGING] "
 #define FILE_TRANSFER   "[FILE-TRANSFER] "
 #define FILE_DOWNLOAD   "[FILE-DOWNLOAD] "
+#define FILE_UPLOAD     "[FILE-UPLOAD] "
 #define FILE_LISTING    "[FILE-LISTING] "
 #define FILE_DELETE     "[FILE-DELETE] "
 

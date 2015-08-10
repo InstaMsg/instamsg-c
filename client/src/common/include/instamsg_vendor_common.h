@@ -171,7 +171,13 @@ void release_timer(Timer *timer);
     /*                                                                                                              \
      * Reboots the device.                                                                                          \
      */                                                                                                             \
-    void (*rebootDevice)(System *system);
+    void (*rebootDevice)(System *system);                                                                           \
+                                                                                                                    \
+                                                                                                                    \
+    /*                                                                                                              \
+     * Gets the file-size in bytes                                                                                  \
+     */                                                                                                             \
+    long (*getFileSize)(System *system, const char *filepath);
 
 typedef struct System System;
 void init_system_utils(System *system, void *arg);

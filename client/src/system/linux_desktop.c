@@ -25,6 +25,15 @@ static void getSerialNumber(System *system, unsigned char *buf, int maxValueLenA
 }
 
 
+static long getFileSize(System *systen, const char *filepath)
+{
+    struct stat path_stat;
+    stat(filepath, &path_stat);
+
+    return (long)path_stat.st_size;
+}
+
+
 static void getFileListing(System *system, unsigned char *buf, int maxValueLenAllowed, const char *directoryPath)
 {
     int len;
@@ -84,6 +93,7 @@ void init_system_utils(System *system, void *arg)
     system->getSerialNumber = getSerialNumber;
     system->getFileListing = getFileListing;
     system->rebootDevice = rebootDevice;
+    system->getFileSize = getFileSize;
 }
 
 
