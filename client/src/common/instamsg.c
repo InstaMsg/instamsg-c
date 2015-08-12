@@ -645,7 +645,10 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                 {
                     if(connack_rc == 0x00)  // Connection Accepted
                     {
-                        c->onConnectCallback();
+                        if(c->onConnectCallback != NULL)
+                        {
+                            c->onConnectCallback();
+                        }
                     }
                     else
                     {
@@ -917,7 +920,10 @@ int MQTTDisconnect(InstaMsg* c)
     if (len > 0)
         rc = sendPacket(c, buf, len);            // send the disconnect packet
 
-    c->onDisconnectCallback();
+    if(c->onDisconnectCallback != NULL)
+    {
+        c->onDisconnectCallback();
+    }
 
     return rc;
 }

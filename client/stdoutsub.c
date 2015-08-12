@@ -97,7 +97,7 @@ static void messageArrived(MessageData* md)
 }
 
 
-static int onConnect()
+static int onConnectOneTimeOperations()
 {
     info_log("Connected successfully");
 
@@ -269,7 +269,7 @@ int main(int argc, char** argv)
 
     while(1)
     {
-        initInstaMsg(&instaMsg, opts.clientid, opts.password, onConnect, onDisconnect, NULL, &opts);
+        initInstaMsg(&instaMsg, opts.clientid, opts.password, onConnectOneTimeOperations, onDisconnect, NULL, &opts);
 
         while(1)
         {
