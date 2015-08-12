@@ -101,15 +101,23 @@ static void connect_underlying_medium_guaranteed(Network* network, unsigned char
 
 static int tcp_socket_read(Network* network, unsigned char* buffer, int len, unsigned char guaranteed)
 {
+    if(len == 0)
+    {
+        return SUCCESS;
+    }
+
 	int bytes = 0;
     int rc = 0;
 
+    unsigned int errBackup;
 	while (bytes < len)
 	{
-        printf("receiving \n");
-		if(rc = recv(network->socket, &buffer[bytes], (size_t)(len - bytes), 0) < 0)
+		rc = recv(network->socket, &buffer[bytes], (size_t)(len - bytes), 0);
+        errBackup = errno;
+
+        if(rc < 0)
         {
-            if((errno == EAGAIN) || (errno == EWOULDBLOCK))
+            if((errBackup == EAGAIN) || (errBackup == EWOULDBLOCK))
             {
                 /*
                  * Timeout occurred before we could read any bytes.
@@ -135,17 +143,35 @@ static int tcp_socket_read(Network* network, unsigned char* buffer, int len, uns
                 /*
                  * There was some error on the socket.
                  */
-                error_log(SOCKET_READ "Errno [%d] occurred while reading from socket", errno);
-
-                network->socketCorrupted = 1;
+                error_log(SOCKET_READ "Errno [%d] occurred while reading from socket", errBackup);
                 return FAILURE;
             }
         }
 
-        // STRANGE: On Ubuntu 14.04, if "n" bytes are received successfully as one chunk, rc is 0 (and not "n") :(
+        /* STRANGE:
+         *
+         * 1)
+         * On Ubuntu 14.04, if "n" bytes are received successfully as one chunk, rc is 0 (and not "n") :(
+         *
+         * 2)
+         * Moreover, rc is 0, in both the following cases ::
+         *
+         *      i)  All n bytes were successfully received.
+         *      ii) Peer shutdown the socket
+         *
+         * So, the following hacky test has been deployed
+         */
         if(rc == 0)
         {
-            bytes = len;
+            if(errBackup != 0)
+            {
+                error_log(SOCKET_READ "Errno [%d] occurred while reading from socket", errBackup);
+                return FAILURE;
+            }
+            else
+            {
+                bytes = len;
+            }
         }
         else
         {
@@ -162,26 +188,48 @@ static int tcp_socket_write(Network* network, unsigned char* buffer, int len)
     int bytes = 0;
     int rc = 0;
 
+    unsigned int errBackup;
     while(bytes < len)
     {
-	    if(rc = write(network->socket, &buffer[bytes], (size_t)(len - bytes)) < 0)
+	    rc = write(network->socket, &buffer[bytes], (size_t)(len - bytes));
+        errBackup = errno;
+
+        if(rc < 0)
         {
             error_log(SOCKET_WRITE "Errno [%d] occurred while writing to socket", errno);
-
-            network->socketCorrupted = 1;
             return FAILURE;
         }
 
-        // STRANGE: On Ubuntu 14.04, if "n" bytes are sent successfully as one chunk, rc is 0 (and not "n") :(
+        /* STRANGE:
+         *
+         * 1)
+         * On Ubuntu 14.04, if "n" bytes are received successfully as one chunk, rc is 0 (and not "n") :(
+         *
+         * 2)
+         * Moreover, rc is 0, in both the following cases ::
+         *
+         *      i)  All n bytes were successfully sent.
+         *      ii) Peer shutdown the socket
+         *
+         * So, the following hacky test has been deployed
+         */
         if(rc == 0)
         {
-            bytes = len;
+            if(errBackup != 0)
+            {
+                error_log(SOCKET_READ "Errno [%d] occurred while sending to socket", errBackup);
+                return FAILURE;
+            }
+            else
+            {
+                bytes = len;
+            }
         }
         else
         {
             bytes = bytes + rc;
         }
-    }
+	}
 
     return SUCCESS;
 }

@@ -60,7 +60,7 @@ struct opts_struct *opts_p;
 
 static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
-    debug_log("PUBACK received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
+    info_log("PUBACK received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
 }
 
 
@@ -76,10 +76,10 @@ void* coreLoopyBusinessLogicInitiatedBySelf(void *arg)
         counter++;
         sprintf(buf, "%s %d", opts_p->msg, counter);
 
-		debug_log("Publishing message [%s] to %s", buf, topic);
+		info_log("Publishing message [%s] to %s", buf, topic);
 		rc = MQTTPublish(&instaMsg, topic, (const char*)buf, opts_p->qos, 0,
                          publishAckReceived, MQTT_RESULT_HANDLER_TIMEOUT, 0, 1);
-		debug_log("Published %d", rc);
+		info_log("Published %d", rc);
 	}
 }
 

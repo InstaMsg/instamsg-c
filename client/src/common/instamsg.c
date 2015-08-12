@@ -65,13 +65,13 @@ static void serverLoggingTopicMessageArrived(MessageData *md)
 
 void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
-    debug_log("SUBACK received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
+    info_log("SUBACK received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
 }
 
 
 static void publishQoS2CycleCompleted(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
-    debug_log("PUBCOMP received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
+    info_log("PUBCOMP received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
 }
 
 
@@ -130,16 +130,16 @@ static void fireResultHandlerAndRemove(InstaMsg *c, MQTTFixedHeaderPlusMsgId *fi
 
 static int sendPacket(InstaMsg *c, unsigned char *buf, int length)
 {
-    int rc = SUCCESS;
-
     if((c->ipstack).socketCorrupted == 1)
     {
         release_network(&(c->ipstack));
 	    init_network(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT);
     }
 
+    int rc = SUCCESS;
     if((c->ipstack).write(&(c->ipstack), buf, length) == FAILURE)
     {
+        (c->ipstack).socketCorrupted = 1;
         rc = FAILURE;
     }
 
@@ -174,9 +174,9 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     do
     {
         rc = (c->ipstack).read(&(c->ipstack), c->readbuf, 1, 0);
-
         if(rc == FAILURE)
         {
+            (c->ipstack).socketCorrupted = 1;
             goto exit;
         }
 
@@ -206,6 +206,7 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     {
         if((c->ipstack).read(&(c->ipstack), &i, 1, 1) == FAILURE) // Pseudo-Blocking Call
         {
+            (c->ipstack).socketCorrupted = 1;
             goto exit;
         }
 
@@ -221,6 +222,7 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     {
         if((c->ipstack).read(&(c->ipstack), c->readbuf + len, rem_len, 1) == FAILURE) // Pseudo-Blocking Call
         {
+            (c->ipstack).socketCorrupted = 1;
             goto exit;
         }
     }
