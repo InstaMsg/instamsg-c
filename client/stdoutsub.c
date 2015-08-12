@@ -68,6 +68,7 @@ void* coreLoopyBusinessLogicInitiatedBySelf(void *arg)
 {
     int rc;
 
+    startAndCountdownTimer(3);
 	if(opts_p->publish == 1)
 	{
         char buf[MAX_BUFFER_SIZE] = {0};
@@ -290,7 +291,6 @@ int main(int argc, char** argv)
             * Application-Specific Cycles
             */
             coreLoopyBusinessLogicInitiatedBySelf(NULL);
-            startAndCountdownTimer(3);
         }
     }
 }
