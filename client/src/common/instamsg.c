@@ -776,7 +776,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
 
             case PINGRESP:
             {
-                debug_log("PINGRESP received... relations are intact !!");
+                info_log("PINGRESP received... relations are intact !!");
                 break;
             }
         }
