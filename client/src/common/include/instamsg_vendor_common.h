@@ -58,7 +58,7 @@
  * Interface for sending/receiving bytes between the device and instamsg-server.
  */
 typedef struct Network Network;
-void init_network(Network *network, void *arg);
+void init_network(Network *network, const char *hostName, unsigned int port);
 void release_network(Network *network);
 
 
@@ -89,21 +89,6 @@ void release_serial_interface(Serial *Serial);
 typedef struct Command Command;
 void init_command_interface(Command *command, void *arg);
 void release_command_interface(Command *command);
-
-
-/*
- * Threading-Interface
- */
-void create_and_init_thread(void *start_func, void *arg);
-void thread_sleep(int seconds);
-
-
-/*
- * Mutex-Interface
- */
-typedef struct Mutex Mutex;
-void init_mutex(Mutex *mutex);
-void release_mutex(Mutex *mutex);
 
 
 /*
@@ -138,9 +123,11 @@ void release_mutex(Mutex *mutex);
      */                                                                                                             \
     void (*getOffset)(Timer *timer, unsigned char *buf, int maxValueLenAllowed);
 
+
 typedef struct Timer Timer;
 void init_timer(Timer *timer, void *arg);
 void release_timer(Timer *timer);
+void startAndCountdownTimer(int seconds);
 
 
 /*

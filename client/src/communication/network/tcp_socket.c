@@ -16,6 +16,8 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <errno.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "instamsg_vendor.h"
 #include "../../common/include/globals.h"
@@ -76,11 +78,11 @@ static void connect_underlying_medium_guaranteed(Network* network, unsigned char
                 if(connect(network->socket, (struct sockaddr*)&address, sizeof(address)) != 0)
                 {
                     info_log("Could not connect to the network ... retrying");
-
-                    thread_sleep(1);
+                    startAndCountdownTimer(1);
                 }
                 else
                 {
+                    network->socketCorrupted = 0;
                     break;
                 }
 		    }
@@ -114,7 +116,7 @@ static int tcp_socket_read(Network* network, unsigned char* buffer, int len, uns
                  */
                 if(guaranteed == 1)
                 {
-                    debug_log(SOCKET_READ "%s", "Timeout occurred while waiting for data.. retrying");
+                    debug_log(SOCKET_READ "Timeout occurred while waiting for data.. retrying");
                     continue;
                 }
                 else
@@ -131,6 +133,9 @@ static int tcp_socket_read(Network* network, unsigned char* buffer, int len, uns
                 /*
                  * There was some error on the socket.
                  */
+                error_log(SOCKET_READ "Errno [%d] occurred while reading from socket", errno);
+
+                network->socketCorrupted = 1;
                 return FAILURE;
             }
         }
@@ -157,8 +162,11 @@ static int tcp_socket_write(Network* network, unsigned char* buffer, int len)
 
     while(bytes < len)
     {
-	    while(rc = write(network->socket, &buffer[bytes], (size_t)(len - bytes)) < 0)
+	    if(rc = write(network->socket, &buffer[bytes], (size_t)(len - bytes)) < 0)
         {
+            error_log(SOCKET_WRITE "Errno [%d] occurred while writing to socket", errno);
+
+            network->socketCorrupted = 1;
             return FAILURE;
         }
 
@@ -177,7 +185,7 @@ static int tcp_socket_write(Network* network, unsigned char* buffer, int len)
 }
 
 
-void init_network(Network *network, void *arg)
+void init_network(Network *network, const char *hostName, unsigned int port)
 {
     // Register read-callback.
 	network->read = tcp_socket_read;
@@ -186,9 +194,9 @@ void init_network(Network *network, void *arg)
 	network->write = tcp_socket_write;
 
     // Keep a copy of connection-parameters, for easy book-keeping.
-    NetworkParameters *params = (NetworkParameters *)arg;
-    snprintf(network->host, MAX_BUFFER_SIZE - 1, "%s", params->hostName);
-    network->port = params->port;
+    memset(network->host, 0, MAX_BUFFER_SIZE);
+    snprintf(network->host, MAX_BUFFER_SIZE - 1, "%s", hostName);
+    network->port = port;
 
     // Connect the medium (socket).
     connect_underlying_medium_guaranteed(network, network->host, network->port);

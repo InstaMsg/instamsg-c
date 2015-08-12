@@ -18,14 +18,6 @@ enum ValueType
 };
 
 
-typedef struct NetworkParameters NetworkParameters;
-struct NetworkParameters
-{
-    unsigned char hostName[MAX_BUFFER_SIZE];
-    int port;
-};
-
-
 typedef struct KeyValuePairs KeyValuePairs;
 struct KeyValuePairs
 {
@@ -41,6 +33,20 @@ struct KeyValuePairs
 #define POST_BOUNDARY "-----------ThIs_Is_tHe_bouNdaRY_78564$!@"
 
 #define SOCKET_READ     "[SOCKET-READ] "
+#define SOCKET_WRITE    "[SOCKET-WRITE] "
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+#define INSTAMSG_HOST       "localhost"
+#define INSTAMSG_PORT       1883
+#define INSTAMSG_HTTP_HOST  "localhost"
+#define INSTAMSG_HTTP_PORT  80
+#define LOG_LEVEL           3
+#define USE_SERIAL_LOGGER
+
 #define NETWORK_READ_TIMEOUT_SECS 1
+#define MAX_TRIES_ALLOWED_WHILE_READING_FROM_NETWORK_MEDIUM 5
+///////////////////////////////////////////////////////////////////////////////
 
 #endif

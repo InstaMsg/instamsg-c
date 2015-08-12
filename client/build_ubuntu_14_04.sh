@@ -7,7 +7,6 @@ SYSTEM_INCLUDES=`echo                                               \
 
 VENDOR="linux_desktop"
 
-THREAD_IMPL="pthread"
 SYSTEM_IMPL="linux_desktop"
 TIME_IMPL="sys_timeval"
 NETWORK_COMMUNICATION_IMPL="tcp_socket"
@@ -15,7 +14,7 @@ FS_COMMUNICATION_IMPL="linux_fs"
 COMMAND_COMMUNICATION_IMPL="linux_stub"
 SERIAL_COMMUNICATION_IMPL="linux_stub"
 
-EXTRA_LINK_LIBS="-lpthread -lm"
+EXTRA_LINK_LIBS=""
 
 gcc -nostdinc                                                       \
         stdoutsub.c                                                 \
@@ -41,7 +40,6 @@ gcc -nostdinc                                                       \
         ../MQTTPacket/src/MQTTUnsubscribeServer.c                   \
         ../MQTTPacket/src/MQTTUnsubscribeClient.c                   \
                                                                     \
-        src/threading/${THREAD_IMPL}.c                              \
         src/system/${SYSTEM_IMPL}.c                                 \
         src/time/${TIME_IMPL}.c                                     \
         src/communication/network/${NETWORK_COMMUNICATION_IMPL}.c   \

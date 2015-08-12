@@ -18,7 +18,6 @@ static void getNextLine(Network *network, unsigned char *buf)
 
         if(network->read(network, ch, 1, 1) == FAILURE) // Pseudo-Blocking Call
         {
-            terminateCurrentInstance = 1;
             return;
         }
 
@@ -174,13 +173,7 @@ HTTPResponse downloadFile(const char *url,
     Network network;
     HTTPResponse response;
 
-    {
-        NetworkParameters networkParametrs;
-        readConfig(&config, "INSTAMSG_HTTP_HOST", STRING, &(networkParametrs.hostName));
-        readConfig(&config, "INSTAMSG_HTTP_PORT", INTEGER, &(networkParametrs.port));
-
-	    init_network(&network, &networkParametrs);
-    }
+	init_network(&network, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
 
     char request[MAX_BUFFER_SIZE] = {0};
     generateRequest("GET", url, params, headers, request, MAX_BUFFER_SIZE, 1);
@@ -191,7 +184,6 @@ HTTPResponse downloadFile(const char *url,
      */
     if(network.write(&network, request, strlen(request)) == FAILURE)
     {
-        terminateCurrentInstance = 1;
         goto exit;
     }
 
@@ -239,9 +231,7 @@ HTTPResponse downloadFile(const char *url,
 
                 if(network.read(&network, ch, 1, 1) == FAILURE) // Pseudo-Blocking Call
                 {
-                    terminateCurrentInstance = 1;
                     release_file_system(&fs);
-
                     goto exit;
                 }
 
@@ -311,14 +301,7 @@ HTTPResponse uploadFile(const char *url,
     Network network;
     HTTPResponse response;
 
-    {
-        NetworkParameters networkParametrs;
-        readConfig(&config, "INSTAMSG_HTTP_HOST", STRING, &(networkParametrs.hostName));
-        readConfig(&config, "INSTAMSG_HTTP_PORT", INTEGER, &(networkParametrs.port));
-
-	    init_network(&network, &networkParametrs);
-    }
-
+	init_network(&network, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
 
     char request[MAX_BUFFER_SIZE] = {0};
 
@@ -370,16 +353,12 @@ HTTPResponse uploadFile(const char *url,
     if(network.write(&network, request, strlen(request)) == FAILURE)
     {
         error_log(FILE_UPLOAD "Error occurred while uploading POST data (FIRST LEVEL) for [%s]", filename);
-        terminateCurrentInstance = 1;
-
         goto exit;
     }
 
     if(network.write(&network, secondLevel, strlen(secondLevel)) == FAILURE)
     {
         error_log(FILE_UPLOAD "Error occurred while uploading POST data (SECOND LEVEL) for [%s]", filename);
-        terminateCurrentInstance = 1;
-
         goto exit;
     }
 
@@ -397,8 +376,6 @@ HTTPResponse uploadFile(const char *url,
         if(network.write(&network, ch, 1) == FAILURE)
         {
             error_log(FILE_UPLOAD "Error occurred while uploading POST data (THIRD LEVEL) for [%s]", filename);
-            terminateCurrentInstance = 1;
-
             release_file_system(&fs);
             goto exit;
         }
@@ -410,8 +387,6 @@ HTTPResponse uploadFile(const char *url,
     if(network.write(&network, fourthLevel, strlen(fourthLevel)) == FAILURE)
     {
         error_log(FILE_UPLOAD "Error occurred while uploading POST data (FOURTH LEVEL) for [%s]", filename);
-        terminateCurrentInstance = 1;
-
         goto exit;
     }
 

@@ -11,6 +11,8 @@ struct Network
     unsigned char host[MAX_BUFFER_SIZE];
     int port;
 
+    unsigned char socketCorrupted;
+
     COMMUNICATION_INTERFACE(Network)
 };
 
@@ -32,16 +34,6 @@ struct Serial
 struct Command
 {
     COMMUNICATION_INTERFACE(Command)
-};
-
-
-#include <pthread.h>
-struct Mutex
-{
-    pthread_mutex_t mtx;
-
-    void (*lock)(Mutex *mutex);
-    void (*unlock)(Mutex *mutex);
 };
 
 

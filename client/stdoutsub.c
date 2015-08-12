@@ -65,53 +65,36 @@ static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 }
 
 
-void* onConnectHandler(void *arg)
+void* coreLoopyBusinessLogicInitiatedBySelf(void *arg)
 {
     int rc;
-    info_log("Connected successfully\n");
-
-
-	if(opts_p->subscribe == 1)
-	{
-    	info_log("Subscribing to %s\n", topic);
-		rc = MQTTSubscribe(&instaMsg, topic, opts_p->qos, messageArrived, subscribeAckReceived, MQTT_RESULT_HANDLER_TIMEOUT);
-		info_log("Subscribed %d\n", rc);
-	}
 
 	if(opts_p->publish == 1)
 	{
-        while(1)
-        {
-            if(terminateCurrentInstance == 1)
-            {
-                info_log("Terminating onConnectHandler Thread\n");
-                break;
-            }
+        char buf[MAX_BUFFER_SIZE] = {0};
 
-            char buf[MAX_BUFFER_SIZE] = {0};
+        static int counter;
+        counter++;
+        sprintf(buf, "%s %d", opts_p->msg, counter);
 
-            static int counter;
-            counter++;
-            sprintf(buf, "%s %d", opts_p->msg, counter);
-
-		    debug_log("Publishing message [%s] to %s\n", buf, topic);
-		    rc = MQTTPublish(&instaMsg, topic, (const char*)buf, opts_p->qos, 0,
-                             publishAckReceived, MQTT_RESULT_HANDLER_TIMEOUT, 0, 1);
-		    debug_log("Published %d\n", rc);
-
-            thread_sleep(3);
-        }
+		debug_log("Publishing message [%s] to %s", buf, topic);
+		rc = MQTTPublish(&instaMsg, topic, (const char*)buf, opts_p->qos, 0,
+                         publishAckReceived, MQTT_RESULT_HANDLER_TIMEOUT, 0, 1);
+		debug_log("Published %d", rc);
 	}
-
-    incrementOrDecrementThreadCount(0);
-	return NULL;
 }
 
 
 static int onConnect()
 {
-    create_and_init_thread(onConnectHandler, NULL);
-    incrementOrDecrementThreadCount(1);
+    info_log("Connected successfully");
+
+	if(opts_p->subscribe == 1)
+	{
+    	info_log("Subscribing to %s", topic);
+		int rc = MQTTSubscribe(&instaMsg, topic, opts_p->qos, messageArrived, subscribeAckReceived, MQTT_RESULT_HANDLER_TIMEOUT);
+		info_log("Subscribed %d", rc);
+	}
 }
 
 
@@ -245,21 +228,6 @@ void getopts(int argc, char** argv, struct opts_struct *opts)
 }
 
 
-void init_system(struct opts_struct *opts)
-{
-	initInstaMsg(&instaMsg, opts->clientid, opts->password, onConnect, onDisconnect, NULL, opts);
-
-    create_and_init_thread(clientTimerThread, &instaMsg);
-    incrementOrDecrementThreadCount(1);
-
-    create_and_init_thread(keepAliveThread, &instaMsg);
-    incrementOrDecrementThreadCount(1);
-
-    create_and_init_thread(readPacketThread, &instaMsg);
-    incrementOrDecrementThreadCount(1);
-}
-
-
 int main(int argc, char** argv)
 {
     struct opts_struct opts =
@@ -287,37 +255,22 @@ int main(int argc, char** argv)
 	signal(SIGINT, cfinish);
 	signal(SIGTERM, cfinish);
 
-    init_mutex(&threadCountMutex);
-    terminateCurrentInstance = 1;
+	initInstaMsg(&instaMsg, opts.clientid, opts.password, onConnect, onDisconnect, NULL, &opts);
 
-	while (!toStop)
-	{
-        while(terminateCurrentInstance == 1)
-        {
-            threadCountMutex.lock(&threadCountMutex);
+    while(1)
+    {
+        /*
+         * InstaMsg-Specific Cycles
+         */
+        readAndProcessIncomingMQTTPacketsIfAny(&instaMsg);
+        removeExpiredResultHandlers(&instaMsg);
+        sendPingReqToServer(&instaMsg);
 
-            if(threadCount == 0)
-            {
-                terminateCurrentInstance = 0;
-                threadCountMutex.unlock(&threadCountMutex);
-
-                if(firstTimeStart == 0)
-                {
-                    cleanInstaMsgObject(&instaMsg);
-                }
-                firstTimeStart = 0;
-
-                init_system(&opts);
-            }
-            else
-            {
-                threadCountMutex.unlock(&threadCountMutex);
-            }
-
-            thread_sleep(1);
-        }
-
-        thread_sleep(1);
-	}
+        /*
+         * Application-Specific Cycles
+         */
+        coreLoopyBusinessLogicInitiatedBySelf(NULL);
+        startAndCountdownTimer(3);
+    }
 }
 

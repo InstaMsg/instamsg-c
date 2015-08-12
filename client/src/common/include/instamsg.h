@@ -31,10 +31,6 @@
 
 
 
-unsigned char terminateCurrentInstance;
-unsigned int threadCount;
-Mutex threadCountMutex;
-
 void NewTimer(Timer*);
 
 typedef struct MQTTMessage MQTTMessage;
@@ -100,10 +96,6 @@ struct InstaMsg {
     int (*onDisconnectCallback)();
     int (*oneToOneMessageCallback)();
 
-    struct Mutex networkPhysicalMediumMutex;
-    struct Mutex messageHandlersMutex;
-    struct Mutex resultHandlersMutex;
-
     unsigned char filesTopic[MAX_BUFFER_SIZE];
     unsigned char rebootTopic[MAX_BUFFER_SIZE];
     unsigned char enableServerLoggingTopic[MAX_BUFFER_SIZE];
@@ -113,7 +105,6 @@ struct InstaMsg {
     unsigned char serverLoggingEnabled;
 
     Network ipstack;
-
     System systemUtils;
 
     MQTTPacket_connectData connectOptions;
@@ -153,14 +144,6 @@ void initInstaMsg(InstaMsg* c,
                   int (*oneToOneMessageHandler)(),
                   struct opts_struct *opts);
 
-void cleanInstaMsgObject(InstaMsg *c);
-
-void* clientTimerThread(InstaMsg *c);
-void* keepAliveThread(InstaMsg *c);
-void readPacketThread(InstaMsg *c);
-
-void prepareThreadTerminationIfApplicable(const char *threadName);
-void incrementOrDecrementThreadCount(char increment);
 
 typedef struct JSONParseStuff JSONParseStuff;
 struct JSONParseStuff
@@ -183,6 +166,9 @@ void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId);
 #define FILE_LISTING    "[FILE-LISTING] "
 #define FILE_DELETE     "[FILE-DELETE] "
 
+void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c);
+void removeExpiredResultHandlers(InstaMsg *c);
+void sendPingReqToServer(InstaMsg *c);
 
 #define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}
 #endif
