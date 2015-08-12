@@ -253,22 +253,32 @@ int main(int argc, char** argv)
 	signal(SIGINT, cfinish);
 	signal(SIGTERM, cfinish);
 
-	initInstaMsg(&instaMsg, opts.clientid, opts.password, onConnect, onDisconnect, NULL, &opts);
 
     while(1)
     {
-        /*
-         * InstaMsg-Specific Cycles
-         */
-        readAndProcessIncomingMQTTPacketsIfAny(&instaMsg);
-        removeExpiredResultHandlers(&instaMsg);
-        sendPingReqToServer(&instaMsg);
+        initInstaMsg(&instaMsg, opts.clientid, opts.password, onConnect, onDisconnect, NULL, &opts);
 
-        /*
-         * Application-Specific Cycles
-         */
-        coreLoopyBusinessLogicInitiatedBySelf(NULL);
-        startAndCountdownTimer(3);
+        while(1)
+        {
+            if(instaMsg.ipstack.socketCorrupted == 1)
+            {
+                clearInstaMsg(&instaMsg);
+                break;
+            }
+
+            /*
+            * InstaMsg-Specific Cycles
+            */
+            readAndProcessIncomingMQTTPacketsIfAny(&instaMsg);
+            removeExpiredResultHandlers(&instaMsg);
+            sendPingReqToServer(&instaMsg);
+
+            /*
+            * Application-Specific Cycles
+            */
+            coreLoopyBusinessLogicInitiatedBySelf(NULL);
+            startAndCountdownTimer(3);
+        }
     }
 }
 

@@ -136,6 +136,7 @@ int MQTTUnsubscribe (InstaMsg*, const char*);
 int MQTTDisconnect (InstaMsg*);
 void setDefaultMessageHandler(InstaMsg*, messageHandler);
 
+void clearInstaMsg(InstaMsg *c);
 void initInstaMsg(InstaMsg* c,
                   char *clientId,
                   char *authKey,

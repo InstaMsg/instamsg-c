@@ -132,8 +132,7 @@ static int sendPacket(InstaMsg *c, unsigned char *buf, int length)
 {
     if((c->ipstack).socketCorrupted == 1)
     {
-        release_network(&(c->ipstack));
-	    init_network(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT);
+        return FAILURE;
     }
 
     int rc = SUCCESS;
@@ -151,8 +150,7 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
 {
     if((c->ipstack).socketCorrupted == 1)
     {
-        release_network(&(c->ipstack));
-	    init_network(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT);
+        return FAILURE;
     }
 
     MQTTHeader header = {0};
@@ -361,6 +359,22 @@ void sendPingReqToServer(InstaMsg *c)
     if (len > 0)
     {
         sendPacket(c, buf, len);
+    }
+}
+
+
+void clearInstaMsg(InstaMsg *c)
+{
+    release_system_utils(&(c->systemUtils));
+    release_network(&(c->ipstack));
+
+    if(serialLoggerEnabled == 1)
+    {
+        release_serial_logger(&serialLogger);
+    }
+    else
+    {
+        release_file_logger(&fileLogger);
     }
 }
 
