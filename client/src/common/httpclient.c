@@ -421,7 +421,7 @@ HTTPResponse uploadFile(const char *url,
             }
             else
             {
-                debug_log(FILE_UPLOAD "URL being provided to peer for uploaded file [%s] is [%s]", filename, response.body);
+                info_log(FILE_UPLOAD "URL being provided to peer for uploaded file [%s] is [%s]", filename, response.body);
                 break;
             }
         }
