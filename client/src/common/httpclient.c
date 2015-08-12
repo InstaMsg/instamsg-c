@@ -16,7 +16,7 @@ static void getNextLine(Network *network, unsigned char *buf)
     {
         char ch[2] = {0};
 
-        if(network->read(network, ch, 1) == FAILURE)
+        if(network->read(network, ch, 1, 1) == FAILURE) // Pseudo-Blocking Call
         {
             terminateCurrentInstance = 1;
             return;
@@ -237,7 +237,7 @@ HTTPResponse downloadFile(const char *url,
             {
                 char ch[2] = {0};
 
-                if(network.read(&network, ch, 1) == FAILURE)
+                if(network.read(&network, ch, 1, 1) == FAILURE) // Pseudo-Blocking Call
                 {
                     terminateCurrentInstance = 1;
                     release_file_system(&fs);
@@ -393,7 +393,7 @@ HTTPResponse uploadFile(const char *url,
     {
         char ch[2] = {0};
 
-        fs.read(&fs, ch, 1);
+        fs.read(&fs, ch, 1, 1);
         if(network.write(&network, ch, 1) == FAILURE)
         {
             error_log(FILE_UPLOAD "Error occurred while uploading POST data (THIRD LEVEL) for [%s]", filename);
@@ -440,7 +440,7 @@ HTTPResponse uploadFile(const char *url,
 
         if(beginPayloadDownload == 1)
         {
-            if(network.read(&network, response.body, numBytes) == FAILURE)
+            if(network.read(&network, response.body, numBytes, 1) == FAILURE) // Pseudo-Blocking Call
             {
                 error_log(FILE_UPLOAD "Socket error while reading URL-payload for uploaded file [%s]", filename);
                 goto exit;

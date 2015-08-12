@@ -9,7 +9,7 @@
 #include "../../common/include/globals.h"
 
 
-static int linux_command_stub_read(Command* command, unsigned char* buffer, int len)
+static int linux_command_stub_read(Command* command, unsigned char* buffer, int len, unsigned char guaranteed)
 {
     return SUCCESS;
 }

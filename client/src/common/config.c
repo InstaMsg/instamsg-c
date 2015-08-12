@@ -45,7 +45,7 @@ void readConfig(Config *config, const unsigned char *key, enum ValueType valueTy
         {
             char ch = EOF;
 
-            (config->fs).read(&(config->fs), &ch, 1);
+            (config->fs).read(&(config->fs), &ch, 1, 1);
 
 
             // We reached the end of file, but we were not done yet :(

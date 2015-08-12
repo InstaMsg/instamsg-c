@@ -33,7 +33,7 @@ static void connect_underlying_medium_guaranteed(FileSystem* fs, const char *fil
 }
 
 
-static int linux_fs_read(FileSystem* fs, unsigned char* buffer, int len)
+static int linux_fs_read(FileSystem* fs, unsigned char* buffer, int len, unsigned char guaranteed)
 {
     if(fread(buffer, sizeof(buffer[0]), len, fs->fp) < len)
     {

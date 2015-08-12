@@ -15,7 +15,7 @@
 #include "../../common/include/globals.h"
 
 
-static int linux_serial_read(Serial *serial, unsigned char* buffer, int len)
+static int linux_serial_read(Serial *serial, unsigned char* buffer, int len, unsigned char guaranteed)
 {
     return SUCCESS;
 }

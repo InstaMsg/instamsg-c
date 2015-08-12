@@ -15,6 +15,7 @@
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <errno.h>
 
 #include "instamsg_vendor.h"
 #include "../../common/include/globals.h"
@@ -86,21 +87,52 @@ static void connect_underlying_medium_guaranteed(Network* network, unsigned char
         }
 	}
 
+
+    // Set timeout-limitation in the socket-receiving function
+    struct timeval interval = {NETWORK_READ_TIMEOUT_SECS, 0};
+    setsockopt(network->socket, SOL_SOCKET, SO_RCVTIMEO, (char *)&interval, sizeof(struct timeval));
+
     info_log("TCP-SOCKET UNDERLYING_MEDIUM INITIATED FOR HOST = [%s], PORT = [%d].",
              network->host, network->port);
 }
 
 
-static int tcp_socket_read(Network* network, unsigned char* buffer, int len)
+static int tcp_socket_read(Network* network, unsigned char* buffer, int len, unsigned char guaranteed)
 {
 	int bytes = 0;
     int rc = 0;
 
 	while (bytes < len)
 	{
-		while(rc = recv(network->socket, &buffer[bytes], (size_t)(len - bytes), 0) < 0)
+		if(rc = recv(network->socket, &buffer[bytes], (size_t)(len - bytes), 0) < 0)
         {
-            return FAILURE;
+            if((errno == EAGAIN) || (errno == EWOULDBLOCK))
+            {
+                /*
+                 * Timeout occurred before we could read any bytes.
+                 * Now, we re-read the bytes if we are in guaranteed (pseudo-blocking) mode.
+                 */
+                if(guaranteed == 1)
+                {
+                    debug_log(SOCKET_READ "%s", "Timeout occurred while waiting for data.. retrying");
+                    continue;
+                }
+                else
+                {
+                    /*
+                     * WE have genuinely timed-out.
+                     * Return this info, and let the calling-function take appropriate action.
+                     */
+                    return SOCKET_READ_TIMEOUT;
+                }
+            }
+            else
+            {
+                /*
+                 * There was some error on the socket.
+                 */
+                return FAILURE;
+            }
         }
 
         // STRANGE: On Ubuntu 14.04, if "n" bytes are received successfully as one chunk, rc is 0 (and not "n") :(

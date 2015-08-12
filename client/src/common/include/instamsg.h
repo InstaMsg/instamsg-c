@@ -183,5 +183,6 @@ void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId);
 #define FILE_LISTING    "[FILE-LISTING] "
 #define FILE_DELETE     "[FILE-DELETE] "
 
+
 #define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}
 #endif

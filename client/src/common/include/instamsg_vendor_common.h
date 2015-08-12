@@ -50,7 +50,7 @@
 
 #define COMMUNICATION_INTERFACE(type)                                                           \
                                                                                                 \
-    int (*read) (type *interface, unsigned char* buffer, int len);                              \
+    int (*read) (type *interface, unsigned char* buffer, int len, unsigned char guaranteed);    \
     int (*write)(type *interface, unsigned char* buffer, int len);
 
 

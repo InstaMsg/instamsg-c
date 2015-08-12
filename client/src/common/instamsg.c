@@ -195,7 +195,7 @@ static int decodePacket(InstaMsg* c, int* value)
     {
         int rc = MQTTPACKET_READ_ERROR;
 
-        if((c->ipstack).read(&(c->ipstack), &i, 1) == FAILURE)
+        if((c->ipstack).read(&(c->ipstack), &i, 1, 1) == FAILURE) // Pseudo-Blocking Call
         {
             terminateCurrentInstance = 1;
             return FAILURE;
@@ -226,7 +226,7 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     /* 1. read the header byte.  This has the packet type in it
      *    (note that this function is guaranteed to succeed, since "ensure_guarantee has been passed as 1
      */
-    if((c->ipstack).read(&(c->ipstack), c->readbuf, 1) == FAILURE)
+    if((c->ipstack).read(&(c->ipstack), c->readbuf, 1, 0) == FAILURE) // Truly Non-Blocking Call
     {
         terminateCurrentInstance = 1;
         return FAILURE;
@@ -245,7 +245,7 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     /* 3. read the rest of the buffer using a callback to supply the rest of the data */
     if (rem_len > 0)
     {
-        if((c->ipstack).read(&(c->ipstack), c->readbuf + len, rem_len) == FAILURE)
+        if((c->ipstack).read(&(c->ipstack), c->readbuf + len, rem_len, 1) == FAILURE) // Pseudo-Blocking Call
         {
             terminateCurrentInstance = 1;
             return FAILURE;

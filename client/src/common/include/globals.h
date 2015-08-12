@@ -5,9 +5,10 @@
 
 enum returnCode
 {
-   BUFFER_OVERFLOW = -2,
-   FAILURE = -1,
-   SUCCESS = 0
+    SOCKET_READ_TIMEOUT = -3,
+    BUFFER_OVERFLOW = -2,
+    FAILURE = -1,
+    SUCCESS = 0
 };
 
 enum ValueType
@@ -38,5 +39,8 @@ struct KeyValuePairs
 
 #define CONTENT_LENGTH "Content-Length"
 #define POST_BOUNDARY "-----------ThIs_Is_tHe_bouNdaRY_78564$!@"
+
+#define SOCKET_READ     "[SOCKET-READ] "
+#define NETWORK_READ_TIMEOUT_SECS 1
 
 #endif
