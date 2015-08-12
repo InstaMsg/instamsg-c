@@ -150,7 +150,7 @@ static void init(void)
 }
 
 
-static int tiva_serial_read(Serial* serial, unsigned char* buffer, int len)
+static int tiva_serial_read(Serial* serial, unsigned char* buffer, int len, unsigned char guaranteed)
 {
     int pos = 0;
     while(len-- > 0)

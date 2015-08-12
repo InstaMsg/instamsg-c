@@ -15,7 +15,7 @@ int main()
     while(1)
     {
         unsigned char buf[2] = {0};
-        serial.read(&serial, buf, 1);
+        serial.read(&serial, buf, 1, 1);
         serial.write(&serial, buf, 1);
     }
 
