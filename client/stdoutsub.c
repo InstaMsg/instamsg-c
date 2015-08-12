@@ -42,7 +42,6 @@
 */
 #include "src/common/include/instamsg.h"
 #include "src/common/include/log.h"
-#include "src/common/include/config.h"
 #include "src/common/include/globals.h"
 
 #include <stdio.h>
@@ -237,7 +236,6 @@ int main(int argc, char** argv)
 
 	int rc = 0;
     char firstTimeStart = 1;
-    init_config(&config, "./config.txt");
 
 	if (argc < 2)
 		usage();

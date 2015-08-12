@@ -1,6 +1,5 @@
 #include "include/globals.h"
 #include "include/instamsg.h"
-#include "include/config.h"
 #include "include/httpclient.h"
 
 #include "include/instamsg_vendor_common.h"

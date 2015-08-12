@@ -15,7 +15,6 @@
  *    Ajay Garg <ajay.garg@sensegrow.com>
  *******************************************************************************/
 
-#include "include/config.h"
 #include "include/instamsg.h"
 #include "include/httpclient.h"
 
@@ -379,11 +378,9 @@ void initInstaMsg(InstaMsg* c,
     // VERY IMPORTANT: If this is not done, the "write" on an invalid socket will cause program-crash
     signal(SIGPIPE,SIG_IGN);
 
-    readConfig(&config, "LOG_LEVEL", INTEGER, &currentLogLevel);
-
+    currentLogLevel = LOG_LEVEL;
     {
-        readConfig(&config, "USE_SERIAL_LOGGER", INTEGER, &serialLoggerEnabled);
-
+        serialLoggerEnabled = USE_SERIAL_LOGGER;
         if(serialLoggerEnabled == 1)
         {
             init_serial_logger(&serialLogger, opts->logFilePath);

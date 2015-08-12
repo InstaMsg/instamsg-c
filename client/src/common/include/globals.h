@@ -42,8 +42,8 @@ struct KeyValuePairs
 #define INSTAMSG_PORT       1883
 #define INSTAMSG_HTTP_HOST  "localhost"
 #define INSTAMSG_HTTP_PORT  80
-#define LOG_LEVEL           3
-#define USE_SERIAL_LOGGER
+#define LOG_LEVEL           2
+#define USE_SERIAL_LOGGER   0
 
 #define NETWORK_READ_TIMEOUT_SECS 1
 #define MAX_TRIES_ALLOWED_WHILE_READING_FROM_NETWORK_MEDIUM 5

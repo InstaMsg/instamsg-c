@@ -106,6 +106,7 @@ static int tcp_socket_read(Network* network, unsigned char* buffer, int len, uns
 
 	while (bytes < len)
 	{
+        printf("receiving \n");
 		if(rc = recv(network->socket, &buffer[bytes], (size_t)(len - bytes), 0) < 0)
         {
             if((errno == EAGAIN) || (errno == EWOULDBLOCK))
@@ -125,6 +126,7 @@ static int tcp_socket_read(Network* network, unsigned char* buffer, int len, uns
                      * WE have genuinely timed-out.
                      * Return this info, and let the calling-function take appropriate action.
                      */
+                    debug_log(SOCKET_READ "Timeout occurred while waiting for data.. NOT retrying");
                     return SOCKET_READ_TIMEOUT;
                 }
             }
