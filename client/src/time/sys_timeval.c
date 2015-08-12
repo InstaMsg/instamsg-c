@@ -33,7 +33,7 @@ static void getOffset(Timer *timer, unsigned char *buf, int maxValueLenAllowed)
 
 void startAndCountdownTimer(int seconds)
 {
-    sleep(3);
+    sleep(seconds);
 }
 
 
