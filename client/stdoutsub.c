@@ -61,7 +61,7 @@ struct opts_struct *opts_p;
 
 static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
-    debug_log("PUBACK received for msg-id [%u]\n", fixedHeaderPlusMsgId->msgId);
+    debug_log("PUBACK received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
 }
 
 

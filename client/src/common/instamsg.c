@@ -121,11 +121,10 @@ static void fireResultHandlerAndRemove(InstaMsg *c, MQTTFixedHeaderPlusMsgId *fi
         if (c->resultHandlers[i].msgId == fixedHeaderPlusMsgId->msgId)
         {
             c->resultHandlers[i].fp(fixedHeaderPlusMsgId);
-
             c->resultHandlers[i].msgId = 0;
 
             break;
-                                                                                                                                                        }
+        }
     }
 }
 
