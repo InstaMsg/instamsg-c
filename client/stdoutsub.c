@@ -84,6 +84,19 @@ void* coreLoopyBusinessLogicInitiatedBySelf(void *arg)
 }
 
 
+static void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
+{
+    info_log("SUBACK received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
+}
+
+
+static void messageArrived(MessageData* md)
+{
+	MQTTMessage* message = md->message;
+    info_log("%.*s", (int)message->payloadlen, (char*)message->payload);
+}
+
+
 static int onConnect()
 {
     info_log("Connected successfully");

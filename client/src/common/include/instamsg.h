@@ -157,8 +157,6 @@ struct JSONParseStuff
 
 char serialLoggerEnabled;
 
-void messageArrived(MessageData* md);
-void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId);
 
 #define SERVER_LOGGING  "[SERVER-LOGGING] "
 #define FILE_TRANSFER   "[FILE-TRANSFER] "

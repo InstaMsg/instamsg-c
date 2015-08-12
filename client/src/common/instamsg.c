@@ -21,14 +21,6 @@
 #include <string.h>
 #include <signal.h>
 
-
-void messageArrived(MessageData* md)
-{
-	MQTTMessage* message = md->message;
-    info_log("%.*s", (int)message->payloadlen, (char*)message->payload);
-}
-
-
 static void serverLoggingTopicMessageArrived(MessageData *md)
 {
     /*
@@ -60,12 +52,6 @@ static void serverLoggingTopicMessageArrived(MessageData *md)
             info_log(SERVER_LOGGING "Disabled.");
         }
     }
-}
-
-
-void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
-{
-    info_log("SUBACK received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
 }
 
 
@@ -338,132 +324,6 @@ static int fireResultHandlerUsingMsgIdAsTheKey(InstaMsg *c)
 }
 
 
-void removeExpiredResultHandlers(InstaMsg *c)
-{
-    int i;
-    for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
-    {
-        if (c->resultHandlers[i].msgId > 0)
-        {
-            info_log("No result obtained for msgId [%u] in the specified period", c->resultHandlers[i].msgId);
-            c->resultHandlers[i].msgId = 0;
-        }
-    }
-}
-
-
-void sendPingReqToServer(InstaMsg *c)
-{
-    unsigned char buf[1000];
-    int len = MQTTSerialize_pingreq(buf, 1000);
-    if (len > 0)
-    {
-        sendPacket(c, buf, len);
-    }
-}
-
-
-void clearInstaMsg(InstaMsg *c)
-{
-    release_system_utils(&(c->systemUtils));
-    release_network(&(c->ipstack));
-
-    if(serialLoggerEnabled == 1)
-    {
-        release_serial_logger(&serialLogger);
-    }
-    else
-    {
-        release_file_logger(&fileLogger);
-    }
-}
-
-
-void initInstaMsg(InstaMsg* c,
-                  char *clientId,
-                  char *authKey,
-                  int (*connectHandler)(),
-                  int (*disconnectHandler)(),
-                  int (*oneToOneMessageHandler)(),
-                  struct opts_struct *opts)
-{
-    int i;
-    char clientIdMachine[MAX_BUFFER_SIZE] = {0};
-    char username[MAX_BUFFER_SIZE] = {0};
-
-    // VERY IMPORTANT: If this is not done, the "write" on an invalid socket will cause program-crash
-    signal(SIGPIPE,SIG_IGN);
-
-    currentLogLevel = LOG_LEVEL;
-    {
-        serialLoggerEnabled = USE_SERIAL_LOGGER;
-        if(serialLoggerEnabled == 1)
-        {
-            init_serial_logger(&serialLogger, opts->logFilePath);
-
-            logger_write_func = (void *) &(serialLogger.serial.write);
-            logger_medium = &(serialLogger.serial);
-        }
-        else
-        {
-            init_file_logger(&fileLogger, opts->logFilePath);
-
-            logger_write_func = (void *) &(fileLogger.fs.write);
-            logger_medium = &(fileLogger.fs);
-        }
-    }
-
-	init_network(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT);
-    init_system_utils(&(c->systemUtils), NULL);
-
-    for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
-    {
-        c->messageHandlers[i].msgId = 0;
-        c->messageHandlers[i].topicFilter = 0;
-
-        c->resultHandlers[i].msgId = 0;
-        c->resultHandlers[i].timeout = 0;
-    }
-
-    c->defaultMessageHandler = NULL;
-    c->next_packetid = MAX_PACKET_ID;
-    c->onConnectCallback = connectHandler;
-    c->onDisconnectCallback = disconnectHandler;
-    c->oneToOneMessageCallback = oneToOneMessageHandler;
-
-    memset(c->filesTopic, 0, MAX_BUFFER_SIZE);
-    sprintf(c->filesTopic, "instamsg/clients/%s/files", clientId);
-
-    memset(c->rebootTopic, 0, MAX_BUFFER_SIZE);
-    sprintf(c->rebootTopic, "instamsg/clients/%s/reboot", clientId);
-
-    memset(c->enableServerLoggingTopic, 0, MAX_BUFFER_SIZE);
-    sprintf(c->enableServerLoggingTopic, "instamsg/clients/%s/enableServerLogging", clientId);
-
-    memset(c->serverLogsTopic, 0, MAX_BUFFER_SIZE);
-    sprintf(c->serverLogsTopic, "instamsg/clients/%s/logs", clientId);
-
-    memset(c->fileUploadUrl, 0, MAX_BUFFER_SIZE);
-    sprintf(c->fileUploadUrl, "/api/beta/clients/%s/files", clientId);
-
-    c->serverLoggingEnabled = 0;
-
-	c->connectOptions.willFlag = 0;
-	c->connectOptions.MQTTVersion = 3;
-
-    strncpy(clientIdMachine, clientId, 23);
-	c->connectOptions.clientID.cstring = clientIdMachine;
-
-    strcpy(username, clientId + 24);
-	c->connectOptions.username.cstring = username;
-
-	c->connectOptions.password.cstring = authKey;
-	c->connectOptions.cleansession = 1;
-
-    MQTTConnect(c);
-}
-
-
 static void logJsonFailureMessageAndReturn(const char *key, MQTTMessage *msg)
 {
     error_log(FILE_TRANSFER "Could not find key [%s] in message-payload [%s] .. not proceeding further", key, msg->payload);
@@ -632,6 +492,132 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
                 MQTT_RESULT_HANDLER_TIMEOUT,
                 0,
                 1);
+}
+
+
+void removeExpiredResultHandlers(InstaMsg *c)
+{
+    int i;
+    for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
+    {
+        if (c->resultHandlers[i].msgId > 0)
+        {
+            info_log("No result obtained for msgId [%u] in the specified period", c->resultHandlers[i].msgId);
+            c->resultHandlers[i].msgId = 0;
+        }
+    }
+}
+
+
+void sendPingReqToServer(InstaMsg *c)
+{
+    unsigned char buf[1000];
+    int len = MQTTSerialize_pingreq(buf, 1000);
+    if (len > 0)
+    {
+        sendPacket(c, buf, len);
+    }
+}
+
+
+void clearInstaMsg(InstaMsg *c)
+{
+    release_system_utils(&(c->systemUtils));
+    release_network(&(c->ipstack));
+
+    if(serialLoggerEnabled == 1)
+    {
+        release_serial_logger(&serialLogger);
+    }
+    else
+    {
+        release_file_logger(&fileLogger);
+    }
+}
+
+
+void initInstaMsg(InstaMsg* c,
+                  char *clientId,
+                  char *authKey,
+                  int (*connectHandler)(),
+                  int (*disconnectHandler)(),
+                  int (*oneToOneMessageHandler)(),
+                  struct opts_struct *opts)
+{
+    int i;
+    char clientIdMachine[MAX_BUFFER_SIZE] = {0};
+    char username[MAX_BUFFER_SIZE] = {0};
+
+    // VERY IMPORTANT: If this is not done, the "write" on an invalid socket will cause program-crash
+    signal(SIGPIPE,SIG_IGN);
+
+    currentLogLevel = LOG_LEVEL;
+    {
+        serialLoggerEnabled = USE_SERIAL_LOGGER;
+        if(serialLoggerEnabled == 1)
+        {
+            init_serial_logger(&serialLogger, opts->logFilePath);
+
+            logger_write_func = (void *) &(serialLogger.serial.write);
+            logger_medium = &(serialLogger.serial);
+        }
+        else
+        {
+            init_file_logger(&fileLogger, opts->logFilePath);
+
+            logger_write_func = (void *) &(fileLogger.fs.write);
+            logger_medium = &(fileLogger.fs);
+        }
+    }
+
+	init_network(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT);
+    init_system_utils(&(c->systemUtils), NULL);
+
+    for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
+    {
+        c->messageHandlers[i].msgId = 0;
+        c->messageHandlers[i].topicFilter = 0;
+
+        c->resultHandlers[i].msgId = 0;
+        c->resultHandlers[i].timeout = 0;
+    }
+
+    c->defaultMessageHandler = NULL;
+    c->next_packetid = MAX_PACKET_ID;
+    c->onConnectCallback = connectHandler;
+    c->onDisconnectCallback = disconnectHandler;
+    c->oneToOneMessageCallback = oneToOneMessageHandler;
+
+    memset(c->filesTopic, 0, MAX_BUFFER_SIZE);
+    sprintf(c->filesTopic, "instamsg/clients/%s/files", clientId);
+
+    memset(c->rebootTopic, 0, MAX_BUFFER_SIZE);
+    sprintf(c->rebootTopic, "instamsg/clients/%s/reboot", clientId);
+
+    memset(c->enableServerLoggingTopic, 0, MAX_BUFFER_SIZE);
+    sprintf(c->enableServerLoggingTopic, "instamsg/clients/%s/enableServerLogging", clientId);
+
+    memset(c->serverLogsTopic, 0, MAX_BUFFER_SIZE);
+    sprintf(c->serverLogsTopic, "instamsg/clients/%s/logs", clientId);
+
+    memset(c->fileUploadUrl, 0, MAX_BUFFER_SIZE);
+    sprintf(c->fileUploadUrl, "/api/beta/clients/%s/files", clientId);
+
+    c->serverLoggingEnabled = 0;
+
+	c->connectOptions.willFlag = 0;
+	c->connectOptions.MQTTVersion = 3;
+
+    strncpy(clientIdMachine, clientId, 23);
+	c->connectOptions.clientID.cstring = clientIdMachine;
+
+    strcpy(username, clientId + 24);
+	c->connectOptions.username.cstring = username;
+
+	c->connectOptions.password.cstring = authKey;
+	c->connectOptions.cleansession = 1;
+
+    MQTTConnect(c);
 }
 
 
