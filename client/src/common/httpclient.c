@@ -7,9 +7,10 @@
 
 #include <string.h>
 
+#define HTTP_RESPONSE_STATUS_PREFIX "HTTP/1.0"
 
 
-static void getNextLine(Network *network, unsigned char *buf)
+static void getNextLine(Network *network, unsigned char *buf, int *responseCode)
 {
     while(1)
     {
@@ -22,6 +23,15 @@ static void getNextLine(Network *network, unsigned char *buf)
 
         if(ch[0] == '\n')
         {
+            if(strncmp(buf, HTTP_RESPONSE_STATUS_PREFIX, strlen(HTTP_RESPONSE_STATUS_PREFIX)) == 0)
+            {
+                char *saveptr;
+                char *firstToken = strtok_r(buf, " ", &saveptr);
+                char *secondToken = strtok_r(NULL, " ", &saveptr);
+
+                *responseCode = atoi(secondToken);
+            }
+
             return;
         }
         else
@@ -168,7 +178,6 @@ HTTPResponse downloadFile(const char *url,
                           KeyValuePairs *headers,
                           unsigned int timeout)
 {
-    int rc = FAILURE;
     Network network;
     HTTPResponse response;
 
@@ -192,7 +201,7 @@ HTTPResponse downloadFile(const char *url,
         char beginPayloadDownload = 0;
 
         char newLine[MAX_BUFFER_SIZE] = "";
-        getNextLine(&network, newLine);
+        getNextLine(&network, newLine, &(response.status));
 
         /*
          * The actual file-payload begins after we receive an empty line.
@@ -246,13 +255,10 @@ HTTPResponse downloadFile(const char *url,
             rename_file_system(tempFileName, filename);
             info_log(FILE_DOWNLOAD "File [%s] successfully moved to [%s] worth [%ld] bytes", tempFileName, filename, numBytes);
 
-            rc = HTTP_FILE_DOWNLOAD_SUCCESS;
-
 exit:
             release_network(&network);
 
-            // TODO: Ideally, parse this 200 from the response.
-            response.status = rc;
+            info_log(FILE_DOWNLOAD "HTTP-Response Status = [%d]", response.status);
             return response;
         }
     }
@@ -296,7 +302,6 @@ HTTPResponse uploadFile(const char *url,
     int i = 0;
     long numBytes = 0;
 
-    int rc = FAILURE;
     Network network;
     HTTPResponse response;
 
@@ -396,7 +401,7 @@ HTTPResponse uploadFile(const char *url,
         char beginPayloadDownload = 0;
 
         char newLine[MAX_BUFFER_SIZE] = "";
-        getNextLine(&network, newLine);
+        getNextLine(&network, newLine, &(response.status));
 
         /*
          * The actual payload begins after we receive an empty line.
@@ -427,11 +432,9 @@ HTTPResponse uploadFile(const char *url,
         }
     }
 
-    rc = HTTP_FILE_UPLOAD_SUCCESS;
-
 exit:
     release_network(&network);
 
-    response.status = rc;
+    info_log(FILE_UPLOAD "HTTP-Response Status = [%d]", response.status);
     return response;
 }
