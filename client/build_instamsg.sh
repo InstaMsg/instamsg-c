@@ -6,6 +6,12 @@ TOTAL_INCLUDES=`echo                                                \
         -I ../MQTTPacket/src    `
 
 
+if [ -z "${SERIAL_COMMUNICATION_IMPL}" ];
+then
+    SERIAL_COMMUNICATION_IMPL="empty"
+fi
+
+
 SOURCES=`echo                                                       \
         stdoutsub                                                   \
         src/common/instamsg                                         \

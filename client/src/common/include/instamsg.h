@@ -160,8 +160,6 @@ struct JSONParseStuff
     unsigned char type;
 };
 
-char serialLoggerEnabled;
-
 
 #define SERVER_LOGGING  "[SERVER-LOGGING] "
 #define FILE_TRANSFER   "[FILE-TRANSFER] "

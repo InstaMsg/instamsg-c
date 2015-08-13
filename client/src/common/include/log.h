@@ -40,8 +40,5 @@ void debug_log(char *fmt, ...);
 
 int currentLogLevel;
 
-LOG_WRITE_FUNC *logger_write_func;
-void *logger_medium;
-
 
 #endif

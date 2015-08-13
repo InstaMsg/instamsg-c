@@ -525,14 +525,8 @@ void clearInstaMsg(InstaMsg *c)
     release_file_system(&(c->singletonUtilityFs));
     release_timer(&(c->singletonUtilityTimer));
 
-    if(serialLoggerEnabled == 1)
-    {
-        release_serial_logger(&serialLogger);
-    }
-    else
-    {
-        release_file_logger(&fileLogger);
-    }
+    release_file_logger(&fileLogger);
+    release_serial_logger(&serialLogger);
 }
 
 
@@ -550,23 +544,9 @@ void initInstaMsg(InstaMsg* c,
     signal(SIGPIPE,SIG_IGN);
 
     currentLogLevel = LOG_LEVEL;
-    {
-        serialLoggerEnabled = USE_SERIAL_LOGGER;
-        if(serialLoggerEnabled == 1)
-        {
-            init_serial_logger(&serialLogger, opts->logFilePath);
 
-            logger_write_func = (void *) &(serialLogger.serial.write);
-            logger_medium = &(serialLogger.serial);
-        }
-        else
-        {
-            init_file_logger(&fileLogger, opts->logFilePath);
-
-            logger_write_func = (void *) &(fileLogger.fs.write);
-            logger_medium = &(fileLogger.fs);
-        }
-    }
+    init_serial_logger(&serialLogger, opts->logFilePath);
+    init_file_logger(&fileLogger, opts->logFilePath);
 
     init_timer(&(c->singletonUtilityTimer), NULL);
     init_file_system(&(c->singletonUtilityFs), "");
