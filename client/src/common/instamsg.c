@@ -545,8 +545,6 @@ void initInstaMsg(InstaMsg* c,
                   struct opts_struct *opts)
 {
     int i;
-    char clientIdMachine[MAX_BUFFER_SIZE] = {0};
-    char username[MAX_BUFFER_SIZE] = {0};
 
     // VERY IMPORTANT: If this is not done, the "write" on an invalid socket will cause program-crash
     signal(SIGPIPE,SIG_IGN);
@@ -607,15 +605,19 @@ void initInstaMsg(InstaMsg* c,
 
 	c->connectOptions.willFlag = 0;
 	c->connectOptions.MQTTVersion = 3;
-
-    strncpy(clientIdMachine, clientId, 23);
-	c->connectOptions.clientID.cstring = clientIdMachine;
-
-    strcpy(username, clientId + 24);
-	c->connectOptions.username.cstring = username;
-
-	c->connectOptions.password.cstring = authKey;
 	c->connectOptions.cleansession = 1;
+
+    memset(c->clientIdMachine, 0, MAX_BUFFER_SIZE);
+    strncpy(c->clientIdMachine, clientId, 23);
+    c->connectOptions.clientID.cstring = c->clientIdMachine;
+
+    memset(c->username, 0, MAX_BUFFER_SIZE);
+    strcpy(c->username, clientId + 24);
+    c->connectOptions.username.cstring = c->username;
+
+    memset(c->password, 0, MAX_BUFFER_SIZE);
+    strcpy(c->password, authKey);
+    c->connectOptions.password.cstring = c->password;
 
     MQTTConnect(c);
 }

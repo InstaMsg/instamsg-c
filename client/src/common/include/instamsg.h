@@ -108,6 +108,9 @@ struct InstaMsg {
     System systemUtils;
 
     MQTTPacket_connectData connectOptions;
+    unsigned char clientIdMachine[MAX_BUFFER_SIZE];
+    unsigned char username[MAX_BUFFER_SIZE];
+    unsigned char password[MAX_BUFFER_SIZE];
 };
 
 InstaMsg instaMsg;
