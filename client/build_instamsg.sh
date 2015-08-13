@@ -8,7 +8,7 @@ TOTAL_INCLUDES=`echo                                                \
 
 if [ -z "${SERIAL_COMMUNICATION_IMPL}" ];
 then
-    SERIAL_COMMUNICATION_IMPL="empty"
+    SERIAL_COMMUNICATION_IMPL="serial_empty"
 fi
 
 
