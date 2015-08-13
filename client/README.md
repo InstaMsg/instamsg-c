@@ -9,12 +9,14 @@ Add a topic, say "listener_topic" as a sub_topic for Client1, and as a pub_topic
 Also, add appropriate passwords.
 
 2)
-Compile the binary "stdoutsub", using "sh build.sh <device-name>"
+Compile the binary "stdoutsub", using 
+
+    ./build_instamsg.sh ./Makefile_Linux_Desktop
 
 3)
 In one terminal, fire the following for Client1
 
-	./stdoutsub "listener_topic" --clientid "920dfd80-2eef-11e5-b031" --username 34689524378f  --password ajaygarg456 --qos 0 --sub
+    build/linux_desktop/instamsg listener_topic --qos 2 --clientid 920dfd80-2eef-11e5-b031-34689524378f --password ajaygarg456 --log /home/ajay/subscriber --sub
 
 (NOTE THE SPLITTING of InstaMsg-Server-ClientId AS THE OPTIONS).
 
@@ -24,7 +26,7 @@ This should subscribe Client1 for topic "listener_topic" at the InstaMsg-Server,
 4)
 In second terminal (while the first terminal is still active), fire the following for Client2
 
-	./stdoutsub "listener_topic" --clientid "b5fb75e0-2ef1-11e5-86dd" --username 34689524378f  --password ajaygarg789 --qos 0 --pub --msg "this really works !!"
+    build/linux_desktop/instamsg listener_topic --qos 2 --clientid b5fb75e0-2ef1-11e5-86dd-34689524378f --password ajaygarg789 --log /home/ajay/publisher --pub --msg "Test"
 
 (AGAIN, NOTE THE SPLITTING of InstaMsg-Server-ClientId AS THE OPTIONS).
 
