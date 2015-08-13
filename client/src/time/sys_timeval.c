@@ -31,7 +31,7 @@ static void getOffset(Timer *timer, unsigned char *buf, int maxValueLenAllowed)
 }
 
 
-void startAndCountdownTimer(int seconds)
+static void startAndCountdownTimer(Timer *timer, int seconds)
 {
     sleep(seconds);
 }
@@ -41,6 +41,7 @@ void init_timer(Timer *timer, void *arg)
 {
     timer->getTimeIn_YYYYmmdd4HHMMSS = getTimeIn_YYYYmmdd4HHMMSS;
     timer->getOffset = getOffset;
+    timer->startAndCountdownTimer = startAndCountdownTimer;
 }
 
 

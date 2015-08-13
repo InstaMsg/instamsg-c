@@ -105,6 +105,7 @@ struct InstaMsg {
     unsigned char serverLoggingEnabled;
 
     Network ipstack;
+    Timer singletonUtilityTimer;
     FileSystem singletonUtilityFs;
     System systemUtils;
 

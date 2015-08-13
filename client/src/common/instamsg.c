@@ -524,6 +524,7 @@ void clearInstaMsg(InstaMsg *c)
 {
     release_system_utils(&(c->systemUtils));
     release_file_system(&(c->singletonUtilityFs));
+    release_timer(&(c->singletonUtilityTimer));
     release_network(&(c->ipstack));
 
     if(serialLoggerEnabled == 1)
@@ -570,6 +571,7 @@ void initInstaMsg(InstaMsg* c,
     }
 
 	init_network(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT);
+    init_timer(&(c->singletonUtilityTimer), NULL);
     init_file_system(&(c->singletonUtilityFs), "");
     init_system_utils(&(c->systemUtils), NULL);
 

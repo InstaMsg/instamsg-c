@@ -68,7 +68,7 @@ void* coreLoopyBusinessLogicInitiatedBySelf(void *arg)
 {
     int rc;
 
-    startAndCountdownTimer(3);
+    instaMsg.singletonUtilityTimer.startAndCountdownTimer(&(instaMsg.singletonUtilityTimer), 3);
 	if(opts_p->publish == 1)
 	{
         char buf[MAX_BUFFER_SIZE] = {0};

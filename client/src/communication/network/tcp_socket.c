@@ -21,6 +21,7 @@
 
 #include "instamsg_vendor.h"
 #include "../../common/include/globals.h"
+#include "../../common/include/instamsg.h"
 
 
 static void release_underlying_medium_guaranteed(Network* network)
@@ -78,7 +79,7 @@ static void connect_underlying_medium_guaranteed(Network* network, unsigned char
                 if(connect(network->socket, (struct sockaddr*)&address, sizeof(address)) != 0)
                 {
                     info_log("Could not connect to the network ... retrying");
-                    startAndCountdownTimer(1);
+                    instaMsg.singletonUtilityTimer.startAndCountdownTimer(&(instaMsg.singletonUtilityTimer), 1);
                 }
                 else
                 {
