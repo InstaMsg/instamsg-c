@@ -18,8 +18,6 @@ In one terminal, fire the following for Client1
 
     build/linux_desktop/instamsg listener_topic --qos 2 --clientid 920dfd80-2eef-11e5-b031-34689524378f --password ajaygarg456 --log /home/ajay/subscriber --sub
 
-(NOTE THE SPLITTING of InstaMsg-Server-ClientId AS THE OPTIONS).
-
 This should subscribe Client1 for topic "listener_topic" at the InstaMsg-Server, and must be confirmed from the console-logs of the InstaMsg-Server.
 
 
@@ -27,8 +25,6 @@ This should subscribe Client1 for topic "listener_topic" at the InstaMsg-Server,
 In second terminal (while the first terminal is still active), fire the following for Client2
 
     build/linux_desktop/instamsg listener_topic --qos 2 --clientid b5fb75e0-2ef1-11e5-86dd-34689524378f --password ajaygarg789 --log /home/ajay/publisher --pub --msg "Test"
-
-(AGAIN, NOTE THE SPLITTING of InstaMsg-Server-ClientId AS THE OPTIONS).
 
 This should publish the message on the topic "listener_topic" at the InstaMsg-Server (can be confirmed from the console-logs of the InstaMsg-Server).
 But most importantly, the message "this really works !!" must be received properly at Client1 in the first-terminal.
