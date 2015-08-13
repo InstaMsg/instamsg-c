@@ -21,7 +21,7 @@ struct Network
 struct FileSystem
 {
     FILE *fp;
-    COMMUNICATION_INTERFACE(FileSystem)
+    FILE_SYSTEM_INTERFACE
 };
 
 

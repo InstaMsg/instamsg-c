@@ -224,7 +224,7 @@ HTTPResponse downloadFile(const char *url,
             /*
              * Delete the file (it might have been downloaded partially some other time).
              */
-            delete_file_system(tempFileName);
+            instaMsg.singletonUtilityFs.deleteFile(&(instaMsg.singletonUtilityFs), tempFileName);
 
             FileSystem fs;
             init_file_system(&fs, (void *)tempFileName);
@@ -252,7 +252,7 @@ HTTPResponse downloadFile(const char *url,
              * If we reach here, the file has been downloaded successfully.
              * So, move the "temp"-file to the actual file.
              */
-            rename_file_system(tempFileName, filename);
+            instaMsg.singletonUtilityFs.renameFile(&(instaMsg.singletonUtilityFs), tempFileName, filename);
             info_log(FILE_DOWNLOAD "File [%s] successfully moved to [%s] worth [%ld] bytes", tempFileName, filename, numBytes);
 
 exit:
@@ -329,7 +329,7 @@ HTTPResponse uploadFile(const char *url,
     /*
      * Add the "Content-Length header
      */
-    numBytes = instaMsg.systemUtils.getFileSize(&(instaMsg.systemUtils), filename);
+    numBytes = instaMsg.singletonUtilityFs.getFileSize(&(instaMsg.singletonUtilityFs), filename);
     long totalLength = strlen(secondLevel) + numBytes + strlen(fourthLevel);
     i = 0;
 

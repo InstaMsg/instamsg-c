@@ -65,10 +65,38 @@ void release_network(Network *network);
 /*
  * Interface for sending/receiving bytes between the instamg-client (on the device) and the device-file(system).
  */
+#define FILE_SYSTEM_INTERFACE                                                                                       \
+    COMMUNICATION_INTERFACE(FileSystem)                                                                             \
+                                                                                                                    \
+    /*                                                                                                              \
+     * This method renames/moves a file, and returns SUCCESS (0) for success, else a non-zero value.                \
+     */                                                                                                             \
+    int (*renameFile)(FileSystem *fs, const char *oldPath, const char *newPath);                                    \
+                                                                                                                    \
+                                                                                                                    \
+    /*                                                                                                              \
+     * This method deletes a file, and returns SUCCESS (0) for success, else a non-zero value.                      \
+     */                                                                                                             \
+    int (*deleteFile)(FileSystem *fs, const char *filePath);                                                        \
+                                                                                                                    \
+                                                                                                                    \
+    /*                                                                                                              \
+     * This method returns the file-listing in the directory specified, and populates the "buf".                    \
+     * The format is ::                                                                                             \
+     *                                                                                                              \
+     *          {"publisher.sh":152,"subscriber.sh":140,"filetester.sh":137,"config.txt_filetester":148,"stdoutsub":56040,"build_ubuntu_14_04.sh":2892,"README.md":1502,"config.txt":128,"stdoutsub.c":6649,"config.txt_local_testing":128}                         \
+     */                                                                                                             \
+    void (*getFileListing)(FileSystem *fs, unsigned char *buf, int maxValueLenAllowed, const char *directoryPath);  \
+                                                                                                                    \
+                                                                                                                    \
+    /*                                                                                                              \
+     * This method returns a long-value, specifying the size of file in bytes.                                      \
+     */                                                                                                             \
+    long (*getFileSize)(FileSystem *fs, const char *filepath);
+
+
 typedef struct FileSystem FileSystem;
 void init_file_system(FileSystem *fs, void *arg);
-int rename_file_system(const char *oldPath, const char *newPath);
-int delete_file_system(const char *filePath);
 void release_file_system(FileSystem *fs);
 
 
@@ -121,13 +149,19 @@ void release_command_interface(Command *command);
      * Also, note that the "buf" will be all-0-initialized from the callee, so the vendor-implementation            \
      * does not need to bother about that.                                                                          \
      */                                                                                                             \
-    void (*getOffset)(Timer *timer, unsigned char *buf, int maxValueLenAllowed);
+    void (*getOffset)(Timer *timer, unsigned char *buf, int maxValueLenAllowed);                                    \
+                                                                                                                    \
+                                                                                                                    \
+    /*                                                                                                              \
+     * This method causes the current thread to wait for "n" seconds.                                               \
+     */                                                                                                             \
+    void (*startAndCountdownTimer)(Timer *timer, int n);
 
 
 typedef struct Timer Timer;
 void init_timer(Timer *timer, void *arg);
 void release_timer(Timer *timer);
-void startAndCountdownTimer(int seconds);
+
 
 
 /*
@@ -149,22 +183,10 @@ void startAndCountdownTimer(int seconds);
                                                                                                                     \
                                                                                                                     \
     /*                                                                                                              \
-     * Note that the "buf" will be all-0-initialized from the callee, so the vendor-implementation                  \
-     * does not need to bother about that.                                                                          \
-     */                                                                                                             \
-    void (*getFileListing)(System *system, unsigned char *buf, int maxValueLenAllowed, const char *directoryPath);  \
-                                                                                                                    \
-                                                                                                                    \
-    /*                                                                                                              \
      * Reboots the device.                                                                                          \
      */                                                                                                             \
     void (*rebootDevice)(System *system);                                                                           \
                                                                                                                     \
-                                                                                                                    \
-    /*                                                                                                              \
-     * Gets the file-size in bytes                                                                                  \
-     */                                                                                                             \
-    long (*getFileSize)(System *system, const char *filepath);
 
 typedef struct System System;
 void init_system_utils(System *system, void *arg);

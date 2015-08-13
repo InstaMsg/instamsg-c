@@ -421,7 +421,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     else if( (strcmp(method, "GET") == 0) && (strlen(filename) == 0))
     {
         unsigned char fileList[MAX_BUFFER_SIZE] = {0};
-        (c->systemUtils).getFileListing(&(c->systemUtils), fileList, MAX_BUFFER_SIZE, ".");
+        (c->singletonUtilityFs).getFileListing(&(c->singletonUtilityFs), fileList, MAX_BUFFER_SIZE, ".");
 
         info_log(FILE_LISTING ": [%s]", fileList);
 
@@ -429,7 +429,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     }
     else if( (strcmp(method, "DELETE") == 0) && (strlen(filename) > 0))
     {
-        int status = delete_file_system(filename);
+        int status = (c->singletonUtilityFs).deleteFile(&(c->singletonUtilityFs), filename);
         if(status == SUCCESS)
         {
             info_log(FILE_DELETE "[%s] deleted successfully.", filename);
@@ -523,6 +523,7 @@ void sendPingReqToServer(InstaMsg *c)
 void clearInstaMsg(InstaMsg *c)
 {
     release_system_utils(&(c->systemUtils));
+    release_file_system(&(c->singletonUtilityFs));
     release_network(&(c->ipstack));
 
     if(serialLoggerEnabled == 1)
@@ -569,6 +570,7 @@ void initInstaMsg(InstaMsg* c,
     }
 
 	init_network(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT);
+    init_file_system(&(c->singletonUtilityFs), "");
     init_system_utils(&(c->systemUtils), NULL);
 
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)

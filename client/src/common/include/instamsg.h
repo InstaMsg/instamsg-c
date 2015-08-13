@@ -105,6 +105,7 @@ struct InstaMsg {
     unsigned char serverLoggingEnabled;
 
     Network ipstack;
+    FileSystem singletonUtilityFs;
     System systemUtils;
 
     MQTTPacket_connectData connectOptions;
