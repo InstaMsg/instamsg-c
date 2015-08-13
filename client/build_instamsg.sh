@@ -48,10 +48,4 @@ do
     cp "${EXTRA_OBJECT_FILES_FOLDER}/${obj}" build/${VENDOR}
 done
 
-TOTAL_OBJECT_FILES=""
-for obj in `ls build/${VENDOR}`
-do
-    TOTAL_OBJECT_FILES=`echo ${TOTAL_OBJECT_FILES} build/${VENDOR}/${obj}`
-done
-
-${LINK_COMMAND} -o build/${VENDOR}/instamsg ${TOTAL_OBJECT_FILES}
+${LINK_COMMAND} build/${VENDOR}/*.o -o build/${VENDOR}/instamsg
