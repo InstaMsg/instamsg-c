@@ -720,9 +720,6 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                 char topicName[MAX_BUFFER_SIZE] = {0};
                 snprintf(topicName, strlen(topicPlusPayload.lenstring.data) - strlen(msg.payload) + 1, "%s", topicPlusPayload.lenstring.data);
 
-                debug_log("PUBLISH-topic = [%s]", topicName);
-                debug_log("PUBLISH-message-payload = [%s]", msg.payload);
-
                 if(topicName != NULL)
                 {
                     if(strcmp(topicName, c->filesTopic) == 0)
