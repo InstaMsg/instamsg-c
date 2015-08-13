@@ -21,7 +21,7 @@
 #include <string.h>
 #include <signal.h>
 
-static void serverLoggingTopicMessageArrived(MessageData *md)
+static void serverLoggingTopicMessageArrived(InstaMsg *c, MQTTMessage *msg)
 {
     /*
      * The payload is of the format ::
@@ -30,8 +30,6 @@ static void serverLoggingTopicMessageArrived(MessageData *md)
 
     const char *CLIENT_ID = "client_id";
     const char *LOGGING = "logging";
-
-    MQTTMessage *msg = md->message;
 
     char clientId[MAX_BUFFER_SIZE] = {0};
     char logging[MAX_BUFFER_SIZE] = {0};
@@ -43,12 +41,12 @@ static void serverLoggingTopicMessageArrived(MessageData *md)
     {
         if(atoi(logging) == 1)
         {
-            md->c->serverLoggingEnabled = 1;
+            c->serverLoggingEnabled = 1;
             info_log(SERVER_LOGGING "Enabled.");
         }
         else
         {
-            md->c->serverLoggingEnabled = 0;
+            c->serverLoggingEnabled = 0;
             info_log(SERVER_LOGGING "Disabled.");
         }
     }
@@ -730,6 +728,11 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                     if(strcmp(topicName, c->filesTopic) == 0)
                     {
                         handleFileTransfer(c, &msg);
+                        break;
+                    }
+                    else if(strcmp(topicName, c->enableServerLoggingTopic) == 0)
+                    {
+                        serverLoggingTopicMessageArrived(c, &msg);
                         break;
                     }
                     else if(strcmp(topicName, c->rebootTopic) == 0)

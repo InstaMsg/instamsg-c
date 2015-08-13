@@ -31,7 +31,7 @@
         MQTTPublish(&instaMsg,                                                                      \
                     instaMsg.serverLogsTopic,                                                       \
                     formatted_string,                                                               \
-                    QOS1,                                                                           \
+                    QOS0,                                                                           \
                     0,                                                                              \
                     NULL,                                                                           \
                     MQTT_RESULT_HANDLER_TIMEOUT,                                                    \
