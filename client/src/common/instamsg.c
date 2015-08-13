@@ -408,7 +408,11 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
          * IT MEANS THE FILE-TRANSFER COMPLETED, AND THAT TOO PERFECTLY SUCCESSFULLY.
          *
          */
-        HTTPResponse response = downloadFile(url, filename, NULL, NULL, 10);
+        HTTPResponse response = {0};
+
+#ifdef FILE_SYSTEM_INTERFACE_ENABLED
+        response = downloadFile(url, filename, NULL, NULL, 10);
+#endif
         if(response.status == HTTP_FILE_DOWNLOAD_SUCCESS)
         {
             ackStatus = 1;
@@ -419,15 +423,24 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     else if( (strcmp(method, "GET") == 0) && (strlen(filename) == 0))
     {
         unsigned char fileList[MAX_BUFFER_SIZE] = {0};
+
+#ifdef FILE_SYSTEM_INTERFACE_ENABLED
         (c->singletonUtilityFs).getFileListing(&(c->singletonUtilityFs), fileList, MAX_BUFFER_SIZE, ".");
+#else
+        strcat(fileList, "{}");
+#endif
 
         info_log(FILE_LISTING ": [%s]", fileList);
-
         sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"files\": %s}", messageId, fileList);
     }
     else if( (strcmp(method, "DELETE") == 0) && (strlen(filename) > 0))
     {
-        int status = (c->singletonUtilityFs).deleteFile(&(c->singletonUtilityFs), filename);
+        int status = FAILURE;
+
+#ifdef FILE_SYSTEM_INTERFACE_ENABLED
+        status = (c->singletonUtilityFs).deleteFile(&(c->singletonUtilityFs), filename);
+#endif
+
         if(status == SUCCESS)
         {
             info_log(FILE_DELETE "[%s] deleted successfully.", filename);
@@ -466,7 +479,11 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
                                     }
                                   };
 
-        HTTPResponse response = uploadFile(c->fileUploadUrl, filename, NULL, headers, 10);
+        HTTPResponse response = {0};
+
+#ifdef FILE_SYSTEM_INTERFACE_ENABLED
+        response = uploadFile(c->fileUploadUrl, filename, NULL, headers, 10);
+#endif
         if(response.status == HTTP_FILE_UPLOAD_SUCCESS)
         {
             sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"url\": \"%s\"}", messageId, response.body);
@@ -522,10 +539,17 @@ void clearInstaMsg(InstaMsg *c)
 {
     release_network(&(c->ipstack));
     release_system_utils(&(c->systemUtils));
+
+#ifdef FILE_SYSTEM_INTERFACE_ENABLED
     release_file_system(&(c->singletonUtilityFs));
+#endif
+
     release_timer(&(c->singletonUtilityTimer));
 
+#ifdef FILE_SYSTEM_INTERFACE_ENABLED
     release_file_logger(&fileLogger);
+#endif
+
     release_serial_logger(&serialLogger);
 }
 
@@ -546,10 +570,17 @@ void initInstaMsg(InstaMsg* c,
     currentLogLevel = LOG_LEVEL;
 
     init_serial_logger(&serialLogger, opts->logFilePath);
+
+#ifdef FILE_SYSTEM_INTERFACE_ENABLED
     init_file_logger(&fileLogger, opts->logFilePath);
+#endif
 
     init_timer(&(c->singletonUtilityTimer), NULL);
+
+#ifdef FILE_SYSTEM_INTERFACE_ENABLED
     init_file_system(&(c->singletonUtilityFs), "");
+#endif
+
     init_system_utils(&(c->systemUtils), NULL);
 	init_network(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT);
 

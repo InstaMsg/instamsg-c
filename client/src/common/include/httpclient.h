@@ -12,6 +12,7 @@ struct HTTPResponse
 };
 
 
+#ifdef FILE_SYSTEM_INTERFACE_ENABLED
 HTTPResponse downloadFile(const char *url,
                           const char *downloadedFileName,
                           KeyValuePairs *params,
@@ -25,4 +26,5 @@ HTTPResponse uploadFile(const char *url,
                         KeyValuePairs *headers,
                         unsigned int timeout);
 
+#endif
 #endif

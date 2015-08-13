@@ -106,7 +106,9 @@ struct InstaMsg {
 
     Network ipstack;
     Timer singletonUtilityTimer;
+#ifdef FILE_SYSTEM_INTERFACE_ENABLED
     FileSystem singletonUtilityFs;
+#endif
     System systemUtils;
 
     MQTTPacket_connectData connectOptions;

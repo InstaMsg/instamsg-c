@@ -3,6 +3,7 @@
 
 #include "instamsg_vendor.h"
 
+#ifdef FILE_SYSTEM_INTERFACE_ENABLED
 typedef struct FileLogger FileLogger;
 struct FileLogger
 {
@@ -13,6 +14,7 @@ void init_file_logger(FileLogger *fileLogger, void *arg);
 void release_file_logger(FileLogger *fileLogger);
 
 FileLogger fileLogger;
+#endif
 
 
 typedef struct SerialLogger SerialLogger;

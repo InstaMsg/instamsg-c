@@ -1,3 +1,5 @@
+#ifdef FILE_SYSTEM_INTERFACE_ENABLED
+
 #include "include/globals.h"
 #include "include/instamsg.h"
 #include "include/httpclient.h"
@@ -438,3 +440,4 @@ exit:
     info_log(FILE_UPLOAD "HTTP-Response Status = [%d]", response.status);
     return response;
 }
+#endif

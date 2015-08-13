@@ -62,6 +62,7 @@ void init_network(Network *network, const char *hostName, unsigned int port);
 void release_network(Network *network);
 
 
+#ifdef FILE_SYSTEM_INTERFACE_ENABLED
 /*
  * Interface for sending/receiving bytes between the instamg-client (on the device) and the device-file(system).
  */
@@ -98,6 +99,7 @@ void release_network(Network *network);
 typedef struct FileSystem FileSystem;
 void init_file_system(FileSystem *fs, void *arg);
 void release_file_system(FileSystem *fs);
+#endif
 
 
 /*
