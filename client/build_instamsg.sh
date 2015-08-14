@@ -17,29 +17,29 @@ then
 fi
 
 
-SOURCES=`echo                                                               \
-        stdoutsub                                                           \
-        src/common/instamsg                                                 \
-        src/common/log                                                      \
-        src/common/httpclient                                               \
-        src/common/json                                                     \
-                                                                            \
-        ../MQTTPacket/src/MQTTFormat                                        \
-        ../MQTTPacket/src/MQTTPacket                                        \
-        ../MQTTPacket/src/MQTTDeserializePublish                            \
-        ../MQTTPacket/src/MQTTConnectClient                                 \
-        ../MQTTPacket/src/MQTTSubscribeClient                               \
-        ../MQTTPacket/src/MQTTSerializePublish                              \
-        ../MQTTPacket/src/MQTTConnectServer                                 \
-        ../MQTTPacket/src/MQTTSubscribeServer                               \
-        ../MQTTPacket/src/MQTTUnsubscribeServer                             \
-        ../MQTTPacket/src/MQTTUnsubscribeClient                             \
-                                                                            \
-        src/system/${SYSTEM_IMPL}                                           \
-        src/time/${TIME_IMPL}                                               \
-        src/communication/network/${NETWORK_COMMUNICATION_IMPL}             \
-        src/communication/command/${COMMAND_SERIAL_COMMUNICATION_IMPL}      \
-        src/communication/serial/${LOGGER_SERIAL_COMMUNICATION_IMPL} `
+SOURCES=`echo                                                                       \
+        stdoutsub                                                                   \
+        src/common/instamsg                                                         \
+        src/common/log                                                              \
+        src/common/httpclient                                                       \
+        src/common/json                                                             \
+                                                                                    \
+        ../MQTTPacket/src/MQTTFormat                                                \
+        ../MQTTPacket/src/MQTTPacket                                                \
+        ../MQTTPacket/src/MQTTDeserializePublish                                    \
+        ../MQTTPacket/src/MQTTConnectClient                                         \
+        ../MQTTPacket/src/MQTTSubscribeClient                                       \
+        ../MQTTPacket/src/MQTTSerializePublish                                      \
+        ../MQTTPacket/src/MQTTConnectServer                                         \
+        ../MQTTPacket/src/MQTTSubscribeServer                                       \
+        ../MQTTPacket/src/MQTTUnsubscribeServer                                     \
+        ../MQTTPacket/src/MQTTUnsubscribeClient                                     \
+                                                                                    \
+        src/system/${SYSTEM_IMPL}                                                   \
+        src/time/${TIME_IMPL}                                                       \
+        src/communication/network/${NETWORK_COMMUNICATION_IMPL}                     \
+        src/communication/command_serial/${COMMAND_SERIAL_COMMUNICATION_IMPL}       \
+        src/communication/logger_serial/${LOGGER_SERIAL_COMMUNICATION_IMPL} `
 
 
 mkdir -p build/${VENDOR}
