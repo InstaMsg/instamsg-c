@@ -20,7 +20,7 @@ FileLogger fileLogger;
 typedef struct SerialLogger SerialLogger;
 struct SerialLogger
 {
-    Serial serial;
+    SerialLoggerInterface serialLoggerInterface;
 };
 
 void init_serial_logger(SerialLogger *serialLogger, void *arg);

@@ -15,28 +15,28 @@
 #include "../../common/include/globals.h"
 
 
-static int linux_serial_read(Serial *serial, unsigned char* buffer, int len, unsigned char guaranteed)
+static int linux_serial_logger_read(SerialLoggerInterface *serialLoggerInterface, unsigned char* buffer, int len, unsigned char guaranteed)
 {
     return SUCCESS;
 }
 
 
-static int linux_serial_write(Serial *serial, unsigned char* buffer, int len)
+static int linux_serial_logger_write(SerialLoggerInterface *serialLoggerInterface, unsigned char* buffer, int len)
 {
     return SUCCESS;
 }
 
 
-void init_serial_interface(Serial *serial, void *arg)
+void init_serial_logger_interface(SerialLoggerInterface *serialLoggerInterface, void *arg)
 {
     // Register read-callback.
-	serial->read = linux_serial_read;
+	serialLoggerInterface->read = linux_serial_logger_read;
 
     // Register write-callback.
-	serial->write = linux_serial_write;
+	serialLoggerInterface->write = linux_serial_logger_write;
 }
 
 
-void release_serial_interface(Serial *serial)
+void release_serial_logger_interface(SerialLoggerInterface *serialLoggerInterface)
 {
 }

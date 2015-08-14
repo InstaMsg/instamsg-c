@@ -41,7 +41,8 @@
     }                                                                                                   \
     else if(level <= currentLogLevel)                                                                   \
     {                                                                                                   \
-        serialLogger.serial.write(&(serialLogger.serial), formatted_string, strlen(formatted_string));  \
+        serialLogger.serialLoggerInterface.write(                                                       \
+                &(serialLogger.serialLoggerInterface), formatted_string, strlen(formatted_string));     \
         fileLogger.fs.write(&(fileLogger.fs), formatted_string, strlen(formatted_string));              \
     }
 #else
@@ -70,7 +71,8 @@
     }                                                                                                   \
     else if(level <= currentLogLevel)                                                                   \
     {                                                                                                   \
-        serialLogger.serial.write(&(serialLogger.serial), formatted_string, strlen(formatted_string));  \
+        serialLogger.serialLoggerInterface.write(                                                       \
+                &(serialLogger.serialLoggerInterface), formatted_string, strlen(formatted_string));     \
     }
 #endif
 
@@ -94,7 +96,7 @@ void release_file_logger(FileLogger *fileLogger)
 void init_serial_logger(SerialLogger *serialLogger, void *arg)
 {
     // Here, physical medium is a serial-interface.
-	init_serial_interface(&(serialLogger->serial), arg);
+	init_serial_logger_interface(&(serialLogger->serialLoggerInterface), arg);
 }
 
 
@@ -102,7 +104,7 @@ void release_serial_logger(SerialLogger *serialLogger)
 {
     info_log("FREEING [LOG] RESOURCES (SERIAL-BASES).\n");
 
-    release_serial_interface(&(serialLogger->serial));
+    release_serial_logger_interface(&(serialLogger->serialLoggerInterface));
 }
 
 

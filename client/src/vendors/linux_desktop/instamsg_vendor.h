@@ -27,9 +27,9 @@ struct FileSystem
 #endif
 
 
-struct Serial
+struct SerialLoggerInterface
 {
-    COMMUNICATION_INTERFACE(Serial)
+    COMMUNICATION_INTERFACE(SerialLoggerInterface)
 };
 
 

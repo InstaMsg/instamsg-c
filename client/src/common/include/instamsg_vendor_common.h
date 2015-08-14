@@ -108,9 +108,9 @@ void release_file_system(FileSystem *fs);
 /*
  * Interface for sending/receiving bytes over a serial-interface (eg. UART).
  */
-typedef struct Serial Serial;
-void init_serial_interface(Serial *serial, void *arg);
-void release_serial_interface(Serial *Serial);
+typedef struct SerialLoggerInterface SerialLoggerInterface;
+void init_serial_logger_interface(SerialLoggerInterface *serialLoggerInterface, void *arg);
+void release_serial_logger_interface(SerialLoggerInterface *serialLoggerInterface);
 
 
 /*
