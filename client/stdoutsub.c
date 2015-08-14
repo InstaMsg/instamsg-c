@@ -100,7 +100,7 @@ static void messageArrived(MessageData* md)
 
 static int onConnectOneTimeOperations()
 {
-    info_log("Connected successfully");
+    info_log("Connected successfully to InstaMsg-Server.");
 
 	if(opts_p->subscribe == 1)
 	{
@@ -285,12 +285,30 @@ int main(int argc, char** argv)
             */
             readAndProcessIncomingMQTTPacketsIfAny(&instaMsg);
             removeExpiredResultHandlers(&instaMsg);
-            sendPingReqToServer(&instaMsg);
 
-            /*
-            * Application-Specific Cycles
-            */
-            coreLoopyBusinessLogicInitiatedBySelf(NULL);
+            if(instaMsg.connected == 1)
+            {
+                sendPingReqToServer(&instaMsg);
+
+                /*
+                * Application-Specific Cycles
+                */
+                coreLoopyBusinessLogicInitiatedBySelf(NULL);
+            }
+            else
+            {
+                static int connectionAttempts = 0;
+                connectionAttempts++;
+
+                error_log("Network is fine at physical layer, but no connection established (yet) with InstaMsg-Server.");
+                if(connectionAttempts > MAX_CONN_ATTEMPTS_WITH_PHYSICAL_LAYER_FINE)
+                {
+                    connectionAttempts = 0;
+                    error_log("Connection-Attempts exhausted ... so trying with re-initializing the network-physical layer.");
+
+                    instaMsg.ipstack.socketCorrupted = 1;
+                }
+            }
         }
     }
 }

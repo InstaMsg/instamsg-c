@@ -47,6 +47,7 @@ struct KeyValuePairs
 
 #define NETWORK_READ_TIMEOUT_SECS 1
 #define MAX_TRIES_ALLOWED_WHILE_READING_FROM_NETWORK_MEDIUM 5
+#define MAX_CONN_ATTEMPTS_WITH_PHYSICAL_LAYER_FINE 5
 ///////////////////////////////////////////////////////////////////////////////
 
 #endif

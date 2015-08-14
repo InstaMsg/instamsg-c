@@ -551,6 +551,8 @@ void clearInstaMsg(InstaMsg *c)
 #endif
 
     release_serial_logger(&serialLogger);
+
+    c->connected = 0;
 }
 
 
@@ -632,6 +634,7 @@ void initInstaMsg(InstaMsg* c,
     strcpy(c->password, authKey);
     c->connectOptions.password.cstring = c->password;
 
+    c->connected = 0;
     MQTTConnect(c);
 }
 
@@ -660,6 +663,8 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                 {
                     if(connack_rc == 0x00)  // Connection Accepted
                     {
+                        c->connected = 1;
+
                         if(c->onConnectCallback != NULL)
                         {
                             c->onConnectCallback();

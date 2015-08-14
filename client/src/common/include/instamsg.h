@@ -115,6 +115,8 @@ struct InstaMsg {
     unsigned char clientIdMachine[MAX_BUFFER_SIZE];
     unsigned char username[MAX_BUFFER_SIZE];
     unsigned char password[MAX_BUFFER_SIZE];
+
+    unsigned char connected;
 };
 
 InstaMsg instaMsg;
