@@ -8,12 +8,12 @@ TOTAL_INCLUDES=`echo                                                \
 
 if [ -z "${LOGGER_SERIAL_COMMUNICATION_IMPL}" ];
 then
-    LOGGER_SERIAL_COMMUNICATION_IMPL="logger_serial_empty"
+    SERIAL_LOGGER_COMMUNICATION_IMPL="serial_logger_empty"
 fi
 
 if [ -z "${COMMAND_SERIAL_COMMUNICATION_IMPL}" ];
 then
-    COMMAND_SERIAL_COMMUNICATION_IMPL="command_serial_empty"
+    SERIAL_COMMAND_COMMUNICATION_IMPL="serial_command_empty"
 fi
 
 
@@ -38,8 +38,8 @@ SOURCES=`echo                                                                   
         src/system/${SYSTEM_IMPL}                                                   \
         src/time/${TIME_IMPL}                                                       \
         src/communication/network/${NETWORK_COMMUNICATION_IMPL}                     \
-        src/communication/command_serial/${COMMAND_SERIAL_COMMUNICATION_IMPL}       \
-        src/communication/logger_serial/${LOGGER_SERIAL_COMMUNICATION_IMPL} `
+        src/communication/serial_command/${SERIAL_COMMAND_COMMUNICATION_IMPL}       \
+        src/communication/serial_logger/${SERIAL_LOGGER_COMMUNICATION_IMPL} `
 
 
 mkdir -p build/${VENDOR}
