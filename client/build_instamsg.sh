@@ -6,14 +6,14 @@ TOTAL_INCLUDES=`echo                                                \
         -I ../MQTTPacket/src    `
 
 
-if [ -z "${LOGGER_SERIAL_COMMUNICATION_IMPL}" ];
+if [ -z "${SERIAL_LOGGER_COMMUNICATION_IMPL}" ];
 then
     SERIAL_LOGGER_COMMUNICATION_IMPL="serial_logger_empty"
 fi
 
-if [ -z "${COMMAND_SERIAL_COMMUNICATION_IMPL}" ];
+if [ -z "${MODBUS_COMMAND_COMMUNICATION_IMPL}" ];
 then
-    SERIAL_COMMAND_COMMUNICATION_IMPL="serial_command_empty"
+    MODBUS_COMMAND_COMMUNICATION_IMPL="modbus_command_empty"
 fi
 
 
@@ -38,7 +38,7 @@ SOURCES=`echo                                                                   
         src/system/${SYSTEM_IMPL}                                                   \
         src/time/${TIME_IMPL}                                                       \
         src/communication/network/${NETWORK_COMMUNICATION_IMPL}                     \
-        src/communication/serial_command/${SERIAL_COMMAND_COMMUNICATION_IMPL}       \
+        src/communication/modbus_command/${MODBUS_COMMAND_COMMUNICATION_IMPL}       \
         src/communication/serial_logger/${SERIAL_LOGGER_COMMUNICATION_IMPL} `
 
 
