@@ -663,6 +663,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                         if(c->onConnectCallback != NULL)
                         {
                             c->onConnectCallback();
+                            c->onConnectCallback = NULL;
                         }
                     }
                     else
