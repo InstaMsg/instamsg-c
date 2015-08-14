@@ -6,35 +6,40 @@ TOTAL_INCLUDES=`echo                                                \
         -I ../MQTTPacket/src    `
 
 
-if [ -z "${SERIAL_COMMUNICATION_IMPL}" ];
+if [ -z "${LOGGER_SERIAL_COMMUNICATION_IMPL}" ];
 then
-    SERIAL_COMMUNICATION_IMPL="serial_empty"
+    LOGGER_SERIAL_COMMUNICATION_IMPL="logger_serial_empty"
+fi
+
+if [ -z "${COMMAND_SERIAL_COMMUNICATION_IMPL}" ];
+then
+    COMMAND_SERIAL_COMMUNICATION_IMPL="command_serial_empty"
 fi
 
 
-SOURCES=`echo                                                       \
-        stdoutsub                                                   \
-        src/common/instamsg                                         \
-        src/common/log                                              \
-        src/common/httpclient                                       \
-        src/common/json                                             \
-                                                                    \
-        ../MQTTPacket/src/MQTTFormat                                \
-        ../MQTTPacket/src/MQTTPacket                                \
-        ../MQTTPacket/src/MQTTDeserializePublish                    \
-        ../MQTTPacket/src/MQTTConnectClient                         \
-        ../MQTTPacket/src/MQTTSubscribeClient                       \
-        ../MQTTPacket/src/MQTTSerializePublish                      \
-        ../MQTTPacket/src/MQTTConnectServer                         \
-        ../MQTTPacket/src/MQTTSubscribeServer                       \
-        ../MQTTPacket/src/MQTTUnsubscribeServer                     \
-        ../MQTTPacket/src/MQTTUnsubscribeClient                     \
-                                                                    \
-        src/system/${SYSTEM_IMPL}                                   \
-        src/time/${TIME_IMPL}                                       \
-        src/communication/network/${NETWORK_COMMUNICATION_IMPL}     \
-        src/communication/command/${COMMAND_COMMUNICATION_IMPL}     \
-        src/communication/serial/${SERIAL_COMMUNICATION_IMPL} `
+SOURCES=`echo                                                               \
+        stdoutsub                                                           \
+        src/common/instamsg                                                 \
+        src/common/log                                                      \
+        src/common/httpclient                                               \
+        src/common/json                                                     \
+                                                                            \
+        ../MQTTPacket/src/MQTTFormat                                        \
+        ../MQTTPacket/src/MQTTPacket                                        \
+        ../MQTTPacket/src/MQTTDeserializePublish                            \
+        ../MQTTPacket/src/MQTTConnectClient                                 \
+        ../MQTTPacket/src/MQTTSubscribeClient                               \
+        ../MQTTPacket/src/MQTTSerializePublish                              \
+        ../MQTTPacket/src/MQTTConnectServer                                 \
+        ../MQTTPacket/src/MQTTSubscribeServer                               \
+        ../MQTTPacket/src/MQTTUnsubscribeServer                             \
+        ../MQTTPacket/src/MQTTUnsubscribeClient                             \
+                                                                            \
+        src/system/${SYSTEM_IMPL}                                           \
+        src/time/${TIME_IMPL}                                               \
+        src/communication/network/${NETWORK_COMMUNICATION_IMPL}             \
+        src/communication/command/${COMMAND_SERIAL_COMMUNICATION_IMPL}      \
+        src/communication/serial/${LOGGER_SERIAL_COMMUNICATION_IMPL} `
 
 
 mkdir -p build/${VENDOR}
