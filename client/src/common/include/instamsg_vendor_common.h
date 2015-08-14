@@ -119,9 +119,9 @@ void release_serial_logger_interface(SerialLoggerInterface *serialLoggerInterfac
  * Generally, the interface would be a serial-port, through which the instamsg-client can send the command-bytes, and
  * receive the command-response-bytes.
  */
-typedef struct Command Command;
-void init_command_interface(Command *command, void *arg);
-void release_command_interface(Command *command);
+typedef struct ModbusCommandInterface ModbusCommandInterface;
+void init_modbus_command_interface(ModbusCommandInterface *modbusCommandInterface, void *arg);
+void release_modbus_command_interface(ModbusCommandInterface *modbusCommandInterface);
 
 
 /*

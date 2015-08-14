@@ -33,9 +33,9 @@ struct SerialLoggerInterface
 };
 
 
-struct Command
+struct ModbusCommandInterface
 {
-    COMMUNICATION_INTERFACE(Command)
+    COMMUNICATION_INTERFACE(ModbusCommandInterface)
 };
 
 

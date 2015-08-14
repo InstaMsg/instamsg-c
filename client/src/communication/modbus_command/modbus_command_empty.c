@@ -9,28 +9,28 @@
 #include "../../common/include/globals.h"
 
 
-static int linux_command_stub_read(Command* command, unsigned char* buffer, int len, unsigned char guaranteed)
+static int modbus_command_stub_read(ModbusCommandInterface* modbusCommandInterface, unsigned char* buffer, int len, unsigned char guaranteed)
 {
     return SUCCESS;
 }
 
 
-static int linux_command_stub_write(Command* fs, unsigned char* buffer, int len)
+static int modbus_command_stub_write(ModbusCommandInterface* modbusCommandInterface, unsigned char* buffer, int len)
 {
     return SUCCESS;
 }
 
 
-void init_command_interface(Command *command, void *arg)
+void init_modbus_command_interface(ModbusCommandInterface *modbusCommandInterface, void *arg)
 {
     // Register read-callback.
-	command->read = linux_command_stub_read;
+	modbusCommandInterface->read = modbus_command_stub_read;
 
     // Register write-callback.
-	command->write = linux_command_stub_write;
+	modbusCommandInterface->write = modbus_command_stub_write;
 }
 
 
-void release_command_interface(Command *command)
+void release_modbus_command_interface(ModbusCommandInterface *modbusCommandInterface)
 {
 }
