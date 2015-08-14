@@ -6,6 +6,9 @@
  * The following two "read" and "write" functions must return "FAILURE" """immediately""" on the
  * first error encountered on the underlying communication-medium (eg. socket, file, serial-port, etc).
  *
+ * Alternatively, if it is a "read" function and "guaranteed" parameter is 0 (meaning it is a non-blocking function) and
+ * the time-expires without any data being read, the "read" function must return SOCKET_READ_TIMEOUT.
+ *
  * When the calling-function receives "FAILURE", it cleans up the communication-medium itself, and re-initializes
  * the communication-medium.
  *
