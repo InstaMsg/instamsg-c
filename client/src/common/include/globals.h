@@ -35,6 +35,8 @@ struct KeyValuePairs
 #define SOCKET_READ     "[SOCKET-READ] "
 #define SOCKET_WRITE    "[SOCKET-WRITE] "
 
+#define NETWORK_NOT_AVAILABLE "Could not connect to the network at physical-layer ... retrying"
+#define MAX_CONN_ATTEMPTS_WITH_PHYSICAL_LAYER_FINE 5
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -43,11 +45,9 @@ struct KeyValuePairs
 #define INSTAMSG_HTTP_HOST  "localhost"
 #define INSTAMSG_HTTP_PORT  80
 #define LOG_LEVEL           2
-#define USE_SERIAL_LOGGER   0
 
 #define NETWORK_READ_TIMEOUT_SECS 1
 #define MAX_TRIES_ALLOWED_WHILE_READING_FROM_NETWORK_MEDIUM 5
-#define MAX_CONN_ATTEMPTS_WITH_PHYSICAL_LAYER_FINE 5
 ///////////////////////////////////////////////////////////////////////////////
 
 #endif

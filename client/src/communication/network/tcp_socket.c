@@ -78,7 +78,7 @@ static void connect_underlying_medium_guaranteed(Network* network, unsigned char
 			    int opt = 1;
                 if(connect(network->socket, (struct sockaddr*)&address, sizeof(address)) != 0)
                 {
-                    info_log("Could not connect to the network ... retrying");
+                    info_log(NETWORK_NOT_AVAILABLE);
                     instaMsg.singletonUtilityTimer.startAndCountdownTimer(&(instaMsg.singletonUtilityTimer), 1);
                 }
                 else
