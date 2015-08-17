@@ -42,7 +42,7 @@ SOURCES=`echo                                                                   
 
 
 mkdir -p build/${VENDOR}
-rm -f build/${VENDOR}/*.o
+rm -f build/${VENDOR}/*
 rm -f build/${VENDOR}/instamsg
 
 # Compile the File-System-Module only if applicable.
