@@ -63,7 +63,7 @@ done
 
 for obj in ${EXTRA_OBJECT_FILES}
 do
-    cp "${EXTRA_OBJECT_FILES_FOLDER}/${obj}" build/${VENDOR}
+    cp ${obj} build/${VENDOR}
 done
 
 ${LINK_COMMAND} build/${VENDOR}/*.o -o build/${VENDOR}/instamsg
