@@ -1,0 +1,21 @@
+SYSTEM_INCLUDES=`echo                                               \
+        -I/usr/lib/gcc/i686-linux-gnu/4.8/include                   \
+        -I/usr/local/include                                        \
+        -I/usr/lib/gcc/i686-linux-gnu/4.8/include-fixed             \
+        -I/usr/include/i386-linux-gnu                               \
+        -I/usr/include  `
+
+VENDOR="ar501"
+
+SYSTEM_IMPL="ar501_system"
+TIME_IMPL="ar501_time"
+NETWORK_COMMUNICATION_IMPL="ar501_gsm"
+FS_COMMUNICATION_IMPL=""
+MODBUS_COMMAND_COMMUNICATION_IMPL=""
+SERIAL_LOGGER_COMMUNICATION_IMPL="ar501_serial"
+
+EXTRA_OBJECT_FILES_FOLDER=""
+EXTRA_OBJECT_FILES=""
+
+COMPILE_COMMAND="gcc -nostdinc"
+LINK_COMMAND="gcc"
