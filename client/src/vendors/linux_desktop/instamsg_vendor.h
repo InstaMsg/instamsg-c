@@ -52,4 +52,6 @@ struct System
     SYSTEM_INTERFACE
 };
 
+#define SYSTEM_GLOBAL_INIT  ;   // Nothing to be done as such for Linux-Desktop
+
 #endif
