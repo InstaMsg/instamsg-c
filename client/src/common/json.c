@@ -3,6 +3,7 @@
 
 #include "include/globals.h"
 #include "include/log.h"
+#include "include/json.h"
 
 
 /*
@@ -14,16 +15,16 @@
  * The key/value can be without double-quotes or single-quotes, but we will return them as a string nevertheless
  * (the calling-function will do the necessary conversions as necessary).
  */
-void getJsonKeyValueIfPresent(unsigned char *json, const unsigned char *key, unsigned char *buf)
+void getJsonKeyValueIfPresent(char *json, const char *key, char *buf)
 {
     unsigned char NOT_FOUND = ' ';
-    unsigned char *jsonStartingPointer = json;
+    char *jsonStartingPointer = json;
 
-    unsigned char parsedKeyToken[MAX_BUFFER_SIZE] = {0};
-    unsigned char parsedValueToken[MAX_BUFFER_SIZE] = {0};
+    char parsedKeyToken[MAX_BUFFER_SIZE] = {0};
+    char parsedValueToken[MAX_BUFFER_SIZE] = {0};
 
     unsigned char keyWrapper = NOT_FOUND;
-    unsigned char *token = parsedKeyToken;
+    char *token = parsedKeyToken;
 
     while(*json)
     {

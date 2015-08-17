@@ -18,10 +18,9 @@ fi
 
 
 SOURCES=`echo                                                                       \
-        stdoutsub                                                                   \
+        ${MAIN_CLASS}                                                               \
         src/common/instamsg                                                         \
         src/common/log                                                              \
-        src/common/httpclient                                                       \
         src/common/json                                                             \
                                                                                     \
         ../MQTTPacket/src/MQTTFormat                                                \
@@ -50,7 +49,9 @@ rm -f build/${VENDOR}/instamsg
 if [ ! -z ${FS_COMMUNICATION_IMPL} ];
 then
     COMPILE_COMMAND="${COMPILE_COMMAND} -DFILE_SYSTEM_INTERFACE_ENABLED"
+
     ${COMPILE_COMMAND} ${TOTAL_INCLUDES} -c "src/communication/fs/${FS_COMMUNICATION_IMPL}.c" -o "build/${VENDOR}/${FS_COMMUNICATION_IMPL}.o"
+    ${COMPILE_COMMAND} ${TOTAL_INCLUDES} -c "src/common/httpclient.c" -o "build/${VENDOR}/httpclient.o"
 fi
 
 for source in ${SOURCES}

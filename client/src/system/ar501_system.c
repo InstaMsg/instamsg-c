@@ -9,14 +9,16 @@
 #include <string.h>
 
 #include "instamsg_vendor.h"
+#include "atoll_common.h"
+#include "atoll_gsm.h"
 
-static void getManufacturer(System *system, unsigned char *buf, int maxValueLenAllowed)
+static void getManufacturer(System *system, char *buf, int maxValueLenAllowed)
 {
     snprintf(buf, maxValueLenAllowed, "ATOLL");
 }
 
 
-static void getSerialNumber(System *system, unsigned char *buf, int maxValueLenAllowed)
+static void getSerialNumber(System *system, char *buf, int maxValueLenAllowed)
 {
     snprintf(buf, maxValueLenAllowed, "RANDOM-ATOLL-SERIAL");
 }

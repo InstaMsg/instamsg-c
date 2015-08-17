@@ -18,7 +18,7 @@
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
 #define LOG_COMMON_CODE(level)                                                                          \
                                                                                                         \
-    unsigned char formatted_string[MAX_BUFFER_SIZE] = {0};                                              \
+    char formatted_string[MAX_BUFFER_SIZE] = {0};                                                       \
     va_list argptr;                                                                                     \
                                                                                                         \
     va_start(argptr, fmt);                                                                              \
@@ -42,13 +42,14 @@
     else if(level <= currentLogLevel)                                                                   \
     {                                                                                                   \
         serialLogger.serialLoggerInterface.write(                                                       \
-                &(serialLogger.serialLoggerInterface), formatted_string, strlen(formatted_string));     \
+                &(serialLogger.serialLoggerInterface),                                                  \
+                (unsigned char*)formatted_string, strlen(formatted_string));                            \
         fileLogger.fs.write(&(fileLogger.fs), formatted_string, strlen(formatted_string));              \
     }
 #else
 #define LOG_COMMON_CODE(level)                                                                          \
                                                                                                         \
-    unsigned char formatted_string[MAX_BUFFER_SIZE] = {0};                                              \
+    char formatted_string[MAX_BUFFER_SIZE] = {0};                                                       \
     va_list argptr;                                                                                     \
                                                                                                         \
     va_start(argptr, fmt);                                                                              \
@@ -72,7 +73,8 @@
     else if(level <= currentLogLevel)                                                                   \
     {                                                                                                   \
         serialLogger.serialLoggerInterface.write(                                                       \
-                &(serialLogger.serialLoggerInterface), formatted_string, strlen(formatted_string));     \
+                &(serialLogger.serialLoggerInterface),                                                  \
+                (unsigned char*)formatted_string, strlen(formatted_string));                            \
     }
 #endif
 

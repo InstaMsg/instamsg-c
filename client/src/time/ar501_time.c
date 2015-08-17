@@ -4,18 +4,19 @@
  *    Ajay Garg <ajay.garg@sensegrow.com>
  *******************************************************************************/
 
+#include <stdio.h>
 
 #include "instamsg_vendor.h"
 #include "atoll_common.h"
 
 
-static void getTimeIn_YYYYmmdd4HHMMSS(Timer *timer, unsigned char *buf, int maxValueLenAllowed)
+static void getTimeIn_YYYYmmdd4HHMMSS(Timer *timer, char *buf, int maxValueLenAllowed)
 {
-    strftime(buf, maxValueLenAllowed, "YYYYmmdd4HHMMSS");
+    sprintf(buf, "YYYYmmdd4HHMMSS");
 }
 
 
-static void getOffset(Timer *timer, unsigned char *buf, int maxValueLenAllowed)
+static void getOffset(Timer *timer, char *buf, int maxValueLenAllowed)
 {
     snprintf(buf, maxValueLenAllowed, "19800");
 }

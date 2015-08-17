@@ -17,9 +17,11 @@
 
 #include "include/instamsg.h"
 #include "include/httpclient.h"
+#include "include/json.h"
 
 #include <string.h>
 #include <signal.h>
+#include <stdlib.h>
 
 static void serverLoggingTopicMessageArrived(InstaMsg *c, MQTTMessage *msg)
 {
@@ -181,7 +183,6 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
      */
     unsigned char i;
     int multiplier = 1;
-    const int MAX_NO_OF_REMAINING_LENGTH_BYTES = 4;
 
     rem_len = 0;
     do
@@ -285,8 +286,8 @@ static int deliverMessageToSelf(InstaMsg* c, MQTTString* topicName, MQTTMessage*
     enum QoS qos = (message->fixedHeaderPlusMsgId).fixedHeader.qos;
     if (qos != QOS0)
     {
-        char buf[MAX_BUFFER_SIZE];
-        int len;
+        unsigned char buf[MAX_BUFFER_SIZE];
+        int len = 0;
 
         if (qos == QOS1)
         {
@@ -349,19 +350,22 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
 
     if(strlen(replyTopic) == 0)
     {
-        return logJsonFailureMessageAndReturn(REPLY_TOPIC, msg);
+        logJsonFailureMessageAndReturn(REPLY_TOPIC, msg);
+        return;
     }
     if(strlen(messageId) == 0)
     {
-        return logJsonFailureMessageAndReturn(MESSAGE_ID, msg);
+        logJsonFailureMessageAndReturn(MESSAGE_ID, msg);
+        return;
     }
     if(strlen(method) == 0)
     {
-        return logJsonFailureMessageAndReturn(METHOD, msg);
+        logJsonFailureMessageAndReturn(METHOD, msg);
+        return;
     }
 
 
-    unsigned char ackMessage[MAX_BUFFER_SIZE] = {0};
+    char ackMessage[MAX_BUFFER_SIZE] = {0};
 
     if( (   (strcmp(method, "POST") == 0) || (strcmp(method, "PUT") == 0)   ) &&
             (strlen(filename) > 0) &&
@@ -422,7 +426,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     }
     else if( (strcmp(method, "GET") == 0) && (strlen(filename) == 0))
     {
-        unsigned char fileList[MAX_BUFFER_SIZE] = {0};
+        char fileList[MAX_BUFFER_SIZE] = {0};
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
         (c->singletonUtilityFs).getFileListing(&(c->singletonUtilityFs), fileList, MAX_BUFFER_SIZE, ".");
@@ -457,6 +461,9 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         char clientIdNotSplitted[MAX_BUFFER_SIZE] = {0};
         sprintf(clientIdNotSplitted, "%s-%s", c->connectOptions.clientID.cstring, c->connectOptions.username.cstring);
 
+        HTTPResponse response = {0};
+
+#ifdef FILE_SYSTEM_INTERFACE_ENABLED
         KeyValuePairs headers[] = {
                                     {
                                         "Authorization",
@@ -479,9 +486,6 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
                                     }
                                   };
 
-        HTTPResponse response = {0};
-
-#ifdef FILE_SYSTEM_INTERFACE_ENABLED
         response = uploadFile(c->fileUploadUrl, filename, NULL, headers, 10);
 #endif
         if(response.status == HTTP_FILE_UPLOAD_SUCCESS)
@@ -768,7 +772,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
             {
                 int msgId = fireResultHandlerUsingMsgIdAsTheKey(c);
 
-                char buf[MAX_BUFFER_SIZE];
+                unsigned char buf[MAX_BUFFER_SIZE];
                 if ((len = MQTTSerialize_ack(buf, MAX_BUFFER_SIZE, PUBREL, 0, msgId)) <= 0)
                 {
                     goto exit;
@@ -801,13 +805,13 @@ exit:
 
 void* MQTTConnect(void* arg)
 {
-    char buf[MAX_BUFFER_SIZE];
+    unsigned char buf[MAX_BUFFER_SIZE];
     int len = 0;
 
     InstaMsg *c = (InstaMsg *)arg;
     if ((len = MQTTSerialize_connect(buf, MAX_BUFFER_SIZE, &(c->connectOptions))) <= 0)
     {
-        return;
+        return NULL;
     }
 
     sendPacket(c, buf, len);
@@ -826,7 +830,7 @@ int MQTTSubscribe(InstaMsg* c,
     int rc = FAILURE;
     int len = 0;
     int id;
-    char buf[MAX_BUFFER_SIZE];
+    unsigned char buf[MAX_BUFFER_SIZE];
 
     MQTTString topic = MQTTString_initializer;
     topic.cstring = (char *)topicName;
@@ -871,7 +875,7 @@ exit:
 int MQTTUnsubscribe(InstaMsg* c, const char* topicFilter)
 {
     int rc = FAILURE;
-    char buf[MAX_BUFFER_SIZE];
+    unsigned char buf[MAX_BUFFER_SIZE];
 
     MQTTString topic = MQTTString_initializer;
     topic.cstring = (char *)topicFilter;
@@ -898,12 +902,12 @@ int MQTTPublish(InstaMsg* c,
                 const char logging)
 {
     int rc = FAILURE;
-    char buf[MAX_BUFFER_SIZE];
+    unsigned char buf[MAX_BUFFER_SIZE];
 
     MQTTString topic = MQTTString_initializer;
     topic.cstring = (char *)topicName;
     int len = 0;
-    int id;
+    int id = -1;
 
     if (qos == QOS1 || qos == QOS2)
     {
@@ -937,7 +941,7 @@ exit:
 int MQTTDisconnect(InstaMsg* c)
 {
     int rc = FAILURE;
-    char buf[MAX_BUFFER_SIZE];
+    unsigned char buf[MAX_BUFFER_SIZE];
 
     int len = MQTTSerialize_disconnect(buf, MAX_BUFFER_SIZE);
     if (len > 0)

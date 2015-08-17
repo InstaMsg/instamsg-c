@@ -142,7 +142,7 @@ void release_modbus_command_interface(ModbusCommandInterface *modbusCommandInter
      * Also, note that the "buf" will be all-0-initialized from the callee, so the vendor-implementation            \
      * does not need to bother about that.                                                                          \
      */                                                                                                             \
-    void (*getTimeIn_YYYYmmdd4HHMMSS)(Timer *timer, unsigned char *buf, int maxValueLenAllowed);                    \
+    void (*getTimeIn_YYYYmmdd4HHMMSS)(Timer *timer, char *buf, int maxValueLenAllowed);                             \
                                                                                                                     \
                                                                                                                     \
     /*                                                                                                              \
@@ -154,7 +154,7 @@ void release_modbus_command_interface(ModbusCommandInterface *modbusCommandInter
      * Also, note that the "buf" will be all-0-initialized from the callee, so the vendor-implementation            \
      * does not need to bother about that.                                                                          \
      */                                                                                                             \
-    void (*getOffset)(Timer *timer, unsigned char *buf, int maxValueLenAllowed);                                    \
+    void (*getOffset)(Timer *timer, char *buf, int maxValueLenAllowed);                                             \
                                                                                                                     \
                                                                                                                     \
     /*                                                                                                              \
@@ -177,14 +177,14 @@ void release_timer(Timer *timer);
      * Note that the "buf" will be all-0-initialized from the callee, so the vendor-implementation                  \
      * does not need to bother about that.                                                                          \
      */                                                                                                             \
-    void (*getManufacturer)(System *system, unsigned char *buf, int maxValueLenAllowed);                            \
+    void (*getManufacturer)(System *system, char *buf, int maxValueLenAllowed);                                     \
                                                                                                                     \
                                                                                                                     \
     /*                                                                                                              \
      * Note that the "buf" will be all-0-initialized from the callee, so the vendor-implementation                  \
      * does not need to bother about that.                                                                          \
      */                                                                                                             \
-    void (*getSerialNumber)(System *system, unsigned char *buf, int maxValueLenAllowed);                            \
+    void (*getSerialNumber)(System *system, char *buf, int maxValueLenAllowed);                                     \
                                                                                                                     \
                                                                                                                     \
     /*                                                                                                              \
@@ -196,6 +196,7 @@ void release_timer(Timer *timer);
 typedef struct System System;
 void init_system_utils(System *system, void *arg);
 void release_system_utils(System *system);
+void SYSTEM_GLOBAL_INIT();
 
 
 #endif

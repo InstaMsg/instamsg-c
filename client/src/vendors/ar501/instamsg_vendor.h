@@ -6,7 +6,7 @@
 
 struct Network
 {
-    unsigned char host[MAX_BUFFER_SIZE];
+    char host[MAX_BUFFER_SIZE];
     int port;
 
     unsigned char socketCorrupted;

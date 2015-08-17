@@ -54,33 +54,38 @@
 
 
 
+#if 0
 static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
     info_log("PUBACK received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
 }
 
 
-void* coreLoopyBusinessLogicInitiatedBySelf(void *arg)
+static int coreLoopyBusinessLogicInitiatedBySelf(void *arg)
 {
+    return SUCCESS;
 }
 
+#endif
 
+#if 0
 static void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
     info_log("SUBACK received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
 }
-
 
 static void messageArrived(MessageData* md)
 {
 	MQTTMessage* message = md->message;
     info_log("%.*s", (int)message->payloadlen, (char*)message->payload);
 }
+#endif
 
 
 static int onConnectOneTimeOperations()
 {
     info_log("Connected successfully to InstaMsg-Server.");
+    return SUCCESS;
 }
 
 

@@ -96,11 +96,11 @@ struct InstaMsg {
     int (*onDisconnectCallback)();
     int (*oneToOneMessageCallback)();
 
-    unsigned char filesTopic[MAX_BUFFER_SIZE];
-    unsigned char rebootTopic[MAX_BUFFER_SIZE];
-    unsigned char enableServerLoggingTopic[MAX_BUFFER_SIZE];
-    unsigned char serverLogsTopic[MAX_BUFFER_SIZE];
-    unsigned char fileUploadUrl[MAX_BUFFER_SIZE];
+    char filesTopic[MAX_BUFFER_SIZE];
+    char rebootTopic[MAX_BUFFER_SIZE];
+    char enableServerLoggingTopic[MAX_BUFFER_SIZE];
+    char serverLogsTopic[MAX_BUFFER_SIZE];
+    char fileUploadUrl[MAX_BUFFER_SIZE];
 
     unsigned char serverLoggingEnabled;
 
@@ -112,9 +112,9 @@ struct InstaMsg {
     System systemUtils;
 
     MQTTPacket_connectData connectOptions;
-    unsigned char clientIdMachine[MAX_BUFFER_SIZE];
-    unsigned char username[MAX_BUFFER_SIZE];
-    unsigned char password[MAX_BUFFER_SIZE];
+    char clientIdMachine[MAX_BUFFER_SIZE];
+    char username[MAX_BUFFER_SIZE];
+    char password[MAX_BUFFER_SIZE];
 
     unsigned char connected;
 };

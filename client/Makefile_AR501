@@ -1,9 +1,5 @@
 SYSTEM_INCLUDES=`echo                                               \
-        -I/usr/lib/gcc/i686-linux-gnu/4.8/include                   \
-        -I/usr/local/include                                        \
-        -I/usr/lib/gcc/i686-linux-gnu/4.8/include-fixed             \
-        -I/usr/include/i386-linux-gnu                               \
-        -I/usr/include  `
+          `
 
 VENDOR="ar501"
 
@@ -12,10 +8,23 @@ TIME_IMPL="ar501_time"
 NETWORK_COMMUNICATION_IMPL="ar501_gsm"
 FS_COMMUNICATION_IMPL=""
 MODBUS_COMMAND_COMMUNICATION_IMPL=""
-SERIAL_LOGGER_COMMUNICATION_IMPL="ar501_serial"
+SERIAL_LOGGER_COMMUNICATION_IMPL="ar501_serial_logger"
 
 EXTRA_OBJECT_FILES_FOLDER=""
 EXTRA_OBJECT_FILES=""
 
-COMPILE_COMMAND="gcc -nostdinc"
-LINK_COMMAND="gcc"
+MAIN_CLASS="device"
+
+#################################################################
+MCU="TM4C123GH6PM"
+TIVAWARE_PATH="../embedded-flash-environment/tivaware"
+#################################################################
+
+COMPILE_COMMAND="../embedded-flash-environment/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-gcc  -g -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -Os -ffunction-sections -fdata-sections -MD -std=c99 -Wall -pedantic -DPART_${MCU} -c -I${TIVAWARE_PATH} -I../../../vendors/tiva_tm4c123gxl -DTARGET_IS_BLIZZARD_RA1 "
+
+
+#################################################################
+LD_SCRIPT="../embedded-flash-environment/tiva-template/${MCU}.ld"
+#################################################################
+
+LINK_COMMAND="../embedded-flash-environment/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-ld -T ${LD_SCRIPT} --entry ResetISR --gc-sections "
