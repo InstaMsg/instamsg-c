@@ -10,13 +10,13 @@
 
 #include "instamsg_vendor.h"
 
-static void getManufacturer(System *system, unsigned char *buf, int maxValueLenAllowed)
+static void getManufacturer(System *system, char *buf, int maxValueLenAllowed)
 {
     snprintf(buf, maxValueLenAllowed, "HP");
 }
 
 
-static void getSerialNumber(System *system, unsigned char *buf, int maxValueLenAllowed)
+static void getSerialNumber(System *system, char *buf, int maxValueLenAllowed)
 {
     snprintf(buf, maxValueLenAllowed, "123456789");
 }

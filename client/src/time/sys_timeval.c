@@ -13,7 +13,7 @@
 #include "instamsg_vendor.h"
 
 
-static void getTimeIn_YYYYmmdd4HHMMSS(Timer *timer, unsigned char *buf, int maxValueLenAllowed)
+static void getTimeIn_YYYYmmdd4HHMMSS(Timer *timer, char *buf, int maxValueLenAllowed)
 {
     time_t time_t_time;
     struct tm* tm_info;
@@ -25,7 +25,7 @@ static void getTimeIn_YYYYmmdd4HHMMSS(Timer *timer, unsigned char *buf, int maxV
 }
 
 
-static void getOffset(Timer *timer, unsigned char *buf, int maxValueLenAllowed)
+static void getOffset(Timer *timer, char *buf, int maxValueLenAllowed)
 {
     snprintf(buf, maxValueLenAllowed, "19800");
 }
