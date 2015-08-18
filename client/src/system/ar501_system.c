@@ -5,9 +5,6 @@
  *******************************************************************************/
 
 
-#include <stdio.h>
-#include <string.h>
-
 #include "instamsg_vendor.h"
 
 
@@ -18,7 +15,7 @@
  *
  * Also, the device-implementation must take care that the manufacturer-value (including null-terminator)
  * is not greater than "maxValueLenAllowed".
-*/
+ */
 static void getManufacturer(System *system, char *buf, int maxValueLenAllowed)
 {
 }
@@ -31,7 +28,7 @@ static void getManufacturer(System *system, char *buf, int maxValueLenAllowed)
  *
  * Also, the device-implementation must take care that the serial-number-value (including null-terminator)
  * is not greater than "maxValueLenAllowed".
-*/
+ */
 static void getSerialNumber(System *system, char *buf, int maxValueLenAllowed)
 {
 }

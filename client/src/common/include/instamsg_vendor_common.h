@@ -142,7 +142,7 @@ void release_modbus_command_interface(ModbusCommandInterface *modbusCommandInter
      * Also, note that the "buf" will be all-0-initialized from the callee, so the vendor-implementation            \
      * does not need to bother about that.                                                                          \
      */                                                                                                             \
-    void (*getTimeIn_YYYYmmdd4HHMMSS)(Timer *timer, char *buf, int maxValueLenAllowed);                             \
+    void (*getTimeIn_YYYYmmdd4HHMMSS)(Timer *timer, char *buf);                                                     \
                                                                                                                     \
                                                                                                                     \
     /*                                                                                                              \
@@ -154,7 +154,7 @@ void release_modbus_command_interface(ModbusCommandInterface *modbusCommandInter
      * Also, note that the "buf" will be all-0-initialized from the callee, so the vendor-implementation            \
      * does not need to bother about that.                                                                          \
      */                                                                                                             \
-    void (*getOffset)(Timer *timer, char *buf, int maxValueLenAllowed);                                             \
+    void (*getOffset)(Timer *timer, char *buf);                                                                     \
                                                                                                                     \
                                                                                                                     \
     /*                                                                                                              \
