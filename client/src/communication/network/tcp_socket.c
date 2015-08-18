@@ -30,7 +30,7 @@ static void release_underlying_medium_guaranteed(Network* network)
 }
 
 
-static void connect_underlying_medium_guaranteed(Network* network, unsigned char *hostName, int port)
+static void connect_underlying_medium_try_once(Network* network, unsigned char *hostName, int port)
 {
 	int type = SOCK_STREAM;
 	struct sockaddr_in address;
@@ -70,7 +70,7 @@ static void connect_underlying_medium_guaranteed(Network* network, unsigned char
 
 	if (rc == SUCCESS)
 	{
-        while(1)
+        if(1)
         {
 		    network->socket = socket(family, type, 0);
 		    if (network->socket != -1)
@@ -80,11 +80,11 @@ static void connect_underlying_medium_guaranteed(Network* network, unsigned char
                 {
                     info_log(NETWORK_NOT_AVAILABLE);
                     instaMsg.singletonUtilityTimer.startAndCountdownTimer(&(instaMsg.singletonUtilityTimer), 1);
+                    return;
                 }
                 else
                 {
                     network->socketCorrupted = 0;
-                    break;
                 }
 		    }
         }
@@ -250,7 +250,7 @@ void init_network(Network *network, const char *hostName, unsigned int port)
     network->port = port;
 
     // Connect the medium (socket).
-    connect_underlying_medium_guaranteed(network, network->host, network->port);
+    connect_underlying_medium_try_once(network, network->host, network->port);
 }
 
 

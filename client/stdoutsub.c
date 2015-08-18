@@ -58,68 +58,6 @@ char *topic;
 
 struct opts_struct *opts_p;
 
-static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
-{
-    info_log("PUBACK received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
-}
-
-
-void* coreLoopyBusinessLogicInitiatedBySelf(void *arg)
-{
-    int rc;
-
-    instaMsg.singletonUtilityTimer.startAndCountdownTimer(&(instaMsg.singletonUtilityTimer), 3);
-	if(opts_p->publish == 1)
-	{
-        char buf[MAX_BUFFER_SIZE] = {0};
-
-        static int counter;
-        counter++;
-        sprintf(buf, "%s %d", opts_p->msg, counter);
-
-		info_log("Publishing message [%s] to %s", buf, topic);
-		rc = MQTTPublish(&instaMsg, topic, (const char*)buf, opts_p->qos, 0,
-                         publishAckReceived, MQTT_RESULT_HANDLER_TIMEOUT, 0, 1);
-		info_log("Published %d", rc);
-	}
-}
-
-
-static void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
-{
-    info_log("SUBACK received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
-}
-
-
-static void messageArrived(MessageData* md)
-{
-	MQTTMessage* message = md->message;
-    info_log("%.*s", (int)message->payloadlen, (char*)message->payload);
-}
-
-
-static int onConnectOneTimeOperations()
-{
-    info_log("Connected successfully to InstaMsg-Server.");
-
-	if(opts_p->subscribe == 1)
-	{
-    	info_log("Subscribing to %s", topic);
-		int rc = MQTTSubscribe(&instaMsg, topic, opts_p->qos, messageArrived, subscribeAckReceived, MQTT_RESULT_HANDLER_TIMEOUT);
-		info_log("Subscribed %d", rc);
-	}
-}
-
-
-static int onDisconnect()
-{
-    info_log("Disconnect \"callback\" called.. not really needed, as MQTT-Disconnect does not get any response from server. "
-           "So, no async-callback required as such.\n");
-
-	return 0;
-}
-
-
 void usage()
 {
 	printf("MQTT stdout subscriber\n");
@@ -241,6 +179,68 @@ void getopts(int argc, char** argv, struct opts_struct *opts)
 }
 
 
+static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
+{
+    info_log("PUBACK received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
+}
+
+
+void coreLoopyBusinessLogicInitiatedBySelf()
+{
+    int rc;
+
+    instaMsg.singletonUtilityTimer.startAndCountdownTimer(&(instaMsg.singletonUtilityTimer), 3);
+	if(opts_p->publish == 1)
+	{
+        char buf[MAX_BUFFER_SIZE] = {0};
+
+        static int counter;
+        counter++;
+        sprintf(buf, "%s %d", opts_p->msg, counter);
+
+		info_log("Publishing message [%s] to %s", buf, topic);
+		rc = MQTTPublish(&instaMsg, topic, (const char*)buf, opts_p->qos, 0,
+                         publishAckReceived, MQTT_RESULT_HANDLER_TIMEOUT, 0, 1);
+		info_log("Published %d", rc);
+	}
+}
+
+
+static void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
+{
+    info_log("SUBACK received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
+}
+
+
+static void messageArrived(MessageData* md)
+{
+	MQTTMessage* message = md->message;
+    info_log("%.*s", (int)message->payloadlen, (char*)message->payload);
+}
+
+
+static int onConnectOneTimeOperations()
+{
+	if(opts_p->subscribe == 1)
+	{
+    	info_log("Subscribing to %s", topic);
+		int rc = MQTTSubscribe(&instaMsg, topic, opts_p->qos, messageArrived, subscribeAckReceived, MQTT_RESULT_HANDLER_TIMEOUT);
+		info_log("Subscribed %d", rc);
+	}
+
+    return 0;
+}
+
+
+static int onDisconnect()
+{
+    info_log("Disconnect \"callback\" called.. not really needed, as MQTT-Disconnect does not get any response from server. "
+           "So, no async-callback required as such.\n");
+
+	return 0;
+}
+
+
 int main(int argc, char** argv)
 {
     struct opts_struct opts =
@@ -268,48 +268,7 @@ int main(int argc, char** argv)
 	signal(SIGTERM, cfinish);
 
 
-    while(1)
-    {
-        initInstaMsg(&instaMsg, opts.clientid, opts.password, onConnectOneTimeOperations, onDisconnect, NULL, &opts);
-
-        while(1)
-        {
-            if(instaMsg.ipstack.socketCorrupted == 1)
-            {
-                clearInstaMsg(&instaMsg);
-                break;
-            }
-
-            /*
-            * InstaMsg-Specific Cycles
-            */
-            readAndProcessIncomingMQTTPacketsIfAny(&instaMsg);
-            removeExpiredResultHandlers(&instaMsg);
-
-            if(instaMsg.connected == 1)
-            {
-                sendPingReqToServer(&instaMsg);
-
-                /*
-                * Application-Specific Cycles
-                */
-                coreLoopyBusinessLogicInitiatedBySelf(NULL);
-            }
-            else
-            {
-                static int connectionAttempts = 0;
-                connectionAttempts++;
-
-                error_log("Network is fine at physical layer, but no connection established (yet) with InstaMsg-Server.");
-                if(connectionAttempts > MAX_CONN_ATTEMPTS_WITH_PHYSICAL_LAYER_FINE)
-                {
-                    connectionAttempts = 0;
-                    error_log("Connection-Attempts exhausted ... so trying with re-initializing the network-physical layer.");
-
-                    instaMsg.ipstack.socketCorrupted = 1;
-                }
-            }
-        }
-    }
+    start(&instaMsg, opts.clientid, opts.password, onConnectOneTimeOperations, onDisconnect, NULL,
+          coreLoopyBusinessLogicInitiatedBySelf, opts.logFilePath);
 }
 

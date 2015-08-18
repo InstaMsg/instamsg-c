@@ -18,7 +18,7 @@ static void release_underlying_medium_guaranteed(Network* network)
 }
 
 
-static void connect_underlying_medium_guaranteed(Network* network, char *hostName, int port)
+static void connect_underlying_medium_try_once(Network* network, char *hostName, int port)
 {
     info_log("TCP-SOCKET UNDERLYING_MEDIUM INITIATED FOR HOST = [%s], PORT = [%d].",
              network->host, network->port);
@@ -51,7 +51,7 @@ void init_network(Network *network, const char *hostName, unsigned int port)
     network->port = port;
 
     // Connect the medium (socket).
-    connect_underlying_medium_guaranteed(network, network->host, network->port);
+    connect_underlying_medium_try_once(network, network->host, network->port);
 }
 
 

@@ -35,7 +35,7 @@ struct KeyValuePairs
 #define SOCKET_READ     "[SOCKET-READ] "
 #define SOCKET_WRITE    "[SOCKET-WRITE] "
 
-#define NETWORK_NOT_AVAILABLE "Could not connect to the network at physical-layer ... retrying"
+#define NETWORK_NOT_AVAILABLE "Could not connect to the network at physical-layer ... not retrying"
 #define MAX_CONN_ATTEMPTS_WITH_PHYSICAL_LAYER_FINE 5
 
 

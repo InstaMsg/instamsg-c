@@ -530,6 +530,12 @@ void removeExpiredResultHandlers(InstaMsg *c)
 
 void sendPingReqToServer(InstaMsg *c)
 {
+    if((c->ipstack).socketCorrupted == 1)
+    {
+        error_log("Network not available at physical layer .. so server cannot be pinged for maintaining keep-alive.");
+        return;
+    }
+
     unsigned char buf[1000];
     int len = MQTTSerialize_pingreq(buf, 1000);
     if (len > 0)
@@ -566,7 +572,7 @@ void initInstaMsg(InstaMsg* c,
                   int (*connectHandler)(),
                   int (*disconnectHandler)(),
                   int (*oneToOneMessageHandler)(),
-                  struct opts_struct *opts)
+                  char *logFilePath)
 {
     int i;
 
@@ -578,7 +584,7 @@ void initInstaMsg(InstaMsg* c,
     init_serial_logger(&serialLogger, NULL);
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
-    init_file_logger(&fileLogger, opts->logFilePath);
+    init_file_logger(&fileLogger, logFilePath);
 #endif
 
     init_timer(&(c->singletonUtilityTimer), NULL);
@@ -588,7 +594,13 @@ void initInstaMsg(InstaMsg* c,
 #endif
 
     init_system_utils(&(c->systemUtils), NULL);
+
+    (c->ipstack).socketCorrupted = 1;
 	init_network(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT);
+    if((c->ipstack).socketCorrupted ==1)
+    {
+        return;
+    }
 
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {
@@ -667,6 +679,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                 {
                     if(connack_rc == 0x00)  // Connection Accepted
                     {
+                        info_log("Connected successfully to InstaMsg-Server.");
                         c->connected = 1;
 
                         if(c->onConnectCallback != NULL)
@@ -953,5 +966,60 @@ int MQTTDisconnect(InstaMsg* c)
     }
 
     return rc;
+}
+
+
+void start(InstaMsg *c, char *clientId, char *password,
+           int (*onConnectOneTimeOperations)(),
+           int (*onDisconnect)(),
+           int (*oneToOneMessageHandler)(),
+           void (*coreLoopyBusinessLogicInitiatedBySelf)(),
+           char *logFilePath)
+{
+    while(1)
+    {
+        initInstaMsg(c, clientId, password, onConnectOneTimeOperations, onDisconnect, oneToOneMessageHandler, logFilePath);
+
+        while(1)
+        {
+            if((c->ipstack).socketCorrupted == 1)
+            {
+                error_log("Network not available at physical layer .. so nothing can be read from network.");
+            }
+            else
+            {
+                readAndProcessIncomingMQTTPacketsIfAny(c);
+            }
+
+            removeExpiredResultHandlers(c);
+            coreLoopyBusinessLogicInitiatedBySelf(NULL);
+
+            // This is 1 means physical-network is fine, AND connection to InstaMsg-Server is fine at protocol level.
+            if(c->connected == 1)
+            {
+                sendPingReqToServer(c);
+            }
+            else if((c->ipstack).socketCorrupted == 0)
+            {
+                static int connectionAttempts = 0;
+                connectionAttempts++;
+
+                error_log("Network is fine at physical layer, but no connection established (yet) with InstaMsg-Server.");
+                if(connectionAttempts > MAX_CONN_ATTEMPTS_WITH_PHYSICAL_LAYER_FINE)
+                {
+                    connectionAttempts = 0;
+                    error_log("Connection-Attempts exhausted ... so trying with re-initializing the network-physical layer.");
+
+                    (c->ipstack).socketCorrupted = 1;
+                }
+            }
+
+            if((c->ipstack).socketCorrupted == 1)
+            {
+                clearInstaMsg(&instaMsg);
+                break;
+            }
+        }
+    }
 }
 

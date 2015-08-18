@@ -152,7 +152,7 @@ void initInstaMsg(InstaMsg* c,
                   int (*connectHandler)(),
                   int (*disconnectHandler)(),
                   int (*oneToOneMessageHandler)(),
-                  struct opts_struct *opts);
+                  char *logFilePath);
 
 
 typedef struct JSONParseStuff JSONParseStuff;
@@ -175,6 +175,12 @@ struct JSONParseStuff
 void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c);
 void removeExpiredResultHandlers(InstaMsg *c);
 void sendPingReqToServer(InstaMsg *c);
+void start(InstaMsg *c, char *clientId, char *password,
+           int (*onConnectOneTimeOperations)(),
+           int (*onDisconnect)(),
+           int (*oneToOneMessageHandler)(),
+           void (*coreLoopyBusinessLogicInitiatedBySelf)(),
+           char *logFilePath);
 
 #define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}
 #endif
