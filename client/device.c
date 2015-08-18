@@ -10,6 +10,6 @@ void coreLoopyBusinessLogicInitiatedBySelf()
 int main(int argc, char** argv)
 {
     SYSTEM_GLOBAL_INIT();
-    start((&instaMsg, "00125580-e29a-11e4-ace1-bc764e102b63", "password", NULL, NULL, NULL, NULL);
+    start(&instaMsg, "00125580-e29a-11e4-ace1-bc764e102b63", "password", NULL, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, NULL);
 }
 
