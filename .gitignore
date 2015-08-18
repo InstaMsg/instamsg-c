@@ -56,3 +56,4 @@ client/tiva_tm4c123gxl_blinky/tiva_build/
 client/src/communication/serial_logger/tiva_tm4c123gxl_uart/tiva_build/
 
 build/
+tiva_cross_compilation_checks/

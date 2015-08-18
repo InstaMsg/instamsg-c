@@ -18,6 +18,7 @@ fi
 
 
 SOURCES=`echo                                                                       \
+        ${EXTRA_SOURCES}                                                            \
         ${MAIN_CLASS}                                                               \
         src/common/instamsg                                                         \
         src/common/log                                                              \
@@ -66,4 +67,9 @@ do
     cp ${obj} build/${VENDOR}
 done
 
-${LINK_COMMAND} build/${VENDOR}/*.o -o build/${VENDOR}/instamsg
+${LINK_COMMAND} build/${VENDOR}/*.o build/${VENDOR}/*.obj -o build/${VENDOR}/instamsg
+
+for cmd in "${FINAL_COMMANDS[@]}"
+do
+    $cmd
+done
