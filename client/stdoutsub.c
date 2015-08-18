@@ -243,6 +243,8 @@ static int onDisconnect()
 
 int main(int argc, char** argv)
 {
+    SYSTEM_GLOBAL_INIT();
+
     struct opts_struct opts =
     {
         (char*)"stdout-subscriber", 0, (char*)"\n", QOS2, NULL, (char*)"localhost", 1883, 0, 0, 0, ""
