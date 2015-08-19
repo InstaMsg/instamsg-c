@@ -13,7 +13,7 @@
  * Note that the "buf" will be all-0-initialized from the callee, so the vendor-implementation
  * does not need to bother about that.
  *
- * Also, the device-implementation must take care that the manufacturer-value (including null-terminator)
+ * Also, the device-implementation must take care that the length of manufacturer-value (including null-terminator)
  * is not greater than "maxValueLenAllowed".
  */
 static void getManufacturer(System *system, char *buf, int maxValueLenAllowed)
@@ -26,7 +26,7 @@ static void getManufacturer(System *system, char *buf, int maxValueLenAllowed)
  * Note that the "buf" will be all-0-initialized from the callee, so the vendor-implementation
  * does not need to bother about that.
  *
- * Also, the device-implementation must take care that the serial-number-value (including null-terminator)
+ * Also, the device-implementation must take care that the length of serial-number-value (including null-terminator)
  * is not greater than "maxValueLenAllowed".
  */
 static void getSerialNumber(System *system, char *buf, int maxValueLenAllowed)
