@@ -175,7 +175,7 @@ struct JSONParseStuff
 void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c);
 void removeExpiredResultHandlers(InstaMsg *c);
 void sendPingReqToServer(InstaMsg *c);
-void start(InstaMsg *c, char *clientId, char *password,
+void start(char *clientId, char *password,
            int (*onConnectOneTimeOperations)(),
            int (*onDisconnect)(),
            int (*oneToOneMessageHandler)(),

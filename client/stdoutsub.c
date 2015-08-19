@@ -270,7 +270,7 @@ int main(int argc, char** argv)
 	signal(SIGTERM, cfinish);
 
 
-    start(&instaMsg, opts.clientid, opts.password, onConnectOneTimeOperations, onDisconnect, NULL,
+    start(opts.clientid, opts.password, onConnectOneTimeOperations, onDisconnect, NULL,
           coreLoopyBusinessLogicInitiatedBySelf, opts.logFilePath);
 }
 

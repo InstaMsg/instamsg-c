@@ -969,13 +969,15 @@ int MQTTDisconnect(InstaMsg* c)
 }
 
 
-void start(InstaMsg *c, char *clientId, char *password,
+void start(char *clientId, char *password,
            int (*onConnectOneTimeOperations)(),
            int (*onDisconnect)(),
            int (*oneToOneMessageHandler)(),
            void (*coreLoopyBusinessLogicInitiatedBySelf)(),
            char *logFilePath)
 {
+    InstaMsg *c = &instaMsg;
+
     while(1)
     {
         initInstaMsg(c, clientId, password, onConnectOneTimeOperations, onDisconnect, oneToOneMessageHandler, logFilePath);
