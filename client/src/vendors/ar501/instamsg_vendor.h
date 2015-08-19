@@ -1,11 +1,22 @@
 #ifndef INSTAMSG_VENDOR
 #define INSTAMSG_VENDOR
 
-#include "../../common/include/globals.h"
 #include "../../common/include/instamsg_vendor_common.h"
+#include "../../common/include/globals.h"
+
+/*
+ * VERY IMPORTANT NOTE ::
+ *
+ * A device-implementor is free to add any additional fields/variables in the following structs, which can
+ * then be accessed through the struct-pointers passed to the APIs.
+ *
+ */
+
 
 struct Network
 {
+    // Feel free to add any additional fields as desired.
+
     char host[MAX_BUFFER_SIZE];
     int port;
 
@@ -17,25 +28,32 @@ struct Network
 
 struct SerialLoggerInterface
 {
-    COMMUNICATION_INTERFACE(SerialLoggerInterface)
+    // Feel free to add any additional fields as desired.
+
+    int (*write)(SerialLoggerInterface *serialLoggerInterface, unsigned char* buffer, int len);
 };
 
 
 struct ModbusCommandInterface
 {
+    // Feel free to add any additional fields as desired.
+
     COMMUNICATION_INTERFACE(ModbusCommandInterface)
 };
 
 
-#include <sys/time.h>
 struct Timer
 {
+    // Feel free to add any additional fields as desired.
+
     TIMER_INTERFACE
 };
 
 
 struct System
 {
+    // Feel free to add any additional fields as desired.
+
     SYSTEM_INTERFACE
 };
 

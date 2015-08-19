@@ -5,41 +5,45 @@
  *
  *******************************************************************************/
 
-#include <stdio.h>
 
 #include "instamsg_vendor.h"
-#include "atoll_common.h"
-
-#include "../../common/include/globals.h"
 
 
-static int ar501_uart_read(SerialLoggerInterface *serialLoggerInterface, unsigned char* buffer, int len, unsigned char guaranteed)
+/*
+ * This method writes to the serial-logger-interface.
+ *
+ * This method is just for debugging-purposes.
+ *
+ * For example, in an embedded-device where UART is available, we could connect the UART to a serial-terminal on a desktop,
+ * and see the logs there, which will help greatly in debugging.
+ *
+ * PLEASE NOTE THAT THIS METHOD MUST NOT BLOCK, for eg. if the UART-write buffers are full, then this method MUST NOT wait
+ * for the buffers to become empty; instead, the method must return immediately.
+ *
+ * Note that the UART-write-buffers-full scenario is a very likely one (when there is no serial-cable attached between
+ * embedded-device and laptop).
+ *
+ * If all "len" bytes are written, this method must return SUCCESS.
+ * If all "len" bytes could not be written, this method must return FAILURE.
+ */
+static int ar501_serial_logger_write(SerialLoggerInterface *serialLoggerInterface, unsigned char* buffer, int len)
 {
-    return SUCCESS;
 }
 
 
-static int ar501_uart_write(SerialLoggerInterface *serialLoggerInterface, unsigned char* buffer, int len)
-{
-    char finalStringToSend[MAX_BUFFER_SIZE] = {0};
-    sprintf(finalStringToSend, "\r\n%s", buffer);
-
-    AtollUart0_StringSend(finalStringToSend);
-
-    return SUCCESS;
-}
-
-
+/*
+ * NOTHING EXTRA NEEDS TO BE DONE HERE.
+ */
 void init_serial_logger_interface(SerialLoggerInterface *serialLoggerInterface, void *arg)
 {
-    // Register read-callback.
-	serialLoggerInterface->read = ar501_uart_read;
-
     // Register write-callback.
-	serialLoggerInterface->write = ar501_uart_write;
+	serialLoggerInterface->write = ar501_serial_logger_write;
 }
 
 
+/*
+ * NOTHING EXTRA NEEDS TO BE DONE HERE.
+ */
 void release_serial_logger_interface(SerialLoggerInterface *serialLoggerInterface)
 {
 }

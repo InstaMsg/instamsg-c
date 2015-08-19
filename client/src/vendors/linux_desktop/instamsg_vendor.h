@@ -1,8 +1,8 @@
 #ifndef INSTAMSG_VENDOR
 #define INSTAMSG_VENDOR
 
-#include "../../common/include/globals.h"
 #include "../../common/include/instamsg_vendor_common.h"
+#include "../../common/include/globals.h"
 
 struct Network
 {
@@ -29,7 +29,7 @@ struct FileSystem
 
 struct SerialLoggerInterface
 {
-    COMMUNICATION_INTERFACE(SerialLoggerInterface)
+    int (*write)(SerialLoggerInterface *serialLoggerInterface, unsigned char* buffer, int len);
 };
 
 
