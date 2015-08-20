@@ -20,7 +20,6 @@
 #include "include/json.h"
 
 #include <string.h>
-#include <signal.h>
 
 static void serverLoggingTopicMessageArrived(InstaMsg *c, MQTTMessage *msg)
 {
@@ -574,10 +573,6 @@ void initInstaMsg(InstaMsg* c,
                   char *logFilePath)
 {
     int i;
-
-    // VERY IMPORTANT: If this is not done, the "write" on an invalid socket will cause program-crash
-    signal(SIGPIPE,SIG_IGN);
-
     currentLogLevel = LOG_LEVEL;
 
     init_serial_logger(&serialLogger, NULL);

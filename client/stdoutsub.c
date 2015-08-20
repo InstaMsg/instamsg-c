@@ -269,6 +269,9 @@ int main(int argc, char** argv)
 	signal(SIGINT, cfinish);
 	signal(SIGTERM, cfinish);
 
+    // VERY IMPORTANT: If this is not done, the "write" on an invalid socket will cause program-crash
+    signal(SIGPIPE, SIG_IGN);
+
 
     start(opts.clientid, opts.password, onConnectOneTimeOperations, onDisconnect, NULL,
           coreLoopyBusinessLogicInitiatedBySelf, opts.logFilePath);
