@@ -1,5 +1,4 @@
 #include "include/globals.h"
-#include <stdio.h>
 
 /*
 	Copyright 2001, 2002 Georges Menie (www.menie.org)
