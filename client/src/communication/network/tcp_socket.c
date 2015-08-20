@@ -246,7 +246,7 @@ void init_network(Network *network, const char *hostName, unsigned int port)
 
     // Keep a copy of connection-parameters, for easy book-keeping.
     memset(network->host, 0, MAX_BUFFER_SIZE);
-    snprintf(network->host, MAX_BUFFER_SIZE - 1, "%s", hostName);
+    sg_sprintf(network->host, "%s", hostName);
     network->port = port;
 
     // Connect the medium (socket).

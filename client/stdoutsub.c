@@ -215,7 +215,7 @@ static void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 static void messageArrived(MessageData* md)
 {
 	MQTTMessage* message = md->message;
-    info_log("%.*s", (int)message->payloadlen, (char*)message->payload);
+    info_log("%s", (char*)message->payload);
 }
 
 

@@ -50,4 +50,6 @@ struct KeyValuePairs
 #define MAX_TRIES_ALLOWED_WHILE_READING_FROM_NETWORK_MEDIUM 5
 ///////////////////////////////////////////////////////////////////////////////
 
+int sg_print(char **out, int *varg);
+int sg_sprintf(char *out, const char *format, ...);
 #endif

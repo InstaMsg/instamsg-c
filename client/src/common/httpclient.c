@@ -58,7 +58,7 @@ static void generateRequest(const char *requestType,
     /*
      * Add the "GET" and "/1.txt"
      */
-    sprintf(buf, "%s %s", requestType, url);
+    sg_sprintf(buf, "%s %s", requestType, url);
 
     /*
      * Append the parameters (if any).
@@ -221,7 +221,7 @@ HTTPResponse downloadFile(const char *url,
         if(beginPayloadDownload == 1)
         {
             char tempFileName[MAX_BUFFER_SIZE] = {0};
-            sprintf(tempFileName, "~%s", filename);
+            sg_sprintf(tempFileName, "~%s", filename);
 
             /*
              * Delete the file (it might have been downloaded partially some other time).
@@ -318,7 +318,7 @@ HTTPResponse uploadFile(const char *url,
      *          http://stackoverflow.com/questions/8659808/how-does-http-file-upload-work
      */
     char secondLevel[MAX_BUFFER_SIZE] = {0};
-    sprintf(secondLevel, "--%s"                                                                   \
+    sg_sprintf(secondLevel, "--%s"                                                                   \
                          "\r\n"                                                                 \
                          "Content-Disposition: form-data; name=\"file\"; filename=\"%s\""       \
                          "\r\n"                                                                 \
@@ -326,7 +326,7 @@ HTTPResponse uploadFile(const char *url,
                          "\r\n\r\n", POST_BOUNDARY, filename);
 
     char fourthLevel[MAX_BUFFER_SIZE] = {0};
-    sprintf(fourthLevel, "\r\n--%s--", POST_BOUNDARY);
+    sg_sprintf(fourthLevel, "\r\n--%s--", POST_BOUNDARY);
 
     /*
      * Add the "Content-Length header
@@ -345,7 +345,7 @@ HTTPResponse uploadFile(const char *url,
         if(strcmp(headers[i].key, CONTENT_LENGTH) == 0)
         {
             char value[MAX_BUFFER_SIZE] = {0};
-            sprintf(value, "%ld", totalLength);
+            sg_sprintf(value, "%ld", totalLength);
 
             headers[i].value = value;
         }

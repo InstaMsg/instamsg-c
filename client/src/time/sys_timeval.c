@@ -27,7 +27,7 @@ static void getTimeIn_YYYYmmdd4HHMMSS(Timer *timer, char *buf)
 
 static void getOffset(Timer *timer, char *buf)
 {
-    sprintf(buf, "19800");
+    sg_sprintf(buf, "19800");
 }
 
 

@@ -57,6 +57,7 @@
  */
 static int ar501_modbus_read(ModbusCommandInterface* modbusCommandInterface, unsigned char* buffer, int len, unsigned char guaranteed)
 {
+    return FAILURE;
 }
 
 
@@ -76,6 +77,7 @@ static int ar501_modbus_read(ModbusCommandInterface* modbusCommandInterface, uns
  */
 static int ar501_modbus_write(ModbusCommandInterface* modbusCommandInterface, unsigned char* buffer, int len)
 {
+    return FAILURE;
 }
 
 

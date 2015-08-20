@@ -28,6 +28,7 @@
  */
 static int ar501_serial_logger_write(SerialLoggerInterface *serialLoggerInterface, unsigned char* buffer, int len)
 {
+    return FAILURE;
 }
 
 

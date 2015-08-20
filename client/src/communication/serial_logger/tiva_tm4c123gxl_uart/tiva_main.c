@@ -1,24 +1,12 @@
-#include "../../../common/include/instamsg_vendor_common.h"
-
-#include "instamsg_vendor.h"
-
 #include <string.h>
+#include <stdio.h>
 
 int main()
 {
-    Serial serial;
-    init_serial_interface(&serial, NULL);
+    char m[100];
+    memset(m, 0, 100);
 
-    unsigned char *str = (unsigned char*)"TREATING UART AS SERIAL NOW (and not as FS) :: ";
-    serial.write(&serial, str, strlen((const char*)str));
+    sg_sprintf(m, "Test %s %d", "Ajay", 100);  // Culprit-Line
 
-    while(1)
-    {
-        unsigned char buf[2] = {0};
-        serial.read(&serial, buf, 1, 1);
-        serial.write(&serial, buf, 1);
-    }
-
-    release_serial_interface(&serial);
     return 0;
 }

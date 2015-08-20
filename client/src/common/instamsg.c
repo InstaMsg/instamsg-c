@@ -21,7 +21,6 @@
 
 #include <string.h>
 #include <signal.h>
-#include <stdlib.h>
 
 static void serverLoggingTopicMessageArrived(InstaMsg *c, MQTTMessage *msg)
 {
@@ -41,7 +40,7 @@ static void serverLoggingTopicMessageArrived(InstaMsg *c, MQTTMessage *msg)
 
     if( (strlen(clientId) > 0) && (strlen(logging) > 0) )
     {
-        if(atoi(logging) == 1)
+        if(strcmp(logging, "1") == 0)
         {
             c->serverLoggingEnabled = 1;
             info_log(SERVER_LOGGING "Enabled.");
@@ -421,7 +420,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         {
             ackStatus = 1;
         }
-        sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": %d}", messageId, ackStatus);
+        sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": %d}", messageId, ackStatus);
 
     }
     else if( (strcmp(method, "GET") == 0) && (strlen(filename) == 0))
@@ -435,7 +434,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
 #endif
 
         info_log(FILE_LISTING ": [%s]", fileList);
-        sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"files\": %s}", messageId, fileList);
+        sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"files\": %s}", messageId, fileList);
     }
     else if( (strcmp(method, "DELETE") == 0) && (strlen(filename) > 0))
     {
@@ -448,18 +447,18 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         if(status == SUCCESS)
         {
             info_log(FILE_DELETE "[%s] deleted successfully.", filename);
-            sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1}", messageId);
+            sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1}", messageId);
         }
         else
         {
             error_log(FILE_DELETE "[%s] could not be deleted :(", filename);
-            sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 0, \"error_msg\":\"%s\"}", messageId, "File-Removal Failed :(");
+            sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 0, \"error_msg\":\"%s\"}", messageId, "File-Removal Failed :(");
         }
     }
     else if( (strcmp(method, "GET") == 0) && (strlen(filename) > 0))
     {
         char clientIdNotSplitted[MAX_BUFFER_SIZE] = {0};
-        sprintf(clientIdNotSplitted, "%s-%s", c->connectOptions.clientID.cstring, c->connectOptions.username.cstring);
+        sg_sprintf(clientIdNotSplitted, "%s-%s", c->connectOptions.clientID.cstring, c->connectOptions.username.cstring);
 
         HTTPResponse response = {0};
 
@@ -490,11 +489,11 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
 #endif
         if(response.status == HTTP_FILE_UPLOAD_SUCCESS)
         {
-            sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"url\": \"%s\"}", messageId, response.body);
+            sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"url\": \"%s\"}", messageId, response.body);
         }
         else
         {
-            sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 0}", messageId);
+            sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 0}", messageId);
         }
     }
 
@@ -618,19 +617,19 @@ void initInstaMsg(InstaMsg* c,
     c->oneToOneMessageCallback = oneToOneMessageHandler;
 
     memset(c->filesTopic, 0, MAX_BUFFER_SIZE);
-    sprintf(c->filesTopic, "instamsg/clients/%s/files", clientId);
+    sg_sprintf(c->filesTopic, "instamsg/clients/%s/files", clientId);
 
     memset(c->rebootTopic, 0, MAX_BUFFER_SIZE);
-    sprintf(c->rebootTopic, "instamsg/clients/%s/reboot", clientId);
+    sg_sprintf(c->rebootTopic, "instamsg/clients/%s/reboot", clientId);
 
     memset(c->enableServerLoggingTopic, 0, MAX_BUFFER_SIZE);
-    sprintf(c->enableServerLoggingTopic, "instamsg/clients/%s/enableServerLogging", clientId);
+    sg_sprintf(c->enableServerLoggingTopic, "instamsg/clients/%s/enableServerLogging", clientId);
 
     memset(c->serverLogsTopic, 0, MAX_BUFFER_SIZE);
-    sprintf(c->serverLogsTopic, "instamsg/clients/%s/logs", clientId);
+    sg_sprintf(c->serverLogsTopic, "instamsg/clients/%s/logs", clientId);
 
     memset(c->fileUploadUrl, 0, MAX_BUFFER_SIZE);
-    sprintf(c->fileUploadUrl, "/api/beta/clients/%s/files", clientId);
+    sg_sprintf(c->fileUploadUrl, "/api/beta/clients/%s/files", clientId);
 
     c->serverLoggingEnabled = 0;
 
@@ -752,7 +751,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                  * At this point, "msg.payload" contains the real-stuff that is passed from the peer ....
                  */
                 char topicName[MAX_BUFFER_SIZE] = {0};
-                snprintf(topicName, strlen(topicPlusPayload.lenstring.data) - strlen(msg.payload) + 1, "%s", topicPlusPayload.lenstring.data);
+                memcpy(topicName, topicPlusPayload.lenstring.data, strlen(topicPlusPayload.lenstring.data) - strlen(msg.payload));
 
                 if(topicName != NULL)
                 {

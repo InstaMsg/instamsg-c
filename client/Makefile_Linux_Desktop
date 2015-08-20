@@ -19,5 +19,5 @@ EXTRA_OBJECT_FILES=""
 
 MAIN_CLASS="stdoutsub"
 
-COMPILE_COMMAND="gcc -nostdinc"
+COMPILE_COMMAND="gcc -g -nostdinc"
 LINK_COMMAND="gcc"

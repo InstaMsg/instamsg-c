@@ -7,24 +7,22 @@
 
 
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
 
 #include "./include/instamsg.h"
 #include "./include/log.h"
+#include "./include/globals.h"
+
+char formatted_string[MAX_BUFFER_SIZE];
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
 #define LOG_COMMON_CODE(level)                                                                          \
                                                                                                         \
-    char formatted_string[MAX_BUFFER_SIZE] = {0};                                                       \
-    va_list argptr;                                                                                     \
-                                                                                                        \
-    va_start(argptr, fmt);                                                                              \
-    vsnprintf(formatted_string, MAX_BUFFER_SIZE, fmt, argptr);                                          \
-    va_end(argptr);                                                                                     \
-                                                                                                        \
+    memset(formatted_string, 0, MAX_BUFFER_SIZE);                                                       \
+    register int *varg = (int *)(&fmt);                                                                 \
+    char *firstLevel = &(formatted_string[0]);                                                          \
+    sg_print(&firstLevel, varg);                                                                        \
     strcat(formatted_string, "\n");                                                                     \
                                                                                                         \
     if(instaMsg.serverLoggingEnabled == 1)                                                              \
@@ -49,13 +47,10 @@
 #else
 #define LOG_COMMON_CODE(level)                                                                          \
                                                                                                         \
-    char formatted_string[MAX_BUFFER_SIZE] = {0};                                                       \
-    va_list argptr;                                                                                     \
-                                                                                                        \
-    va_start(argptr, fmt);                                                                              \
-    vsnprintf(formatted_string, MAX_BUFFER_SIZE, fmt, argptr);                                          \
-    va_end(argptr);                                                                                     \
-                                                                                                        \
+    memset(formatted_string, 0, MAX_BUFFER_SIZE);                                                       \
+    register int *varg = (int *)(&fmt);                                                                 \
+    char *firstLevel = &(formatted_string[0]);                                                          \
+    sg_print(&firstLevel, varg);                                                                        \
     strcat(formatted_string, "\n");                                                                     \
                                                                                                         \
     if(instaMsg.serverLoggingEnabled == 1)                                                              \
@@ -104,7 +99,7 @@ void init_serial_logger(SerialLogger *serialLogger, void *arg)
 
 void release_serial_logger(SerialLogger *serialLogger)
 {
-    info_log("FREEING [LOG] RESOURCES (SERIAL-BASES).\n");
+    info_log("FREEING [LOG] RESOURCES (SERIAL-BASES).");
 
     release_serial_logger_interface(&(serialLogger->serialLoggerInterface));
 }

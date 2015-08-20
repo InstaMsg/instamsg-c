@@ -23,6 +23,7 @@ SOURCES=`echo                                                                   
         src/common/instamsg                                                         \
         src/common/log                                                              \
         src/common/json                                                             \
+        src/common/globals                                                          \
                                                                                     \
         ../MQTTPacket/src/MQTTFormat                                                \
         ../MQTTPacket/src/MQTTPacket                                                \
@@ -44,7 +45,6 @@ SOURCES=`echo                                                                   
 
 mkdir -p build/${VENDOR}
 rm -f build/${VENDOR}/*
-rm -f build/${VENDOR}/instamsg
 
 # Compile the File-System-Module only if applicable.
 if [ ! -z ${FS_COMMUNICATION_IMPL} ];

@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <string.h>
 
 #include "include/globals.h"
@@ -82,23 +81,3 @@ void getJsonKeyValueIfPresent(char *json, const char *key, char *buf)
     }
 }
 
-/*
-int main()
-{
-    while(1)
-    {
-        char value[1000] = {0};
-
-        getJsonKeyValueIfPresent("{'ajay' :  gatg, ajat:garg}", "ajat", value);
-        printf("%s\n", value);
-
-        memset(value, 0, 1000);
-        getJsonKeyValueIfPresent("{'ajay' :  gatg, ajat:garg}", "ajay", value);
-        printf("%s\n", value);
-
-        break;
-    }
-
-    return 0;
-}
-*/

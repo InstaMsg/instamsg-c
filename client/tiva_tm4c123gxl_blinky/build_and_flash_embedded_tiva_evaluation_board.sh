@@ -1,5 +1,3 @@
-set -e
-
 . ./tiva_Env.ini
 make -f tiva_Makefile
 

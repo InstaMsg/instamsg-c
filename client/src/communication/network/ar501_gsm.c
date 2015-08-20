@@ -5,8 +5,10 @@
  *
  *******************************************************************************/
 
-
 #include "instamsg_vendor.h"
+#include "../../common/include/instamsg.h"
+
+#include <string.h>
 
 
 /*
@@ -82,6 +84,7 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
  */
 static int ar501_gsm_socket_read(Network* network, unsigned char* buffer, int len, unsigned char guaranteed)
 {
+    return FAILURE;
 }
 
 
@@ -101,6 +104,7 @@ static int ar501_gsm_socket_read(Network* network, unsigned char* buffer, int le
  */
 static int ar501_gsm_socket_write(Network* network, unsigned char* buffer, int len)
 {
+    return FAILURE;
 }
 
 
@@ -117,7 +121,7 @@ void init_network(Network *network, const char *hostName, unsigned int port)
 
     // Keep a copy of connection-parameters, for easy book-keeping.
     memset(network->host, 0, MAX_BUFFER_SIZE);
-    snprintf(network->host, MAX_BUFFER_SIZE - 1, "%s", hostName);
+    sg_sprintf(network->host, "%s", hostName);
     network->port = port;
 
     // Connect the medium.

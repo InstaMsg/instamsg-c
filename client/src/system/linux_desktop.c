@@ -12,13 +12,13 @@
 
 static void getManufacturer(System *system, char *buf, int maxValueLenAllowed)
 {
-    snprintf(buf, maxValueLenAllowed, "HP");
+    sg_sprintf(buf, "HP");
 }
 
 
 static void getSerialNumber(System *system, char *buf, int maxValueLenAllowed)
 {
-    snprintf(buf, maxValueLenAllowed, "123456789");
+    sg_sprintf(buf, "123456789");
 }
 
 

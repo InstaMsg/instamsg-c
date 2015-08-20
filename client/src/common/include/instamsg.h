@@ -22,7 +22,6 @@
 #include "./log.h"
 #include "../../../../MQTTPacket/src/MQTTPacket.h"
 
-#include "stdio.h"
 
 #define MAX_PACKET_ID 30000
 #define MAX_MESSAGE_HANDLERS 5
