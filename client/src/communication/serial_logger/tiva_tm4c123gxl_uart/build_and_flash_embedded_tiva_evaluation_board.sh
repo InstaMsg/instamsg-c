@@ -11,7 +11,7 @@ TIVAWARE_PATH="../../../../../embedded-flash-environment/tivaware"
 MCU="TM4C123GH6PM"
 LD_SCRIPT="../../../../../embedded-flash-environment/tiva-template/${MCU}.ld"
 
-SOURCES=`echo tiva_startup_gcc tiva_main`
+SOURCES=`echo tiva_startup_gcc tiva_main ../../../common/globals`
 
 
 for source in ${SOURCES}
