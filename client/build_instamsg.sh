@@ -54,17 +54,15 @@ then
 fi
 
 
+TOTAL_COMPILE_COMMAND="${COMPILE_COMMAND} ${TOTAL_INCLUDES} ${SOURCES} -o build/${VENDOR}/instamsg"
+
 for obj in ${EXTRA_OBJECT_FILES}
 do
+    TOTAL_COMPILE_COMMAND="${COMPILE_COMMAND} ${TOTAL_INCLUDES} ${SOURCES} build/${VENDOR}/* -o build/${VENDOR}/instamsg"
     cp ${obj} build/${VENDOR}
 done
 
-if [ ! -z ${EXTRA_OBJECT_FILES} ];
-then
-    ${COMPILE_COMMAND} ${TOTAL_INCLUDES} ${SOURCES} build/vendor/* -o "build/${VENDOR}/instamsg"
-else
-    ${COMPILE_COMMAND} ${TOTAL_INCLUDES} ${SOURCES} -o "build/${VENDOR}/instamsg"
-fi
+${TOTAL_COMPILE_COMMAND}
 
 for cmd in "${FINAL_COMMANDS[@]}"
 do
