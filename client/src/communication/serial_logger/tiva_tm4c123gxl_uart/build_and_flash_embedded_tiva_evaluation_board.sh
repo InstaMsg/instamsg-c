@@ -11,15 +11,16 @@ TIVAWARE_PATH="../../../../../embedded-flash-environment/tivaware"
 MCU="TM4C123GH6PM"
 LD_SCRIPT="../../../../../embedded-flash-environment/tiva-template/${MCU}.ld"
 
-SOURCES=`echo tiva_startup_gcc tiva_main ../../../common/globals`
+SOURCES=`echo tiva_startup_gcc tiva_main ../../../common/globals ../tiva_tm4c123gxl_launchpad_serial_logger `
 
 
 for source in ${SOURCES}
 do
     basename=`echo "${source}" | rev | cut -d/ -f1`
-    arm-none-eabi-gcc -g -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -Os -ffunction-sections -fdata-sections -MD -std=c99 -Wall -pedantic -DPART_${MCU} -c -I${TIVAWARE_PATH} -I../../../vendors/tiva_tm4c123gxl -DTARGET_IS_BLIZZARD_RA1 -c "${source}.c" -o "tiva_build/${basename}.o"
+    arm-none-eabi-gcc -g -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -Os -ffunction-sections -fdata-sections -MD -std=c99 -Wall -pedantic -DPART_${MCU} -c -I${TIVAWARE_PATH} -I../../../vendors/tiva_tm4c123gxl_launchpad -DTARGET_IS_BLIZZARD_RA1 -c "${source}.c" -o "tiva_build/${basename}.o"
 done
 
+cp /home/ajay/work/src/instamsg-client-libs/instamsg-c/embedded-flash-environment/tivaware/driverlib/gcc/gpio.o tiva_build
 
 arm-none-eabi-gcc -T ${LD_SCRIPT} --entry ResetISR -Wl,--gc-sections tiva_build/*.o -o tiva_build/a.out
 arm-none-eabi-objcopy -O binary tiva_build/a.out tiva_build/image_to_flash

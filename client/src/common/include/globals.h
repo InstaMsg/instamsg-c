@@ -53,7 +53,7 @@ struct KeyValuePairs
 int sg_print(char **out, int *varg);
 int sg_sprintf(char *out, const char *format, ...);
 
-#if 0
+#if 1
 #define SG_MEMSET(dest, byte, size)                             \
     {                                                           \
         char temp[MAX_BUFFER_SIZE] = {byte};                    \
@@ -61,9 +61,10 @@ int sg_sprintf(char *out, const char *format, ...);
     }
 #endif
 
-#if 1
+#if 0
 void DO_SG_MEMSET(char *dest, char byte, unsigned int size);
 #define SG_MEMSET(dest, byte, size)     DO_SG_MEMSET(dest, byte, size);
 #endif
 
+unsigned int sg_strlen(char *str);
 #endif

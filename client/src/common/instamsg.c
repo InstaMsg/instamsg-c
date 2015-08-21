@@ -37,7 +37,7 @@ static void serverLoggingTopicMessageArrived(InstaMsg *c, MQTTMessage *msg)
     getJsonKeyValueIfPresent(msg->payload, CLIENT_ID, clientId);
     getJsonKeyValueIfPresent(msg->payload, LOGGING, logging);
 
-    if( (strlen(clientId) > 0) && (strlen(logging) > 0) )
+    if( (sg_strlen(clientId) > 0) && (sg_strlen(logging) > 0) )
     {
         if(strcmp(logging, "1") == 0)
         {
@@ -346,17 +346,17 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     getJsonKeyValueIfPresent(msg->payload, "url", url);
     getJsonKeyValueIfPresent(msg->payload, "filename", filename);
 
-    if(strlen(replyTopic) == 0)
+    if(sg_strlen(replyTopic) == 0)
     {
         logJsonFailureMessageAndReturn(REPLY_TOPIC, msg);
         return;
     }
-    if(strlen(messageId) == 0)
+    if(sg_strlen(messageId) == 0)
     {
         logJsonFailureMessageAndReturn(MESSAGE_ID, msg);
         return;
     }
-    if(strlen(method) == 0)
+    if(sg_strlen(method) == 0)
     {
         logJsonFailureMessageAndReturn(METHOD, msg);
         return;
@@ -366,8 +366,8 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     char ackMessage[MAX_BUFFER_SIZE] = {0};
 
     if( (   (strcmp(method, "POST") == 0) || (strcmp(method, "PUT") == 0)   ) &&
-            (strlen(filename) > 0) &&
-            (strlen(url) > 0)   )
+            (sg_strlen(filename) > 0) &&
+            (sg_strlen(url) > 0)   )
     {
         int ackStatus = 0;
 
@@ -422,7 +422,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": %d}", messageId, ackStatus);
 
     }
-    else if( (strcmp(method, "GET") == 0) && (strlen(filename) == 0))
+    else if( (strcmp(method, "GET") == 0) && (sg_strlen(filename) == 0))
     {
         char fileList[MAX_BUFFER_SIZE] = {0};
 
@@ -435,7 +435,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         info_log(FILE_LISTING ": [%s]", fileList);
         sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"files\": %s}", messageId, fileList);
     }
-    else if( (strcmp(method, "DELETE") == 0) && (strlen(filename) > 0))
+    else if( (strcmp(method, "DELETE") == 0) && (sg_strlen(filename) > 0))
     {
         int status = FAILURE;
 
@@ -454,7 +454,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
             sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 0, \"error_msg\":\"%s\"}", messageId, "File-Removal Failed :(");
         }
     }
-    else if( (strcmp(method, "GET") == 0) && (strlen(filename) > 0))
+    else if( (strcmp(method, "GET") == 0) && (sg_strlen(filename) > 0))
     {
         char clientIdNotSplitted[MAX_BUFFER_SIZE] = {0};
         sg_sprintf(clientIdNotSplitted, "%s-%s", c->connectOptions.clientID.cstring, c->connectOptions.username.cstring);
@@ -746,7 +746,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                  * At this point, "msg.payload" contains the real-stuff that is passed from the peer ....
                  */
                 char topicName[MAX_BUFFER_SIZE] = {0};
-                memcpy(topicName, topicPlusPayload.lenstring.data, strlen(topicPlusPayload.lenstring.data) - strlen(msg.payload));
+                memcpy(topicName, topicPlusPayload.lenstring.data, sg_strlen(topicPlusPayload.lenstring.data) - sg_strlen(msg.payload));
 
                 if(topicName != NULL)
                 {
@@ -927,7 +927,7 @@ int MQTTPublish(InstaMsg* c,
         attachResultHandler(c, id, resultHandlerTimeout, resultHandler);
     }
 
-    len = MQTTSerialize_publish(buf, MAX_BUFFER_SIZE, 0, qos, retain, id, topic, (unsigned char*)payload, strlen(payload) + 1);
+    len = MQTTSerialize_publish(buf, MAX_BUFFER_SIZE, 0, qos, retain, id, topic, (unsigned char*)payload, sg_strlen(payload) + 1);
     if (len <= 0)
         goto exit;
     if ((rc = sendPacket(c, buf, len)) != SUCCESS) // send the subscribe packet

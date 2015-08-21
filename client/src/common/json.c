@@ -27,7 +27,7 @@ void getJsonKeyValueIfPresent(char *json, const char *key, char *buf)
 
     while(*json)
     {
-        if((keyWrapper == NOT_FOUND) && (*json == NOT_FOUND) && (strlen(parsedKeyToken) == 0))
+        if((keyWrapper == NOT_FOUND) && (*json == NOT_FOUND) && (sg_strlen(parsedKeyToken) == 0))
         {
         }
         else if((keyWrapper == NOT_FOUND) && ((*json == '{') || (*json == ',')))
@@ -46,7 +46,7 @@ void getJsonKeyValueIfPresent(char *json, const char *key, char *buf)
             keyWrapper = NOT_FOUND;
 
             // Now, if we were currrently parsing-key, move to parsing value.
-            if(strlen(parsedValueToken) == 0)
+            if(sg_strlen(parsedValueToken) == 0)
             {
                 token = parsedValueToken;
             }

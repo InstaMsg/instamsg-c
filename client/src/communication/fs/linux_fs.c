@@ -96,7 +96,7 @@ static void getFileListing(FileSystem *fs, unsigned char *buf, int maxValueLenAl
             char newEntry[MAX_BUFFER_SIZE] = {0};
             sg_sprintf(newEntry, "\"%s\":%ld", pDirent->d_name, (long)path_stat.st_size);
 
-            if((strlen(buf) + strlen(newEntry)) < (maxValueLenAllowed - 10))
+            if((sg_strlen(buf) + sg_strlen(newEntry)) < (maxValueLenAllowed - 10))
             {
                 if(firstEntryDone == 1)
                 {

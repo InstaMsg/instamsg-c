@@ -25,7 +25,7 @@ static void getNextLine(Network *network, unsigned char *buf, int *responseCode)
 
         if(ch[0] == '\n')
         {
-            if(strncmp(buf, HTTP_RESPONSE_STATUS_PREFIX, strlen(HTTP_RESPONSE_STATUS_PREFIX)) == 0)
+            if(strncmp(buf, HTTP_RESPONSE_STATUS_PREFIX, sg_strlen(HTTP_RESPONSE_STATUS_PREFIX)) == 0)
             {
                 char *saveptr;
                 char *firstToken = strtok_r(buf, " ", &saveptr);
@@ -192,7 +192,7 @@ HTTPResponse downloadFile(const char *url,
     /*
      * Fire the request-bytes over the network-medium.
      */
-    if(network.write(&network, request, strlen(request)) == FAILURE)
+    if(network.write(&network, request, sg_strlen(request)) == FAILURE)
     {
         goto exit;
     }
@@ -208,7 +208,7 @@ HTTPResponse downloadFile(const char *url,
         /*
          * The actual file-payload begins after we receive an empty line.
          */
-        if(strlen(newLine) == 0)
+        if(sg_strlen(newLine) == 0)
         {
             beginPayloadDownload = 1;
         }
@@ -332,7 +332,7 @@ HTTPResponse uploadFile(const char *url,
      * Add the "Content-Length header
      */
     numBytes = instaMsg.singletonUtilityFs.getFileSize(&(instaMsg.singletonUtilityFs), filename);
-    long totalLength = strlen(secondLevel) + numBytes + strlen(fourthLevel);
+    long totalLength = sg_strlen(secondLevel) + numBytes + sg_strlen(fourthLevel);
     i = 0;
 
     while(1)
@@ -356,13 +356,13 @@ HTTPResponse uploadFile(const char *url,
     generateRequest("POST", url, params, headers, request, MAX_BUFFER_SIZE, 0);
     info_log(FILE_UPLOAD "First-stage URL that will be hit : [%s]", request);
 
-    if(network.write(&network, request, strlen(request)) == FAILURE)
+    if(network.write(&network, request, sg_strlen(request)) == FAILURE)
     {
         error_log(FILE_UPLOAD "Error occurred while uploading POST data (FIRST LEVEL) for [%s]", filename);
         goto exit;
     }
 
-    if(network.write(&network, secondLevel, strlen(secondLevel)) == FAILURE)
+    if(network.write(&network, secondLevel, sg_strlen(secondLevel)) == FAILURE)
     {
         error_log(FILE_UPLOAD "Error occurred while uploading POST data (SECOND LEVEL) for [%s]", filename);
         goto exit;
@@ -390,7 +390,7 @@ HTTPResponse uploadFile(const char *url,
     info_log(FILE_UPLOAD "File [%s] successfully uploaded worth [%ld] bytes", filename, numBytes);
 
     release_file_system(&fs);
-    if(network.write(&network, fourthLevel, strlen(fourthLevel)) == FAILURE)
+    if(network.write(&network, fourthLevel, sg_strlen(fourthLevel)) == FAILURE)
     {
         error_log(FILE_UPLOAD "Error occurred while uploading POST data (FOURTH LEVEL) for [%s]", filename);
         goto exit;
@@ -409,7 +409,7 @@ HTTPResponse uploadFile(const char *url,
          * The actual payload begins after we receive an empty line.
          * Here, the payload contains the URL that needs to be passed to the peer.
          */
-        if(strlen(newLine) == 0)
+        if(sg_strlen(newLine) == 0)
         {
             beginPayloadDownload = 1;
         }

@@ -187,9 +187,23 @@ int sg_sprintf(char *out, const char *format, ...)
 	return sg_print(&out, varg);
 }
 
+
 void DO_SG_MEMSET(char *dest, char byte, unsigned int size)
 {
     char temp[MAX_BUFFER_SIZE] = {byte};
     memcpy(dest, temp, size);
+}
+
+
+unsigned int sg_strlen(char *str)
+{
+    unsigned int len = 0;
+    while(*str)
+    {
+        len++;
+        str++;
+    }
+
+    return len;
 }
 

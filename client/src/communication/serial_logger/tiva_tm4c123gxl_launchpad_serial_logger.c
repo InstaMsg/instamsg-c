@@ -44,9 +44,10 @@ __error__(char *pcFilename, uint32_t ui32Line)
 // Send a string to the UART.
 //
 //*****************************************************************************
-static void UARTSend(const unsigned char *string)
+static void UARTSend(const unsigned char *string, unsigned int len)
 {
-    while(*string != 0)
+    int i;
+    for(i = 0; i < len; i++)
     {
         //
         // Write the next character to the UART.
@@ -118,7 +119,7 @@ static void init(void)
 
 static int tiva_serial_logger_write(SerialLoggerInterface* serialLoggerInterface, unsigned char* buffer, int len)
 {
-    UARTSend(buffer);
+    UARTSend(buffer, len);
     return SUCCESS;
 }
 
