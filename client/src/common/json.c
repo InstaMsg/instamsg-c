@@ -62,8 +62,8 @@ void getJsonKeyValueIfPresent(char *json, const char *key, char *buf)
                 }
 
                 // We have parsed current key-value pair. So, reset the token-buffers.
-                memset(parsedKeyToken, 0, MAX_BUFFER_SIZE);
-                memset(parsedValueToken, 0, MAX_BUFFER_SIZE);
+                SG_MEMSET(parsedKeyToken, 0, MAX_BUFFER_SIZE)
+                SG_MEMSET(parsedValueToken, 0, MAX_BUFFER_SIZE)
 
                 // Set the current-token to "key"-parsing-mode.
                 token = parsedKeyToken;

@@ -120,7 +120,7 @@ void init_network(Network *network, const char *hostName, unsigned int port)
 	network->write = ar501_gsm_socket_write;
 
     // Keep a copy of connection-parameters, for easy book-keeping.
-    memset(network->host, 0, MAX_BUFFER_SIZE);
+    SG_MEMSET(network->host, 0, MAX_BUFFER_SIZE)
     sg_sprintf(network->host, "%s", hostName);
     network->port = port;
 

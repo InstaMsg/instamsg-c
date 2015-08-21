@@ -1,5 +1,7 @@
 #include "include/globals.h"
 
+#include <string.h>
+
 /*
 	Copyright 2001, 2002 Georges Menie (www.menie.org)
 
@@ -184,3 +186,10 @@ int sg_sprintf(char *out, const char *format, ...)
 	register int *varg = (int *)(&format);
 	return sg_print(&out, varg);
 }
+
+void DO_SG_MEMSET(char *dest, char byte, unsigned int size)
+{
+    char temp[MAX_BUFFER_SIZE] = {byte};
+    memcpy(dest, temp, size);
+}
+

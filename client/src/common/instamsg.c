@@ -143,10 +143,10 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     int rem_len = 0;
 
     /*
-     * 0. Before reading the packet, memset the read-buffer to all-empty, else there will be issues
+     * 0. Before reading the packet, SG_MEMSET the read-buffer to all-empty, else there will be issues
      *    processing the buffer as a string.
      */
-    memset(c->readbuf, 0, MAX_BUFFER_SIZE);
+    SG_MEMSET((char*)c->readbuf, 0, MAX_BUFFER_SIZE)
 
 
     /*
@@ -611,19 +611,19 @@ void initInstaMsg(InstaMsg* c,
     c->onDisconnectCallback = disconnectHandler;
     c->oneToOneMessageCallback = oneToOneMessageHandler;
 
-    memset(c->filesTopic, 0, MAX_BUFFER_SIZE);
+    SG_MEMSET(c->filesTopic, 0, MAX_BUFFER_SIZE)
     sg_sprintf(c->filesTopic, "instamsg/clients/%s/files", clientId);
 
-    memset(c->rebootTopic, 0, MAX_BUFFER_SIZE);
+    SG_MEMSET(c->rebootTopic, 0, MAX_BUFFER_SIZE)
     sg_sprintf(c->rebootTopic, "instamsg/clients/%s/reboot", clientId);
 
-    memset(c->enableServerLoggingTopic, 0, MAX_BUFFER_SIZE);
+    SG_MEMSET(c->enableServerLoggingTopic, 0, MAX_BUFFER_SIZE)
     sg_sprintf(c->enableServerLoggingTopic, "instamsg/clients/%s/enableServerLogging", clientId);
 
-    memset(c->serverLogsTopic, 0, MAX_BUFFER_SIZE);
+    SG_MEMSET(c->serverLogsTopic, 0, MAX_BUFFER_SIZE)
     sg_sprintf(c->serverLogsTopic, "instamsg/clients/%s/logs", clientId);
 
-    memset(c->fileUploadUrl, 0, MAX_BUFFER_SIZE);
+    SG_MEMSET(c->fileUploadUrl, 0, MAX_BUFFER_SIZE)
     sg_sprintf(c->fileUploadUrl, "/api/beta/clients/%s/files", clientId);
 
     c->serverLoggingEnabled = 0;
@@ -632,15 +632,15 @@ void initInstaMsg(InstaMsg* c,
 	c->connectOptions.MQTTVersion = 3;
 	c->connectOptions.cleansession = 1;
 
-    memset(c->clientIdMachine, 0, MAX_BUFFER_SIZE);
+    SG_MEMSET(c->clientIdMachine, 0, MAX_BUFFER_SIZE)
     strncpy(c->clientIdMachine, clientId, 23);
     c->connectOptions.clientID.cstring = c->clientIdMachine;
 
-    memset(c->username, 0, MAX_BUFFER_SIZE);
+    SG_MEMSET(c->username, 0, MAX_BUFFER_SIZE)
     strcpy(c->username, clientId + 24);
     c->connectOptions.username.cstring = c->username;
 
-    memset(c->password, 0, MAX_BUFFER_SIZE);
+    SG_MEMSET(c->password, 0, MAX_BUFFER_SIZE)
     strcpy(c->password, authKey);
     c->connectOptions.password.cstring = c->password;
 

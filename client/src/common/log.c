@@ -19,7 +19,7 @@ char formatted_string[MAX_BUFFER_SIZE];
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
 #define LOG_COMMON_CODE(level)                                                                          \
                                                                                                         \
-    memset(formatted_string, 0, MAX_BUFFER_SIZE);                                                       \
+    SG_MEMSET(formatted_string, 0, MAX_BUFFER_SIZE)                                                     \
     register int *varg = (int *)(&fmt);                                                                 \
     char *firstLevel = &(formatted_string[0]);                                                          \
     sg_print(&firstLevel, varg);                                                                        \
@@ -47,7 +47,7 @@ char formatted_string[MAX_BUFFER_SIZE];
 #else
 #define LOG_COMMON_CODE(level)                                                                          \
                                                                                                         \
-    memset(formatted_string, 0, MAX_BUFFER_SIZE);                                                       \
+    SG_MEMSET(formatted_string, 0, MAX_BUFFER_SIZE)                                                     \
     register int *varg = (int *)(&fmt);                                                                 \
     char *firstLevel = &(formatted_string[0]);                                                          \
     sg_print(&firstLevel, varg);                                                                        \
