@@ -43,8 +43,8 @@
     {                                                                                                   \
         serialLogger.serialLoggerInterface.write(                                                       \
                 &(serialLogger.serialLoggerInterface),                                                  \
-                (unsigned char*)formatted_string, sg_strlen(formatted_string));                         \
-        fileLogger.fs.write(&(fileLogger.fs), formatted_string, sg_strlen(formatted_string));           \
+                (unsigned char*)formatted_string, strlen(formatted_string));                            \
+        fileLogger.fs.write(&(fileLogger.fs), formatted_string, strlen(formatted_string));              \
     }
 #else
 #define LOG_COMMON_CODE(level)                                                                          \
@@ -74,7 +74,7 @@
     {                                                                                                   \
         serialLogger.serialLoggerInterface.write(                                                       \
                 &(serialLogger.serialLoggerInterface),                                                  \
-                (unsigned char*)formatted_string, sg_strlen(formatted_string));                         \
+                (unsigned char*)formatted_string, strlen(formatted_string));                            \
     }
 #endif
 

@@ -52,21 +52,8 @@ struct KeyValuePairs
 
 static const char * const g_pcHex = "0123456789abcdef";
 
-int sg_print(char **out, int *varg);
+#include <stdarg.h>
+void sg_varargs(char *out, const char *pcString, va_list vaArgP);
 void sg_sprintf(char *out, const char *format, ...);
 
-#if 1
-#define SG_MEMSET(dest, byte, size)                             \
-    {                                                           \
-        char temp[MAX_BUFFER_SIZE] = {byte};                    \
-        memcpy(dest, temp, size);                               \
-    }
-#endif
-
-#if 0
-void DO_SG_MEMSET(char *dest, char byte, unsigned int size);
-#define SG_MEMSET(dest, byte, size)     DO_SG_MEMSET(dest, byte, size);
-#endif
-
-unsigned int sg_strlen(char *str);
 #endif

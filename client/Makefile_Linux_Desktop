@@ -7,17 +7,16 @@ SYSTEM_INCLUDES=`echo                                               \
 
 VENDOR="linux_desktop"
 
-SYSTEM_IMPL="linux_desktop"
-TIME_IMPL="sys_timeval"
-NETWORK_COMMUNICATION_IMPL="tcp_socket"
-FS_COMMUNICATION_IMPL="linux_fs"
+SYSTEM_IMPL="linux_desktop.c"
+TIME_IMPL="sys_timeval.c"
+NETWORK_COMMUNICATION_IMPL="tcp_socket.c"
+FS_COMMUNICATION_IMPL="linux_fs.c"
 MODBUS_COMMAND_COMMUNICATION_IMPL=""
 SERIAL_LOGGER_COMMUNICATION_IMPL=""
 
 EXTRA_SOURCES=""
 EXTRA_OBJECT_FILES=""
 
-MAIN_CLASS="stdoutsub"
+MAIN_CLASS="stdoutsub.c"
 
 COMPILE_COMMAND="gcc -g -nostdinc"
-LINK_COMMAND="gcc"

@@ -8,38 +8,38 @@ TOTAL_INCLUDES=`echo                                                \
 
 if [ -z "${SERIAL_LOGGER_COMMUNICATION_IMPL}" ];
 then
-    SERIAL_LOGGER_COMMUNICATION_IMPL="serial_logger_empty"
+    SERIAL_LOGGER_COMMUNICATION_IMPL="serial_logger_empty.c"
 fi
 
 if [ -z "${MODBUS_COMMAND_COMMUNICATION_IMPL}" ];
 then
-    MODBUS_COMMAND_COMMUNICATION_IMPL="modbus_command_empty"
+    MODBUS_COMMAND_COMMUNICATION_IMPL="modbus_command_empty.c"
 fi
 
 
-SOURCES=`echo                                                                       \
-        ${EXTRA_SOURCES}                                                            \
-        ${MAIN_CLASS}                                                               \
-        src/common/instamsg                                                         \
-        src/common/log                                                              \
-        src/common/json                                                             \
-        src/common/globals                                                          \
-                                                                                    \
-        ../MQTTPacket/src/MQTTFormat                                                \
-        ../MQTTPacket/src/MQTTPacket                                                \
-        ../MQTTPacket/src/MQTTDeserializePublish                                    \
-        ../MQTTPacket/src/MQTTConnectClient                                         \
-        ../MQTTPacket/src/MQTTSubscribeClient                                       \
-        ../MQTTPacket/src/MQTTSerializePublish                                      \
-        ../MQTTPacket/src/MQTTConnectServer                                         \
-        ../MQTTPacket/src/MQTTSubscribeServer                                       \
-        ../MQTTPacket/src/MQTTUnsubscribeServer                                     \
-        ../MQTTPacket/src/MQTTUnsubscribeClient                                     \
-                                                                                    \
-        src/system/${SYSTEM_IMPL}                                                   \
-        src/time/${TIME_IMPL}                                                       \
-        src/communication/network/${NETWORK_COMMUNICATION_IMPL}                     \
-        src/communication/modbus_command/${MODBUS_COMMAND_COMMUNICATION_IMPL}       \
+SOURCES=`echo                                                                           \
+        ${EXTRA_SOURCES}                                                                \
+        ${MAIN_CLASS}                                                                   \
+        src/common/instamsg.c                                                           \
+        src/common/log.c                                                                \
+        src/common/json.c                                                               \
+        src/common/globals.c                                                            \
+                                                                                        \
+        ../MQTTPacket/src/MQTTFormat.c                                                  \
+        ../MQTTPacket/src/MQTTPacket.c                                                  \
+        ../MQTTPacket/src/MQTTDeserializePublish.c                                      \
+        ../MQTTPacket/src/MQTTConnectClient.c                                           \
+        ../MQTTPacket/src/MQTTSubscribeClient.c                                         \
+        ../MQTTPacket/src/MQTTSerializePublish.c                                        \
+        ../MQTTPacket/src/MQTTConnectServer.c                                           \
+        ../MQTTPacket/src/MQTTSubscribeServer.c                                         \
+        ../MQTTPacket/src/MQTTUnsubscribeServer.c                                       \
+        ../MQTTPacket/src/MQTTUnsubscribeClient.c                                       \
+                                                                                        \
+        src/system/${SYSTEM_IMPL}                                                       \
+        src/time/${TIME_IMPL}                                                           \
+        src/communication/network/${NETWORK_COMMUNICATION_IMPL}                         \
+        src/communication/modbus_command/${MODBUS_COMMAND_COMMUNICATION_IMPL}           \
         src/communication/serial_logger/${SERIAL_LOGGER_COMMUNICATION_IMPL} `
 
 
@@ -49,17 +49,9 @@ rm -f build/${VENDOR}/*
 # Compile the File-System-Module only if applicable.
 if [ ! -z ${FS_COMMUNICATION_IMPL} ];
 then
+    SOURCES="${SOURCES} src/communication/fs/${FS_COMMUNICATION_IMPL} src/common/httpclient.c  "
     COMPILE_COMMAND="${COMPILE_COMMAND} -DFILE_SYSTEM_INTERFACE_ENABLED"
-
-    ${COMPILE_COMMAND} ${TOTAL_INCLUDES} -c "src/communication/fs/${FS_COMMUNICATION_IMPL}.c" -o "build/${VENDOR}/${FS_COMMUNICATION_IMPL}.o"
-    ${COMPILE_COMMAND} ${TOTAL_INCLUDES} -c "src/common/httpclient.c" -o "build/${VENDOR}/httpclient.o"
 fi
-
-for source in ${SOURCES}
-do
-    basename=`echo "${source}" | rev | cut -d/ -f1 | rev`
-    ${COMPILE_COMMAND} ${TOTAL_INCLUDES} -c "${source}.c" -o "build/${VENDOR}/${basename}.o"
-done
 
 
 for obj in ${EXTRA_OBJECT_FILES}
@@ -67,7 +59,12 @@ do
     cp ${obj} build/${VENDOR}
 done
 
-${LINK_COMMAND} build/${VENDOR}/*.o -o build/${VENDOR}/instamsg
+if [ ! -z ${EXTRA_OBJECT_FILES} ];
+then
+    ${COMPILE_COMMAND} ${TOTAL_INCLUDES} ${SOURCES} build/vendor/* -o "build/${VENDOR}/instamsg"
+else
+    ${COMPILE_COMMAND} ${TOTAL_INCLUDES} ${SOURCES} -o "build/${VENDOR}/instamsg"
+fi
 
 for cmd in "${FINAL_COMMANDS[@]}"
 do

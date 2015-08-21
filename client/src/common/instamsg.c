@@ -37,7 +37,7 @@ static void serverLoggingTopicMessageArrived(InstaMsg *c, MQTTMessage *msg)
     getJsonKeyValueIfPresent(msg->payload, CLIENT_ID, clientId);
     getJsonKeyValueIfPresent(msg->payload, LOGGING, logging);
 
-    if( (sg_strlen(clientId) > 0) && (sg_strlen(logging) > 0) )
+    if( (strlen(clientId) > 0) && (strlen(logging) > 0) )
     {
         if(strcmp(logging, "1") == 0)
         {
@@ -143,10 +143,10 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     int rem_len = 0;
 
     /*
-     * 0. Before reading the packet, SG_MEMSET the read-buffer to all-empty, else there will be issues
+     * 0. Before reading the packet, memset the read-buffer to all-empty, else there will be issues
      *    processing the buffer as a string.
      */
-    SG_MEMSET((char*)c->readbuf, 0, MAX_BUFFER_SIZE)
+    memset((char*)c->readbuf, 0, MAX_BUFFER_SIZE);
 
 
     /*
@@ -346,17 +346,17 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     getJsonKeyValueIfPresent(msg->payload, "url", url);
     getJsonKeyValueIfPresent(msg->payload, "filename", filename);
 
-    if(sg_strlen(replyTopic) == 0)
+    if(strlen(replyTopic) == 0)
     {
         logJsonFailureMessageAndReturn(REPLY_TOPIC, msg);
         return;
     }
-    if(sg_strlen(messageId) == 0)
+    if(strlen(messageId) == 0)
     {
         logJsonFailureMessageAndReturn(MESSAGE_ID, msg);
         return;
     }
-    if(sg_strlen(method) == 0)
+    if(strlen(method) == 0)
     {
         logJsonFailureMessageAndReturn(METHOD, msg);
         return;
@@ -366,8 +366,8 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     char ackMessage[MAX_BUFFER_SIZE] = {0};
 
     if( (   (strcmp(method, "POST") == 0) || (strcmp(method, "PUT") == 0)   ) &&
-            (sg_strlen(filename) > 0) &&
-            (sg_strlen(url) > 0)   )
+            (strlen(filename) > 0) &&
+            (strlen(url) > 0)   )
     {
         int ackStatus = 0;
 
@@ -422,7 +422,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": %d}", messageId, ackStatus);
 
     }
-    else if( (strcmp(method, "GET") == 0) && (sg_strlen(filename) == 0))
+    else if( (strcmp(method, "GET") == 0) && (strlen(filename) == 0))
     {
         char fileList[MAX_BUFFER_SIZE] = {0};
 
@@ -435,7 +435,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         info_log(FILE_LISTING ": [%s]", fileList);
         sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"files\": %s}", messageId, fileList);
     }
-    else if( (strcmp(method, "DELETE") == 0) && (sg_strlen(filename) > 0))
+    else if( (strcmp(method, "DELETE") == 0) && (strlen(filename) > 0))
     {
         int status = FAILURE;
 
@@ -454,7 +454,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
             sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 0, \"error_msg\":\"%s\"}", messageId, "File-Removal Failed :(");
         }
     }
-    else if( (strcmp(method, "GET") == 0) && (sg_strlen(filename) > 0))
+    else if( (strcmp(method, "GET") == 0) && (strlen(filename) > 0))
     {
         char clientIdNotSplitted[MAX_BUFFER_SIZE] = {0};
         sg_sprintf(clientIdNotSplitted, "%s-%s", c->connectOptions.clientID.cstring, c->connectOptions.username.cstring);
@@ -611,19 +611,19 @@ void initInstaMsg(InstaMsg* c,
     c->onDisconnectCallback = disconnectHandler;
     c->oneToOneMessageCallback = oneToOneMessageHandler;
 
-    SG_MEMSET(c->filesTopic, 0, MAX_BUFFER_SIZE)
+    memset(c->filesTopic, 0, MAX_BUFFER_SIZE);
     sg_sprintf(c->filesTopic, "instamsg/clients/%s/files", clientId);
 
-    SG_MEMSET(c->rebootTopic, 0, MAX_BUFFER_SIZE)
+    memset(c->rebootTopic, 0, MAX_BUFFER_SIZE);
     sg_sprintf(c->rebootTopic, "instamsg/clients/%s/reboot", clientId);
 
-    SG_MEMSET(c->enableServerLoggingTopic, 0, MAX_BUFFER_SIZE)
+    memset(c->enableServerLoggingTopic, 0, MAX_BUFFER_SIZE);
     sg_sprintf(c->enableServerLoggingTopic, "instamsg/clients/%s/enableServerLogging", clientId);
 
-    SG_MEMSET(c->serverLogsTopic, 0, MAX_BUFFER_SIZE)
+    memset(c->serverLogsTopic, 0, MAX_BUFFER_SIZE);
     sg_sprintf(c->serverLogsTopic, "instamsg/clients/%s/logs", clientId);
 
-    SG_MEMSET(c->fileUploadUrl, 0, MAX_BUFFER_SIZE)
+    memset(c->fileUploadUrl, 0, MAX_BUFFER_SIZE);
     sg_sprintf(c->fileUploadUrl, "/api/beta/clients/%s/files", clientId);
 
     c->serverLoggingEnabled = 0;
@@ -632,15 +632,15 @@ void initInstaMsg(InstaMsg* c,
 	c->connectOptions.MQTTVersion = 3;
 	c->connectOptions.cleansession = 1;
 
-    SG_MEMSET(c->clientIdMachine, 0, MAX_BUFFER_SIZE)
+    memset(c->clientIdMachine, 0, MAX_BUFFER_SIZE);
     strncpy(c->clientIdMachine, clientId, 23);
     c->connectOptions.clientID.cstring = c->clientIdMachine;
 
-    SG_MEMSET(c->username, 0, MAX_BUFFER_SIZE)
+    memset(c->username, 0, MAX_BUFFER_SIZE);
     strcpy(c->username, clientId + 24);
     c->connectOptions.username.cstring = c->username;
 
-    SG_MEMSET(c->password, 0, MAX_BUFFER_SIZE)
+    memset(c->password, 0, MAX_BUFFER_SIZE);
     strcpy(c->password, authKey);
     c->connectOptions.password.cstring = c->password;
 
@@ -746,7 +746,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                  * At this point, "msg.payload" contains the real-stuff that is passed from the peer ....
                  */
                 char topicName[MAX_BUFFER_SIZE] = {0};
-                memcpy(topicName, topicPlusPayload.lenstring.data, sg_strlen(topicPlusPayload.lenstring.data) - sg_strlen(msg.payload));
+                memcpy(topicName, topicPlusPayload.lenstring.data, strlen(topicPlusPayload.lenstring.data) - strlen(msg.payload));
 
                 if(topicName != NULL)
                 {
@@ -927,7 +927,7 @@ int MQTTPublish(InstaMsg* c,
         attachResultHandler(c, id, resultHandlerTimeout, resultHandler);
     }
 
-    len = MQTTSerialize_publish(buf, MAX_BUFFER_SIZE, 0, qos, retain, id, topic, (unsigned char*)payload, sg_strlen((char*)payload) + 1);
+    len = MQTTSerialize_publish(buf, MAX_BUFFER_SIZE, 0, qos, retain, id, topic, (unsigned char*)payload, strlen((char*)payload) + 1);
     if (len <= 0)
         goto exit;
     if ((rc = sendPacket(c, buf, len)) != SUCCESS) // send the subscribe packet

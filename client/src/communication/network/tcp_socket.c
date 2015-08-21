@@ -245,7 +245,7 @@ void init_network(Network *network, const char *hostName, unsigned int port)
 	network->write = tcp_socket_write;
 
     // Keep a copy of connection-parameters, for easy book-keeping.
-    SG_MEMSET(network->host, 0, MAX_BUFFER_SIZE)
+    memset(network->host, 0, MAX_BUFFER_SIZE);
     sg_sprintf(network->host, "%s", hostName);
     network->port = port;
 
