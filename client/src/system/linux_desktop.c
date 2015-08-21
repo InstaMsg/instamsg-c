@@ -44,4 +44,6 @@ void release_system_utils(System *system)
 
 void SYSTEM_GLOBAL_INIT()
 {
+    // VERY IMPORTANT: If this is not done, the "write" on an invalid socket will cause program-crash
+    signal(SIGPIPE, SIG_IGN);
 }
