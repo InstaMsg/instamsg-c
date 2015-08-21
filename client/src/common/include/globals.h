@@ -50,8 +50,10 @@ struct KeyValuePairs
 #define MAX_TRIES_ALLOWED_WHILE_READING_FROM_NETWORK_MEDIUM 5
 ///////////////////////////////////////////////////////////////////////////////
 
+static const char * const g_pcHex = "0123456789abcdef";
+
 int sg_print(char **out, int *varg);
-int sg_sprintf(char *out, const char *format, ...);
+void sg_sprintf(char *out, const char *format, ...);
 
 #if 1
 #define SG_MEMSET(dest, byte, size)                             \

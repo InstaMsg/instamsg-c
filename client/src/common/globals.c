@@ -1,6 +1,7 @@
 #include "include/globals.h"
 
 #include <string.h>
+#include <stdarg.h>
 
 /*
 	Copyright 2001, 2002 Georges Menie (www.menie.org)
@@ -27,164 +28,412 @@
 	replace outbyte(c) by your own function call.
 */
 
-static void sg_printchar(char **str, int c)
+void sg_varargs(char *out, const char *pcString, va_list vaArgP)
 {
-	if (str) {
-		**str = c;
-		++(*str);
-	}
+    unsigned long ulIdx, ulValue, ulPos, ulCount, ulBase, ulNeg, temp;
+    char *pcStr, pcBuf[16], cFill;
+
+    //
+    // Loop while there are more characters in the string.
+    //
+    while(*pcString)
+    {
+        //
+        // Find the first non-% character, or the end of the string.
+        //
+        for(ulIdx = 0; (pcString[ulIdx] != '%') && (pcString[ulIdx] != '\0');
+            ulIdx++)
+        {
+        }
+
+        //
+        // Write this portion of the string.
+        //
+        for(temp = 0; temp < ulIdx; temp++)
+        {
+            *out = pcString[temp];
+            out++;
+            //UARTwrite(pcString, ulIdx);
+        }
+
+        //
+        // Skip the portion of the string that was written.
+        //
+        pcString += ulIdx;
+
+        //
+        // See if the next character is a %.
+        //
+        if(*pcString == '%')
+        {
+            //
+            // Skip the %.
+            //
+            pcString++;
+
+            //
+            // Set the digit count to zero, and the fill character to space
+            // (i.e. to the defaults).
+            //
+            ulCount = 0;
+            cFill = ' ';
+
+            //
+            // It may be necessary to get back here to process more characters.
+            // Goto's aren't pretty, but effective.  I feel extremely dirty for
+            // using not one but two of the beasts.
+            //
+again:
+
+            //
+            // Determine how to handle the next character.
+            //
+            switch(*pcString++)
+            {
+                //
+                // Handle the digit characters.
+                //
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                {
+                    //
+                    // If this is a zero, and it is the first digit, then the
+                    // fill character is a zero instead of a space.
+                    //
+                    if((pcString[-1] == '0') && (ulCount == 0))
+                    {
+                        cFill = '0';
+                    }
+
+                    //
+                    // Update the digit count.
+                    //
+                    ulCount *= 10;
+                    ulCount += pcString[-1] - '0';
+
+                    //
+                    // Get the next character.
+                    //
+                    goto again;
+                }
+
+                //
+                // Handle the %c command.
+                //
+                case 'c':
+                {
+                    //
+                    // Get the value from the varargs.
+                    //
+                    ulValue = va_arg(vaArgP, unsigned long);
+
+                    //
+                    // Print out the character.
+                    //
+                    *out = ulValue;
+
+                    //
+                    // This command has been handled.
+                    //
+                    break;
+                }
+
+                //
+                // Handle the %d and %i commands.
+                //
+                case 'd':
+                case 'i':
+                {
+                    //
+                    // Get the value from the varargs.
+                    //
+                    ulValue = va_arg(vaArgP, unsigned long);
+
+                    //
+                    // Reset the buffer position.
+                    //
+                    ulPos = 0;
+
+                    //
+                    // If the value is negative, make it positive and indicate
+                    // that a minus sign is needed.
+                    //
+                    if((long)ulValue < 0)
+                    {
+                        //
+                        // Make the value positive.
+                        //
+                        ulValue = -(long)ulValue;
+
+                        //
+                        // Indicate that the value is negative.
+                        //
+                        ulNeg = 1;
+                    }
+                    else
+                    {
+                        //
+                        // Indicate that the value is positive so that a minus
+                        // sign isn't inserted.
+                        //
+                        ulNeg = 0;
+                    }
+
+                    //
+                    // Set the base to 10.
+                    //
+                    ulBase = 10;
+
+                    //
+                    // Convert the value to ASCII.
+                    //
+                    goto convert;
+                }
+
+                //
+                // Handle the %s command.
+                //
+                case 's':
+                {
+                    //
+                    // Get the string pointer from the varargs.
+                    //
+                    pcStr = va_arg(vaArgP, char *);
+
+                    //
+                    // Determine the length of the string.
+                    //
+                    for(ulIdx = 0; pcStr[ulIdx] != '\0'; ulIdx++)
+                    {
+                    }
+
+                    //
+                    // Write the string.
+                    //
+                    for(temp = 0; temp < ulIdx; temp++)
+                    {
+                        *out = pcStr[temp];
+                        out++;
+                    }
+
+                    //
+                    // Write any required padding spaces
+                    //
+                    if(ulCount > ulIdx)
+                    {
+                        ulCount -= ulIdx;
+                        while(ulCount--)
+                        {
+                            *out = ' ';
+                            out++;
+                        }
+                    }
+                    //
+                    // This command has been handled.
+                    //
+                    break;
+                }
+
+                //
+                // Handle the %u command.
+                //
+                case 'u':
+                {
+                    //
+                    // Get the value from the varargs.
+                    //
+                    ulValue = va_arg(vaArgP, unsigned long);
+
+                    //
+                    // Reset the buffer position.
+                    //
+                    ulPos = 0;
+
+                    //
+                    // Set the base to 10.
+                    //
+                    ulBase = 10;
+
+                    //
+                    // Indicate that the value is positive so that a minus sign
+                    // isn't inserted.
+                    //
+                    ulNeg = 0;
+
+                    //
+                    // Convert the value to ASCII.
+                    //
+                    goto convert;
+                }
+
+                //
+                // Handle the %x and %X commands.  Note that they are treated
+                // identically; i.e. %X will use lower case letters for a-f
+                // instead of the upper case letters is should use.  We also
+                // alias %p to %x.
+                //
+                case 'x':
+                case 'X':
+                case 'p':
+                {
+                    //
+                    // Get the value from the varargs.
+                    //
+                    ulValue = va_arg(vaArgP, unsigned long);
+
+                    //
+                    // Reset the buffer position.
+                    //
+                    ulPos = 0;
+
+                    //
+                    // Set the base to 16.
+                    //
+                    ulBase = 16;
+
+                    //
+                    // Indicate that the value is positive so that a minus sign
+                    // isn't inserted.
+                    //
+                    ulNeg = 0;
+
+                    //
+                    // Determine the number of digits in the string version of
+                    // the value.
+                    //
+convert:
+                    for(ulIdx = 1;
+                        (((ulIdx * ulBase) <= ulValue) &&
+                         (((ulIdx * ulBase) / ulBase) == ulIdx));
+                        ulIdx *= ulBase, ulCount--)
+                    {
+                    }
+
+                    //
+                    // If the value is negative, reduce the count of padding
+                    // characters needed.
+                    //
+                    if(ulNeg)
+                    {
+                        ulCount--;
+                    }
+
+                    //
+                    // If the value is negative and the value is padded with
+                    // zeros, then place the minus sign before the padding.
+                    //
+                    if(ulNeg && (cFill == '0'))
+                    {
+                        //
+                        // Place the minus sign in the output buffer.
+                        //
+                        pcBuf[ulPos++] = '-';
+
+                        //
+                        // The minus sign has been placed, so turn off the
+                        // negative flag.
+                        //
+                        ulNeg = 0;
+                    }
+
+                    //
+                    // Provide additional padding at the beginning of the
+                    // string conversion if needed.
+                    //
+                    if((ulCount > 1) && (ulCount < 16))
+                    {
+                        for(ulCount--; ulCount; ulCount--)
+                        {
+                            pcBuf[ulPos++] = cFill;
+                        }
+                    }
+
+                    //
+                    // If the value is negative, then place the minus sign
+                    // before the number.
+                    //
+                    if(ulNeg)
+                    {
+                        //
+                        // Place the minus sign in the output buffer.
+                        //
+                        pcBuf[ulPos++] = '-';
+                    }
+
+                    //
+                    // Convert the value into a string.
+                    //
+                    for(; ulIdx; ulIdx /= ulBase)
+                    {
+                        pcBuf[ulPos++] = g_pcHex[(ulValue / ulIdx) % ulBase];
+                    }
+
+                    //
+                    // Write the string.
+                    //
+                    for(temp = 0; temp < ulPos; temp++)
+                    {
+                        *out = pcBuf[temp];
+                        out++;
+                    }
+
+                    //
+                    // This command has been handled.
+                    //
+                    break;
+                }
+
+                //
+                // Handle the %% command.
+                //
+                case '%':
+                {
+                    //
+                    // Simply write a single %.
+                    //
+                    *out = '%';
+                    out++;
+
+                    //
+                    // This command has been handled.
+                    //
+                    break;
+                }
+
+                //
+                // Handle all other commands.
+                //
+                default:
+                {
+                    //
+                    // Indicate an error.
+                    //
+
+                    //
+                    // This command has been handled.
+                    //
+                    break;
+                }
+            }
+        }
+    }
 }
 
-#define PAD_RIGHT 1
-#define PAD_ZERO 2
 
-static int sg_prints(char **out, const char *string, int width, int pad)
+void sg_sprintf(char *out, const char *pcString, ...)
 {
-	register int pc = 0, padchar = ' ';
-
-	if (width > 0) {
-		register int len = 0;
-		register const char *ptr;
-		for (ptr = string; *ptr; ++ptr) ++len;
-		if (len >= width) width = 0;
-		else width -= len;
-		if (pad & PAD_ZERO) padchar = '0';
-	}
-	if (!(pad & PAD_RIGHT)) {
-		for ( ; width > 0; --width) {
-			sg_printchar (out, padchar);
-			++pc;
-		}
-	}
-	for ( ; *string ; ++string) {
-		sg_printchar (out, *string);
-		++pc;
-	}
-	for ( ; width > 0; --width) {
-		sg_printchar (out, padchar);
-		++pc;
-	}
-
-	return pc;
-}
-
-/* the following should be enough for 32 bit int */
-#define PRINT_BUF_LEN 12
-
-static int sg_printi(char **out, int i, int b, int sg, int width, int pad, int letbase)
-{
-	char print_buf[PRINT_BUF_LEN];
-	register char *s;
-	register int t, neg = 0, pc = 0;
-	register unsigned int u = i;
-
-	if (i == 0) {
-		print_buf[0] = '0';
-		print_buf[1] = '\0';
-		return sg_prints (out, print_buf, width, pad);
-	}
-
-	if (sg && b == 10 && i < 0) {
-		neg = 1;
-		u = -i;
-	}
-
-	s = print_buf + PRINT_BUF_LEN-1;
-	*s = '\0';
-
-	while (u) {
-		t = u % b;
-		if( t >= 10 )
-			t += letbase - '0' - 10;
-		*--s = t + '0';
-		u /= b;
-	}
-
-	if (neg) {
-		if( width && (pad & PAD_ZERO) ) {
-			sg_printchar (out, '-');
-			++pc;
-			--width;
-		}
-		else {
-			*--s = '-';
-		}
-	}
-
-	return pc + sg_prints (out, s, width, pad);
-}
-
-int sg_print(char **out, int *varg)
-{
-	register int width, pad;
-	register int pc = 0;
-	register char *format = (char *)(*varg++);
-	char scr[2];
-
-
-	for (; *format != 0; ++format) {
-		if (*format == '%') {
-			++format;
-			width = pad = 0;
-			if (*format == '\0') break;
-			if (*format == '%') goto out;
-			if (*format == '-') {
-				++format;
-				pad = PAD_RIGHT;
-			}
-			while (*format == '0') {
-				++format;
-				pad |= PAD_ZERO;
-			}
-			for ( ; *format >= '0' && *format <= '9'; ++format) {
-				width *= 10;
-				width += *format - '0';
-			}
-			if( *format == 's' ) {
-				register char *s = *((char **)varg++);
-				pc += sg_prints (out, s?s:"(null)", width, pad);
-				continue;
-			}
-			if( *format == 'd' ) {
-				pc += sg_printi (out, *varg++, 10, 1, width, pad, 'a');
-				continue;
-			}
-			if( *format == 'x' ) {
-				pc += sg_printi (out, *varg++, 16, 0, width, pad, 'a');
-				continue;
-			}
-			if( *format == 'X' ) {
-				pc += sg_printi (out, *varg++, 16, 0, width, pad, 'A');
-				continue;
-			}
-			if( *format == 'u' ) {
-				pc += sg_printi (out, *varg++, 10, 0, width, pad, 'a');
-				continue;
-			}
-			if( *format == 'c' ) {
-				/* char are converted to int then pushed on the stack */
-				scr[0] = *varg++;
-				scr[1] = '\0';
-				pc += sg_prints (out, scr, width, pad);
-				continue;
-			}
-		}
-		else {
-		out:
-			sg_printchar (out, *format);
-			++pc;
-		}
-	}
-	if (out) **out = '\0';
-	return pc;
-}
-
-/* assuming sizeof(void *) == sizeof(int) */
-
-int sg_sprintf(char *out, const char *format, ...)
-{
-	register int *varg = (int *)(&format);
-	return sg_print(&out, varg);
+    va_list argptr;
+    va_start(argptr, pcString);
+    sg_varargs(out, pcString, argptr);
+    va_end(argptr);
 }
 
 
@@ -207,3 +456,15 @@ unsigned int sg_strlen(char *str)
     return len;
 }
 
+
+#if 0
+int main()
+{
+    char a[1000] = {0};
+
+    sg_sprintf(a, "Hi %s %d %c", "Ajay", 123, 't');
+    printf("\n%s\n", a);
+
+    return 0;
+}
+#endif

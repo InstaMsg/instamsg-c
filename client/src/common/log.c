@@ -14,15 +14,17 @@
 #include "./include/log.h"
 #include "./include/globals.h"
 
-char formatted_string[MAX_BUFFER_SIZE];
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
 #define LOG_COMMON_CODE(level)                                                                          \
                                                                                                         \
-    SG_MEMSET(formatted_string, 0, MAX_BUFFER_SIZE)                                                     \
-    register int *varg = (int *)(&fmt);                                                                 \
-    char *firstLevel = &(formatted_string[0]);                                                          \
-    sg_print(&firstLevel, varg);                                                                        \
+    char formatted_string[MAX_BUFFER_SIZE] = {0};                                                       \
+                                                                                                        \
+    va_list argptr;                                                                                     \
+    va_start(argptr, fmt);                                                                              \
+    sg_varargs(formatted_string, fmt, argptr);                                                          \
+    va_end(argptr);                                                                                     \
+                                                                                                        \
     strcat(formatted_string, "\n");                                                                     \
                                                                                                         \
     if(instaMsg.serverLoggingEnabled == 1)                                                              \
@@ -47,10 +49,13 @@ char formatted_string[MAX_BUFFER_SIZE];
 #else
 #define LOG_COMMON_CODE(level)                                                                          \
                                                                                                         \
-    SG_MEMSET(formatted_string, 0, MAX_BUFFER_SIZE)                                                     \
-    register int *varg = (int *)(&fmt);                                                                 \
-    char *firstLevel = &(formatted_string[0]);                                                          \
-    sg_print(&firstLevel, varg);                                                                        \
+    char formatted_string[MAX_BUFFER_SIZE] = {0};                                                       \
+                                                                                                        \
+    va_list argptr;                                                                                     \
+    va_start(argptr, fmt);                                                                              \
+    sg_varargs(formatted_string, fmt, argptr);                                                          \
+    va_end(argptr);                                                                                     \
+                                                                                                        \
     strcat(formatted_string, "\n");                                                                     \
                                                                                                         \
     if(instaMsg.serverLoggingEnabled == 1)                                                              \
