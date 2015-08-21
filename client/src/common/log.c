@@ -15,17 +15,19 @@
 #include "./include/globals.h"
 
 
+char formatted_string[MAX_BUFFER_SIZE] = {0};
+
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
 #define LOG_COMMON_CODE(level)                                                                          \
                                                                                                         \
-    char formatted_string[MAX_BUFFER_SIZE] = {0};                                                       \
+    memset(formatted_string, 0, MAX_BUFFER_SIZE);                                                       \
                                                                                                         \
     va_list argptr;                                                                                     \
     va_start(argptr, fmt);                                                                              \
     sg_varargs(formatted_string, fmt, argptr);                                                          \
     va_end(argptr);                                                                                     \
                                                                                                         \
-    strcat(formatted_string, "\n");                                                                     \
+    strcat(formatted_string, "\r\n");                                                                   \
                                                                                                         \
     if(instaMsg.serverLoggingEnabled == 1)                                                              \
     {                                                                                                   \
@@ -49,14 +51,14 @@
 #else
 #define LOG_COMMON_CODE(level)                                                                          \
                                                                                                         \
-    char formatted_string[MAX_BUFFER_SIZE] = {0};                                                       \
+    memset(formatted_string, 0, MAX_BUFFER_SIZE);                                                       \
                                                                                                         \
     va_list argptr;                                                                                     \
     va_start(argptr, fmt);                                                                              \
     sg_varargs(formatted_string, fmt, argptr);                                                          \
     va_end(argptr);                                                                                     \
                                                                                                         \
-    strcat(formatted_string, "\n");                                                                     \
+    strcat(formatted_string, "\r\n");                                                                   \
                                                                                                         \
     if(instaMsg.serverLoggingEnabled == 1)                                                              \
     {                                                                                                   \
