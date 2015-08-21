@@ -927,7 +927,7 @@ int MQTTPublish(InstaMsg* c,
         attachResultHandler(c, id, resultHandlerTimeout, resultHandler);
     }
 
-    len = MQTTSerialize_publish(buf, MAX_BUFFER_SIZE, 0, qos, retain, id, topic, (unsigned char*)payload, sg_strlen(payload) + 1);
+    len = MQTTSerialize_publish(buf, MAX_BUFFER_SIZE, 0, qos, retain, id, topic, (unsigned char*)payload, sg_strlen((char*)payload) + 1);
     if (len <= 0)
         goto exit;
     if ((rc = sendPacket(c, buf, len)) != SUCCESS) // send the subscribe packet
