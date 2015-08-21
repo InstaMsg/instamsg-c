@@ -1,7 +1,7 @@
 SYSTEM_INCLUDES=`echo                                               \
           `
 
-VENDOR="ar501"
+VENDOR="tiva_tm4c123gxl_launchpad"
 
 SYSTEM_IMPL="ar501_system"
 TIME_IMPL="ar501_time"
@@ -38,4 +38,4 @@ LD_SCRIPT="../embedded-flash-environment/tiva-template/${MCU}.ld"
 LINK_COMMAND="../embedded-flash-environment/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-gcc -T ${LD_SCRIPT} --entry ResetISR -Wl,--gc-sections "
 #LINK_COMMAND="../embedded-flash-environment/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-gcc -T ${LD_SCRIPT} --entry ResetISR -Wl,--gc-sections "
 
-declare -a FINAL_COMMANDS=("../embedded-flash-environment/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-objcopy -O binary build/${VENDOR}/instamsg build/${VENDOR}/instamsg_to_flash" "../embedded-flash-environment/lm4tools/lm4flash/lm4flash instamsg_to_flash")
+declare -a FINAL_COMMANDS=("../embedded-flash-environment/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-objcopy -O binary build/${VENDOR}/instamsg build/${VENDOR}/instamsg_to_flash" "../embedded-flash-environment/lm4tools/lm4flash/lm4flash build/${VENDOR}/instamsg_to_flash")
