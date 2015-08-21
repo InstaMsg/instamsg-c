@@ -53,7 +53,6 @@ static void UARTSend(const unsigned char *string, unsigned int len)
         // Write the next character to the UART.
         //
         ROM_UARTCharPut(UART0_BASE, (*string));
-        ROM_UARTCharPut(UART0_BASE, sizeof(int));
         string++;
     }
 }
