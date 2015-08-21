@@ -62,14 +62,6 @@ static void UARTSend(const unsigned char *string, unsigned int len)
 static void init(void)
 {
     //
-    // Enable lazy stacking for interrupt handlers.  This allows floating-point
-    // instructions to be used within interrupt handlers, but at the expense of
-    // extra stack usage.
-    //
-    ROM_FPUEnable();
-    ROM_FPULazyStackingEnable();
-
-    //
     // Set the clocking to run directly from the crystal.
     //
     ROM_SysCtlClockSet(SYSCTL_SYSDIV_1 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
@@ -81,20 +73,11 @@ static void init(void)
     ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
 
     //
-    // Enable the GPIO pins for the LED (PF2).
-    //
-    ROM_GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_2);
-
-    //
     // Enable the peripherals used by this example.
     //
     ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
     ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
 
-    //
-    // Enable processor interrupts.
-    //
-    ROM_IntMasterEnable();
 
     //
     // Set GPIO A0 and A1 as UART pins.
@@ -110,11 +93,6 @@ static void init(void)
                             (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
                              UART_CONFIG_PAR_NONE));
 
-    //
-    // Enable the UART interrupt.
-    //
-    ROM_IntEnable(INT_UART0);
-    ROM_UARTIntEnable(UART0_BASE, UART_INT_RX | UART_INT_RT);
 }
 
 
