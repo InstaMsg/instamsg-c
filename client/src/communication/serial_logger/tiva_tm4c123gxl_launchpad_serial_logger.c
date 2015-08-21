@@ -38,40 +38,6 @@ __error__(char *pcFilename, uint32_t ui32Line)
 }
 #endif
 
-static char UARTRead(void)
-{
-    uint32_t ui32Status;
-    char ch;
-
-    /*
-     * This code was picked up, where this method was called upon interrupts.
-     * But here, this is being called synchronously.
-     *
-     * TODO: Clean this interrupt-related code.
-     */
-    //
-    // Get the interrrupt status.
-    //
-    ui32Status = ROM_UARTIntStatus(UART0_BASE, true);
-
-    //
-    // Clear the asserted interrupts.
-    //
-    ROM_UARTIntClear(UART0_BASE, ui32Status);
-
-    //
-    // Loop while there are characters in the receive FIFO.
-    //
-    if(1)
-    {
-        /*
-         * Get the character in a blocking-manner.
-         */
-        ch = ROM_UARTCharGet(UART0_BASE);
-    }
-
-    return ch;
-}
 
 //*****************************************************************************
 //
@@ -150,39 +116,23 @@ static void init(void)
 }
 
 
-static int tiva_serial_read(Serial* serial, unsigned char* buffer, int len, unsigned char guaranteed)
-{
-    int pos = 0;
-    while(len-- > 0)
-    {
-        char ch = UARTRead();
-        buffer[pos++] = ch;
-    }
-
-    return SUCCESS;
-}
-
-
-static int tiva_serial_write(Serial* serial, unsigned char* buffer, int len)
+static int tiva_serial_logger_write(SerialLoggerInterface* serialLoggerInterface, unsigned char* buffer, int len)
 {
     UARTSend(buffer);
     return SUCCESS;
 }
 
 
-void init_serial_interface(Serial *serial, void *arg)
+void init_serial_logger_interface(SerialLoggerInterface *serialLoggerInterface, void *arg)
 {
     init();
 
-    // Register read-callback.
-	serial->read = tiva_serial_read;
-
     // Register write-callback.
-	serial->write = tiva_serial_write;
+	serialLoggerInterface->write = tiva_serial_logger_write;
 }
 
 
-void release_serial_interface(Serial *serial)
+void release_serial_logger_interface(SerialLoggerInterface *serialLoggerInterface)
 {
     /*
      * Nothing to be done as such.
