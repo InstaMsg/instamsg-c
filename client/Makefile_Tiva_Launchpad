@@ -14,7 +14,7 @@ EXTRA_SOURCES=`echo													\
 			  src/vendors/ar501/tiva_startup_gcc.c`
 
 EXTRA_OBJECT_FILES=`echo														\
-					../embedded-flash-environment/tivaware/driverlib/gcc/*.o	`
+					../embedded-flash-environment/tivaware/driverlib/gcc/gpio.o	`
 
 MAIN_CLASS="device.c"
 
