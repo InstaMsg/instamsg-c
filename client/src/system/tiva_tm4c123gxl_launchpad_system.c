@@ -7,8 +7,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include "driverlib/rom.h"
+#include "inc/hw_memmap.h"
+#include "driverlib/gpio.h"
+#include "driverlib/pin_map.h"
 #include "driverlib/sysctl.h"
+#include "driverlib/uart.h"
+#include "driverlib/rom.h"
 
 
 
@@ -74,9 +78,31 @@ void release_system_utils(System *system)
  */
 void SYSTEM_GLOBAL_INIT()
 {
-    //
-    // Set the clocking to run directly from the crystal.
-    //
+    /*
+     * Set the clocking to run directly from the crystal.
+     */
     ROM_SysCtlClockSet(SYSCTL_SYSDIV_1 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
                        SYSCTL_XTAL_16MHZ);
+
+
+
+    /*
+     * UART-initialiazation, for serial-logger functionality.
+     */
+
+    // Enable the peripherals.
+    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+
+
+    // Set GPIO A1 as UART-Transmitter pins.
+    GPIOPinConfigure(GPIO_PA1_U0TX);
+    ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_1);
+
+    // Configure the UART for 9600, 8-N-1 operation.
+    ROM_UARTConfigSetExpClk(UART0_BASE, ROM_SysCtlClockGet(), 9600,
+                            (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
+                             UART_CONFIG_PAR_NONE));
+
 }
+
