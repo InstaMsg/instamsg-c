@@ -103,5 +103,33 @@ void SYSTEM_GLOBAL_INIT()
     ROM_UARTConfigSetExpClk(UART0_BASE, ROM_SysCtlClockGet(), 9600,
                             (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
                              UART_CONFIG_PAR_NONE));
+
+
+    // Enable the peripherals.
+    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART1);
+    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
+    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+
+
+    // Set GPIO A1 as UART-Transmitter pins.
+    GPIOPinConfigure(GPIO_PB0_U1RX);
+    GPIOPinConfigure(GPIO_PB1_U1TX);
+    ROM_GPIOPinTypeUART(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+
+    // Configure GPIO pins for UART1 HW flow control
+    GPIOPinConfigure(GPIO_PC4_U1RTS);
+    GPIOPinConfigure(GPIO_PC5_U1CTS);
+    ROM_GPIOPinTypeUART(GPIO_PORTC_BASE, GPIO_PIN_4 | GPIO_PIN_5);
+
+    // Configure the UART for 9600, 8-N-1 operation.
+    ROM_UARTConfigSetExpClk(UART1_BASE, ROM_SysCtlClockGet(), 9600,
+                            (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
+                             UART_CONFIG_PAR_NONE));
+
+    // Enable RTS/CTS HW flow control for UART1
+    UARTFlowControlSet(UART1_BASE, UART_FLOWCONTROL_RX | UART_FLOWCONTROL_TX);
+    // Enable UART1, this call also enables the FIFO buffer necessary for HW flow control
+    UARTEnable(UART1_BASE);
+
 }
 

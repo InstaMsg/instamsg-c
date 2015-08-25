@@ -573,9 +573,9 @@ void initInstaMsg(InstaMsg* c,
                   char *logFilePath)
 {
     int i;
-    currentLogLevel = LOG_LEVEL;
+//    currentLogLevel = LOG_LEVEL;
 
-    init_serial_logger(&serialLogger, NULL);
+  //  init_serial_logger(&serialLogger, NULL);
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
     init_file_logger(&fileLogger, logFilePath);

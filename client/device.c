@@ -41,8 +41,25 @@ int main()
 #endif
 
 #if 1
+#include "uart_utils.h"
+
+#include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
+#include "inc/hw_memmap.h"
+#include "driverlib/gpio.h"
+#include "driverlib/pin_map.h"
+#include "driverlib/sysctl.h"
+#include "driverlib/uart.h"
+#include "driverlib/rom.h"
+
+
+
+
 #include "src/common/include/instamsg.h"
 #include "src/common/include/globals.h"
+
+#include <string.h>
 
 void coreLoopyBusinessLogicInitiatedBySelf()
 {
@@ -50,10 +67,42 @@ void coreLoopyBusinessLogicInitiatedBySelf()
 }
 
 
+
+unsigned char result[MAX_BUFFER_SIZE] = {0};
+unsigned char command[MAX_BUFFER_SIZE] = {0};
 int main(int argc, char** argv)
 {
+
     SYSTEM_GLOBAL_INIT();
-    start("920dfd80-2eef-11e5-b031-34689524378f", "ajaygarg456", NULL, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, NULL);
+
+    currentLogLevel = LOG_LEVEL;
+
+    init_serial_logger(&serialLogger, NULL);
+
+#if 1
+    info_log("sending command to gprs %d", sizeof(command));
+    bzero(command, MAX_BUFFER_SIZE);
+    //memset(command, 0, MAX_BUFFER_SIZE);
+    strcpy((char*)command, "AT\r\n");
+
+    UARTSend(UART1_BASE, command, strlen((char*)command));
+    info_log("sent command [%s] to gprs of length [%d]", command, strlen((char*)command));
+
+#if 0
+    memset(command, 0, MAX_BUFFER_SIZE);
+    strcpy((char*)command, "AT\r\n");
+
+    UARTSend(UART1_BASE, command, strlen((char*)command));
+    info_log("sent command [%s] to gprs of length [%d]", command, strlen((char*)command));
+#endif
+
+ 
+    memset(result, 0, MAX_BUFFER_SIZE);
+    UARTRecv(UART1_BASE, result, 10000, NO_TIMEOUT);
+#endif
+
+
+    //start("920dfd80-2eef-11e5-b031-34689524378f", "ajaygarg456", NULL, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, NULL);
 }
 #endif
 

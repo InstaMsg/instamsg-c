@@ -27,11 +27,16 @@ int UARTRecv(const unsigned int UART_ID, unsigned char *buf, unsigned int len, u
 
     int rc = FAILURE;
 
+    
+    info_log("debug1 UARTRecv");
     if(timeout == NO_TIMEOUT)
     {
+    info_log("debug2 UARTRecv");
         for(i = 0; i < len; i++)
         {
+    info_log("debug3 UARTRecv");
             *buf = ROM_UARTCharGet(UART_ID);
+            info_log("[%c]", *buf);
             buf++;
         }
 
