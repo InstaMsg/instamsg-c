@@ -7,7 +7,6 @@
 
 #include "instamsg_vendor.h"
 #include "../../common/include/instamsg.h"
-
 #include <string.h>
 
 
@@ -31,7 +30,7 @@ static void release_underlying_medium_guaranteed(Network* network)
  */
 static void connect_underlying_medium_try_once(Network* network, char *hostName, int port)
 {
-    START_TIMER(1)
+    startAndCountdownTimer(1);
 }
 
 

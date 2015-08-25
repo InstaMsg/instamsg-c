@@ -103,6 +103,5 @@ void SYSTEM_GLOBAL_INIT()
     ROM_UARTConfigSetExpClk(UART0_BASE, ROM_SysCtlClockGet(), 9600,
                             (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
                              UART_CONFIG_PAR_NONE));
-
 }
 

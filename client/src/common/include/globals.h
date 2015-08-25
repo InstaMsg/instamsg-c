@@ -56,6 +56,7 @@ static const char * const g_pcHex = "0123456789abcdef";
 void sg_varargs(char *out, const char *pcString, va_list vaArgP);
 void sg_sprintf(char *out, const char *format, ...);
 
-#define START_TIMER(seconds) instaMsg.singletonUtilityTimer.startAndCountdownTimer(&(instaMsg.singletonUtilityTimer), seconds);
+#define NO_TIMEOUT 0
 
+void startAndCountdownTimer(int seconds);
 #endif

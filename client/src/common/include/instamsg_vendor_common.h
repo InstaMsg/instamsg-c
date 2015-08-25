@@ -157,10 +157,10 @@ void release_modbus_command_interface(ModbusCommandInterface *modbusCommandInter
     void (*getOffset)(Timer *timer, char *buf);                                                                     \
                                                                                                                     \
                                                                                                                     \
-    /*                                                                                                              \
-     * This method causes the current thread to wait for "n" seconds.                                               \
-     */                                                                                                             \
-    void (*startAndCountdownTimer)(Timer *timer, int n);
+    unsigned int (*getMinimumDelayPossibleInMicroSeconds)(Timer *timer);                                            \
+                                                                                                                    \
+                                                                                                                    \
+    void (*minimumDelay)(Timer *timer);
 
 
 typedef struct Timer Timer;

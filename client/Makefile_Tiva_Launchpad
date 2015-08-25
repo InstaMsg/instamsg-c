@@ -16,7 +16,8 @@ EXTRA_SOURCES=`echo													\
 
 EXTRA_OBJECT_FILES=`echo																\
 					../embedded-flash-environment/tivaware/driverlib/gcc/gpio.o			\
-					../embedded-flash-environment/tivaware/driverlib/gcc/sysctl.o		`
+					../embedded-flash-environment/tivaware/driverlib/gcc/sysctl.o		\
+					../embedded-flash-environment/tivaware/driverlib/gcc/systick.o		`
 
 MAIN_CLASS="device.c"
 

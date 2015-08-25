@@ -1,4 +1,5 @@
 #include "include/globals.h"
+#include "include/instamsg.h"
 
 #include <string.h>
 #include <stdarg.h>
@@ -412,3 +413,20 @@ void sg_sprintf(char *out, const char *format, ...)
 }
 
 
+/*
+ * This method causes the current thread to wait for "n" seconds.
+ */
+void startAndCountdownTimer(int seconds)
+{
+    int i;
+    long j;
+    long cycles = 1000000 / (instaMsg.singletonUtilityTimer.getMinimumDelayPossibleInMicroSeconds(&(instaMsg.singletonUtilityTimer)));
+
+    for(i = 0; i < seconds; i++)
+    {
+        for(j = 0; j < cycles; j++)
+        {
+            instaMsg.singletonUtilityTimer.minimumDelay(&(instaMsg.singletonUtilityTimer));
+        }
+    }
+}

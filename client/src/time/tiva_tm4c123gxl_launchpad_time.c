@@ -7,6 +7,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "driverlib/sysctl.h"
+#include "driverlib/systick.h"
+#include "driverlib/rom.h"
+#include "driverlib/rom_map.h"
 
 #include "instamsg_vendor.h"
 
@@ -47,17 +50,19 @@ static void getOffset(Timer *timer, char *buf)
 }
 
 
-/*
- * This method causes the current thread to wait for "n" seconds.
- */
-static void startAndCountdownTimer(Timer *timer, int seconds)
+unsigned int getMinimumDelayPossibleInMicroSeconds(Timer *timer)
 {
-    int i;
-    for(i = 0; i < seconds; i++)
-    {
-         SysCtlDelay(SysCtlClockGet() / 3);
-    }
+    return 5;
 }
+
+
+void minimumDelay(Timer *timer)
+{
+    ROM_SysCtlDelay(ROM_SysCtlClockGet() / 3000000);
+}
+
+
+
 
 
 /*
@@ -67,7 +72,8 @@ void init_timer(Timer *timer, void *arg)
 {
     timer->getTimeIn_YYYYmmdd4HHMMSS = getTimeIn_YYYYmmdd4HHMMSS;
     timer->getOffset = getOffset;
-    timer->startAndCountdownTimer = startAndCountdownTimer;
+    timer->getMinimumDelayPossibleInMicroSeconds = getMinimumDelayPossibleInMicroSeconds;
+    timer->minimumDelay = minimumDelay;
 }
 
 
