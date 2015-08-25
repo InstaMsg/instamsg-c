@@ -13,11 +13,12 @@
 #include "inc/hw_memmap.h"
 #include "driverlib/gpio.h"
 #include "driverlib/pin_map.h"
-#include "driverlib/rom.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
+#include "driverlib/rom.h"
 
 #include "instamsg_vendor.h"
+#include "uart_utils.h"
 #include "../../common/include/globals.h"
 
 
@@ -33,25 +34,6 @@ __error__(char *pcFilename, uint32_t ui32Line)
 {
 }
 #endif
-
-
-//*****************************************************************************
-//
-// Send a string to the UART.
-//
-//*****************************************************************************
-static void UARTSend(const unsigned char *string, unsigned int len)
-{
-    int i;
-    for(i = 0; i < len; i++)
-    {
-        //
-        // Write the next character to the UART.
-        //
-        ROM_UARTCharPut(UART0_BASE, (*string));
-        string++;
-    }
-}
 
 
 static void init(void)
@@ -81,7 +63,7 @@ static void init(void)
 
 static int tiva_serial_logger_write(SerialLoggerInterface* serialLoggerInterface, unsigned char* buffer, int len)
 {
-    UARTSend(buffer, len);
+    UARTSend(UART0_BASE, buffer, len);
     return SUCCESS;
 }
 

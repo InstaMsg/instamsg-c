@@ -11,7 +11,8 @@ MODBUS_COMMAND_COMMUNICATION_IMPL="ar501_modbus_command.c"
 SERIAL_LOGGER_COMMUNICATION_IMPL="tiva_tm4c123gxl_launchpad_serial_logger.c"
 
 EXTRA_SOURCES=`echo													\
-			  src/vendors/ar501/tiva_startup_gcc.c`
+			  src/vendors/ar501/tiva_startup_gcc.c					\
+			  src/vendors/${VENDOR}/uart_utils.c	`
 
 EXTRA_OBJECT_FILES=`echo																\
 					../embedded-flash-environment/tivaware/driverlib/gcc/gpio.o			\
