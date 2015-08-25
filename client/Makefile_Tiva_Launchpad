@@ -3,7 +3,7 @@ SYSTEM_INCLUDES=`echo                                               \
 
 VENDOR="tiva_tm4c123gxl_launchpad"
 
-SYSTEM_IMPL="ar501_system.c"
+SYSTEM_IMPL="tiva_tm4c123gxl_launchpad_system.c"
 TIME_IMPL="ar501_time.c"
 NETWORK_COMMUNICATION_IMPL="ar501_gsm.c"
 FS_COMMUNICATION_IMPL=""
