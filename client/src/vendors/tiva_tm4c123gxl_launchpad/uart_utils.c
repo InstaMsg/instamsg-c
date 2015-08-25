@@ -5,7 +5,7 @@
 #include "../../common/include/instamsg.h"
 
 
-void UARTSend(const unsigned int UART_ID, const unsigned char *string, unsigned int len)
+void UARTSend(const unsigned int UART_ID, unsigned char *buf, unsigned int len)
 {
     int i;
     for(i = 0; i < len; i++)
@@ -13,8 +13,8 @@ void UARTSend(const unsigned int UART_ID, const unsigned char *string, unsigned 
         //
         // Write the next character to the UART.
         //
-        ROM_UARTCharPut(UART_ID, (*string));
-        string++;
+        ROM_UARTCharPut(UART_ID, (*buf));
+        buf++;
     }
 }
 
