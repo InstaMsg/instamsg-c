@@ -79,11 +79,10 @@ static void init(void)
 
 
     //
-    // Set GPIO A0 and A1 as UART pins.
+    // Set GPIO A1 as UART-Transmitter pins.
     //
-    GPIOPinConfigure(GPIO_PA0_U0RX);
     GPIOPinConfigure(GPIO_PA1_U0TX);
-    ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+    ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_1);
 
     //
     // Configure the UART for 9600, 8-N-1 operation.
