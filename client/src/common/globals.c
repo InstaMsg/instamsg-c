@@ -115,6 +115,7 @@ again:
                     // Print out the character.
                     //
                     *out = ulValue;
+                    out++;
 
                     //
                     // This command has been handled.
