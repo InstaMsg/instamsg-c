@@ -72,8 +72,8 @@ unsigned char result[MAX_BUFFER_SIZE] = {0};
 unsigned char command[MAX_BUFFER_SIZE] = {0};
 int main(int argc, char** argv)
 {
-
     globalSystemInit();
+
 #if 1
     info_log("sending command to gprs %d", sizeof(command));
     bzero(command, MAX_BUFFER_SIZE);
