@@ -108,7 +108,7 @@ struct InstaMsg {
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
     FileSystem singletonUtilityFs;
 #endif
-    System systemUtils;
+    System singletonSystemUtils;
 
     MQTTPacket_connectData connectOptions;
     char clientIdMachine[MAX_BUFFER_SIZE];

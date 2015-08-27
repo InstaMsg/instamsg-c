@@ -31,17 +31,25 @@ static void getOffset(Timer *timer, char *buf)
 }
 
 
-static void startAndCountdownTimer(Timer *timer, int seconds)
+unsigned int getMinimumDelayPossibleInMicroSeconds(Timer *timer)
 {
-    sleep(seconds);
+    return 5;
 }
+
+
+void minimumDelay(Timer *timer)
+{
+    usleep(5);
+}
+
 
 
 void init_timer(Timer *timer, void *arg)
 {
     timer->getTimeIn_YYYYmmdd4HHMMSS = getTimeIn_YYYYmmdd4HHMMSS;
     timer->getOffset = getOffset;
-    timer->startAndCountdownTimer = startAndCountdownTimer;
+    timer->getMinimumDelayPossibleInMicroSeconds = getMinimumDelayPossibleInMicroSeconds;
+    timer->minimumDelay = minimumDelay;
 }
 
 

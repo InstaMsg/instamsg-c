@@ -1,6 +1,17 @@
 #include <stdint.h>
 #include "driverlib/rom.h"
 
+#include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
+#include "inc/hw_memmap.h"
+#include "driverlib/gpio.h"
+#include "driverlib/pin_map.h"
+#include "driverlib/sysctl.h"
+#include "driverlib/uart.h"
+#include "driverlib/rom.h"
+
+
 #include "../../common/include/globals.h"
 #include "../../common/include/instamsg.h"
 
@@ -14,6 +25,8 @@ void UARTSend(const unsigned int UART_ID, unsigned char *buf, unsigned int len)
         // Write the next character to the UART.
         //
         ROM_UARTCharPut(UART_ID, (*buf));
+        //ROM_UARTCharPut(UART2_BASE, (*buf));
+        //ROM_UARTCharPut(UART_ID, 'a');
         buf++;
     }
 }
@@ -28,15 +41,18 @@ int UARTRecv(const unsigned int UART_ID, unsigned char *buf, unsigned int len, u
     int rc = FAILURE;
 
     
-    info_log("debug1 UARTRecv");
+    //info_log("debug1 UARTRecv");
     if(timeout == NO_TIMEOUT)
     {
-    info_log("debug2 UARTRecv");
+    //info_log("debug2 UARTRecv");
         for(i = 0; i < len; i++)
         {
     info_log("debug3 UARTRecv");
             *buf = ROM_UARTCharGet(UART_ID);
+            //ROM_UARTCharPut(UART_ID, *buf);
+        //ROM_UARTCharPut(UART0_BASE, *buf);
             info_log("[%c]", *buf);
+        //ROM_UARTCharPut(UART1_BASE, *buf);
             buf++;
         }
 

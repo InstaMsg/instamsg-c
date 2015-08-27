@@ -546,19 +546,14 @@ void sendPingReqToServer(InstaMsg *c)
 void clearInstaMsg(InstaMsg *c)
 {
     release_network(&(c->ipstack));
-    release_system_utils(&(c->systemUtils));
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
     release_file_system(&(c->singletonUtilityFs));
 #endif
 
-    release_timer(&(c->singletonUtilityTimer));
-
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
     release_file_logger(&fileLogger);
 #endif
-
-    release_serial_logger(&serialLogger);
 
     c->connected = 0;
 }
@@ -573,21 +568,16 @@ void initInstaMsg(InstaMsg* c,
                   char *logFilePath)
 {
     int i;
-//    currentLogLevel = LOG_LEVEL;
-
-  //  init_serial_logger(&serialLogger, NULL);
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
     init_file_logger(&fileLogger, logFilePath);
 #endif
 
-    init_timer(&(c->singletonUtilityTimer), NULL);
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
     init_file_system(&(c->singletonUtilityFs), "");
 #endif
 
-    init_system_utils(&(c->systemUtils), NULL);
 
     (c->ipstack).socketCorrupted = 1;
 	init_network(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT);
@@ -762,7 +752,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                     }
                     else if(strcmp(topicName, c->rebootTopic) == 0)
                     {
-                        (c->systemUtils).rebootDevice(&(c->systemUtils));
+                        instaMsg.singletonSystemUtils.rebootDevice(&(instaMsg.singletonSystemUtils));
                         break;
                     }
                 }

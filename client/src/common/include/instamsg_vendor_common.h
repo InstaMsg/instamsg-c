@@ -192,11 +192,15 @@ void release_timer(Timer *timer);
      */                                                                                                             \
     void (*rebootDevice)(System *system);                                                                           \
                                                                                                                     \
+                                                                                                                    \
+    /*                                                                                                              \
+     * Does the device-specific initialization.                                                                     \
+     */                                                                                                             \
+    void (*localSystemInit)(System *system);
 
 typedef struct System System;
 void init_system_utils(System *system, void *arg);
 void release_system_utils(System *system);
-void SYSTEM_GLOBAL_INIT();
 
 
 #endif

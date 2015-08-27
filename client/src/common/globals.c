@@ -431,3 +431,17 @@ void startAndCountdownTimer(int seconds)
         }
     }
 }
+
+
+void globalSystemInit()
+{
+    currentLogLevel = LOG_LEVEL;
+    init_serial_logger(&serialLogger, NULL);
+
+    init_timer(&(instaMsg.singletonUtilityTimer), NULL);
+
+    init_system_utils(&(instaMsg.singletonSystemUtils), NULL);
+    instaMsg.singletonSystemUtils.localSystemInit(&(instaMsg.singletonSystemUtils));
+}
+
+

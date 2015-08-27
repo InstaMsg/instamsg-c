@@ -79,7 +79,8 @@ static void connect_underlying_medium_try_once(Network* network, unsigned char *
                 if(connect(network->socket, (struct sockaddr*)&address, sizeof(address)) != 0)
                 {
                     info_log(NETWORK_NOT_AVAILABLE);
-                    START_TIMER(1)
+                    startAndCountdownTimer(1);
+
                     return;
                 }
                 else

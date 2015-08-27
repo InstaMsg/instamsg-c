@@ -30,11 +30,19 @@ static void rebootDevice(System *sys)
 }
 
 
+void localSystemInit(System *sys)
+{
+    // VERY IMPORTANT: If this is not done, the "write" on an invalid socket will cause program-crash
+    signal(SIGPIPE, SIG_IGN);
+}
+
+
 void init_system_utils(System *system, void *arg)
 {
     system->getManufacturer = getManufacturer;
     system->getSerialNumber = getSerialNumber;
     system->rebootDevice = rebootDevice;
+    system->localSystemInit = localSystemInit;
 }
 
 
@@ -43,8 +51,4 @@ void release_system_utils(System *system)
 }
 
 
-void SYSTEM_GLOBAL_INIT()
-{
-    // VERY IMPORTANT: If this is not done, the "write" on an invalid socket will cause program-crash
-    signal(SIGPIPE, SIG_IGN);
-}
+

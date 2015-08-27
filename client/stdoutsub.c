@@ -189,7 +189,7 @@ void coreLoopyBusinessLogicInitiatedBySelf()
 {
     int rc;
 
-    instaMsg.singletonUtilityTimer.startAndCountdownTimer(&(instaMsg.singletonUtilityTimer), 3);
+    startAndCountdownTimer(3);
 	if(opts_p->publish == 1)
 	{
         char buf[MAX_BUFFER_SIZE] = {0};
@@ -243,7 +243,7 @@ static int onDisconnect()
 
 int main(int argc, char** argv)
 {
-    SYSTEM_GLOBAL_INIT();
+    globalSystemInit();
 
     struct opts_struct opts =
     {

@@ -59,4 +59,5 @@ void sg_sprintf(char *out, const char *format, ...);
 #define NO_TIMEOUT 0
 
 void startAndCountdownTimer(int seconds);
+void globalSystemInit();
 #endif
