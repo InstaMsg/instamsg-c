@@ -33,13 +33,13 @@ static void getOffset(Timer *timer, char *buf)
 
 unsigned int getMinimumDelayPossibleInMicroSeconds(Timer *timer)
 {
-    return 5;
+    return 500;
 }
 
 
 void minimumDelay(Timer *timer)
 {
-    usleep(5);
+    usleep(500);
 }
 
 

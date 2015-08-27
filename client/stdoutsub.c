@@ -243,7 +243,6 @@ static int onDisconnect()
 
 int main(int argc, char** argv)
 {
-    globalSystemInit();
 
     struct opts_struct opts =
     {
@@ -270,6 +269,7 @@ int main(int argc, char** argv)
 	signal(SIGTERM, cfinish);
 
 
+    globalSystemInit();
     start(opts.clientid, opts.password, onConnectOneTimeOperations, onDisconnect, NULL,
           coreLoopyBusinessLogicInitiatedBySelf, opts.logFilePath);
 }
