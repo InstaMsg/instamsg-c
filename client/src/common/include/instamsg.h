@@ -104,11 +104,9 @@ struct InstaMsg {
     unsigned char serverLoggingEnabled;
 
     Network ipstack;
-    Timer singletonUtilityTimer;
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
     FileSystem singletonUtilityFs;
 #endif
-    System singletonSystemUtils;
 
     MQTTPacket_connectData connectOptions;
     char clientIdMachine[MAX_BUFFER_SIZE];

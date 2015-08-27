@@ -752,7 +752,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                     }
                     else if(strcmp(topicName, c->rebootTopic) == 0)
                     {
-                        instaMsg.singletonSystemUtils.rebootDevice(&(instaMsg.singletonSystemUtils));
+                        singletonSystemUtils.rebootDevice(&singletonSystemUtils);
                         break;
                     }
                 }

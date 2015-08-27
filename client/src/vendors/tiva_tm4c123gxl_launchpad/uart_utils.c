@@ -60,7 +60,7 @@ int UARTRecv(const unsigned int UART_ID, unsigned char *buf, unsigned int len, u
     }
     else
     {
-        numDelays = (1000000 / instaMsg.singletonUtilityTimer.getMinimumDelayPossibleInMicroSeconds(&(instaMsg.singletonUtilityTimer))) *
+        numDelays = (1000000 / singletonUtilityTimer.getMinimumDelayPossibleInMicroSeconds(&singletonUtilityTimer)) *
                     timeout;
         j = 0;
 

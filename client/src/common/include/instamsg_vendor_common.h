@@ -203,5 +203,8 @@ void init_system_utils(System *system, void *arg);
 void release_system_utils(System *system);
 
 
+Timer singletonUtilityTimer;
+System singletonSystemUtils;
+
 #endif
 

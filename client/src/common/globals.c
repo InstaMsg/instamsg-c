@@ -421,13 +421,13 @@ void startAndCountdownTimer(int seconds)
 {
     int i;
     long j;
-    long cycles = 1000000 / (instaMsg.singletonUtilityTimer.getMinimumDelayPossibleInMicroSeconds(&(instaMsg.singletonUtilityTimer)));
+    long cycles = 1000000 / (singletonUtilityTimer.getMinimumDelayPossibleInMicroSeconds(&singletonUtilityTimer));
 
     for(i = 0; i < seconds; i++)
     {
         for(j = 0; j < cycles; j++)
         {
-            instaMsg.singletonUtilityTimer.minimumDelay(&(instaMsg.singletonUtilityTimer));
+            singletonUtilityTimer.minimumDelay(&singletonUtilityTimer);
         }
     }
 }
@@ -438,10 +438,10 @@ void globalSystemInit()
     currentLogLevel = LOG_LEVEL;
     init_serial_logger(&serialLogger, NULL);
 
-    init_timer(&(instaMsg.singletonUtilityTimer), NULL);
+    init_timer(&singletonUtilityTimer, NULL);
 
-    init_system_utils(&(instaMsg.singletonSystemUtils), NULL);
-    instaMsg.singletonSystemUtils.localSystemInit(&(instaMsg.singletonSystemUtils));
+    init_system_utils(&singletonSystemUtils, NULL);
+    singletonSystemUtils.localSystemInit(&singletonSystemUtils);
 }
 
 
