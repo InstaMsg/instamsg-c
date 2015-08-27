@@ -54,30 +54,7 @@ static void rebootDevice(System *sys)
 }
 
 
-/*
- * NOTHING EXTRA NEEDS TO BE DONE HERE.
- */
-void init_system_utils(System *system, void *arg)
-{
-    system->getManufacturer = getManufacturer;
-    system->getSerialNumber = getSerialNumber;
-    system->rebootDevice = rebootDevice;
-}
-
-
-/*
- * NOTHING EXTRA NEEDS TO BE DONE HERE.
- */
-void release_system_utils(System *system)
-{
-}
-
-
-/*
- * This method does the one-time system-initialization.
- * This code is called right at the beginning of InstaMsg-binary.
- */
-void SYSTEM_GLOBAL_INIT()
+static void localSystemInit(System *sys)
 {
     /*
      * Set the clocking to run directly from the crystal.
@@ -145,4 +122,26 @@ void SYSTEM_GLOBAL_INIT()
 #endif
 
 }
+
+
+/*
+ * NOTHING EXTRA NEEDS TO BE DONE HERE.
+ */
+void init_system_utils(System *system, void *arg)
+{
+    system->getManufacturer = getManufacturer;
+    system->getSerialNumber = getSerialNumber;
+    system->rebootDevice = rebootDevice;
+    system->localSystemInit = localSystemInit;
+}
+
+
+/*
+ * NOTHING EXTRA NEEDS TO BE DONE HERE.
+ */
+void release_system_utils(System *system)
+{
+}
+
+
 

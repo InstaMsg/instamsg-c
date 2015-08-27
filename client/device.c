@@ -73,19 +73,14 @@ unsigned char command[MAX_BUFFER_SIZE] = {0};
 int main(int argc, char** argv)
 {
 
-    SYSTEM_GLOBAL_INIT();
-
-    currentLogLevel = LOG_LEVEL;
-
-    init_serial_logger(&serialLogger, NULL);
-
+    globalSystemInit();
 #if 1
     info_log("sending command to gprs %d", sizeof(command));
     bzero(command, MAX_BUFFER_SIZE);
     //memset(command, 0, MAX_BUFFER_SIZE);
-    strcpy((char*)command, "AT\r\n");
+    strcpy((char*)command, "ajay pankaj testing");
 
-    UARTSend(UART1_BASE, command, strlen((char*)command));
+    UARTSend(UART3_BASE, command, strlen((char*)command));
     info_log("sent command [%s] to gprs of length [%d]", command, strlen((char*)command));
 
 #if 0
@@ -98,7 +93,7 @@ int main(int argc, char** argv)
 
  
     memset(result, 0, MAX_BUFFER_SIZE);
-    UARTRecv(UART1_BASE, result, 10000, NO_TIMEOUT);
+    UARTRecv(UART3_BASE, result, 10000, NO_TIMEOUT);
 #endif
 
 
