@@ -752,7 +752,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
             {
                 MQTTString topicPlusPayload;
                 MQTTMessage msg;
-                char topicName[MAX_BUFFER_SIZE] = {0};
+                char *topicName;
 
                 if (MQTTDeserialize_publish(&(msg.fixedHeaderPlusMsgId),
                                             &topicPlusPayload,
@@ -767,6 +767,12 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                 /*
                  * At this point, "msg.payload" contains the real-stuff that is passed from the peer ....
                  */
+                topicName = (char *)sg_malloc(MAX_BUFFER_SIZE);
+                if(topicName == NULL)
+                {
+                    error_log("Could not allocate memory for topic-name");
+                    goto exit;
+                }
                 memcpy(topicName, topicPlusPayload.lenstring.data, strlen(topicPlusPayload.lenstring.data) - strlen(msg.payload));
 
                 if(topicName != NULL)
@@ -774,40 +780,54 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                     if(strcmp(topicName, c->filesTopic) == 0)
                     {
                         handleFileTransfer(c, &msg);
-                        break;
                     }
                     else if(strcmp(topicName, c->enableServerLoggingTopic) == 0)
                     {
                         serverLoggingTopicMessageArrived(c, &msg);
-                        break;
                     }
                     else if(strcmp(topicName, c->rebootTopic) == 0)
                     {
                         singletonSystemUtils.rebootDevice(&singletonSystemUtils);
-                        break;
+                    }
+                    else
+                    {
+                        deliverMessageToSelf(c, &topicPlusPayload, &msg);
                     }
                 }
+                else
+                {
+                    deliverMessageToSelf(c, &topicPlusPayload, &msg);
+                }
 
-                /*
-                 * This is the last-ditch effort... if we reach till here... call this method
-                 */
-                deliverMessageToSelf(c, &topicPlusPayload, &msg);
-
+                sg_free(topicName);
                 break;
             }
 
             case PUBREC:
             {
-                int msgId = fireResultHandlerUsingMsgIdAsTheKey(c);
+                int msgId;
+                unsigned char *buf;
 
-                unsigned char buf[MAX_BUFFER_SIZE];
-                if ((len = MQTTSerialize_ack(buf, MAX_BUFFER_SIZE, PUBREL, 0, msgId)) <= 0)
+                msgId = fireResultHandlerUsingMsgIdAsTheKey(c);
+                buf = (unsigned char*)sg_malloc(MAX_BUFFER_SIZE);
+                if(buf == NULL)
                 {
+                    error_log("Memory could not be allocated for PUBREC");
                     goto exit;
                 }
+                else
+                {
+                    if ((len = MQTTSerialize_ack(buf, MAX_BUFFER_SIZE, PUBREL, 0, msgId)) <= 0)
+                    {
+                        sg_free(buf);
+                        goto exit;
+                    }
 
-                attachResultHandler(c, msgId, MQTT_RESULT_HANDLER_TIMEOUT, publishQoS2CycleCompleted);
-                sendPacket(c, buf, len); /* send the PUBREL packet */
+                    attachResultHandler(c, msgId, MQTT_RESULT_HANDLER_TIMEOUT, publishQoS2CycleCompleted);
+                    sendPacket(c, buf, len); /* send the PUBREL packet */
+
+                    sg_free(buf);
+                }
 
                 break;
             }
