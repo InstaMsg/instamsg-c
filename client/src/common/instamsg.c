@@ -253,6 +253,7 @@ static int deliverMessageToSelf(InstaMsg* c, MQTTString* topicName, MQTTMessage*
 {
     int i;
     int rc = FAILURE;
+    enum QoS qos;
 
     // we have to find the right message handler - indexed by topic
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
@@ -281,7 +282,7 @@ static int deliverMessageToSelf(InstaMsg* c, MQTTString* topicName, MQTTMessage*
     /*
      * Send the ACK to the server too, if applicable
      */
-    enum QoS qos = (message->fixedHeaderPlusMsgId).fixedHeader.qos;
+    qos = (message->fixedHeaderPlusMsgId).fixedHeader.qos;
     if (qos != QOS0)
     {
         unsigned char buf[MAX_BUFFER_SIZE];
@@ -338,6 +339,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     char method[MAX_BUFFER_SIZE] = {0};
     char url[MAX_BUFFER_SIZE] = {0};
     char filename[MAX_BUFFER_SIZE] = {0};
+    char ackMessage[MAX_BUFFER_SIZE] = {0};
 
 
     getJsonKeyValueIfPresent(msg->payload, REPLY_TOPIC, replyTopic);
@@ -363,7 +365,6 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     }
 
 
-    char ackMessage[MAX_BUFFER_SIZE] = {0};
 
     if( (   (strcmp(method, "POST") == 0) || (strcmp(method, "PUT") == 0)   ) &&
             (strlen(filename) > 0) &&
@@ -457,33 +458,30 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     else if( (strcmp(method, "GET") == 0) && (strlen(filename) > 0))
     {
         char clientIdNotSplitted[MAX_BUFFER_SIZE] = {0};
-        sg_sprintf(clientIdNotSplitted, "%s-%s", c->connectOptions.clientID.cstring, c->connectOptions.username.cstring);
 
         HTTPResponse response = {0};
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
-        KeyValuePairs headers[] = {
-                                    {
-                                        "Authorization",
-                                        c->connectOptions.password.cstring
-                                    },
-                                    {
-                                        "ClientId",
-                                        clientIdNotSplitted
-                                    },
-                                    {
-                                        "Content-Type",
-                                        "multipart/form-data; boundary=" POST_BOUNDARY
-                                    },
-                                    {
-                                        CONTENT_LENGTH,
-                                        "0"                 // This will be updated to proper bytes later.
-                                    },
-                                    {
-                                        0
-                                    }
-                                  };
+        KeyValuePairs headers[5];
 
+        headers[0].key = "Authorization";
+        headers[0].value = c->connectOptions.password.cstring;
+
+        headers[1].key = "ClientId";
+        headers[1].value = clientIdNotSplitted;
+
+        headers[2].key = "Content-Type";
+        headers[2].value = "multipart/form-data; boundary=" POST_BOUNDARY;
+
+        headers[3].key = CONTENT_LENGTH;
+        headers[3].value = "0"; /* This will be updated to proper bytes later. */
+
+        headers[4].key = 0;
+        headers[4].value = 0;
+
+
+
+        sg_sprintf(clientIdNotSplitted, "%s-%s", c->connectOptions.clientID.cstring, c->connectOptions.username.cstring);
         response = uploadFile(c->fileUploadUrl, filename, NULL, headers, 10);
 #endif
         if(response.status == HTTP_FILE_UPLOAD_SUCCESS)
@@ -528,14 +526,15 @@ void removeExpiredResultHandlers(InstaMsg *c)
 
 void sendPingReqToServer(InstaMsg *c)
 {
+    unsigned char buf[1000];
+    int len = MQTTSerialize_pingreq(buf, 1000);
+
     if((c->ipstack).socketCorrupted == 1)
     {
         error_log("Network not available at physical layer .. so server cannot be pinged for maintaining keep-alive.");
         return;
     }
 
-    unsigned char buf[1000];
-    int len = MQTTSerialize_pingreq(buf, 1000);
     if (len > 0)
     {
         sendPacket(c, buf, len);
@@ -689,13 +688,14 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
 
             case SUBACK:
             {
-                fireResultHandlerUsingMsgIdAsTheKey(c);
 
                 /*
                 * Remove the message-handlers, if the server was unable to process the subscription-request.
                 */
                 int count = 0, grantedQoS = -1;
                 unsigned short msgId;
+
+                fireResultHandlerUsingMsgIdAsTheKey(c);
 
                 if (MQTTDeserialize_suback(&msgId, 1, &count, &grantedQoS, c->readbuf, MAX_BUFFER_SIZE) != 1)
                 {
@@ -722,6 +722,8 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
             {
                 MQTTString topicPlusPayload;
                 MQTTMessage msg;
+                char topicName[MAX_BUFFER_SIZE] = {0};
+
                 if (MQTTDeserialize_publish(&(msg.fixedHeaderPlusMsgId),
                                             &topicPlusPayload,
                                             (unsigned char**)&msg.payload,
@@ -735,7 +737,6 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                 /*
                  * At this point, "msg.payload" contains the real-stuff that is passed from the peer ....
                  */
-                char topicName[MAX_BUFFER_SIZE] = {0};
                 memcpy(topicName, topicPlusPayload.lenstring.data, strlen(topicPlusPayload.lenstring.data) - strlen(msg.payload));
 
                 if(topicName != NULL)
@@ -873,10 +874,10 @@ int MQTTUnsubscribe(InstaMsg* c, const char* topicFilter)
 {
     int rc = FAILURE;
     unsigned char buf[MAX_BUFFER_SIZE];
+    int len = 0;
 
     MQTTString topic = MQTTString_initializer;
     topic.cstring = (char *)topicFilter;
-    int len = 0;
 
     if ((len = MQTTSerialize_unsubscribe(buf, MAX_BUFFER_SIZE, 0, getNextPacketId(c), 1, &topic)) <= 0)
         goto exit;
@@ -899,12 +900,12 @@ int MQTTPublish(InstaMsg* c,
                 const char logging)
 {
     int rc = FAILURE;
+    int len = 0;
+    int id = -1;
     unsigned char buf[MAX_BUFFER_SIZE];
 
     MQTTString topic = MQTTString_initializer;
     topic.cstring = (char *)topicName;
-    int len = 0;
-    int id = -1;
 
     if (qos == QOS1 || qos == QOS2)
     {

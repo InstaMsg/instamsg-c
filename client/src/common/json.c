@@ -35,24 +35,24 @@ void getJsonKeyValueIfPresent(char *json, const char *key, char *buf)
         }
         else if((keyWrapper == NOT_FOUND) && ((*json == '\'') || (*json == '"')))
         {
-            // This means we need to start parsing the key now.
+            /* This means we need to start parsing the key now. */
             keyWrapper = *json;
         }
         else if(    (*json == keyWrapper) ||
                     ((*json == ':') && (keyWrapper == NOT_FOUND)) ||
                     ((*json == '}') && (keyWrapper == NOT_FOUND)))
         {
-            // We need to stop parsing the key now.
+            /* We need to stop parsing the key now. */
             keyWrapper = NOT_FOUND;
 
-            // Now, if we were currrently parsing-key, move to parsing value.
+            /* Now, if we were currrently parsing-key, move to parsing value. */
             if(strlen(parsedValueToken) == 0)
             {
                 token = parsedValueToken;
             }
             else
             {
-                // If we found the current key-value, we are done.
+                /* If we found the current key-value, we are done. */
                 if(strcmp(parsedKeyToken, key) == 0)
                 {
                     strcat(buf, parsedValueToken);
@@ -61,17 +61,17 @@ void getJsonKeyValueIfPresent(char *json, const char *key, char *buf)
                     return;
                 }
 
-                // We have parsed current key-value pair. So, reset the token-buffers.
+                /* We have parsed current key-value pair. So, reset the token-buffers. */
                 memset(parsedKeyToken, 0, MAX_BUFFER_SIZE);
                 memset(parsedValueToken, 0, MAX_BUFFER_SIZE);
 
-                // Set the current-token to "key"-parsing-mode.
+                /* Set the current-token to "key"-parsing-mode. */
                 token = parsedKeyToken;
             }
         }
         else
         {
-            // Simply add to the running token.
+            /* Simply add to the running token. */
             char ch[2] = {0};
             ch[0] = *json;
             strcat(token, ch);

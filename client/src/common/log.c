@@ -20,9 +20,9 @@ char formatted_string[MAX_BUFFER_SIZE] = {0};
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
 #define LOG_COMMON_CODE(level)                                                                          \
                                                                                                         \
+    va_list argptr;                                                                                     \
     memset(formatted_string, 0, MAX_BUFFER_SIZE);                                                       \
                                                                                                         \
-    va_list argptr;                                                                                     \
     va_start(argptr, fmt);                                                                              \
     sg_varargs(formatted_string, fmt, argptr);                                                          \
     va_end(argptr);                                                                                     \
@@ -46,7 +46,9 @@ char formatted_string[MAX_BUFFER_SIZE] = {0};
         serialLogger.serialLoggerInterface.write(                                                       \
                 &(serialLogger.serialLoggerInterface),                                                  \
                 (unsigned char*)formatted_string, strlen(formatted_string));                            \
-        fileLogger.fs.write(&(fileLogger.fs), formatted_string, strlen(formatted_string));              \
+        fileLogger.fs.write(                                                                            \
+                &(fileLogger.fs),                                                                       \
+                (unsigned char*)formatted_string, strlen(formatted_string));                            \
     }
 #else
 #define LOG_COMMON_CODE(level)                                                                          \
@@ -84,7 +86,7 @@ char formatted_string[MAX_BUFFER_SIZE] = {0};
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
 void init_file_logger(FileLogger *fileLogger, void *arg)
 {
-    // Here, physical medium is a file-system.
+    /* Here, physical medium is a file-system. */
 	init_file_system(&(fileLogger->fs), arg);
 }
 
@@ -99,7 +101,7 @@ void release_file_logger(FileLogger *fileLogger)
 
 void init_serial_logger(SerialLogger *serialLogger, void *arg)
 {
-    // Here, physical medium is a serial-interface.
+    /* Here, physical medium is a serial-interface. */
 	init_serial_logger_interface(&(serialLogger->serialLoggerInterface), arg);
 }
 
