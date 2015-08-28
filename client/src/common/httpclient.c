@@ -126,7 +126,7 @@ static void generateRequest(const char *requestType,
 
 static long getBytesIfContentLengthBytes(char *line)
 {
-    long numBytes = 0;
+    unsigned long numBytes = 0;
 
     char *saveptr;
     char *headerKey = strtok_r(line, ":", &saveptr);
@@ -183,7 +183,7 @@ HTTPResponse downloadFile(const char *url,
     Network network;
     HTTPResponse response = {0};
 
-    unsigned int numBytes;
+    unsigned long numBytes;
     char *request;
 
     request = (char *)sg_malloc(MAX_BUFFER_SIZE);
@@ -314,7 +314,7 @@ HTTPResponse uploadFile(const char *url,
 {
 
     int i = 0;
-    unsigned int numBytes = 0;
+    unsigned long numBytes = 0;
 
     Network network;
     HTTPResponse response = {0};
