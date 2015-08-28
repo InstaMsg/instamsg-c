@@ -40,9 +40,9 @@ struct KeyValuePairs
 
 
 /****************************************************************************************/
-#define INSTAMSG_HOST       "localhost"
+#define INSTAMSG_HOST       "device.instamsg.io"
 #define INSTAMSG_PORT       1883
-#define INSTAMSG_HTTP_HOST  "localhost"
+#define INSTAMSG_HTTP_HOST  "platform.instamsg.io"
 #define INSTAMSG_HTTP_PORT  80
 #define LOG_LEVEL           2
 

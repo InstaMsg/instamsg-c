@@ -183,7 +183,7 @@ HTTPResponse downloadFile(const char *url,
     Network network;
     HTTPResponse response;
 
-    long numBytes;
+    unsigned int numBytes;
     char request[MAX_BUFFER_SIZE] = {0};
 
 	init_network(&network, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
@@ -235,7 +235,7 @@ HTTPResponse downloadFile(const char *url,
             init_file_system(&fs, (void *)tempFileName);
 
             /* Now, we need to start reading the bytes */
-            info_log(FILE_DOWNLOAD "Beginning downloading of [%s] worth [%ld] bytes", tempFileName, numBytes);
+            info_log(FILE_DOWNLOAD "Beginning downloading of [%s] worth [%u] bytes", tempFileName, numBytes);
 
             for(i = 0; i < numBytes; i++)
             {
@@ -257,7 +257,7 @@ HTTPResponse downloadFile(const char *url,
              * So, move the "temp"-file to the actual file.
              */
             instaMsg.singletonUtilityFs.renameFile(&(instaMsg.singletonUtilityFs), tempFileName, filename);
-            info_log(FILE_DOWNLOAD "File [%s] successfully moved to [%s] worth [%ld] bytes", tempFileName, filename, numBytes);
+            info_log(FILE_DOWNLOAD "File [%s] successfully moved to [%s] worth [%u] bytes", tempFileName, filename, numBytes);
 
 exit:
             release_network(&network);
@@ -304,13 +304,13 @@ HTTPResponse uploadFile(const char *url,
 {
 
     int i = 0;
-    long numBytes = 0;
+    unsigned int numBytes = 0;
 
     Network network;
     HTTPResponse response;
     FileSystem fs;
 
-    long totalLength;
+    unsigned int totalLength;
 
     char request[MAX_BUFFER_SIZE] = {0};
     char secondLevel[MAX_BUFFER_SIZE] = {0};
@@ -349,7 +349,7 @@ HTTPResponse uploadFile(const char *url,
         if(strcmp(headers[i].key, CONTENT_LENGTH) == 0)
         {
             char value[MAX_BUFFER_SIZE] = {0};
-            sg_sprintf(value, "%ld", totalLength);
+            sg_sprintf(value, "%u", totalLength);
 
             headers[i].value = value;
         }
@@ -390,7 +390,7 @@ HTTPResponse uploadFile(const char *url,
         }
     }
 
-    info_log(FILE_UPLOAD "File [%s] successfully uploaded worth [%ld] bytes", filename, numBytes);
+    info_log(FILE_UPLOAD "File [%s] successfully uploaded worth [%u] bytes", filename, numBytes);
 
     release_file_system(&fs);
     if(network.write(&network, (unsigned char*)fourthLevel, strlen(fourthLevel)) == FAILURE)
