@@ -1,9 +1,9 @@
 SYSTEM_INCLUDES=`echo                                               \
-        -I/usr/lib/gcc/i686-linux-gnu/4.8/include                   \
-        -I/usr/local/include                                        \
-        -I/usr/lib/gcc/i686-linux-gnu/4.8/include-fixed             \
-        -I/usr/include/i386-linux-gnu                               \
-        -I/usr/include  `
+        -isystem/usr/lib/gcc/i686-linux-gnu/4.8/include                   \
+        -isystem/usr/local/include                                        \
+        -isystem/usr/lib/gcc/i686-linux-gnu/4.8/include-fixed             \
+        -isystem/usr/include/i386-linux-gnu                               \
+        -isystem/usr/include  `
 
 VENDOR="linux_desktop"
 
