@@ -184,7 +184,9 @@ HTTPResponse downloadFile(const char *url,
     HTTPResponse response = {0};
 
     unsigned int numBytes;
-    char *request = (char *)sg_malloc(MAX_BUFFER_SIZE);
+    char *request;
+
+    request = (char *)sg_malloc(MAX_BUFFER_SIZE);
     if(request == NULL)
     {
         error_log(FILE_DOWNLOAD "Failure in memory allocation for downloadFile");
@@ -266,9 +268,7 @@ HTTPResponse downloadFile(const char *url,
 
 exit:
             if(request != NULL)
-            {
                 sg_free(request);
-            }
 
             release_network(&network);
 
@@ -321,10 +321,11 @@ HTTPResponse uploadFile(const char *url,
     FileSystem fs;
 
     unsigned int totalLength;
+    char *request, *secondLevel, *fourthLevel;
 
-    char *request = (char *) sg_malloc(MAX_BUFFER_SIZE);
-    char *secondLevel = (char *) sg_malloc(MAX_BUFFER_SIZE);
-    char *fourthLevel = (char *) sg_malloc(MAX_BUFFER_SIZE);
+    request = (char *) sg_malloc(MAX_BUFFER_SIZE);
+    secondLevel = (char *) sg_malloc(MAX_BUFFER_SIZE);
+    fourthLevel = (char *) sg_malloc(MAX_BUFFER_SIZE);
 
     if((request == NULL) || (secondLevel == NULL) || (fourthLevel == NULL))
     {
@@ -456,17 +457,13 @@ HTTPResponse uploadFile(const char *url,
 exit:
 
     if(request)
-    {
         sg_free(request);
-    }
+
     if(secondLevel)
-    {
         sg_free(secondLevel);
-    }
+
     if(fourthLevel)
-    {
         sg_free(fourthLevel);
-    }
 
     release_network(&network);
 

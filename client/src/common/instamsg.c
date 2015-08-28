@@ -338,14 +338,14 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     const char *REPLY_TOPIC = "reply_to";
     const char *MESSAGE_ID = "message_id";
     const char *METHOD = "method";
+    char *replyTopic, *messageId, *method, *url, *filename, *ackMessage;
 
-    char replyTopic[MAX_BUFFER_SIZE] = {0};
-    char messageId[MAX_BUFFER_SIZE] = {0};
-    char method[MAX_BUFFER_SIZE] = {0};
-    char url[MAX_BUFFER_SIZE] = {0};
-    char filename[MAX_BUFFER_SIZE] = {0};
-    char ackMessage[MAX_BUFFER_SIZE] = {0};
-
+    replyTopic = (char *)sg_malloc(MAX_BUFFER_SIZE);
+    messageId = (char *)sg_malloc(50);
+    method = (char *)sg_malloc(20);
+    url = (char *)sg_malloc(MAX_BUFFER_SIZE);
+    filename = (char *)sg_malloc(MAX_BUFFER_SIZE);
+    ackMessage = (char *)sg_malloc(MAX_BUFFER_SIZE);
 
     getJsonKeyValueIfPresent(msg->payload, REPLY_TOPIC, replyTopic);
     getJsonKeyValueIfPresent(msg->payload, MESSAGE_ID, messageId);
@@ -356,17 +356,17 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     if(strlen(replyTopic) == 0)
     {
         logJsonFailureMessageAndReturn(REPLY_TOPIC, msg);
-        return;
+        goto exit;
     }
     if(strlen(messageId) == 0)
     {
         logJsonFailureMessageAndReturn(MESSAGE_ID, msg);
-        return;
+        goto exit;
     }
     if(strlen(method) == 0)
     {
         logJsonFailureMessageAndReturn(METHOD, msg);
-        return;
+        goto exit;
     }
 
 
@@ -512,6 +512,28 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
                 MQTT_RESULT_HANDLER_TIMEOUT,
                 0,
                 1);
+
+exit:
+    if(replyTopic)
+        sg_free(replyTopic);
+
+    if(messageId)
+        sg_free(messageId);
+
+    if(method)
+        sg_free(method);
+
+    if(url)
+        sg_free(url);
+
+    if(filename)
+        sg_free(filename);
+
+    if(ackMessage)
+        sg_free(ackMessage);
+
+
+    return;
 }
 
 
