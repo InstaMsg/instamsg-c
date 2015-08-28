@@ -452,7 +452,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
         (c->singletonUtilityFs).getFileListing(&(c->singletonUtilityFs), (char*)GLOBAL_BUFFER, MAX_BUFFER_SIZE, ".");
 #else
-        strcat(GLOBAL_BUFFER, "{}");
+        strcat((char *)GLOBAL_BUFFER, "{}");
 #endif
 
         info_log(FILE_LISTING ": [%s]", GLOBAL_BUFFER);
