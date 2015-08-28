@@ -19,4 +19,4 @@ EXTRA_OBJECT_FILES=""
 
 MAIN_CLASS="stdoutsub.c"
 
-COMPILE_COMMAND="gcc -g -nostdinc"
+COMPILE_COMMAND="gcc -g -nostdinc -pedantic "

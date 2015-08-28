@@ -12,7 +12,7 @@
 #define HTTP_RESPONSE_STATUS_PREFIX "HTTP/1.0"
 
 
-static void getNextLine(Network *network, unsigned char *buf, int *responseCode)
+static void getNextLine(Network *network, char *buf, int *responseCode)
 {
     while(1)
     {
@@ -306,6 +306,7 @@ HTTPResponse uploadFile(const char *url,
 
     Network network;
     HTTPResponse response;
+    FileSystem fs;
 
 	init_network(&network, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
 
@@ -362,7 +363,7 @@ HTTPResponse uploadFile(const char *url,
         goto exit;
     }
 
-    if(network.write(&network, secondLevel, strlen(secondLevel)) == FAILURE)
+    if(network.write(&network, (unsigned char*)secondLevel, strlen(secondLevel)) == FAILURE)
     {
         error_log(FILE_UPLOAD "Error occurred while uploading POST data (SECOND LEVEL) for [%s]", filename);
         goto exit;
@@ -371,15 +372,14 @@ HTTPResponse uploadFile(const char *url,
     /*
      * Now, upload the actual file-data
      */
-    FileSystem fs;
     init_file_system(&fs, (void *)filename);
 
     for(i = 0; i < numBytes; i++)
     {
         char ch[2] = {0};
 
-        fs.read(&fs, ch, 1, 1);
-        if(network.write(&network, ch, 1) == FAILURE)
+        fs.read(&fs, (unsigned char*)ch, 1, 1);
+        if(network.write(&network, (unsigned char*)ch, 1) == FAILURE)
         {
             error_log(FILE_UPLOAD "Error occurred while uploading POST data (THIRD LEVEL) for [%s]", filename);
             release_file_system(&fs);
@@ -390,7 +390,7 @@ HTTPResponse uploadFile(const char *url,
     info_log(FILE_UPLOAD "File [%s] successfully uploaded worth [%ld] bytes", filename, numBytes);
 
     release_file_system(&fs);
-    if(network.write(&network, fourthLevel, strlen(fourthLevel)) == FAILURE)
+    if(network.write(&network, (unsigned char*)fourthLevel, strlen(fourthLevel)) == FAILURE)
     {
         error_log(FILE_UPLOAD "Error occurred while uploading POST data (FOURTH LEVEL) for [%s]", filename);
         goto exit;
@@ -421,7 +421,7 @@ HTTPResponse uploadFile(const char *url,
 
         if(beginPayloadDownload == 1)
         {
-            if(network.read(&network, response.body, numBytes, 1) == FAILURE) // Pseudo-Blocking Call
+            if(network.read(&network, (unsigned char*)response.body, numBytes, 1) == FAILURE) // Pseudo-Blocking Call
             {
                 error_log(FILE_UPLOAD "Socket error while reading URL-payload for uploaded file [%s]", filename);
                 goto exit;
