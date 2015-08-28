@@ -81,14 +81,14 @@ struct InstaMsg {
         int msgId;
         const char* topicFilter;
         void (*fp) (MessageData*);
-    } messageHandlers[MAX_MESSAGE_HANDLERS];      // Message handlers are indexed by subscription topic
+    } messageHandlers[MAX_MESSAGE_HANDLERS];      /* Message handlers are indexed by subscription topic */
 
     struct ResultHandlers
     {
         int msgId;
         unsigned int timeout;
         void (*fp) (MQTTFixedHeaderPlusMsgId*);
-    } resultHandlers[MAX_MESSAGE_HANDLERS];      // Message handlers are indexed by subscription topic
+    } resultHandlers[MAX_MESSAGE_HANDLERS];      /* Message handlers are indexed by subscription topic */
 
     void (*defaultMessageHandler) (MessageData*);
     int (*onConnectCallback)();

@@ -53,7 +53,7 @@ void sg_free(void *ptr)
 
     if(ptr != NULL)
     {
-        memcpy(&numBytes, ptr - HEADER_SIZE, HEADER_SIZE);
+        memcpy(&numBytes, (char*)ptr - HEADER_SIZE, HEADER_SIZE);
 
         /*
         * Now, simply reverse the counter keeping track of the bytes allocated from the heap.

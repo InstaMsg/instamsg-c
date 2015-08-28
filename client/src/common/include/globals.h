@@ -39,7 +39,7 @@ struct KeyValuePairs
 #define MAX_CONN_ATTEMPTS_WITH_PHYSICAL_LAYER_FINE 5
 
 
-////////////////////////////////////////////////////////////////////////////////
+/****************************************************************************************/
 #define INSTAMSG_HOST       "localhost"
 #define INSTAMSG_PORT       1883
 #define INSTAMSG_HTTP_HOST  "localhost"
@@ -48,7 +48,7 @@ struct KeyValuePairs
 
 #define NETWORK_READ_TIMEOUT_SECS 1
 #define MAX_TRIES_ALLOWED_WHILE_READING_FROM_NETWORK_MEDIUM 5
-///////////////////////////////////////////////////////////////////////////////
+/***************************************************************************************/
 
 static const char * const g_pcHex = "0123456789abcdef";
 

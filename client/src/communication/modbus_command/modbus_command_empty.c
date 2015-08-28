@@ -23,10 +23,10 @@ static int modbus_command_stub_write(ModbusCommandInterface* modbusCommandInterf
 
 void init_modbus_command_interface(ModbusCommandInterface *modbusCommandInterface, void *arg)
 {
-    // Register read-callback.
+    /* Register read-callback. */
 	modbusCommandInterface->read = modbus_command_stub_read;
 
-    // Register write-callback.
+    /* Register write-callback. */
 	modbusCommandInterface->write = modbus_command_stub_write;
 }
 

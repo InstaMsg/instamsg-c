@@ -30,12 +30,13 @@ static void release_underlying_medium_guaranteed(Network* network)
 }
 
 
-static void connect_underlying_medium_try_once(Network* network, unsigned char *hostName, int port)
+static void connect_underlying_medium_try_once(Network* network, char *hostName, int port)
 {
 	int type = SOCK_STREAM;
 	struct sockaddr_in address;
 
 	int rc = SUCCESS;
+    struct timeval interval = {NETWORK_READ_TIMEOUT_SECS, 0};
 
 	sa_family_t family = AF_INET;
 	struct addrinfo *result = NULL;
@@ -92,8 +93,7 @@ static void connect_underlying_medium_try_once(Network* network, unsigned char *
 	}
 
 
-    // Set timeout-limitation in the socket-receiving function
-    struct timeval interval = {NETWORK_READ_TIMEOUT_SECS, 0};
+    /* Set timeout-limitation in the socket-receiving function */
     setsockopt(network->socket, SOL_SOCKET, SO_RCVTIMEO, (char *)&interval, sizeof(struct timeval));
 
     info_log("TCP-SOCKET UNDERLYING_MEDIUM INITIATED FOR HOST = [%s], PORT = [%d].",
@@ -103,15 +103,16 @@ static void connect_underlying_medium_try_once(Network* network, unsigned char *
 
 static int tcp_socket_read(Network* network, unsigned char* buffer, int len, unsigned char guaranteed)
 {
+	int bytes = 0;
+    int rc = 0;
+    unsigned int errBackup;
+
     if(len == 0)
     {
         return SUCCESS;
     }
 
-	int bytes = 0;
-    int rc = 0;
 
-    unsigned int errBackup;
 	while (bytes < len)
 	{
 		rc = recv(network->socket, &buffer[bytes], (size_t)(len - bytes), 0);
@@ -239,18 +240,18 @@ static int tcp_socket_write(Network* network, unsigned char* buffer, int len)
 
 void init_network(Network *network, const char *hostName, unsigned int port)
 {
-    // Register read-callback.
+    /* Register read-callback. */
 	network->read = tcp_socket_read;
 
-    // Register write-callback.
+    /* Register write-callback. */
 	network->write = tcp_socket_write;
 
-    // Keep a copy of connection-parameters, for easy book-keeping.
+    /* Keep a copy of connection-parameters, for easy book-keeping. */
     memset(network->host, 0, MAX_BUFFER_SIZE);
     sg_sprintf(network->host, "%s", hostName);
     network->port = port;
 
-    // Connect the medium (socket).
+    /* Connect the medium (socket). */
     connect_underlying_medium_try_once(network, network->host, network->port);
 }
 

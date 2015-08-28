@@ -90,7 +90,7 @@ void release_network(Network *network);
      *                                                                                                              \
      *          {"publisher.sh":152,"subscriber.sh":140,"filetester.sh":137,"config.txt_filetester":148,"stdoutsub":56040,"build_ubuntu_14_04.sh":2892,"README.md":1502,"config.txt":128,"stdoutsub.c":6649,"config.txt_local_testing":128}                         \
      */                                                                                                             \
-    void (*getFileListing)(FileSystem *fs, unsigned char *buf, int maxValueLenAllowed, const char *directoryPath);  \
+    void (*getFileListing)(FileSystem *fs, char *buf, int maxValueLenAllowed, const char *directoryPath);           \
                                                                                                                     \
                                                                                                                     \
     /*                                                                                                              \

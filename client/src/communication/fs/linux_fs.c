@@ -24,7 +24,7 @@ static void release_underlying_medium_guaranteed(FileSystem* fs)
     if(fp != NULL)
     {
         fclose(fp);
-        fp = NULL;      // This helps to keep track if a file is closed already.
+        fp = NULL;      /* This helps to keep track if a file is closed already. */
     }
 }
 
@@ -70,11 +70,12 @@ static int deleteFile(FileSystem *fs, const char *filePath)
 }
 
 
-static void getFileListing(FileSystem *fs, unsigned char *buf, int maxValueLenAllowed, const char *directoryPath)
+static void getFileListing(FileSystem *fs, char *buf, int maxValueLenAllowed, const char *directoryPath)
 {
     int len;
     struct dirent *pDirent;
     DIR *pDir;
+    char firstEntryDone = 0;
 
     pDir = opendir(directoryPath);
     if(pDir == NULL)
@@ -83,7 +84,6 @@ static void getFileListing(FileSystem *fs, unsigned char *buf, int maxValueLenAl
         return;
     }
 
-    char firstEntryDone = 0;
 
     strcat(buf, "{");
     while ((pDirent = readdir(pDir)) != NULL)
@@ -126,20 +126,21 @@ static long getFileSize(FileSystem *fs, const char *filepath)
 
 void init_file_system(FileSystem *fs, void *arg)
 {
-    // Register read-callback.
+    const char *fileName = (const char*)arg;
+
+    /* Register read-callback. */
 	fs->read = linux_fs_read;
 
-    // Register write-callback.
+    /* Register write-callback. */
 	fs->write = linux_fs_write;
 
-    // Register other-callbacks.
+    /* Register other-callbacks. */
     fs->renameFile = renameFile;
     fs->deleteFile = deleteFile;
     fs->getFileListing = getFileListing;
     fs->getFileSize = getFileSize;
 
-    // Connect the medium (file-pointer).
-    const char *fileName = (const char*)arg;
+    /* Connect the medium (file-pointer). */
     connect_underlying_medium_guaranteed(fs, fileName);
 }
 

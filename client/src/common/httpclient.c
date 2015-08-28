@@ -18,7 +18,7 @@ static void getNextLine(Network *network, char *buf, int *responseCode)
     {
         char ch[2] = {0};
 
-        if(network->read(network, ch, 1, 1) == FAILURE) // Pseudo-Blocking Call
+        if(network->read(network, (unsigned char*)ch, 1, 1) == FAILURE) /* Pseudo-Blocking Call */
         {
             return;
         }
@@ -184,17 +184,17 @@ HTTPResponse downloadFile(const char *url,
     HTTPResponse response;
 
     long numBytes;
+    char request[MAX_BUFFER_SIZE] = {0};
 
 	init_network(&network, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
 
-    char request[MAX_BUFFER_SIZE] = {0};
     generateRequest("GET", url, params, headers, request, MAX_BUFFER_SIZE, 1);
     info_log(FILE_DOWNLOAD "Complete URL that will be hit : [%s]", request);
 
     /*
      * Fire the request-bytes over the network-medium.
      */
-    if(network.write(&network, request, strlen(request)) == FAILURE)
+    if(network.write(&network, (unsigned char*)request, strlen(request)) == FAILURE)
     {
         goto exit;
     }
@@ -234,14 +234,14 @@ HTTPResponse downloadFile(const char *url,
             instaMsg.singletonUtilityFs.deleteFile(&(instaMsg.singletonUtilityFs), tempFileName);
             init_file_system(&fs, (void *)tempFileName);
 
-            // Now, we need to start reading the bytes
+            /* Now, we need to start reading the bytes */
             info_log(FILE_DOWNLOAD "Beginning downloading of [%s] worth [%ld] bytes", tempFileName, numBytes);
 
             for(i = 0; i < numBytes; i++)
             {
                 char ch[2] = {0};
 
-                if(network.read(&network, (unsigned char*)ch, 1, 1) == FAILURE) // Pseudo-Blocking Call
+                if(network.read(&network, (unsigned char*)ch, 1, 1) == FAILURE) /* Pseudo-Blocking Call */
                 {
                     release_file_system(&fs);
                     goto exit;
@@ -424,7 +424,7 @@ HTTPResponse uploadFile(const char *url,
 
         if(beginPayloadDownload == 1)
         {
-            if(network.read(&network, (unsigned char*)response.body, numBytes, 1) == FAILURE) // Pseudo-Blocking Call
+            if(network.read(&network, (unsigned char*)response.body, numBytes, 1) == FAILURE) /* Pseudo-Blocking Call */
             {
                 error_log(FILE_UPLOAD "Socket error while reading URL-payload for uploaded file [%s]", filename);
                 goto exit;

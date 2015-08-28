@@ -32,7 +32,7 @@ static void rebootDevice(System *sys)
 
 static void localSystemInit(System *sys)
 {
-    // VERY IMPORTANT: If this is not done, the "write" on an invalid socket will cause program-crash
+    /* VERY IMPORTANT: If this is not done, the "write" on an invalid socket will cause program-crash */
     signal(SIGPIPE, SIG_IGN);
 }
 

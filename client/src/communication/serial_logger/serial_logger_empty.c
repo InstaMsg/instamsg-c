@@ -19,7 +19,7 @@ static int linux_serial_logger_write(SerialLoggerInterface *serialLoggerInterfac
 
 void init_serial_logger_interface(SerialLoggerInterface *serialLoggerInterface, void *arg)
 {
-    // Register write-callback.
+    /* Register write-callback. */
 	serialLoggerInterface->write = linux_serial_logger_write;
 }
 
