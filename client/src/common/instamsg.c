@@ -18,6 +18,7 @@
 #include "include/instamsg.h"
 #include "include/httpclient.h"
 #include "include/json.h"
+#include "include/sg_mem.h"
 
 #include <string.h>
 
@@ -462,7 +463,9 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     }
     else if( (strcmp(method, "GET") == 0) && (strlen(filename) > 0))
     {
+#ifdef FILE_SYSTEM_INTERFACE_ENABLED
         char clientIdNotSplitted[MAX_BUFFER_SIZE] = {0};
+#endif
 
         HTTPResponse response = {0};
 
