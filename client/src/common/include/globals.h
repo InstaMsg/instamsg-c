@@ -60,4 +60,8 @@ void sg_sprintf(char *out, const char *format, ...);
 
 void startAndCountdownTimer(int seconds);
 void globalSystemInit();
+
+#define MAX_HEAP_SIZE (10 * 1024)
+#define MEM_ALLOC     "[MEM-ALLOC] "
+
 #endif

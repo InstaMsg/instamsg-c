@@ -24,6 +24,7 @@ SOURCES=`echo                                                                   
         src/common/log.c                                                                \
         src/common/json.c                                                               \
         src/common/globals.c                                                            \
+        src/common/sg_mem.c                                                             \
                                                                                         \
         ../MQTTPacket/src/MQTTFormat.c                                                  \
         ../MQTTPacket/src/MQTTPacket.c                                                  \
