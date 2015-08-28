@@ -31,9 +31,15 @@ static void serverLoggingTopicMessageArrived(InstaMsg *c, MQTTMessage *msg)
 
     const char *CLIENT_ID = "client_id";
     const char *LOGGING = "logging";
+    char *clientId, *logging;
 
-    char clientId[MAX_BUFFER_SIZE] = {0};
-    char logging[MAX_BUFFER_SIZE] = {0};
+    clientId = (char *)sg_malloc(MAX_BUFFER_SIZE);
+    logging = (char *)sg_malloc(MAX_BUFFER_SIZE);
+    if((clientId == NULL) || (logging == NULL))
+    {
+        error_log("Could not allocate memory in serverLoggingTopicMessageArrived");
+        goto exit;
+    }
 
     getJsonKeyValueIfPresent(msg->payload, CLIENT_ID, clientId);
     getJsonKeyValueIfPresent(msg->payload, LOGGING, logging);
@@ -51,6 +57,15 @@ static void serverLoggingTopicMessageArrived(InstaMsg *c, MQTTMessage *msg)
             info_log(SERVER_LOGGING "Disabled.");
         }
     }
+
+exit:
+    if(clientId)
+        sg_free(clientId);
+
+    if(logging)
+        sg_free(logging);
+
+    return;
 }
 
 
@@ -853,16 +868,17 @@ exit:
 
 void* MQTTConnect(void* arg)
 {
-    unsigned char buf[MAX_BUFFER_SIZE];
     int len = 0;
-
     InstaMsg *c = (InstaMsg *)arg;
-    if ((len = MQTTSerialize_connect(buf, MAX_BUFFER_SIZE, &(c->connectOptions))) <= 0)
+
+    RESET_GLOBAL_BUFFER;
+
+    if ((len = MQTTSerialize_connect(GLOBAL_BUFFER, MAX_BUFFER_SIZE, &(c->connectOptions))) <= 0)
     {
         return NULL;
     }
 
-    sendPacket(c, buf, len);
+    sendPacket(c, GLOBAL_BUFFER, len);
 
     return NULL;
 }
@@ -878,13 +894,14 @@ int MQTTSubscribe(InstaMsg* c,
     int rc = FAILURE;
     int len = 0;
     int id;
-    unsigned char buf[MAX_BUFFER_SIZE];
 
     MQTTString topic = MQTTString_initializer;
     topic.cstring = (char *)topicName;
 
+    RESET_GLOBAL_BUFFER;
+
     id = getNextPacketId(c);
-    len = MQTTSerialize_subscribe(buf, MAX_BUFFER_SIZE, 0, id, 1, &topic, (int*)&qos);
+    len = MQTTSerialize_subscribe(GLOBAL_BUFFER, MAX_BUFFER_SIZE, 0, id, 1, &topic, (int*)&qos);
     if (len <= 0)
         goto exit;
 
@@ -912,7 +929,7 @@ int MQTTSubscribe(InstaMsg* c,
          }
     }
 
-    if ((rc = sendPacket(c, buf, len)) != SUCCESS) /* send the subscribe packet */
+    if ((rc = sendPacket(c, GLOBAL_BUFFER, len)) != SUCCESS) /* send the subscribe packet */
         goto exit;             /* there was a problem */
 
 exit:
@@ -923,15 +940,16 @@ exit:
 int MQTTUnsubscribe(InstaMsg* c, const char* topicFilter)
 {
     int rc = FAILURE;
-    unsigned char buf[MAX_BUFFER_SIZE];
     int len = 0;
 
     MQTTString topic = MQTTString_initializer;
     topic.cstring = (char *)topicFilter;
 
-    if ((len = MQTTSerialize_unsubscribe(buf, MAX_BUFFER_SIZE, 0, getNextPacketId(c), 1, &topic)) <= 0)
+    RESET_GLOBAL_BUFFER;
+
+    if ((len = MQTTSerialize_unsubscribe(GLOBAL_BUFFER, MAX_BUFFER_SIZE, 0, getNextPacketId(c), 1, &topic)) <= 0)
         goto exit;
-    if ((rc = sendPacket(c, buf, len)) != SUCCESS) /* send the subscribe packet */
+    if ((rc = sendPacket(c, GLOBAL_BUFFER, len)) != SUCCESS) /* send the subscribe packet */
         goto exit; /* there was a problem */
 
 exit:
@@ -952,10 +970,11 @@ int MQTTPublish(InstaMsg* c,
     int rc = FAILURE;
     int len = 0;
     int id = -1;
-    unsigned char buf[MAX_BUFFER_SIZE];
 
     MQTTString topic = MQTTString_initializer;
     topic.cstring = (char *)topicName;
+
+    RESET_GLOBAL_BUFFER;
 
     if (qos == QOS1 || qos == QOS2)
     {
@@ -968,10 +987,10 @@ int MQTTPublish(InstaMsg* c,
         attachResultHandler(c, id, resultHandlerTimeout, resultHandler);
     }
 
-    len = MQTTSerialize_publish(buf, MAX_BUFFER_SIZE, 0, qos, retain, id, topic, (unsigned char*)payload, strlen((char*)payload) + 1);
+    len = MQTTSerialize_publish(GLOBAL_BUFFER, MAX_BUFFER_SIZE, 0, qos, retain, id, topic, (unsigned char*)payload, strlen((char*)payload) + 1);
     if (len <= 0)
         goto exit;
-    if ((rc = sendPacket(c, buf, len)) != SUCCESS) /* send the subscribe packet */
+    if ((rc = sendPacket(c, GLOBAL_BUFFER, len)) != SUCCESS) /* send the subscribe packet */
         goto exit; /* there was a problem */
 
     if (qos == QOS1)
@@ -989,11 +1008,14 @@ exit:
 int MQTTDisconnect(InstaMsg* c)
 {
     int rc = FAILURE;
-    unsigned char buf[MAX_BUFFER_SIZE];
+    int len;
 
-    int len = MQTTSerialize_disconnect(buf, MAX_BUFFER_SIZE);
+    RESET_GLOBAL_BUFFER;
+
+    len = MQTTSerialize_disconnect(GLOBAL_BUFFER, MAX_BUFFER_SIZE);
+
     if (len > 0)
-        rc = sendPacket(c, buf, len);            /* send the disconnect packet */
+        rc = sendPacket(c, GLOBAL_BUFFER, len);            /* send the disconnect packet */
 
     if(c->onDisconnectCallback != NULL)
     {

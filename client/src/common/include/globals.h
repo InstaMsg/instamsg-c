@@ -64,4 +64,6 @@ void globalSystemInit();
 #define MAX_HEAP_SIZE (10 * 1024)
 #define MEM_ALLOC     "[MEM-ALLOC] "
 
+unsigned char GLOBAL_BUFFER[MAX_BUFFER_SIZE];
+#define RESET_GLOBAL_BUFFER memset(GLOBAL_BUFFER, 0, MAX_BUFFER_SIZE);
 #endif
