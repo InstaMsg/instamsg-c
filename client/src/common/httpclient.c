@@ -184,24 +184,17 @@ HTTPResponse downloadFile(const char *url,
     HTTPResponse response = {0};
 
     unsigned long numBytes;
-    char *request;
-
-    request = (char *)sg_malloc(MAX_BUFFER_SIZE);
-    if(request == NULL)
-    {
-        error_log(FILE_DOWNLOAD "Failure in memory allocation for downloadFile");
-        goto exit;
-    }
 
 	init_network(&network, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
 
-    generateRequest("GET", url, params, headers, request, MAX_BUFFER_SIZE, 1);
-    info_log(FILE_DOWNLOAD "Complete URL that will be hit : [%s]", request);
+    RESET_GLOBAL_BUFFER;
+    generateRequest("GET", url, params, headers, (char*)GLOBAL_BUFFER, MAX_BUFFER_SIZE, 1);
+    info_log(FILE_DOWNLOAD "Complete URL that will be hit : [%s]", GLOBAL_BUFFER);
 
     /*
      * Fire the request-bytes over the network-medium.
      */
-    if(network.write(&network, (unsigned char*)request, strlen(request)) == FAILURE)
+    if(network.write(&network, GLOBAL_BUFFER, strlen((char*)GLOBAL_BUFFER)) == FAILURE)
     {
         goto exit;
     }
@@ -267,9 +260,6 @@ HTTPResponse downloadFile(const char *url,
             info_log(FILE_DOWNLOAD "File [%s] successfully moved to [%s] worth [%u] bytes", tempFileName, filename, numBytes);
 
 exit:
-            if(request != NULL)
-                sg_free(request);
-
             release_network(&network);
 
             info_log(FILE_DOWNLOAD "HTTP-Response Status = [%d]", response.status);
