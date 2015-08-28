@@ -187,16 +187,18 @@ HTTPResponse downloadFile(const char *url,
 
 	init_network(&network, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
 
-    RESET_GLOBAL_BUFFER;
-    generateRequest("GET", url, params, headers, (char*)GLOBAL_BUFFER, MAX_BUFFER_SIZE, 1);
-    info_log(FILE_DOWNLOAD "Complete URL that will be hit : [%s]", GLOBAL_BUFFER);
-
-    /*
-     * Fire the request-bytes over the network-medium.
-     */
-    if(network.write(&network, GLOBAL_BUFFER, strlen((char*)GLOBAL_BUFFER)) == FAILURE)
     {
-        goto exit;
+        RESET_GLOBAL_BUFFER;
+        generateRequest("GET", url, params, headers, (char*)GLOBAL_BUFFER, MAX_BUFFER_SIZE, 1);
+        info_log(FILE_DOWNLOAD "Complete URL that will be hit : [%s]", GLOBAL_BUFFER);
+
+        /*
+        * Fire the request-bytes over the network-medium.
+        */
+        if(network.write(&network, GLOBAL_BUFFER, strlen((char*)GLOBAL_BUFFER)) == FAILURE)
+        {
+            goto exit;
+        }
     }
 
     numBytes = 0;
@@ -204,27 +206,37 @@ HTTPResponse downloadFile(const char *url,
     {
         char beginPayloadDownload = 0;
 
-        char newLine[MAX_BUFFER_SIZE] = "";
-        getNextLine(&network, newLine, &(response.status));
-
-        /*
-         * The actual file-payload begins after we receive an empty line.
-         */
-        if(strlen(newLine) == 0)
         {
-            beginPayloadDownload = 1;
-        }
+            char *newLine;
 
-        if(numBytes == 0)
-        {
-            numBytes = getBytesIfContentLengthBytes(newLine);
+            RESET_GLOBAL_BUFFER;
+            newLine = (char*)GLOBAL_BUFFER;
+
+            strcpy(newLine, "");
+            getNextLine(&network, newLine, &(response.status));
+
+            /*
+            * The actual file-payload begins after we receive an empty line.
+            */
+            if(strlen(newLine) == 0)
+            {
+                beginPayloadDownload = 1;
+            }
+
+            if(numBytes == 0)
+            {
+                numBytes = getBytesIfContentLengthBytes(newLine);
+            }
         }
 
         if(beginPayloadDownload == 1)
         {
             long i;
-            char tempFileName[MAX_BUFFER_SIZE] = {0};
+            char *tempFileName;
             FileSystem fs;
+
+            RESET_GLOBAL_BUFFER;
+            tempFileName = (char*)GLOBAL_BUFFER;
 
             sg_sprintf(tempFileName, "~%s", filename);
 
