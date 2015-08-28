@@ -2,7 +2,7 @@
 
 #include "include/globals.h"
 #include "include/log.h"
-#include "include/json.h"
+#include "include/sg_mem.h"
 
 
 /*
@@ -16,14 +16,21 @@
  */
 void getJsonKeyValueIfPresent(char *json, const char *key, char *buf)
 {
-    unsigned char NOT_FOUND = ' ';
-    char *jsonStartingPointer = json;
+    unsigned char NOT_FOUND, keyWrapper;
+    char *jsonStartingPointer, *parsedKeyToken, *parsedValueToken, *token;
 
-    char parsedKeyToken[MAX_BUFFER_SIZE] = {0};
-    char parsedValueToken[MAX_BUFFER_SIZE] = {0};
+    parsedKeyToken = (char *)sg_malloc(MAX_BUFFER_SIZE);
+    parsedValueToken = (char *)sg_malloc(MAX_BUFFER_SIZE);
+    if((parsedKeyToken == NULL) || (parsedValueToken == NULL))
+    {
+        error_log("Could not allocate memory in getJsonKeyValueIfPresent");
+        goto exit;
+    }
 
-    unsigned char keyWrapper = NOT_FOUND;
-    char *token = parsedKeyToken;
+    NOT_FOUND = ' ';
+    keyWrapper = NOT_FOUND;
+    jsonStartingPointer = json;
+    token = parsedKeyToken;
 
     while(*json)
     {
@@ -79,5 +86,13 @@ void getJsonKeyValueIfPresent(char *json, const char *key, char *buf)
 
         json++;
     }
+
+exit:
+
+    if(parsedKeyToken)
+        sg_free(parsedKeyToken);
+
+    if(parsedValueToken)
+        sg_free(parsedValueToken);
 }
 
