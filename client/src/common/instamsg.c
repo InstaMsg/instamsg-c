@@ -306,21 +306,22 @@ static int deliverMessageToSelf(InstaMsg* c, MQTTString* topicName, MQTTMessage*
     qos = (message->fixedHeaderPlusMsgId).fixedHeader.qos;
     if (qos != QOS0)
     {
-        unsigned char buf[MAX_BUFFER_SIZE];
         int len = 0;
+
+        RESET_GLOBAL_BUFFER;
 
         if (qos == QOS1)
         {
-            len = MQTTSerialize_ack(buf, MAX_BUFFER_SIZE, PUBACK, 0, (message->fixedHeaderPlusMsgId).msgId);
+            len = MQTTSerialize_ack(GLOBAL_BUFFER, MAX_BUFFER_SIZE, PUBACK, 0, (message->fixedHeaderPlusMsgId).msgId);
         }
         else if (qos == QOS2)
         {
-            len = MQTTSerialize_ack(buf, MAX_BUFFER_SIZE, PUBREC, 0, (message->fixedHeaderPlusMsgId).msgId);
+            len = MQTTSerialize_ack(GLOBAL_BUFFER, MAX_BUFFER_SIZE, PUBREC, 0, (message->fixedHeaderPlusMsgId).msgId);
         }
 
         if (len > 0)
         {
-            rc = sendPacket(c, buf, len);
+            rc = sendPacket(c, GLOBAL_BUFFER, len);
         }
     }
 
@@ -446,16 +447,16 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     }
     else if( (strcmp(method, "GET") == 0) && (strlen(filename) == 0))
     {
-        char fileList[MAX_BUFFER_SIZE] = {0};
+        RESET_GLOBAL_BUFFER;
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
-        (c->singletonUtilityFs).getFileListing(&(c->singletonUtilityFs), fileList, MAX_BUFFER_SIZE, ".");
+        (c->singletonUtilityFs).getFileListing(&(c->singletonUtilityFs), (char*)GLOBAL_BUFFER, MAX_BUFFER_SIZE, ".");
 #else
-        strcat(fileList, "{}");
+        strcat(GLOBAL_BUFFER, "{}");
 #endif
 
-        info_log(FILE_LISTING ": [%s]", fileList);
-        sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"files\": %s}", messageId, fileList);
+        info_log(FILE_LISTING ": [%s]", GLOBAL_BUFFER);
+        sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"files\": %s}", messageId, GLOBAL_BUFFER);
     }
     else if( (strcmp(method, "DELETE") == 0) && (strlen(filename) > 0))
     {
@@ -478,10 +479,6 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     }
     else if( (strcmp(method, "GET") == 0) && (strlen(filename) > 0))
     {
-#ifdef FILE_SYSTEM_INTERFACE_ENABLED
-        char clientIdNotSplitted[MAX_BUFFER_SIZE] = {0};
-#endif
-
         HTTPResponse response = {0};
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
@@ -491,7 +488,9 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         headers[0].value = c->connectOptions.password.cstring;
 
         headers[1].key = "ClientId";
-        headers[1].value = clientIdNotSplitted;
+
+        RESET_GLOBAL_BUFFER;
+        headers[1].value = (char*)GLOBAL_BUFFER;
 
         headers[2].key = "Content-Type";
         headers[2].value = "multipart/form-data; boundary=" POST_BOUNDARY;
@@ -504,7 +503,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
 
 
 
-        sg_sprintf(clientIdNotSplitted, "%s-%s", c->connectOptions.clientID.cstring, c->connectOptions.username.cstring);
+        sg_sprintf((char*)GLOBAL_BUFFER, "%s-%s", c->connectOptions.clientID.cstring, c->connectOptions.username.cstring);
         response = uploadFile(c->fileUploadUrl, filename, NULL, headers, 10);
 #endif
         if(response.status == HTTP_FILE_UPLOAD_SUCCESS)
@@ -820,29 +819,16 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
 
             case PUBREC:
             {
-                int msgId;
-                unsigned char *buf;
+                int msgId = fireResultHandlerUsingMsgIdAsTheKey(c);
 
-                msgId = fireResultHandlerUsingMsgIdAsTheKey(c);
-                buf = (unsigned char*)sg_malloc(MAX_BUFFER_SIZE);
-                if(buf == NULL)
+                RESET_GLOBAL_BUFFER;
+                if ((len = MQTTSerialize_ack(GLOBAL_BUFFER, MAX_BUFFER_SIZE, PUBREL, 0, msgId)) <= 0)
                 {
-                    error_log("Memory could not be allocated for PUBREC");
                     goto exit;
                 }
-                else
-                {
-                    if ((len = MQTTSerialize_ack(buf, MAX_BUFFER_SIZE, PUBREL, 0, msgId)) <= 0)
-                    {
-                        sg_free(buf);
-                        goto exit;
-                    }
 
-                    attachResultHandler(c, msgId, MQTT_RESULT_HANDLER_TIMEOUT, publishQoS2CycleCompleted);
-                    sendPacket(c, buf, len); /* send the PUBREL packet */
-
-                    sg_free(buf);
-                }
+                attachResultHandler(c, msgId, MQTT_RESULT_HANDLER_TIMEOUT, publishQoS2CycleCompleted);
+                sendPacket(c, GLOBAL_BUFFER, len); /* send the PUBREL packet */
 
                 break;
             }

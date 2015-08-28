@@ -40,11 +40,20 @@ struct KeyValuePairs
 
 
 /****************************************************************************************/
+#if 0
 #define INSTAMSG_HOST       "device.instamsg.io"
 #define INSTAMSG_PORT       1883
 #define INSTAMSG_HTTP_HOST  "platform.instamsg.io"
 #define INSTAMSG_HTTP_PORT  80
 #define LOG_LEVEL           2
+#endif
+
+#define INSTAMSG_HOST       "localhost"
+#define INSTAMSG_PORT       1883
+#define INSTAMSG_HTTP_HOST  "localhost"
+#define INSTAMSG_HTTP_PORT  80
+#define LOG_LEVEL           2
+
 
 #define NETWORK_READ_TIMEOUT_SECS 1
 #define MAX_TRIES_ALLOWED_WHILE_READING_FROM_NETWORK_MEDIUM 5
