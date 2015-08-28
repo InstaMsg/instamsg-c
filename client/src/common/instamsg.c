@@ -74,12 +74,13 @@ static int getNextPacketId(InstaMsg *c) {
 
 static void attachResultHandler(InstaMsg *c, int msgId, unsigned int timeout, void (*resultHandler)(MQTTFixedHeaderPlusMsgId *))
 {
+    int i;
+
     if(resultHandler == NULL)
     {
         return;
     }
 
-    int i;
 
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {
@@ -114,12 +115,13 @@ static void fireResultHandlerAndRemove(InstaMsg *c, MQTTFixedHeaderPlusMsgId *fi
 
 static int sendPacket(InstaMsg *c, unsigned char *buf, int length)
 {
+    int rc = SUCCESS;
+
     if((c->ipstack).socketCorrupted == 1)
     {
         return FAILURE;
     }
 
-    int rc = SUCCESS;
     if((c->ipstack).write(&(c->ipstack), buf, length) == FAILURE)
     {
         (c->ipstack).socketCorrupted = 1;
@@ -132,15 +134,19 @@ static int sendPacket(InstaMsg *c, unsigned char *buf, int length)
 
 static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
 {
+    MQTTHeader header = {0};
+    int rc = FAILURE;
+    int len = 0;
+    int rem_len = 0;
+    unsigned char i;
+    int multiplier = 1;
+    int numRetries = MAX_TRIES_ALLOWED_WHILE_READING_FROM_NETWORK_MEDIUM;
+
     if((c->ipstack).socketCorrupted == 1)
     {
         return FAILURE;
     }
 
-    MQTTHeader header = {0};
-    int rc = FAILURE;
-    int len = 0;
-    int rem_len = 0;
 
     /*
      * 0. Before reading the packet, memset the read-buffer to all-empty, else there will be issues
@@ -152,7 +158,6 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     /*
      * 1. read the header byte.  This has the packet type in it.
      */
-    int numRetries = MAX_TRIES_ALLOWED_WHILE_READING_FROM_NETWORK_MEDIUM;
     do
     {
         rc = (c->ipstack).read(&(c->ipstack), c->readbuf, 1, 0);
@@ -179,13 +184,11 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     len = 1;
     /* 2. read the remaining length.  This is variable in itself
      */
-    unsigned char i;
-    int multiplier = 1;
 
     rem_len = 0;
     do
     {
-        if((c->ipstack).read(&(c->ipstack), &i, 1, 1) == FAILURE) // Pseudo-Blocking Call
+        if((c->ipstack).read(&(c->ipstack), &i, 1, 1) == FAILURE) /* Pseudo-Blocking Call */
         {
             (c->ipstack).socketCorrupted = 1;
             goto exit;
@@ -201,7 +204,7 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     /* 3. read the rest of the buffer using a callback to supply the rest of the data */
     if(rem_len > 0)
     {
-        if((c->ipstack).read(&(c->ipstack), c->readbuf + len, rem_len, 1) == FAILURE) // Pseudo-Blocking Call
+        if((c->ipstack).read(&(c->ipstack), c->readbuf + len, rem_len, 1) == FAILURE) /* Pseudo-Blocking Call */
         {
             (c->ipstack).socketCorrupted = 1;
             goto exit;
@@ -218,9 +221,11 @@ exit:
 }
 
 
-// assume topic filter and name is in correct format
-// # can only be at end
-// + and # can only be next to separator
+/*
+ * assume topic filter and name is in correct format
+ * # can only be at end
+ * + and # can only be next to separator
+ */
 static char isTopicMatched(char* topicFilter, MQTTString* topicName)
 {
     char* curf = topicFilter;
@@ -234,13 +239,13 @@ static char isTopicMatched(char* topicFilter, MQTTString* topicName)
         if (*curf != '+' && *curf != '#' && *curf != *curn)
             break;
         if (*curf == '+')
-        {   // skip until we meet the next separator, or end of string
+        {   /* skip until we meet the next separator, or end of string */
             char* nextpos = curn + 1;
             while (nextpos < curn_end && *nextpos != '/')
                 nextpos = ++curn + 1;
         }
         else if (*curf == '#')
-            curn = curn_end - 1;    // skip until end of string
+            curn = curn_end - 1;    /* skip until end of string */
         curf++;
         curn++;
     };
@@ -255,7 +260,7 @@ static int deliverMessageToSelf(InstaMsg* c, MQTTString* topicName, MQTTMessage*
     int rc = FAILURE;
     enum QoS qos;
 
-    // we have to find the right message handler - indexed by topic
+    /* we have to find the right message handler - indexed by topic */
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {
         if (c->messageHandlers[i].topicFilter != 0 && (MQTTPacket_equals(topicName, (char*)c->messageHandlers[i].topicFilter) ||
@@ -660,7 +665,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                 char sessionPresent = 0;
                 if (MQTTDeserialize_connack((unsigned char*)&sessionPresent, &connack_rc, c->readbuf, MAX_BUFFER_SIZE) == 1)
                 {
-                    if(connack_rc == 0x00)  // Connection Accepted
+                    if(connack_rc == 0x00)  /* Connection Accepted */
                     {
                         info_log("Connected successfully to InstaMsg-Server.");
                         c->connected = 1;
@@ -777,7 +782,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                 }
 
                 attachResultHandler(c, msgId, MQTT_RESULT_HANDLER_TIMEOUT, publishQoS2CycleCompleted);
-                sendPacket(c, buf, len); // send the PUBREL packet
+                sendPacket(c, buf, len); /* send the PUBREL packet */
 
                 break;
             }
@@ -794,7 +799,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                 break;
             }
         }
-    } while(rc == SUCCESS); // Keep reading packets till the time we are receiving packets fine.
+    } while(rc == SUCCESS); /* Keep reading packets till the time we are receiving packets fine. */
 
 exit:
         return;
@@ -862,8 +867,8 @@ int MQTTSubscribe(InstaMsg* c,
          }
     }
 
-    if ((rc = sendPacket(c, buf, len)) != SUCCESS) // send the subscribe packet
-        goto exit;             // there was a problem
+    if ((rc = sendPacket(c, buf, len)) != SUCCESS) /* send the subscribe packet */
+        goto exit;             /* there was a problem */
 
 exit:
     return rc;
@@ -881,8 +886,8 @@ int MQTTUnsubscribe(InstaMsg* c, const char* topicFilter)
 
     if ((len = MQTTSerialize_unsubscribe(buf, MAX_BUFFER_SIZE, 0, getNextPacketId(c), 1, &topic)) <= 0)
         goto exit;
-    if ((rc = sendPacket(c, buf, len)) != SUCCESS) // send the subscribe packet
-        goto exit; // there was a problem
+    if ((rc = sendPacket(c, buf, len)) != SUCCESS) /* send the subscribe packet */
+        goto exit; /* there was a problem */
 
 exit:
     return rc;
@@ -921,8 +926,8 @@ int MQTTPublish(InstaMsg* c,
     len = MQTTSerialize_publish(buf, MAX_BUFFER_SIZE, 0, qos, retain, id, topic, (unsigned char*)payload, strlen((char*)payload) + 1);
     if (len <= 0)
         goto exit;
-    if ((rc = sendPacket(c, buf, len)) != SUCCESS) // send the subscribe packet
-        goto exit; // there was a problem
+    if ((rc = sendPacket(c, buf, len)) != SUCCESS) /* send the subscribe packet */
+        goto exit; /* there was a problem */
 
     if (qos == QOS1)
     {
@@ -943,7 +948,7 @@ int MQTTDisconnect(InstaMsg* c)
 
     int len = MQTTSerialize_disconnect(buf, MAX_BUFFER_SIZE);
     if (len > 0)
-        rc = sendPacket(c, buf, len);            // send the disconnect packet
+        rc = sendPacket(c, buf, len);            /* send the disconnect packet */
 
     if(c->onDisconnectCallback != NULL)
     {
@@ -981,7 +986,7 @@ void start(char *clientId, char *password,
             removeExpiredResultHandlers(c);
             coreLoopyBusinessLogicInitiatedBySelf(NULL);
 
-            // This is 1 means physical-network is fine, AND connection to InstaMsg-Server is fine at protocol level.
+            /* This is 1 means physical-network is fine, AND connection to InstaMsg-Server is fine at protocol level. */
             if(c->connected == 1)
             {
                 sendPingReqToServer(c);

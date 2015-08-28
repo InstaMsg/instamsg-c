@@ -223,8 +223,10 @@ static int onConnectOneTimeOperations()
 {
 	if(opts_p->subscribe == 1)
 	{
+        int rc;
+
     	info_log("Subscribing to %s", topic);
-		int rc = MQTTSubscribe(&instaMsg, topic, opts_p->qos, messageArrived, subscribeAckReceived, MQTT_RESULT_HANDLER_TIMEOUT);
+		rc = MQTTSubscribe(&instaMsg, topic, opts_p->qos, messageArrived, subscribeAckReceived, MQTT_RESULT_HANDLER_TIMEOUT);
 		info_log("Subscribed %d", rc);
 	}
 
