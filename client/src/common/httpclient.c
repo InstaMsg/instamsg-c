@@ -188,14 +188,18 @@ HTTPResponse downloadFile(const char *url,
 	init_network(&network, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
 
     {
+        char *url;
+
         RESET_GLOBAL_BUFFER;
-        generateRequest("GET", url, params, headers, (char*)GLOBAL_BUFFER, MAX_BUFFER_SIZE, 1);
-        info_log(FILE_DOWNLOAD "Complete URL that will be hit : [%s]", GLOBAL_BUFFER);
+        url = (char*) GLOBAL_BUFFER;
+
+        generateRequest("GET", url, params, headers, url, MAX_BUFFER_SIZE, 1);
+        info_log(FILE_DOWNLOAD "Complete URL that will be hit : [%s]", url);
 
         /*
         * Fire the request-bytes over the network-medium.
         */
-        if(network.write(&network, GLOBAL_BUFFER, strlen((char*)GLOBAL_BUFFER)) == FAILURE)
+        if(network.write(&network, (unsigned char*)url, strlen(url)) == FAILURE)
         {
             goto exit;
         }
@@ -358,26 +362,28 @@ HTTPResponse uploadFile(const char *url,
     totalLength = strlen(secondLevel) + numBytes + strlen(fourthLevel);
     i = 0;
 
-    while(1)
     {
-        if(headers[i].key == NULL)
+        RESET_GLOBAL_BUFFER;
+
+        while(1)
         {
-            break;
+            if(headers[i].key == NULL)
+            {
+                break;
+            }
+
+            if(strcmp(headers[i].key, CONTENT_LENGTH) == 0)
+            {
+                sg_sprintf((char*)GLOBAL_BUFFER, "%u", totalLength);
+                headers[i].value = (char*)GLOBAL_BUFFER;
+            }
+
+            i++;
         }
 
-        if(strcmp(headers[i].key, CONTENT_LENGTH) == 0)
-        {
-            char value[MAX_BUFFER_SIZE] = {0};
-            sg_sprintf(value, "%u", totalLength);
-
-            headers[i].value = value;
-        }
-
-        i++;
+        generateRequest("POST", url, params, headers, request, MAX_BUFFER_SIZE, 0);
+        info_log(FILE_UPLOAD "First-stage URL that will be hit : [%s]", request);
     }
-
-    generateRequest("POST", url, params, headers, request, MAX_BUFFER_SIZE, 0);
-    info_log(FILE_UPLOAD "First-stage URL that will be hit : [%s]", request);
 
     if(network.write(&network, (unsigned char*)request, strlen(request)) == FAILURE)
     {
@@ -423,8 +429,13 @@ HTTPResponse uploadFile(const char *url,
     while(1)
     {
         char beginPayloadDownload = 0;
+        char *newLine;
 
-        char newLine[MAX_BUFFER_SIZE] = "";
+        RESET_GLOBAL_BUFFER;
+
+        newLine = (char*)GLOBAL_BUFFER;
+        strcpy(newLine, "");
+
         getNextLine(&network, newLine, &(response.status));
 
         /*
