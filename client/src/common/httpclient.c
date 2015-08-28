@@ -181,10 +181,15 @@ HTTPResponse downloadFile(const char *url,
                           unsigned int timeout)
 {
     Network network;
-    HTTPResponse response;
+    HTTPResponse response = {0};
 
     unsigned int numBytes;
-    char request[MAX_BUFFER_SIZE] = {0};
+    char *request = (char *)sg_malloc(MAX_BUFFER_SIZE);
+    if(request == NULL)
+    {
+        error_log(FILE_DOWNLOAD "Failure in memory allocation for downloadFile");
+        goto exit;
+    }
 
 	init_network(&network, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
 
@@ -260,6 +265,11 @@ HTTPResponse downloadFile(const char *url,
             info_log(FILE_DOWNLOAD "File [%s] successfully moved to [%s] worth [%u] bytes", tempFileName, filename, numBytes);
 
 exit:
+            if(request != NULL)
+            {
+                sg_free(request);
+            }
+
             release_network(&network);
 
             info_log(FILE_DOWNLOAD "HTTP-Response Status = [%d]", response.status);
@@ -307,14 +317,20 @@ HTTPResponse uploadFile(const char *url,
     unsigned int numBytes = 0;
 
     Network network;
-    HTTPResponse response;
+    HTTPResponse response = {0};
     FileSystem fs;
 
     unsigned int totalLength;
 
-    char request[MAX_BUFFER_SIZE] = {0};
-    char secondLevel[MAX_BUFFER_SIZE] = {0};
-    char fourthLevel[MAX_BUFFER_SIZE] = {0};
+    char *request = (char *) sg_malloc(MAX_BUFFER_SIZE);
+    char *secondLevel = (char *) sg_malloc(MAX_BUFFER_SIZE);
+    char *fourthLevel = (char *) sg_malloc(MAX_BUFFER_SIZE);
+
+    if((request == NULL) || (secondLevel == NULL) || (fourthLevel == NULL))
+    {
+        error_log(FILE_UPLOAD "Failure in memory allocation for uploadFile");
+        goto exit;
+    }
 
 	init_network(&network, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
 
@@ -438,6 +454,20 @@ HTTPResponse uploadFile(const char *url,
     }
 
 exit:
+
+    if(request)
+    {
+        sg_free(request);
+    }
+    if(secondLevel)
+    {
+        sg_free(secondLevel);
+    }
+    if(fourthLevel)
+    {
+        sg_free(fourthLevel);
+    }
+
     release_network(&network);
 
     info_log(FILE_UPLOAD "HTTP-Response Status = [%d]", response.status);

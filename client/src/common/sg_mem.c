@@ -2,7 +2,7 @@
 
 #include "include/sg_mem.h"
 
-static unsigned int currentBytesUsed;
+static unsigned long currentBytesUsed;
 
 void* sg_malloc(unsigned short numBytes)
 {
