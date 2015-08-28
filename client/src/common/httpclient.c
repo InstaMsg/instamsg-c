@@ -51,7 +51,7 @@ static void generateRequest(const char *requestType,
                             const char *url,
                             KeyValuePairs *params,
                             KeyValuePairs *headers,
-                            unsigned char *buf,
+                            char *buf,
                             int maxLenAllowed,
                             unsigned char addFinalDelimiter)
 {
@@ -183,6 +183,8 @@ HTTPResponse downloadFile(const char *url,
     Network network;
     HTTPResponse response;
 
+    long numBytes;
+
 	init_network(&network, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
 
     char request[MAX_BUFFER_SIZE] = {0};
@@ -197,7 +199,7 @@ HTTPResponse downloadFile(const char *url,
         goto exit;
     }
 
-    long numBytes = 0;
+    numBytes = 0;
     while(1)
     {
         char beginPayloadDownload = 0;
@@ -220,32 +222,32 @@ HTTPResponse downloadFile(const char *url,
 
         if(beginPayloadDownload == 1)
         {
+            long i;
             char tempFileName[MAX_BUFFER_SIZE] = {0};
+            FileSystem fs;
+
             sg_sprintf(tempFileName, "~%s", filename);
 
             /*
              * Delete the file (it might have been downloaded partially some other time).
              */
             instaMsg.singletonUtilityFs.deleteFile(&(instaMsg.singletonUtilityFs), tempFileName);
-
-            FileSystem fs;
             init_file_system(&fs, (void *)tempFileName);
 
             // Now, we need to start reading the bytes
             info_log(FILE_DOWNLOAD "Beginning downloading of [%s] worth [%ld] bytes", tempFileName, numBytes);
 
-            long i;
             for(i = 0; i < numBytes; i++)
             {
                 char ch[2] = {0};
 
-                if(network.read(&network, ch, 1, 1) == FAILURE) // Pseudo-Blocking Call
+                if(network.read(&network, (unsigned char*)ch, 1, 1) == FAILURE) // Pseudo-Blocking Call
                 {
                     release_file_system(&fs);
                     goto exit;
                 }
 
-                fs.write(&fs, ch, 1);
+                fs.write(&fs, (unsigned char*)ch, 1);
             }
 
             release_file_system(&fs);
@@ -308,17 +310,19 @@ HTTPResponse uploadFile(const char *url,
     HTTPResponse response;
     FileSystem fs;
 
-	init_network(&network, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
+    long totalLength;
 
     char request[MAX_BUFFER_SIZE] = {0};
+    char secondLevel[MAX_BUFFER_SIZE] = {0};
+    char fourthLevel[MAX_BUFFER_SIZE] = {0};
 
+	init_network(&network, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
 
     /* Now, generate the isecond-level (form) data
      * Please consult ::
      *
      *          http://stackoverflow.com/questions/8659808/how-does-http-file-upload-work
      */
-    char secondLevel[MAX_BUFFER_SIZE] = {0};
     sg_sprintf(secondLevel, "--%s"                                                                   \
                          "\r\n"                                                                 \
                          "Content-Disposition: form-data; name=\"file\"; filename=\"%s\""       \
@@ -326,14 +330,13 @@ HTTPResponse uploadFile(const char *url,
                          "Content-Type: application/octet-stream"                               \
                          "\r\n\r\n", POST_BOUNDARY, filename);
 
-    char fourthLevel[MAX_BUFFER_SIZE] = {0};
     sg_sprintf(fourthLevel, "\r\n--%s--", POST_BOUNDARY);
 
     /*
      * Add the "Content-Length header
      */
     numBytes = instaMsg.singletonUtilityFs.getFileSize(&(instaMsg.singletonUtilityFs), filename);
-    long totalLength = strlen(secondLevel) + numBytes + strlen(fourthLevel);
+    totalLength = strlen(secondLevel) + numBytes + strlen(fourthLevel);
     i = 0;
 
     while(1)
@@ -357,7 +360,7 @@ HTTPResponse uploadFile(const char *url,
     generateRequest("POST", url, params, headers, request, MAX_BUFFER_SIZE, 0);
     info_log(FILE_UPLOAD "First-stage URL that will be hit : [%s]", request);
 
-    if(network.write(&network, request, strlen(request)) == FAILURE)
+    if(network.write(&network, (unsigned char*)request, strlen(request)) == FAILURE)
     {
         error_log(FILE_UPLOAD "Error occurred while uploading POST data (FIRST LEVEL) for [%s]", filename);
         goto exit;
