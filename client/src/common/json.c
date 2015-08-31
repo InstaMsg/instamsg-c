@@ -65,7 +65,7 @@ void getJsonKeyValueIfPresent(char *json, const char *key, char *buf)
                     strcat(buf, parsedValueToken);
 
                     debug_log("Found key [%s] and value [%s] in json [%s]", parsedKeyToken, parsedValueToken, jsonStartingPointer);
-                    return;
+                    goto exit;
                 }
 
                 /* We have parsed current key-value pair. So, reset the token-buffers. */

@@ -14,24 +14,25 @@
 #include "./include/log.h"
 #include "./include/globals.h"
 
+static char LOG_GLOBAL_BUFFER[MAX_BUFFER_SIZE];
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
 #define LOG_COMMON_CODE(level)                                                                          \
                                                                                                         \
     va_list argptr;                                                                                     \
-    RESET_GLOBAL_BUFFER;                                                                                \
+    memset(LOG_GLOBAL_BUFFER, 0, MAX_BUFFER_SIZE);                                                      \
                                                                                                         \
     va_start(argptr, fmt);                                                                              \
-    sg_varargs((char *)GLOBAL_BUFFER, fmt, argptr);                                                     \
+    sg_varargs(LOG_GLOBAL_BUFFER, fmt, argptr);                                                         \
     va_end(argptr);                                                                                     \
                                                                                                         \
-    strcat((char *)GLOBAL_BUFFER, "\r\n");                                                              \
+    strcat(LOG_GLOBAL_BUFFER, "\r\n");                                                                  \
                                                                                                         \
     if(instaMsg.serverLoggingEnabled == 1)                                                              \
     {                                                                                                   \
         MQTTPublish(&instaMsg,                                                                          \
                     instaMsg.serverLogsTopic,                                                           \
-                    (char *)GLOBAL_BUFFER,                                                              \
+                    LOG_GLOBAL_BUFFER,                                                                  \
                     QOS0,                                                                               \
                     0,                                                                                  \
                     NULL,                                                                               \
@@ -43,28 +44,28 @@
     {                                                                                                   \
         serialLogger.serialLoggerInterface.write(                                                       \
                 &(serialLogger.serialLoggerInterface),                                                  \
-                GLOBAL_BUFFER, strlen((char *)GLOBAL_BUFFER));                                          \
+                (unsigned char *)LOG_GLOBAL_BUFFER, strlen(LOG_GLOBAL_BUFFER));                         \
         fileLogger.fs.write(                                                                            \
                 &(fileLogger.fs),                                                                       \
-                GLOBAL_BUFFER, strlen((char *)GLOBAL_BUFFER));                                          \
+                (unsigned char *)LOG_GLOBAL_BUFFER, strlen(LOG_GLOBAL_BUFFER));                         \
     }
 #else
 #define LOG_COMMON_CODE(level)                                                                          \
                                                                                                         \
     va_list argptr;                                                                                     \
+    memset(LOG_GLOBAL_BUFFER, 0, MAX_BUFFER_SIZE);                                                      \
                                                                                                         \
-    RESET_GLOBAL_BUFFER;                                                                                \
     va_start(argptr, fmt);                                                                              \
-    sg_varargs((char *)GLOBAL_BUFFER, fmt, argptr);                                                     \
+    sg_varargs(LOG_GLOBAL_BUFFER, fmt, argptr);                                                         \
     va_end(argptr);                                                                                     \
                                                                                                         \
-    strcat((char *)GLOBAL_BUFFER, "\r\n");                                                              \
+    strcat(LOG_GLOBAL_BUFFER, "\r\n");                                                                  \
                                                                                                         \
     if(instaMsg.serverLoggingEnabled == 1)                                                              \
     {                                                                                                   \
         MQTTPublish(&instaMsg,                                                                          \
                     instaMsg.serverLogsTopic,                                                           \
-                    (char *)GLOBAL_BUFFER,                                                              \
+                    LOG_GLOBAL_BUFFER,                                                                  \
                     QOS0,                                                                               \
                     0,                                                                                  \
                     NULL,                                                                               \
@@ -76,7 +77,7 @@
     {                                                                                                   \
         serialLogger.serialLoggerInterface.write(                                                       \
                 &(serialLogger.serialLoggerInterface),                                                  \
-                GLOBAL_BUFFER, strlen((char *)GLOBAL_BUFFER));                                          \
+                (unsigned char*)LOG_GLOBAL_BUFFER, strlen(LOG_GLOBAL_BUFFER));                          \
     }
 #endif
 

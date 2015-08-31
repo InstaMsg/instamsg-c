@@ -447,16 +447,19 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     }
     else if( (strcmp(method, "GET") == 0) && (strlen(filename) == 0))
     {
+        char *fileListing;
+
         RESET_GLOBAL_BUFFER;
+        fileListing = (char*)GLOBAL_BUFFER;
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
-        (c->singletonUtilityFs).getFileListing(&(c->singletonUtilityFs), (char*)GLOBAL_BUFFER, MAX_BUFFER_SIZE, ".");
+        (c->singletonUtilityFs).getFileListing(&(c->singletonUtilityFs), fileListing, MAX_BUFFER_SIZE, ".");
 #else
-        strcat((char *)GLOBAL_BUFFER, "{}");
+        strcat(fileListing, "{}");
 #endif
 
-        info_log(FILE_LISTING ": [%s]", GLOBAL_BUFFER);
-        sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"files\": %s}", messageId, GLOBAL_BUFFER);
+        info_log(FILE_LISTING ": [%s]", fileListing);
+        sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"files\": %s}", messageId, fileListing);
     }
     else if( (strcmp(method, "DELETE") == 0) && (strlen(filename) > 0))
     {
@@ -482,6 +485,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         HTTPResponse response = {0};
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
+        char *clientIdBuf;
         KeyValuePairs headers[5];
 
         headers[0].key = "Authorization";
@@ -489,8 +493,15 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
 
         headers[1].key = "ClientId";
 
-        RESET_GLOBAL_BUFFER;
-        headers[1].value = (char*)GLOBAL_BUFFER;
+        clientIdBuf = (char*) sg_malloc(MAX_BUFFER_SIZE);
+        if(clientIdBuf == NULL)
+        {
+            error_log(FILE_UPLOAD "Failed to allocate memory");
+            goto terminateFileUpload;
+        }
+
+        sg_sprintf(clientIdBuf, "%s-%s", c->connectOptions.clientID.cstring, c->connectOptions.username.cstring);
+        headers[1].value = clientIdBuf;
 
         headers[2].key = "Content-Type";
         headers[2].value = "multipart/form-data; boundary=" POST_BOUNDARY;
@@ -502,9 +513,12 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         headers[4].value = 0;
 
 
-
-        sg_sprintf((char*)GLOBAL_BUFFER, "%s-%s", c->connectOptions.clientID.cstring, c->connectOptions.username.cstring);
         response = uploadFile(c->fileUploadUrl, filename, NULL, headers, 10);
+
+terminateFileUpload:
+
+        if(clientIdBuf)
+            sg_free(clientIdBuf);
 #endif
         if(response.status == HTTP_FILE_UPLOAD_SUCCESS)
         {

@@ -188,18 +188,18 @@ HTTPResponse downloadFile(const char *url,
 	init_network(&network, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
 
     {
-        char *url;
+        char *urlComplete;
 
         RESET_GLOBAL_BUFFER;
-        url = (char*) GLOBAL_BUFFER;
+        urlComplete = (char*) GLOBAL_BUFFER;
 
-        generateRequest("GET", url, params, headers, url, MAX_BUFFER_SIZE, 1);
-        info_log(FILE_DOWNLOAD "Complete URL that will be hit : [%s]", url);
+        generateRequest("GET", url, params, headers, urlComplete, MAX_BUFFER_SIZE, 1);
+        info_log(FILE_DOWNLOAD "Complete URL that will be hit : [%s]", urlComplete);
 
         /*
         * Fire the request-bytes over the network-medium.
         */
-        if(network.write(&network, (unsigned char*)url, strlen(url)) == FAILURE)
+        if(network.write(&network, (unsigned char*)urlComplete, strlen(urlComplete)) == FAILURE)
         {
             goto exit;
         }
