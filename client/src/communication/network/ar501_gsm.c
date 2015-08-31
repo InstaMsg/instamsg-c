@@ -113,18 +113,36 @@ static int ar501_gsm_socket_write(Network* network, unsigned char* buffer, int l
  */
 void init_network(Network *network, const char *hostName, unsigned int port)
 {
-    // Register read-callback.
+    /* Enable the peripherals. */
+    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART3);
+    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+
+    GPIOPinConfigure(GPIO_PC6_U3RX);
+    GPIOPinConfigure(GPIO_PC7_U3TX);
+    ROM_GPIOPinTypeUART(GPIO_PORTC_BASE, GPIO_PIN_6 | GPIO_PIN_7);
+
+    /* Configure the UART for 9600, 8-N-1 operation. */
+    ROM_UARTConfigSetExpClk(UART3_BASE, ROM_SysCtlClockGet(), 9600,
+                            (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
+                             UART_CONFIG_PAR_NONE));
+
+    UARTEnable(UART3_BASE);
+
+
+
+
+    /* Register read-callback. */
 	network->read = ar501_gsm_socket_read;
 
-    // Register write-callback.
+    /* Register write-callback. */
 	network->write = ar501_gsm_socket_write;
 
-    // Keep a copy of connection-parameters, for easy book-keeping.
+    /* Keep a copy of connection-parameters, for easy book-keeping. */
     memset(network->host, 0, MAX_BUFFER_SIZE);
     sg_sprintf(network->host, "%s", hostName);
     network->port = port;
 
-    // Connect the medium.
+    /* Connect the medium. */
     connect_underlying_medium_try_once(network, network->host, network->port);
 }
 

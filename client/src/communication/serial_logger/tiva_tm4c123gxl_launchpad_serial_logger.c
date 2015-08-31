@@ -22,10 +22,29 @@ static int tiva_serial_logger_write(SerialLoggerInterface* serialLoggerInterface
 
 void init_serial_logger_interface(SerialLoggerInterface *serialLoggerInterface, void *arg)
 {
-    // No init-required here.
-    // Just to be absolutely sure, we are doing all hardware-initialization in SYSTEM_GLOBAL_INIT
+    /*
+     * UART-initialiazation, for serial-logger functionality.
+     */
 
-    // Register write-callback.
+    /* Enable the peripherals. */
+    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+
+
+    /* Set GPIO A1 as UART-Transmitter pins. */
+    GPIOPinConfigure(GPIO_PA1_U0TX);
+    ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_1);
+
+    /* Configure the UART for 9600, 8-N-1 operation. */
+    ROM_UARTConfigSetExpClk(UART0_BASE, ROM_SysCtlClockGet(), 9600,
+                            (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
+                             UART_CONFIG_PAR_NONE));
+
+    UARTEnable(UART0_BASE);
+
+
+
+    /* Register write-callback. */
 	serialLoggerInterface->write = tiva_serial_logger_write;
 }
 

@@ -75,7 +75,7 @@ int main(int argc, char** argv)
     globalSystemInit();
 
 #if 1
-#if 1
+#if 0
     info_log("sending command to gprs %d", sizeof(command));
     bzero(command, MAX_BUFFER_SIZE);
     //memset(command, 0, MAX_BUFFER_SIZE);
@@ -98,7 +98,7 @@ int main(int argc, char** argv)
 #endif
 #endif
 
-    //start("920dfd80-2eef-11e5-b031-34689524378f", "ajaygarg456", NULL, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, NULL);
+    start("920dfd80-2eef-11e5-b031-34689524378f", "ajaygarg456", NULL, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, NULL);
 }
 #endif
 
