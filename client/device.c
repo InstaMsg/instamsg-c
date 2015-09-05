@@ -222,13 +222,16 @@ int main(int argc, char** argv)
     startAndCountdownTimer(3);
 #endif
 
-    startAndCountdownTimer(30);
+    startAndCountdownTimer(3);
+
+#if 0
     memset(command, 0, MAX_BUFFER_SIZE);
     //strcpy((char*)command, "AT+CGSN\r\n");
+    //strcpy((char*)command, "AT+CMGL\r\n");
     //strcpy((char*)command, "AT#SIMDET?\r\n");
     //strcpy((char*)command, "AT+CNUM\r\n");
-    //strcpy((char*)command, "AT+CPIN?\r\n");
-    strcpy((char*)command, "AT+CREG?\r\n");
+    strcpy((char*)command, "AT+CPIN?\r\n");
+    //strcpy((char*)command, "AT+CREG?\r\n");
 
     //startAndCountdownTimer(1);
     //                          info_log("%d", ROM_GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_1));
@@ -261,8 +264,10 @@ ind = 0;
     while(1)
     {
     }
+#endif
 
-    //start("920dfd80-2eef-11e5-b031-34689524378f", "ajaygarg456", NULL, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, NULL);
+    info_log("bootsreap");
+    start("920dfd80-2eef-11e5-b031-34689524378f", "ajaygarg456", NULL, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, NULL);
 }
 #endif
 

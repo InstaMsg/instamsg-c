@@ -637,7 +637,9 @@ void initInstaMsg(InstaMsg* c,
 
 
     (c->ipstack).socketCorrupted = 1;
+    info_log("just before");
 	init_network(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT);
+    info_log("just after");
     if((c->ipstack).socketCorrupted ==1)
     {
         return;
@@ -1035,6 +1037,7 @@ void start(char *clientId, char *password,
 {
     InstaMsg *c = &instaMsg;
 
+    info_log("Doing");
     while(1)
     {
         initInstaMsg(c, clientId, password, onConnectOneTimeOperations, onDisconnect, oneToOneMessageHandler, logFilePath);

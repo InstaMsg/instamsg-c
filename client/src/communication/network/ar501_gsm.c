@@ -6,10 +6,19 @@
  *******************************************************************************/
 
 #include "instamsg_vendor.h"
+#include "uart_utils.h"
+
 #include "../../common/include/instamsg.h"
+
 #include <string.h>
 
+typedef struct NetworkInitCommands NetworkInitCommands;
+NetworkInitCommands commandInformation;
+
 static char result[MAX_BUFFER_SIZE];
+static unsigned int ind;
+static volatile char resultObtained;
+
 
 void UART1Handler(void)
 {
@@ -18,8 +27,6 @@ void UART1Handler(void)
     interrupts  = UARTIntStatus(UART1_BASE, true);
     UARTIntClear(UART1_BASE, interrupts);
 
-
-#if 1
     while(1)
     {
         if(1)
@@ -29,11 +36,142 @@ void UART1Handler(void)
                 result[ind++] = UARTCharGetNonBlocking(UART1_BASE);
             }
         }
+
         break;
     }
 
     result[ind] = 0;
-    info_log(result);
+
+    /*
+     * Now check if any of the terminator-strings is present.
+     */
+    if((strstr(result, "\r\nOK\r\n") != NULL) || (strstr(result, "ERROR") != NULL))
+    {
+#if 0
+        int i;
+        info_log("COMMAND-OUTPUT = [%s]", result);
+
+        /*
+         * Now, check if any of the expected-strings is in the output.
+         */
+        i = 0;
+        while(1)
+        {
+            if(commandInformation.successStrings[i] == NULL)
+            {
+                info_log(MODEM "[%s] Failed :(", commandInformation.logInfoCommand);
+                break;
+            }
+
+            if(strstr(result, commandInformation.successStrings[i]) != NULL)
+            {
+                info_log(MODEM "[%s] Passed", commandInformation.logInfoCommand);
+                break;
+            }
+
+            /*
+             *  Check if the next-string matches
+             */
+            i++;
+        }
+#endif
+        resultObtained = 1;
+    }
+}
+
+
+struct NetworkInitCommands
+{
+    /*
+     * The command to run.
+     */
+    const char *command;
+
+    /*
+     * For logging purposes.
+     */
+    const char *logInfoCommand;
+
+    /*
+     * Assuming that there can be a maximum of 5 such strings.
+     */
+    const char *successStrings[5];
+
+    /*
+     * If the command-output does not contain any of the expected-strings, this command
+     * needs to be run for rectification.
+     *
+     * Ultimately, after running this command (1 or more times), the output of "command"
+     * must contain one of the expected-strings.
+     */
+    const char *commandInCaseNoSuccessStringPresent;
+};
+NetworkInitCommands commands[2] ;
+
+
+#define MODEM "[MODEM] "
+
+static void runInitTests()
+{
+    info_log("Starting INIT-Tests");
+#if 1
+    int i, j;
+
+    i = 0;
+    while(1)
+    {
+        info_log("BEGIN");
+        if(commands[i].command == NULL)
+        {
+            info_log(MODEM "Modem Init-Tests Over");
+            break;
+        }
+
+        info_log(MODEM "Running [%s] for [%s]", commands[i].command, commands[i].logInfoCommand);
+
+        resultObtained = 0;
+        ind = 0;
+        commandInformation = commands[i];
+
+        UARTSend(UART1_BASE, (unsigned char*)commands[i].command, strlen(commands[i].command));
+        while(resultObtained == 0)
+        {
+        }
+
+
+        info_log("COMMAND-OUTPUT = [%s]", result);
+
+        /*
+         * Now, check if any of the expected-strings is in the output.
+         */
+        j = 0;
+        while(1)
+        {
+            if(commandInformation.successStrings[j] == NULL)
+            {
+                info_log(MODEM "[%s] Failed :(", commandInformation.logInfoCommand);
+                break;
+            }
+
+            if(strstr(result, commandInformation.successStrings[j]) != NULL)
+            {
+                info_log(MODEM "[%s] Passed", commandInformation.logInfoCommand);
+                break;
+            }
+
+            /*
+             *  Check if the next-string matches
+             */
+            j++;
+        }
+
+
+        i++;
+    }
+
+    while(1)
+    {
+    }
 #endif
 }
 
@@ -57,7 +195,20 @@ static void release_underlying_medium_guaranteed(Network* network)
  */
 static void connect_underlying_medium_try_once(Network* network, char *hostName, int port)
 {
-    startAndCountdownTimer(1);
+#if 1
+    commands[0].command = "AT+CGSN\r\n";
+    commands[0].logInfoCommand = "IMEI Test";
+
+    commands[0].successStrings[0] = "\r\nOK\r\n";
+    commands[0].successStrings[1] = NULL;
+
+    commands[0].commandInCaseNoSuccessStringPresent = NULL;
+
+    commands[1].command = NULL;
+#endif
+    //startAndCountdownTimer(1);
+    info_log("Almost there");
+    runInitTests();
 }
 
 
@@ -140,24 +291,7 @@ static int ar501_gsm_socket_write(Network* network, unsigned char* buffer, int l
  */
 void init_network(Network *network, const char *hostName, unsigned int port)
 {
-    /* Enable the peripherals. */
-    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART3);
-    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
-
-    GPIOPinConfigure(GPIO_PC6_U3RX);
-    GPIOPinConfigure(GPIO_PC7_U3TX);
-    ROM_GPIOPinTypeUART(GPIO_PORTC_BASE, GPIO_PIN_6 | GPIO_PIN_7);
-
-    /* Configure the UART for 9600, 8-N-1 operation. */
-    ROM_UARTConfigSetExpClk(UART3_BASE, ROM_SysCtlClockGet(), 9600,
-                            (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
-                             UART_CONFIG_PAR_NONE));
-
-    UARTEnable(UART3_BASE);
-
-
-
-
+    info_log("just before here too startr");
     /* Register read-callback. */
 	network->read = ar501_gsm_socket_read;
 
@@ -170,6 +304,7 @@ void init_network(Network *network, const char *hostName, unsigned int port)
     network->port = port;
 
     /* Connect the medium. */
+    info_log("fuck start");
     connect_underlying_medium_try_once(network, network->host, network->port);
 }
 

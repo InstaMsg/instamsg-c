@@ -16,7 +16,7 @@
 #include "../../common/include/instamsg.h"
 
 #if 1
-void UARTSend(const unsigned int UART_ID, unsigned char *buf, unsigned int len)
+void UARTSend(const unsigned int UART_ID, const unsigned char *buf, unsigned int len)
 {
     int i;
     for(i = 0; i < len; i++)

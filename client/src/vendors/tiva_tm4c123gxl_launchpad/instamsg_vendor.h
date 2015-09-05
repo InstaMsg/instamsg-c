@@ -68,5 +68,4 @@ struct System
 #include "driverlib/rom.h"
 #include "inc/tm4c1230d5pm.h"
 
-unsigned int ind;
 #endif
