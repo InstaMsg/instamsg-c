@@ -74,6 +74,8 @@ int main(int argc, char** argv)
 {
     globalSystemInit();
 
+#if 0
+    startAndCountdownTimer(30);
 
 
 
@@ -222,7 +224,6 @@ int main(int argc, char** argv)
     startAndCountdownTimer(3);
 #endif
 
-    startAndCountdownTimer(30);
 
 #if 0
     memset(command, 0, MAX_BUFFER_SIZE);
@@ -267,6 +268,7 @@ ind = 0;
 #endif
 
     info_log("bootsreap");
+#endif
     start("920dfd80-2eef-11e5-b031-34689524378f", "ajaygarg456", NULL, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, NULL);
 }
 #endif

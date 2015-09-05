@@ -85,16 +85,18 @@ NetworkInitCommands commands[3] ;
 
 static void runInitTests()
 {
-    info_log("Starting INIT-Tests");
 #if 1
-    int i, j;
+    int i, j, passed, failed;
+
+    passed = 0;
+    failed = 0;
 
     i = 0;
     while(1)
     {
         if(commands[i].command == NULL)
         {
-            info_log(MODEM "INIT-TESTS OVER !!");
+            info_log("TOTAL MODEM-INIT-COMMANDS: [%u], PASSED: [%u], FAILED: [%u]", i, passed, failed);
             break;
         }
 
@@ -120,6 +122,8 @@ static void runInitTests()
             if(commands[i].successStrings[j] == NULL)
             {
                 info_log(MODEM_COMMAND "\"%s\" Failed :(", i, commands[i].logInfoCommand);
+                failed++;
+
                 break;
             }
 
@@ -127,6 +131,8 @@ static void runInitTests()
             {
                 info_log(MODEM_COMMAND "Found [%s] in output", i, commands[i].successStrings[j]);
                 info_log(MODEM_COMMAND "\"%s\" Passed", i, commands[i].logInfoCommand);
+                passed++;
+
                 break;
             }
 
@@ -166,6 +172,85 @@ static void release_underlying_medium_guaranteed(Network* network)
  */
 static void connect_underlying_medium_try_once(Network* network, char *hostName, int port)
 {
+
+info_log("doing it");
+
+
+//////////////////////////////////////////////////////////////
+//
+    /*
+     * Enable UART1.
+     */
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART1);
+
+    /*
+     * Enable RX/TX.
+     */
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+    GPIOPinConfigure(GPIO_PC4_U1RX);
+    GPIOPinConfigure(GPIO_PC5_U1TX);
+    GPIOPinTypeUART(GPIO_PORTC_BASE, GPIO_PIN_4 | GPIO_PIN_5);
+
+    /*
+     * Enable RTS/CTS.
+     */
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+    GPIOPinConfigure(GPIO_PF0_U1RTS);
+    GPIOPinConfigure(GPIO_PF1_U1CTS);
+    GPIOPinTypeUART(GPIO_PORTF_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+
+    /*
+     * Enable the UART-clocking
+     */
+    //UARTConfigSetExpClk(UART1_BASE, SysCtlClockGet(), 9600,
+    UARTConfigSetExpClk(UART1_BASE, SysCtlClockGet(), 115200,
+                       (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
+                        UART_CONFIG_PAR_NONE));
+
+    //startAndCountdownTimer(30);
+   /*
+    * Re-initializing Port-F :(
+    */
+    //RTS and CTS in IO mode
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+    GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_0);   //RTS output
+    GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_0, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD);
+    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, 0);
+
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);          //CTS input
+    GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, GPIO_PIN_1);
+    GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD);
+
+
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);                // DCD pin Monitor
+    GPIOPinTypeGPIOInput(GPIO_PORTB_BASE, GPIO_PIN_2);
+    GPIOPadConfigSet(GPIO_PORTB_BASE, GPIO_PIN_2, GPIO_STRENGTH_2MA,
+                     GPIO_PIN_TYPE_STD);
+
+
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);                //GPRS Reset IO
+    GPIOPinTypeGPIOOutput(GPIO_PORTE_BASE, GPIO_PIN_4);
+    GPIOPadConfigSet(GPIO_PORTE_BASE, GPIO_PIN_4, GPIO_STRENGTH_2MA,
+                     GPIO_PIN_TYPE_STD);
+
+
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);                //GPRS Power Enable
+    GPIOPinTypeGPIOOutput(GPIO_PORTE_BASE, GPIO_PIN_5);
+    GPIOPadConfigSet(GPIO_PORTE_BASE, GPIO_PIN_5, GPIO_STRENGTH_2MA,
+                     GPIO_PIN_TYPE_STD);
+    GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_5, GPIO_PIN_5);
+
+    info_log("close");
+    ROM_UARTEnable(UART1_BASE);
+    startAndCountdownTimer(30);
+    ROM_IntEnable(INT_UART1);
+    UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_RT|UART_INT_CTS);
+    //UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_CTS);
+
+
+
+    //startAndCountdownTimer(30);
+
 #if 1
     commands[0].command = "AT#SIMDET?\r\n";
     commands[0].logInfoCommand = "SIM-Detection";
@@ -285,6 +370,7 @@ void init_network(Network *network, const char *hostName, unsigned int port)
 
     /* Connect the medium. */
     info_log("fuck start");
+    //startAndCountdownTimer(30);
     connect_underlying_medium_try_once(network, network->host, network->port);
 }
 
