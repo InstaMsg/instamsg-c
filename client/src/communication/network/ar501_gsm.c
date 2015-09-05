@@ -9,37 +9,31 @@
 #include "../../common/include/instamsg.h"
 #include <string.h>
 
+static char result[MAX_BUFFER_SIZE];
+
 void UART1Handler(void)
 {
     unsigned long interrupts;
 
     interrupts  = UARTIntStatus(UART1_BASE, true);
     UARTIntClear(UART1_BASE, interrupts);
-    info_log("Interrupt [0x%x] cleared", interrupts);
 
-#if 0
-    memset(result, 0, MAX_BUFFER_SIZE);
-    UARTRecv(UART1_BASE, result, 10000, NO_TIMEOUT);
-#endif
 
 #if 1
     while(1)
     {
-        while(ROM_UARTCharsAvail(UART1_BASE))
-        //while(1)
+        if(1)
         {
-            //info_log("[%c]",  UARTCharGet(UART1_BASE));
-
-            //break;
-            info_log("[%c]",  UARTCharGetNonBlocking(UART1_BASE));
+            while(ROM_UARTCharsAvail(UART1_BASE))
+            {
+                result[ind++] = UARTCharGetNonBlocking(UART1_BASE);
             }
-
+        }
         break;
-    //ROM_GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
     }
 
-    //ROM_GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
-    info_log("exiting 2");
+    result[ind] = 0;
+    info_log(result);
 #endif
 }
 
