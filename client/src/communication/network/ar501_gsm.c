@@ -106,10 +106,11 @@ struct NetworkInitCommands
      */
     const char *commandInCaseNoSuccessStringPresent;
 };
-NetworkInitCommands commands[2] ;
+NetworkInitCommands commands[3] ;
 
 
 #define MODEM "[MODEM] "
+#define MODEM_COMMAND "[MODEM_INIT_COMMAND %u] "
 
 static void runInitTests()
 {
@@ -120,14 +121,13 @@ static void runInitTests()
     i = 0;
     while(1)
     {
-        info_log("BEGIN");
         if(commands[i].command == NULL)
         {
-            info_log(MODEM "Modem Init-Tests Over");
+            info_log(MODEM "INIT-TESTS OVER !!");
             break;
         }
 
-        info_log(MODEM "Running [%s] for [%s]", commands[i].command, commands[i].logInfoCommand);
+        info_log(MODEM_COMMAND "Running [%s] for \"%s\"", i, commands[i].command, commands[i].logInfoCommand);
 
         resultObtained = 0;
         ind = 0;
@@ -139,7 +139,7 @@ static void runInitTests()
         }
 
 
-        info_log("COMMAND-OUTPUT = [%s]", result);
+        info_log(MODEM_COMMAND "COMMAND-OUTPUT = [%s]", i, result);
 
         /*
          * Now, check if any of the expected-strings is in the output.
@@ -149,13 +149,14 @@ static void runInitTests()
         {
             if(commandInformation.successStrings[j] == NULL)
             {
-                info_log(MODEM "[%s] Failed :(", commandInformation.logInfoCommand);
+                info_log(MODEM_COMMAND "\"%s\" Failed :(", i, commandInformation.logInfoCommand);
                 break;
             }
 
             if(strstr(result, commandInformation.successStrings[j]) != NULL)
             {
-                info_log(MODEM "[%s] Passed", commandInformation.logInfoCommand);
+                info_log(MODEM_COMMAND "Found [%s] in output", i, commandInformation.successStrings[j]);
+                info_log(MODEM_COMMAND "\"%s\" Passed", i, commandInformation.logInfoCommand);
                 break;
             }
 
@@ -196,15 +197,24 @@ static void release_underlying_medium_guaranteed(Network* network)
 static void connect_underlying_medium_try_once(Network* network, char *hostName, int port)
 {
 #if 1
-    commands[0].command = "AT+CGSN\r\n";
-    commands[0].logInfoCommand = "IMEI Test";
+    commands[0].command = "AT#SIMDET?\r\n";
+    commands[0].logInfoCommand = "SIM-Detection";
 
-    commands[0].successStrings[0] = "\r\nOK\r\n";
+    commands[0].successStrings[0] = "1,0";
     commands[0].successStrings[1] = NULL;
 
     commands[0].commandInCaseNoSuccessStringPresent = NULL;
 
-    commands[1].command = NULL;
+    commands[1].command = "AT+CPIN?\r\n";
+    commands[1].logInfoCommand = "PIN-Readiness";
+
+    commands[1].successStrings[0] = "READY";
+    commands[1].successStrings[1] = NULL;
+
+    commands[1].commandInCaseNoSuccessStringPresent = NULL;
+
+
+    commands[2].command = NULL;
 #endif
     //startAndCountdownTimer(1);
     info_log("Almost there");

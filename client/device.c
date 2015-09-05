@@ -222,7 +222,7 @@ int main(int argc, char** argv)
     startAndCountdownTimer(3);
 #endif
 
-    startAndCountdownTimer(3);
+    startAndCountdownTimer(30);
 
 #if 0
     memset(command, 0, MAX_BUFFER_SIZE);
