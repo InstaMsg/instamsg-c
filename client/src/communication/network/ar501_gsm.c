@@ -77,7 +77,7 @@ struct NetworkInitCommands
      */
     const char *commandInCaseNoSuccessStringPresent;
 };
-NetworkInitCommands commands[3] ;
+NetworkInitCommands commands[4] ;
 
 
 #define MODEM "[MODEM] "
@@ -100,7 +100,8 @@ static void runInitTests()
             break;
         }
 
-        info_log(MODEM_COMMAND "\n\nRunning [%s] for \"%s\"", i, commands[i].command, commands[i].logInfoCommand);
+        info_log("\n\n");
+        info_log(MODEM_COMMAND "Running [%s] for \"%s\"", i, commands[i].command, commands[i].logInfoCommand);
 
         resultObtained = 0;
         ind = 0;
@@ -259,6 +260,9 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
 
     commands[0].commandInCaseNoSuccessStringPresent = NULL;
 
+
+    /*
+     */
     commands[1].command = "AT+CPIN?\r\n";
     commands[1].logInfoCommand = "PIN-Readiness";
 
@@ -268,7 +272,21 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
     commands[1].commandInCaseNoSuccessStringPresent = NULL;
 
 
-    commands[2].command = NULL;
+    /*
+     */
+    commands[2].command = "AT+CREG?\r\n";
+    commands[2].logInfoCommand = "SIM-Registered-To-Network";
+
+    commands[2].successStrings[0] = "0,1";
+    commands[2].successStrings[1] = "0,5";
+    commands[2].successStrings[2] = NULL;
+
+    commands[2].commandInCaseNoSuccessStringPresent = NULL;
+
+
+    /*
+     */
+    commands[3].command = NULL;
 
 
     runInitTests();
