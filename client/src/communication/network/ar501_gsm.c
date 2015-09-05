@@ -9,6 +9,7 @@
 #include "uart_utils.h"
 
 #include "../../common/include/instamsg.h"
+#include "../../common/include/sg_mem.h"
 
 #include <string.h>
 
@@ -67,7 +68,7 @@ struct NetworkInitCommands
     /*
      * Assuming that there can be a maximum of 5 such strings.
      */
-    const char *successStrings[5];
+    char *successStrings[5];
 
     /*
      * If the command-output does not contain any of the expected-strings, this command
@@ -76,7 +77,7 @@ struct NetworkInitCommands
      * Ultimately, after running this command (1 or more times), the output of "command"
      * must contain one of the expected-strings.
      */
-    const char *commandInCaseNoSuccessStringPresent;
+    char *commandInCaseNoSuccessStringPresent;
 
     /*
      * Flag, which tells whether we should wait before re-running "command" after running "commandInCaseNoSuccessStringPresent".
@@ -170,7 +171,7 @@ start_commands:
                     RESET_GLOBAL_BUFFER;
                     strcpy((char*)GLOBAL_BUFFER, commands[i].successStrings[j]);
 
-                    temp = GLOBAL_BUFFER;
+                    temp = (char*)GLOBAL_BUFFER;
                     while(1)
                     {
                         token = strtok_r(temp, "&", &saveptr);
@@ -357,10 +358,31 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
     commands[3].command = "AT+CGDCONT?;#USERID?\r\n";
     commands[3].logInfoCommand = "GPRS-Context-Correctness";
 
-    commands[3].successStrings[0] = "OK";
+    commands[3].successStrings[0] = (char*)sg_malloc(MAX_BUFFER_SIZE);
+    if(commands[3].successStrings[0] == NULL)
+    {
+        error_log("Could not allocate memory for successStrings[0] while testing for GPRS-context");
+        goto exit;
+    }
+    else
+    {
+        sg_sprintf(commands[3].successStrings[0],"1,\"IP\",\"%s\"&#USERID: \"%s\"", apn, userid);
+    }
+
     commands[3].successStrings[1] = NULL;
 
-    commands[3].commandInCaseNoSuccessStringPresent = NULL;
+    commands[3].commandInCaseNoSuccessStringPresent = (char*)sg_malloc(MAX_BUFFER_SIZE);
+    if(commands[3].commandInCaseNoSuccessStringPresent == NULL)
+    {
+        error_log("Could not allocate memory for commandInCaseNoSuccessStringPresent while testing for GPRS-context");
+        goto exit;
+    }
+    else
+    {
+        sg_sprintf(commands[3].commandInCaseNoSuccessStringPresent, "AT+CGDCONT=1,\"IP\",\"%s\";#USERID=\"%s\";#PASSW=\"%s\"\r\n",
+                   apn, userid, passw);
+    }
+
     commands[3].giveModemSomeSleep = 1;
 
 
@@ -370,6 +392,15 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
 
 
     runInitTests();
+
+exit:
+    if(commands[3].successStrings[0])
+        sg_free(commands[3].successStrings[0]);
+
+    if(commands[3].commandInCaseNoSuccessStringPresent)
+    {
+        sg_free(commands[3].commandInCaseNoSuccessStringPresent);
+    }
 }
 
 
