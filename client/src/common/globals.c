@@ -417,7 +417,7 @@ void sg_sprintf(char *out, const char *format, ...)
 /*
  * This method causes the current thread to wait for "n" seconds.
  */
-void startAndCountdownTimer(int seconds, unsigned int showRunningStatus)
+void startAndCountdownTimer(int seconds, unsigned char showRunningStatus)
 {
     int i;
     long j;
@@ -425,7 +425,7 @@ void startAndCountdownTimer(int seconds, unsigned int showRunningStatus)
 
     for(i = 0; i < seconds; i++)
     {
-        if(1)
+        if(showRunningStatus == 1)
         {
             info_log("[%u]", seconds - i);
         }

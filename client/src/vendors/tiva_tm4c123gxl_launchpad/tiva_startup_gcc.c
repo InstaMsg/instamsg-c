@@ -55,7 +55,7 @@ extern void UART1Handler(void);
 // Reserve space for the system stack.
 //
 //*****************************************************************************
-static unsigned long pulStack[64];
+static unsigned long pulStack[128];
 
 //*****************************************************************************
 //

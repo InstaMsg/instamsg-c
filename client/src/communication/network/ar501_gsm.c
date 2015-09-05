@@ -94,6 +94,8 @@ static void runInitTests()
     i = 0;
     while(1)
     {
+
+start_command:
         if(commands[i].command == NULL)
         {
             info_log("\n\nTOTAL MODEM-INIT-COMMANDS: [%u], PASSED: [%u], FAILED: [%u]\n\n", i, passed, failed);
@@ -114,33 +116,55 @@ static void runInitTests()
 
         info_log(MODEM_COMMAND "COMMAND-OUTPUT = [%s]", i, result);
 
-        /*
-         * Now, check if any of the expected-strings is in the output.
-         */
-        j = 0;
         while(1)
         {
-            if(commands[i].successStrings[j] == NULL)
-            {
-                info_log(MODEM_COMMAND "\"%s\" Failed :(", i, commands[i].logInfoCommand);
-                failed++;
+            j = 0;
 
-                break;
+            while(1)
+            {
+                if(commands[i].successStrings[j] == NULL)
+                {
+                    if(commands[i].commandInCaseNoSuccessStringPresent != NULL)
+                    {
+                        info_log(MODEM_COMMAND "Initial Check for \"%s\" Failed.. trying to rectify with [%s]",
+                                               i, commands[i].logInfoCommand, commands[i].commandInCaseNoSuccessStringPresent);
+
+                        resultObtained = 0;
+                        ind = 0;
+
+                        UARTSend(UART1_BASE, (unsigned char*)commands[i].commandInCaseNoSuccessStringPresent,
+                                 strlen(commands[i].commandInCaseNoSuccessStringPresent));
+                        while(resultObtained == 0)
+                        {
+                        }
+
+                        goto start_command;
+                    }
+                    else
+                    {
+                        info_log(MODEM_COMMAND "\"%s\" Failed :(", i, commands[i].logInfoCommand);
+
+                        failed++;
+                        break;
+                    }
+                }
+
+                if(strstr(result, commands[i].successStrings[j]) != NULL)
+                {
+                    info_log(MODEM_COMMAND "Found [%s] in output", i, commands[i].successStrings[j]);
+                    info_log(MODEM_COMMAND "\"%s\" Passed", i, commands[i].logInfoCommand);
+
+                    passed++;
+                    break;
+                }
+
+                /*
+                 *  Check if the next-string matches
+                 */
+                j++;
             }
 
-            if(strstr(result, commands[i].successStrings[j]) != NULL)
-            {
-                info_log(MODEM_COMMAND "Found [%s] in output", i, commands[i].successStrings[j]);
-                info_log(MODEM_COMMAND "\"%s\" Passed", i, commands[i].logInfoCommand);
-                passed++;
-
-                break;
-            }
-
-            /*
-             *  Check if the next-string matches
-             */
-            j++;
+            break;
         }
 
 
@@ -258,7 +282,7 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
     commands[0].successStrings[0] = "1,0";
     commands[0].successStrings[1] = NULL;
 
-    commands[0].commandInCaseNoSuccessStringPresent = NULL;
+    commands[0].commandInCaseNoSuccessStringPresent = "AT#SIMDET=1\r\n";
 
 
     /*
