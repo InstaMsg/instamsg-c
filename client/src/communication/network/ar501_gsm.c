@@ -93,14 +93,15 @@ static void runInitTests()
 {
     int i, j, passed, failed;
 
+start_commands:
+
     passed = 0;
     failed = 0;
-
     i = 0;
+
     while(1)
     {
 
-start_command:
         if(commands[i].command == NULL)
         {
             info_log("\n\nTOTAL MODEM-INIT-COMMANDS: [%u], PASSED: [%u], FAILED: [%u]\n\n", i, passed, failed);
@@ -146,11 +147,12 @@ start_command:
 
                         if(commands[i].giveModemSomeSleep == 1)
                         {
-                            info_log(MODEM_COMMAND "Giving Modem [%u] seconds, before re-enquiring status", i, MODEM_SLEEP_INTERVAL);
+                            info_log(MODEM_COMMAND "Giving Modem [%u] seconds, before re-checking statuses from scratch",
+                                     i, MODEM_SLEEP_INTERVAL);
                             startAndCountdownTimer(MODEM_SLEEP_INTERVAL, 1);
                         }
 
-                        goto start_command;
+                        goto start_commands;
                     }
                     else
                     {
