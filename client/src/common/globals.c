@@ -417,7 +417,7 @@ void sg_sprintf(char *out, const char *format, ...)
 /*
  * This method causes the current thread to wait for "n" seconds.
  */
-void startAndCountdownTimer(int seconds)
+void startAndCountdownTimer(int seconds, unsigned int showRunningStatus)
 {
     int i;
     long j;
@@ -425,7 +425,11 @@ void startAndCountdownTimer(int seconds)
 
     for(i = 0; i < seconds; i++)
     {
-        info_log("second [%i]", i);
+        if(1)
+        {
+            info_log("[%u]", seconds - i);
+        }
+
         for(j = 0; j < cycles; j++)
         {
             singletonUtilityTimer.minimumDelay(&singletonUtilityTimer);

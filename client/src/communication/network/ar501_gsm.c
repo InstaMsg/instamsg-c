@@ -96,7 +96,7 @@ static void runInitTests()
     {
         if(commands[i].command == NULL)
         {
-            info_log("TOTAL MODEM-INIT-COMMANDS: [%u], PASSED: [%u], FAILED: [%u]", i, passed, failed);
+            info_log("\n\nTOTAL MODEM-INIT-COMMANDS: [%u], PASSED: [%u], FAILED: [%u]\n\n", i, passed, failed);
             break;
         }
 
@@ -172,12 +172,6 @@ static void release_underlying_medium_guaranteed(Network* network)
  */
 static void connect_underlying_medium_try_once(Network* network, char *hostName, int port)
 {
-
-info_log("doing it");
-
-
-//////////////////////////////////////////////////////////////
-//
     /*
      * Enable UART1.
      */
@@ -202,12 +196,10 @@ info_log("doing it");
     /*
      * Enable the UART-clocking
      */
-    //UARTConfigSetExpClk(UART1_BASE, SysCtlClockGet(), 9600,
     UARTConfigSetExpClk(UART1_BASE, SysCtlClockGet(), 115200,
                        (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
                         UART_CONFIG_PAR_NONE));
 
-    //startAndCountdownTimer(30);
    /*
     * Re-initializing Port-F :(
     */
@@ -240,18 +232,25 @@ info_log("doing it");
                      GPIO_PIN_TYPE_STD);
     GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_5, GPIO_PIN_5);
 
-    info_log("close");
     ROM_UARTEnable(UART1_BASE);
-    startAndCountdownTimer(30);
+
+    /*
+     * Give the GSM-Module enough time to bootstrap with the GSM-network.
+     */
+    info_log("Waiting for 30 seconds to let the GSM-module bootstrap with GSM-Network");
+    startAndCountdownTimer(30, 1);
+
+    /*
+     * Enable interrupts.
+     */
     ROM_IntEnable(INT_UART1);
-    UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_RT|UART_INT_CTS);
-    //UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_CTS);
+    UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_RT | UART_INT_CTS);
 
 
 
-    //startAndCountdownTimer(30);
-
-#if 1
+    /*
+     * Prepare-init-commands.
+     */
     commands[0].command = "AT#SIMDET?\r\n";
     commands[0].logInfoCommand = "SIM-Detection";
 
@@ -270,9 +269,8 @@ info_log("doing it");
 
 
     commands[2].command = NULL;
-#endif
-    //startAndCountdownTimer(1);
-    info_log("Almost there");
+
+
     runInitTests();
 }
 
@@ -356,7 +354,6 @@ static int ar501_gsm_socket_write(Network* network, unsigned char* buffer, int l
  */
 void init_network(Network *network, const char *hostName, unsigned int port)
 {
-    info_log("just before here too startr");
     /* Register read-callback. */
 	network->read = ar501_gsm_socket_read;
 
@@ -369,8 +366,6 @@ void init_network(Network *network, const char *hostName, unsigned int port)
     network->port = port;
 
     /* Connect the medium. */
-    info_log("fuck start");
-    //startAndCountdownTimer(30);
     connect_underlying_medium_try_once(network, network->host, network->port);
 }
 

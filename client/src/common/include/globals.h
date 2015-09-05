@@ -69,7 +69,7 @@ void sg_sprintf(char *out, const char *format, ...);
 
 #define NO_TIMEOUT 0
 
-void startAndCountdownTimer(int seconds);
+void startAndCountdownTimer(int seconds, unsigned int showRunningStatus);
 void globalSystemInit();
 
 #define MAX_HEAP_SIZE (10 * 1024)
