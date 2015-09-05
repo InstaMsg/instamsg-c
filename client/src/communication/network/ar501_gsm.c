@@ -100,7 +100,7 @@ static void runInitTests()
             break;
         }
 
-        info_log(MODEM_COMMAND "Running [%s] for \"%s\"", i, commands[i].command, commands[i].logInfoCommand);
+        info_log(MODEM_COMMAND "\n\nRunning [%s] for \"%s\"", i, commands[i].command, commands[i].logInfoCommand);
 
         resultObtained = 0;
         ind = 0;
