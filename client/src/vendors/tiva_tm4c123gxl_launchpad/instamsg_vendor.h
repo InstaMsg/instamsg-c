@@ -66,6 +66,6 @@ struct System
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
 #include "driverlib/rom.h"
-#include "inc/tm4c123gh6pm.h"
+#include "inc/tm4c1230d5pm.h"
 
 #endif

@@ -26,6 +26,7 @@
 #include <stdint.h>
 #include "inc/hw_nvic.h"
 #include "inc/hw_types.h"
+#include "instamsg_vendor.h"
 
 //*****************************************************************************
 //
@@ -36,6 +37,7 @@ void ResetISR(void);
 static void NmiSR(void);
 static void FaultISR(void);
 static void IntDefaultHandler(void);
+static void UART1Handler(void);
 
 //*****************************************************************************
 //
@@ -43,6 +45,8 @@ static void IntDefaultHandler(void);
 //
 //*****************************************************************************
 extern int main(void);
+extern void info_log(char *fmt, ...);
+extern int UARTRecv(const unsigned int UART_ID, unsigned char *buf, unsigned int len, unsigned int timeout);
 
 //*****************************************************************************
 //
@@ -83,7 +87,8 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // GPIO Port D
     IntDefaultHandler,                      // GPIO Port E
     IntDefaultHandler,                      // UART0 Rx and Tx
-    IntDefaultHandler,                      // UART1 Rx and Tx
+    //IntDefaultHandler,                      // UART1 Rx and Tx
+    UART1Handler,                      // UART1 Rx and Tx
     IntDefaultHandler,                      // SSI0 Rx and Tx
     IntDefaultHandler,                      // I2C0 Master and Slave
     IntDefaultHandler,                      // PWM Fault
@@ -298,6 +303,7 @@ ResetISR(void)
 static void
 NmiSR(void)
 {
+    info_log("INTERRUPT 1 called !!!");
     //
     // Enter an infinite loop.
     //
@@ -316,6 +322,7 @@ NmiSR(void)
 static void
 FaultISR(void)
 {
+    info_log("INTERRUPT 2 called !!!");
     //
     // Enter an infinite loop.
     //
@@ -334,10 +341,47 @@ FaultISR(void)
 static void
 IntDefaultHandler(void)
 {
+    info_log("INTERRUPT 3 called !!!");
     //
     // Go into an infinite loop.
     //
     while(1)
     {
     }
+}
+
+unsigned char result[MAX_BUFFER_SIZE];
+static void
+UART1Handler(void)
+{
+    unsigned long interrupts;
+
+    interrupts  = UARTIntStatus(UART1_BASE, true);
+    info_log("0x%x", interrupts);
+    UARTIntClear(UART1_BASE, interrupts);
+
+#if 0
+    memset(result, 0, MAX_BUFFER_SIZE);
+    UARTRecv(UART1_BASE, result, 10000, NO_TIMEOUT);
+#endif
+
+#if 1
+    while(1)
+    {
+        while(ROM_UARTCharsAvail(UART1_BASE))
+        //while(1)
+        {
+            //info_log("[%c]",  UARTCharGet(UART1_BASE));
+
+            //break;
+            info_log("[%c]",  UARTCharGetNonBlocking(UART1_BASE));
+            }
+
+        break;
+    //ROM_GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
+    }
+
+    //ROM_GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
+    info_log("exiting 2");
+#endif
 }

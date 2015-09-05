@@ -15,7 +15,7 @@
 #include "../../common/include/globals.h"
 #include "../../common/include/instamsg.h"
 
-
+#if 1
 void UARTSend(const unsigned int UART_ID, unsigned char *buf, unsigned int len)
 {
     int i;
@@ -29,6 +29,11 @@ void UARTSend(const unsigned int UART_ID, unsigned char *buf, unsigned int len)
         //ROM_UARTCharPut(UART_ID, 'a');
         buf++;
     }
+
+#if 0
+    ROM_UARTDisable(UART_ID);
+    ROM_UARTEnable(UART_ID);
+#endif
 }
 
 
@@ -44,6 +49,16 @@ int UARTRecv(const unsigned int UART_ID, unsigned char *buf, unsigned int len, u
     //info_log("debug1 UARTRecv");
     if(timeout == NO_TIMEOUT)
     {
+#if 0
+        while(1)
+        {
+        while(ROM_UARTCharsAvail(UART_ID))
+        {
+            *buf = ROM_UARTCharGetNonBlocking(UART_ID);
+                info_log("jeez [%d]", *buf);
+        }
+        }
+#endif
     //info_log("debug2 UARTRecv");
         for(i = 0; i < len; i++)
         {
@@ -51,7 +66,10 @@ int UARTRecv(const unsigned int UART_ID, unsigned char *buf, unsigned int len, u
             *buf = ROM_UARTCharGet(UART_ID);
             //ROM_UARTCharPut(UART_ID, *buf);
         //ROM_UARTCharPut(UART0_BASE, *buf);
-            info_log("[%c]", *buf);
+        //ROM_UARTCharPut(UART0_BASE, (*buf));
+            
+                //ROM_GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_5, GPIO_PIN_5);
+                info_log("[%c]", *buf);
         //ROM_UARTCharPut(UART1_BASE, *buf);
             buf++;
         }
@@ -100,5 +118,5 @@ int UARTRecv(const unsigned int UART_ID, unsigned char *buf, unsigned int len, u
 
     return rc;
 }
-
+#endif
 

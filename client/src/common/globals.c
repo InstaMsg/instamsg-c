@@ -425,6 +425,7 @@ void startAndCountdownTimer(int seconds)
 
     for(i = 0; i < seconds; i++)
     {
+        info_log("second [%i]", i);
         for(j = 0; j < cycles; j++)
         {
             singletonUtilityTimer.minimumDelay(&singletonUtilityTimer);
