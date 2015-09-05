@@ -79,7 +79,7 @@ struct NetworkInitCommands
      */
     char *commandInCaseNoSuccessStringPresent;
 };
-NetworkInitCommands commands[5];
+NetworkInitCommands commands[6];
 
 
 #define MODEM "[MODEM] "
@@ -368,7 +368,16 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
 
     /*
      */
-    commands[4].command = NULL;
+    commands[4].command = "AT+CGATT?\r\n";
+    commands[4].logInfoCommand = "GPRS-Attachment-State";
+    commands[4].successStrings[0] = "+CGATT: 1";
+    commands[4].successStrings[2] = NULL;
+    commands[4].commandInCaseNoSuccessStringPresent = NULL;
+
+
+    /*
+     */
+    commands[5].command = NULL;
 
 
     runInitTests();
