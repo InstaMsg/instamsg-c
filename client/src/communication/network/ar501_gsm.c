@@ -9,6 +9,39 @@
 #include "../../common/include/instamsg.h"
 #include <string.h>
 
+void UART1Handler(void)
+{
+    unsigned long interrupts;
+
+    interrupts  = UARTIntStatus(UART1_BASE, true);
+    info_log("0x%x", interrupts);
+    UARTIntClear(UART1_BASE, interrupts);
+
+#if 0
+    memset(result, 0, MAX_BUFFER_SIZE);
+    UARTRecv(UART1_BASE, result, 10000, NO_TIMEOUT);
+#endif
+
+#if 1
+    while(1)
+    {
+        while(ROM_UARTCharsAvail(UART1_BASE))
+        //while(1)
+        {
+            //info_log("[%c]",  UARTCharGet(UART1_BASE));
+
+            //break;
+            info_log("[%c]",  UARTCharGetNonBlocking(UART1_BASE));
+            }
+
+        break;
+    //ROM_GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
+    }
+
+    //ROM_GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
+    info_log("exiting 2");
+#endif
+}
 
 /*
  * This method does the cleaning up (for eg. closing a socket) when the network is cleaned up.
