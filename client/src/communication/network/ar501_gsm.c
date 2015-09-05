@@ -83,7 +83,7 @@ struct NetworkInitCommands
      */
     unsigned char giveModemSomeSleep;
 };
-NetworkInitCommands commands[4] ;
+NetworkInitCommands commands[4];
 
 
 #define MODEM "[MODEM] "
@@ -91,7 +91,6 @@ NetworkInitCommands commands[4] ;
 
 static void runInitTests()
 {
-#if 1
     int i, j, passed, failed;
 
     passed = 0;
@@ -186,7 +185,6 @@ start_command:
     while(1)
     {
     }
-#endif
 }
 
 /*
