@@ -18,6 +18,7 @@ static char result[MAX_BUFFER_SIZE];
 static unsigned int ind;
 static volatile char resultObtained;
 
+#define MODEM_SLEEP_INTERVAL 30
 
 void UART1Handler(void)
 {
@@ -76,6 +77,11 @@ struct NetworkInitCommands
      * must contain one of the expected-strings.
      */
     const char *commandInCaseNoSuccessStringPresent;
+
+    /*
+     * Flag, which tells whether we should wait before re-running "command" after running "commandInCaseNoSuccessStringPresent".
+     */
+    unsigned char giveModemSomeSleep;
 };
 NetworkInitCommands commands[4] ;
 
@@ -136,6 +142,12 @@ start_command:
                                  strlen(commands[i].commandInCaseNoSuccessStringPresent));
                         while(resultObtained == 0)
                         {
+                        }
+
+                        if(commands[i].giveModemSomeSleep == 1)
+                        {
+                            info_log(MODEM_COMMAND "Giving Modem [%u] seconds, before re-enquiring status", i, MODEM_SLEEP_INTERVAL);
+                            startAndCountdownTimer(MODEM_SLEEP_INTERVAL, 1);
                         }
 
                         goto start_command;
@@ -263,7 +275,7 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
      * Give the GSM-Module enough time to bootstrap with the GSM-network.
      */
     info_log("Waiting for 30 seconds to let the GSM-module bootstrap with GSM-Network");
-    startAndCountdownTimer(30, 1);
+    startAndCountdownTimer(MODEM_SLEEP_INTERVAL, 1);
 
     /*
      * Enable interrupts.
@@ -283,6 +295,7 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
     commands[0].successStrings[1] = NULL;
 
     commands[0].commandInCaseNoSuccessStringPresent = "AT#SIMDET=1\r\n";
+    commands[0].giveModemSomeSleep = 1;
 
 
     /*
@@ -294,6 +307,7 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
     commands[1].successStrings[1] = NULL;
 
     commands[1].commandInCaseNoSuccessStringPresent = NULL;
+    commands[1].giveModemSomeSleep = 1;
 
 
     /*
@@ -306,6 +320,7 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
     commands[2].successStrings[2] = NULL;
 
     commands[2].commandInCaseNoSuccessStringPresent = NULL;
+    commands[2].giveModemSomeSleep = 1;
 
 
     /*
