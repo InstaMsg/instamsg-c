@@ -83,7 +83,7 @@ struct NetworkInitCommands
      */
     unsigned char giveModemSomeSleep;
 };
-NetworkInitCommands commands[4];
+NetworkInitCommands commands[5];
 
 
 #define MODEM "[MODEM] "
@@ -127,6 +127,7 @@ start_command:
 
             while(1)
             {
+
                 if(commands[i].successStrings[j] == NULL)
                 {
                     if(commands[i].commandInCaseNoSuccessStringPresent != NULL)
@@ -160,18 +161,40 @@ start_command:
                     }
                 }
 
-                if(strstr(result, commands[i].successStrings[j]) != NULL)
-                {
-                    info_log(MODEM_COMMAND "Found [%s] in output", i, commands[i].successStrings[j]);
-                    info_log(MODEM_COMMAND "\"%s\" Passed", i, commands[i].logInfoCommand);
 
-                    passed++;
-                    break;
+                {
+                    char *saveptr, *token, *temp;
+
+                    RESET_GLOBAL_BUFFER;
+                    strcpy((char*)GLOBAL_BUFFER, commands[i].successStrings[j]);
+
+                    temp = GLOBAL_BUFFER;
+                    while(1)
+                    {
+                        token = strtok_r(temp, "&", &saveptr);
+                        if(token == NULL)
+                        {
+                            info_log(MODEM_COMMAND "\"%s\" Passed", i, commands[i].logInfoCommand);
+                            passed++;
+
+                            goto continue_with_next_command;
+                        }
+
+                        if(strstr(result, token) != NULL)
+                        {
+                            info_log(MODEM_COMMAND "Found [%s] in output", i, token);
+                        }
+                        else
+                        {
+                            goto continue_with_next_success_string;
+                        }
+
+                        /* For next call to strtok_r */
+                        temp = NULL;
+                    }
                 }
 
-                /*
-                 *  Check if the next-string matches
-                 */
+continue_with_next_success_string:
                 j++;
             }
 
@@ -179,6 +202,7 @@ start_command:
         }
 
 
+continue_with_next_command:
         i++;
     }
 
@@ -207,6 +231,11 @@ static void release_underlying_medium_guaranteed(Network* network)
  */
 static void connect_underlying_medium_try_once(Network* network, char *hostName, int port)
 {
+#if 1
+    const char *apn = "ajay_apn";
+    const char *userid = "ajay_userid";
+    const char *passw = "ajay_passw";
+#endif
     /*
      * Enable UART1.
      */
@@ -287,7 +316,7 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
      * Prepare-init-commands.
      */
     commands[0].command = "AT#SIMDET?\r\n";
-    commands[0].logInfoCommand = "SIM-Detection";
+    commands[0].logInfoCommand = "SIM-Detect";
 
     commands[0].successStrings[0] = "1,0";
     commands[0].successStrings[1] = NULL;
@@ -299,7 +328,7 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
     /*
      */
     commands[1].command = "AT+CPIN?\r\n";
-    commands[1].logInfoCommand = "PIN-Readiness";
+    commands[1].logInfoCommand = "SIM-Ready";
 
     commands[1].successStrings[0] = "READY";
     commands[1].successStrings[1] = NULL;
@@ -323,7 +352,19 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
 
     /*
      */
-    commands[3].command = NULL;
+    commands[3].command = "AT+CGDCONT?;#USERID?\r\n";
+    commands[3].logInfoCommand = "GPRS-Context-Correctness";
+
+    commands[3].successStrings[0] = "OK";
+    commands[3].successStrings[1] = NULL;
+
+    commands[3].commandInCaseNoSuccessStringPresent = NULL;
+    commands[3].giveModemSomeSleep = 1;
+
+
+    /*
+     */
+    commands[4].command = NULL;
 
 
     runInitTests();
