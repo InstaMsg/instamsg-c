@@ -14,8 +14,8 @@ void UART1Handler(void)
     unsigned long interrupts;
 
     interrupts  = UARTIntStatus(UART1_BASE, true);
-    info_log("0x%x", interrupts);
     UARTIntClear(UART1_BASE, interrupts);
+    info_log("Interrupt [0x%x] cleared", interrupts);
 
 #if 0
     memset(result, 0, MAX_BUFFER_SIZE);
