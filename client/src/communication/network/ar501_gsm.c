@@ -13,7 +13,6 @@
 #include <string.h>
 
 typedef struct NetworkInitCommands NetworkInitCommands;
-NetworkInitCommands commandInformation;
 
 static char result[MAX_BUFFER_SIZE];
 static unsigned int ind;
@@ -47,34 +46,6 @@ void UART1Handler(void)
      */
     if((strstr(result, "\r\nOK\r\n") != NULL) || (strstr(result, "ERROR") != NULL))
     {
-#if 0
-        int i;
-        info_log("COMMAND-OUTPUT = [%s]", result);
-
-        /*
-         * Now, check if any of the expected-strings is in the output.
-         */
-        i = 0;
-        while(1)
-        {
-            if(commandInformation.successStrings[i] == NULL)
-            {
-                info_log(MODEM "[%s] Failed :(", commandInformation.logInfoCommand);
-                break;
-            }
-
-            if(strstr(result, commandInformation.successStrings[i]) != NULL)
-            {
-                info_log(MODEM "[%s] Passed", commandInformation.logInfoCommand);
-                break;
-            }
-
-            /*
-             *  Check if the next-string matches
-             */
-            i++;
-        }
-#endif
         resultObtained = 1;
     }
 }
@@ -131,7 +102,6 @@ static void runInitTests()
 
         resultObtained = 0;
         ind = 0;
-        commandInformation = commands[i];
 
         UARTSend(UART1_BASE, (unsigned char*)commands[i].command, strlen(commands[i].command));
         while(resultObtained == 0)
@@ -147,16 +117,16 @@ static void runInitTests()
         j = 0;
         while(1)
         {
-            if(commandInformation.successStrings[j] == NULL)
+            if(commands[i].successStrings[j] == NULL)
             {
-                info_log(MODEM_COMMAND "\"%s\" Failed :(", i, commandInformation.logInfoCommand);
+                info_log(MODEM_COMMAND "\"%s\" Failed :(", i, commands[i].logInfoCommand);
                 break;
             }
 
-            if(strstr(result, commandInformation.successStrings[j]) != NULL)
+            if(strstr(result, commands[i].successStrings[j]) != NULL)
             {
-                info_log(MODEM_COMMAND "Found [%s] in output", i, commandInformation.successStrings[j]);
-                info_log(MODEM_COMMAND "\"%s\" Passed", i, commandInformation.logInfoCommand);
+                info_log(MODEM_COMMAND "Found [%s] in output", i, commands[i].successStrings[j]);
+                info_log(MODEM_COMMAND "\"%s\" Passed", i, commands[i].logInfoCommand);
                 break;
             }
 
