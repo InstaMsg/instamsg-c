@@ -119,7 +119,7 @@ start_commands:
         }
 
 
-        info_log(MODEM_COMMAND "COMMAND-OUTPUT = [%s]", i, result);
+        info_log(MODEM_COMMAND "Comand-Output = [%s]", i, result);
 
         while(1)
         {
@@ -226,9 +226,9 @@ static void release_underlying_medium_guaranteed(Network* network)
 static void connect_underlying_medium_try_once(Network* network, char *hostName, int port)
 {
 #if 1
-    const char *apn = "ajay_apn";
-    const char *userid = "ajay_userid";
-    const char *passw = "ajay_passw";
+    const char *apn = "live.vodafone.com";
+    const char *userid = "";
+    const char *passw = "";
 #endif
     /*
      * Enable UART1.
