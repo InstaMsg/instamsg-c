@@ -78,11 +78,6 @@ struct NetworkInitCommands
      * must contain one of the expected-strings.
      */
     char *commandInCaseNoSuccessStringPresent;
-
-    /*
-     * Flag, which tells whether we should wait before re-running "command" after running "commandInCaseNoSuccessStringPresent".
-     */
-    unsigned char giveModemSomeSleep;
 };
 NetworkInitCommands commands[5];
 
@@ -95,6 +90,9 @@ static void runInitTests()
     int i, j, passed, failed;
 
 start_commands:
+
+    info_log("Giving modem [%u] seconds, before checking all the settings and statuses", MODEM_SLEEP_INTERVAL);
+    startAndCountdownTimer(MODEM_SLEEP_INTERVAL, 1);
 
     passed = 0;
     failed = 0;
@@ -144,13 +142,6 @@ start_commands:
                                  strlen(commands[i].commandInCaseNoSuccessStringPresent));
                         while(resultObtained == 0)
                         {
-                        }
-
-                        if(commands[i].giveModemSomeSleep == 1)
-                        {
-                            info_log(MODEM_COMMAND "Giving Modem [%u] seconds, before re-checking statuses from scratch",
-                                     i, MODEM_SLEEP_INTERVAL);
-                            startAndCountdownTimer(MODEM_SLEEP_INTERVAL, 1);
                         }
 
                         goto start_commands;
@@ -281,31 +272,34 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
     GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD);
 
 
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);                // DCD pin Monitor
+    /*
+     * DCD Pin Monitor
+     */
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
     GPIOPinTypeGPIOInput(GPIO_PORTB_BASE, GPIO_PIN_2);
     GPIOPadConfigSet(GPIO_PORTB_BASE, GPIO_PIN_2, GPIO_STRENGTH_2MA,
                      GPIO_PIN_TYPE_STD);
 
 
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);                //GPRS Reset IO
+    /*
+     * GPRS Reset IO
+     */
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
     GPIOPinTypeGPIOOutput(GPIO_PORTE_BASE, GPIO_PIN_4);
     GPIOPadConfigSet(GPIO_PORTE_BASE, GPIO_PIN_4, GPIO_STRENGTH_2MA,
                      GPIO_PIN_TYPE_STD);
 
 
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);                //GPRS Power Enable
+    /*
+     * GPRS Power Enable.
+     */
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
     GPIOPinTypeGPIOOutput(GPIO_PORTE_BASE, GPIO_PIN_5);
     GPIOPadConfigSet(GPIO_PORTE_BASE, GPIO_PIN_5, GPIO_STRENGTH_2MA,
                      GPIO_PIN_TYPE_STD);
     GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_5, GPIO_PIN_5);
 
     ROM_UARTEnable(UART1_BASE);
-
-    /*
-     * Give the GSM-Module enough time to bootstrap with the GSM-network.
-     */
-    info_log("Waiting for 30 seconds to let the GSM-module bootstrap with GSM-Network");
-    startAndCountdownTimer(MODEM_SLEEP_INTERVAL, 1);
 
     /*
      * Enable interrupts.
@@ -320,44 +314,34 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
      */
     commands[0].command = "AT#SIMDET?\r\n";
     commands[0].logInfoCommand = "SIM-Detect";
-
     commands[0].successStrings[0] = "1,0";
     commands[0].successStrings[1] = NULL;
-
     commands[0].commandInCaseNoSuccessStringPresent = "AT#SIMDET=1\r\n";
-    commands[0].giveModemSomeSleep = 1;
 
 
     /*
      */
     commands[1].command = "AT+CPIN?\r\n";
     commands[1].logInfoCommand = "SIM-Ready";
-
     commands[1].successStrings[0] = "READY";
     commands[1].successStrings[1] = NULL;
-
     commands[1].commandInCaseNoSuccessStringPresent = NULL;
-    commands[1].giveModemSomeSleep = 1;
 
 
     /*
      */
     commands[2].command = "AT+CREG?\r\n";
     commands[2].logInfoCommand = "SIM-Registered-To-Network";
-
     commands[2].successStrings[0] = "0,1";
     commands[2].successStrings[1] = "0,5";
     commands[2].successStrings[2] = NULL;
-
     commands[2].commandInCaseNoSuccessStringPresent = NULL;
-    commands[2].giveModemSomeSleep = 1;
 
 
     /*
      */
     commands[3].command = "AT+CGDCONT?;#USERID?\r\n";
     commands[3].logInfoCommand = "GPRS-Context-Correctness";
-
     commands[3].successStrings[0] = (char*)sg_malloc(MAX_BUFFER_SIZE);
     if(commands[3].successStrings[0] == NULL)
     {
@@ -368,9 +352,7 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
     {
         sg_sprintf(commands[3].successStrings[0],"1,\"IP\",\"%s\"&#USERID: \"%s\"", apn, userid);
     }
-
     commands[3].successStrings[1] = NULL;
-
     commands[3].commandInCaseNoSuccessStringPresent = (char*)sg_malloc(MAX_BUFFER_SIZE);
     if(commands[3].commandInCaseNoSuccessStringPresent == NULL)
     {
@@ -382,8 +364,6 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
         sg_sprintf(commands[3].commandInCaseNoSuccessStringPresent, "AT+CGDCONT=1,\"IP\",\"%s\";#USERID=\"%s\";#PASSW=\"%s\"\r\n",
                    apn, userid, passw);
     }
-
-    commands[3].giveModemSomeSleep = 1;
 
 
     /*
