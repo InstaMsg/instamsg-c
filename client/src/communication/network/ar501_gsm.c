@@ -16,6 +16,8 @@
 typedef struct NetworkInitCommands NetworkInitCommands;
 
 static char result[MAX_BUFFER_SIZE];
+static char *readBuffer;
+
 static unsigned int ind;
 static volatile char resultObtained;
 
@@ -34,19 +36,19 @@ void UART1Handler(void)
         {
             while(ROM_UARTCharsAvail(UART1_BASE))
             {
-                result[ind++] = UARTCharGetNonBlocking(UART1_BASE);
+                readBuffer[ind++] = UARTCharGetNonBlocking(UART1_BASE);
             }
         }
 
         break;
     }
 
-    result[ind] = 0;
+    readBuffer[ind] = 0;
 
     /*
      * Now check if any of the terminator-strings is present.
      */
-    if((strstr(result, "\r\nOK\r\n") != NULL) || (strstr(result, "ERROR") != NULL))
+    if((strstr(readBuffer, "\r\nOK\r\n") != NULL) || (strstr(readBuffer, "ERROR") != NULL))
     {
         resultObtained = 1;
     }
@@ -85,6 +87,18 @@ NetworkInitCommands commands[8];
 #define MODEM "[MODEM] "
 #define MODEM_COMMAND "[MODEM_INIT_COMMAND %u] "
 
+
+#define READ_FROM_UART1(command)                                                                            \
+    resultObtained = 0;                                                                                     \
+    ind = 0;                                                                                                \
+                                                                                                            \
+    UARTSend(UART1_BASE, (unsigned char*)command, strlen((char*)command));                                  \
+    while(resultObtained == 0)                                                                              \
+    {                                                                                                       \
+    }
+
+
+
 static void runInitTests()
 {
     int i, j, passed, failed;
@@ -98,6 +112,8 @@ start_commands:
     failed = 0;
     i = 0;
 
+    readBuffer = result;
+
     while(1)
     {
 
@@ -110,16 +126,8 @@ start_commands:
         info_log("\n\n");
         info_log(MODEM_COMMAND "Running [%s] for \"%s\"", i, commands[i].command, commands[i].logInfoCommand);
 
-        resultObtained = 0;
-        ind = 0;
-
-        UARTSend(UART1_BASE, (unsigned char*)commands[i].command, strlen(commands[i].command));
-        while(resultObtained == 0)
-        {
-        }
-
-
-        info_log(MODEM_COMMAND "Comand-Output = [%s]", i, result);
+        READ_FROM_UART1(commands[i].command);
+        info_log(MODEM_COMMAND "Comand-Output = [%s]", i, readBuffer);
 
         while(1)
         {
@@ -135,15 +143,7 @@ start_commands:
                         info_log(MODEM_COMMAND "Initial Check for \"%s\" Failed.. trying to rectify with [%s]",
                                                i, commands[i].logInfoCommand, commands[i].commandInCaseNoSuccessStringPresent);
 
-                        resultObtained = 0;
-                        ind = 0;
-
-                        UARTSend(UART1_BASE, (unsigned char*)commands[i].commandInCaseNoSuccessStringPresent,
-                                 strlen(commands[i].commandInCaseNoSuccessStringPresent));
-                        while(resultObtained == 0)
-                        {
-                        }
-
+                        READ_FROM_UART1(commands[i].commandInCaseNoSuccessStringPresent);
                         goto start_commands;
                     }
                     else
@@ -174,7 +174,7 @@ start_commands:
                             goto continue_with_next_command;
                         }
 
-                        if(strstr(result, token) != NULL)
+                        if(strstr(readBuffer, token) != NULL)
                         {
                             info_log(MODEM_COMMAND "Found [%s] in output", i, token);
                         }
