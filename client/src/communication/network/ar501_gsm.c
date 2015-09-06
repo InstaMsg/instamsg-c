@@ -88,7 +88,7 @@ NetworkInitCommands commands[8];
 #define MODEM_COMMAND "[MODEM_INIT_COMMAND %u] "
 
 
-#define READ_FROM_UART1(command)                                                                            \
+#define SEND_CMD_AND_READ_RESPONSE_ON_UART1(command)                                                        \
     resultObtained = 0;                                                                                     \
     ind = 0;                                                                                                \
                                                                                                             \
@@ -126,7 +126,7 @@ start_commands:
         info_log("\n\n");
         info_log(MODEM_COMMAND "Running [%s] for \"%s\"", i, commands[i].command, commands[i].logInfoCommand);
 
-        READ_FROM_UART1(commands[i].command);
+        SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].command);
         info_log(MODEM_COMMAND "Comand-Output = [%s]", i, readBuffer);
 
         while(1)
@@ -143,7 +143,7 @@ start_commands:
                         info_log(MODEM_COMMAND "Initial Check for \"%s\" Failed.. trying to rectify with [%s]",
                                                i, commands[i].logInfoCommand, commands[i].commandInCaseNoSuccessStringPresent);
 
-                        READ_FROM_UART1(commands[i].commandInCaseNoSuccessStringPresent);
+                        SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].commandInCaseNoSuccessStringPresent);
                         goto start_commands;
                     }
                     else
@@ -405,9 +405,7 @@ exit:
         sg_free(commands[3].successStrings[0]);
 
     if(commands[3].commandInCaseNoSuccessStringPresent)
-    {
         sg_free(commands[3].commandInCaseNoSuccessStringPresent);
-    }
 }
 
 
