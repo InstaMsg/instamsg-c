@@ -322,7 +322,7 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
     /*
      */
     commands[1].command = "AT+CPIN?\r\n";
-    commands[1].logInfoCommand = "SIM-Ready";
+    commands[1].logInfoCommand = "SIM-PIN-Ready";
     commands[1].successStrings[0] = "READY";
     commands[1].successStrings[1] = NULL;
     commands[1].commandInCaseNoSuccessStringPresent = NULL;
