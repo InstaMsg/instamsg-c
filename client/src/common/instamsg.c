@@ -215,9 +215,9 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     } while ((i & 128) != 0);
 
 
-    len += MQTTPacket_encode(c->readbuf + 1, rem_len); /* put the original remaining length back into the buffer */
+    len += MQTTPacket_encode(c->readbuf + 1, rem_len);
 
-    /* 3. read the rest of the buffer using a callback to supply the rest of the data */
+    /* 3. read the rest of the buffer */
     if(rem_len > 0)
     {
         if((c->ipstack).read(&(c->ipstack), c->readbuf + len, rem_len, 1) == FAILURE) /* Pseudo-Blocking Call */
