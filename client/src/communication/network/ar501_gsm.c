@@ -88,17 +88,18 @@ NetworkInitCommands commands[8];
 #define MODEM_COMMAND "[MODEM_INIT_COMMAND %u] "
 
 
-#define SEND_CMD_AND_READ_RESPONSE_ON_UART1(command, buffer)                                                \
-    resultObtained = 0;                                                                                     \
-    ind = 0;                                                                                                \
-                                                                                                            \
-    readBuffer = buffer;                                                                                    \
-                                                                                                            \
-    UARTSend(UART1_BASE, (unsigned char*)command, strlen((char*)command));                                  \
-    while(resultObtained == 0)                                                                              \
-    {                                                                                                       \
-    }
+static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, char *buffer)
+{
+    resultObtained = 0;
+    ind = 0;
 
+    readBuffer = buffer;
+
+    UARTSend(UART1_BASE, (unsigned char*)command, strlen(command));
+    while(resultObtained == 0)
+    {
+    }
+}
 
 
 static void runInitTests()
