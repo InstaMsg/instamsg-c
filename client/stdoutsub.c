@@ -189,7 +189,7 @@ void coreLoopyBusinessLogicInitiatedBySelf()
 {
     int rc;
 
-    startAndCountdownTimer(3);
+    startAndCountdownTimer(3, 0);
 	if(opts_p->publish == 1)
 	{
         char buf[MAX_BUFFER_SIZE] = {0};
