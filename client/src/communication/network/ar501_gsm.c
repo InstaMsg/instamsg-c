@@ -88,9 +88,11 @@ NetworkInitCommands commands[8];
 #define MODEM_COMMAND "[MODEM_INIT_COMMAND %u] "
 
 
-#define SEND_CMD_AND_READ_RESPONSE_ON_UART1(command)                                                        \
+#define SEND_CMD_AND_READ_RESPONSE_ON_UART1(command, buffer)                                                \
     resultObtained = 0;                                                                                     \
     ind = 0;                                                                                                \
+                                                                                                            \
+    readBuffer = buffer;                                                                                    \
                                                                                                             \
     UARTSend(UART1_BASE, (unsigned char*)command, strlen((char*)command));                                  \
     while(resultObtained == 0)                                                                              \
@@ -112,8 +114,6 @@ start_commands:
     failed = 0;
     i = 0;
 
-    readBuffer = result;
-
     while(1)
     {
 
@@ -126,7 +126,7 @@ start_commands:
         info_log("\n\n");
         info_log(MODEM_COMMAND "Running [%s] for \"%s\"", i, commands[i].command, commands[i].logInfoCommand);
 
-        SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].command);
+        SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].command, result);
         info_log(MODEM_COMMAND "Comand-Output = [%s]", i, readBuffer);
 
         while(1)
@@ -143,7 +143,7 @@ start_commands:
                         info_log(MODEM_COMMAND "Initial Check for \"%s\" Failed.. trying to rectify with [%s]",
                                                i, commands[i].logInfoCommand, commands[i].commandInCaseNoSuccessStringPresent);
 
-                        SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].commandInCaseNoSuccessStringPresent);
+                        SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].commandInCaseNoSuccessStringPresent, result);
                         goto start_commands;
                     }
                     else
