@@ -79,7 +79,7 @@ struct NetworkInitCommands
      */
     char *commandInCaseNoSuccessStringPresent;
 };
-NetworkInitCommands commands[7];
+NetworkInitCommands commands[8];
 
 
 #define MODEM "[MODEM] "
@@ -386,7 +386,16 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
 
     /*
      */
-    commands[6].command = NULL;
+    commands[6].command = "AT#SGACT?\r\n";
+    commands[6].logInfoCommand = "Actiavte-GPRS-PDP-Context-If-Not-Already";
+    commands[6].successStrings[0] = "#SGACT: 1,1";
+    commands[6].successStrings[1] = NULL;
+    commands[6].commandInCaseNoSuccessStringPresent = "AT#SGACT=1,1\r\n";
+
+
+    /*
+     */
+    commands[7].command = NULL;
 
 
     runInitTests();
