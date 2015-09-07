@@ -23,7 +23,11 @@ static const char *specialDelimiter;
 static unsigned int ind;
 static volatile char resultObtained;
 
+#define SEND_COMMAND_BUFFER_SIZE 100
+static char sendCommandBuffer[SEND_COMMAND_BUFFER_SIZE];
+
 #define MODEM_SLEEP_INTERVAL 30
+#define LENGTH_OF_COMMAND 0
 
 void UART1Handler(void)
 {
@@ -101,9 +105,19 @@ NetworkInitCommands commands[8];
 #define MODEM_SOCKET    "[MODEM_SOCKET_COMMAND %u] "
 
 
-static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, char *buffer, unsigned char showCommandOutput,
+static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, int len, char *buffer, unsigned char showCommandOutput,
                                                 const char *delimiter)
 {
+    int lengthToSend = 0;
+    if(len == LENGTH_OF_COMMAND)
+    {
+        lengthToSend = strlen(command);
+    }
+    else
+    {
+        lengthToSend = len;
+    }
+
     resultObtained = 0;
     ind = 0;
 
@@ -117,7 +131,7 @@ static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, char *buffe
         specialDelimiter = NULL;
     }
 
-    UARTSend(UART1_BASE, (unsigned char*)command, strlen(command));
+    UARTSend(UART1_BASE, (unsigned char*)command, lengthToSend);
     while(resultObtained == 0)
     {
     }
@@ -157,7 +171,7 @@ start_commands:
         info_log("\n\n");
         info_log(COMMAND "Running [%s] for \"%s\"", i + 1, commands[i].command, commands[i].logInfoCommand);
 
-        SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].command, result, 1, NULL);
+        SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].command, LENGTH_OF_COMMAND, result, 1, NULL);
 
         while(1)
         {
@@ -173,7 +187,8 @@ start_commands:
                         info_log(COMMAND "Initial Check for \"%s\" Failed.. trying to rectify with [%s]",
                                  i + 1, commands[i].logInfoCommand, commands[i].commandInCaseNoSuccessStringPresent);
 
-                        SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].commandInCaseNoSuccessStringPresent, result, 1, NULL);
+                        SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].commandInCaseNoSuccessStringPresent, LENGTH_OF_COMMAND,
+                                                            result, 1, NULL);
                         goto start_commands;
                     }
                     else
@@ -540,7 +555,7 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
         {
             char *pch;
 
-            SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", result, 1, NULL);
+            SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", LENGTH_OF_COMMAND, result, 1, NULL);
 
             /*
             * Search for a row, ending with ",0".
@@ -579,9 +594,7 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
         rc = setUpModemSocket(network->socket);
     } while(rc == FAILURE);
 
-    while(1)
-    {
-    }
+    network->socketCorrupted = 0;
 }
 
 /*
@@ -654,7 +667,13 @@ static int ar501_gsm_socket_read(Network* network, unsigned char* buffer, int le
  */
 static int ar501_gsm_socket_write(Network* network, unsigned char* buffer, int len)
 {
-    return FAILURE;
+    memset(sendCommandBuffer, 0, SEND_COMMAND_BUFFER_SIZE);
+    sg_sprintf(sendCommandBuffer, "AT#SSENDEXT=%u,%d\r\n", network->socket, len);
+    SEND_CMD_AND_READ_RESPONSE_ON_UART1(sendCommandBuffer, LENGTH_OF_COMMAND, result, 0, "\r\n>");
+
+    SEND_CMD_AND_READ_RESPONSE_ON_UART1((char*)buffer, len, result, 0, NULL);
+
+    return SUCCESS;
 }
 
 
@@ -663,6 +682,9 @@ static int ar501_gsm_socket_write(Network* network, unsigned char* buffer, int l
  */
 void init_network(Network *network, const char *hostName, unsigned int port)
 {
+    //strictly
+    char *test = "this is awesome";
+
     /* Register read-callback. */
 	network->read = ar501_gsm_socket_read;
 
@@ -676,6 +698,13 @@ void init_network(Network *network, const char *hostName, unsigned int port)
 
     /* Connect the medium. */
     connect_underlying_medium_try_once(network, network->host, network->port);
+
+
+    //strictly
+    network->write(network, (unsigned char*)test, strlen(test));
+    while(1)
+    {
+    }
 }
 
 
