@@ -18,6 +18,7 @@ typedef struct NetworkInitCommands NetworkInitCommands;
 
 static char result[MAX_BUFFER_SIZE];
 static char *readBuffer;
+static const char *specialDelimiter;
 
 static unsigned int ind;
 static volatile char resultObtained;
@@ -49,9 +50,19 @@ void UART1Handler(void)
     /*
      * Now check if any of the terminator-strings is present.
      */
-    if((strstr(readBuffer, "\r\nOK\r\n") != NULL) || (strstr(readBuffer, "ERROR") != NULL))
+    if(specialDelimiter == NULL)
     {
-        resultObtained = 1;
+        if((strstr(readBuffer, "\r\nOK\r\n") != NULL) || (strstr(readBuffer, "ERROR") != NULL))
+        {
+            resultObtained = 1;
+        }
+    }
+    else
+    {
+        if(strstr(readBuffer, specialDelimiter) != NULL)
+        {
+            resultObtained = 1;
+        }
     }
 }
 
@@ -90,12 +101,21 @@ NetworkInitCommands commands[8];
 #define MODEM_SOCKET    "[MODEM_SOCKET_COMMAND %u] "
 
 
-static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, char *buffer, unsigned char showCommandOutput)
+static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, char *buffer, unsigned char showCommandOutput,
+                                                const char *delimiter)
 {
     resultObtained = 0;
     ind = 0;
 
     readBuffer = buffer;
+    if(delimiter != NULL)
+    {
+        specialDelimiter = delimiter;
+    }
+    else
+    {
+        specialDelimiter = NULL;
+    }
 
     UARTSend(UART1_BASE, (unsigned char*)command, strlen(command));
     while(resultObtained == 0)
@@ -137,7 +157,7 @@ start_commands:
         info_log("\n\n");
         info_log(COMMAND "Running [%s] for \"%s\"", i + 1, commands[i].command, commands[i].logInfoCommand);
 
-        SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].command, result, 1);
+        SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].command, result, 1, NULL);
 
         while(1)
         {
@@ -153,7 +173,7 @@ start_commands:
                         info_log(COMMAND "Initial Check for \"%s\" Failed.. trying to rectify with [%s]",
                                  i + 1, commands[i].logInfoCommand, commands[i].commandInCaseNoSuccessStringPresent);
 
-                        SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].commandInCaseNoSuccessStringPresent, result, 1);
+                        SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].commandInCaseNoSuccessStringPresent, result, 1, NULL);
                         goto start_commands;
                     }
                     else
@@ -520,7 +540,7 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
         {
             char *pch;
 
-            SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", result, 1);
+            SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", result, 1, NULL);
 
             /*
             * Search for a row, ending with ",0".
