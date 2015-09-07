@@ -61,7 +61,7 @@ struct NetworkInitCommands
     /*
      * The command to run.
      */
-    const char *command;
+    char *command;
 
     /*
      * For logging purposes.
@@ -84,9 +84,10 @@ struct NetworkInitCommands
 };
 NetworkInitCommands commands[8];
 
-
-#define MODEM "[MODEM] "
-#define MODEM_COMMAND "[MODEM_INIT_COMMAND %u] "
+#define MODEM           "[MODEM] "
+#define COMMAND         "[COMMAND %u] "
+#define MODEM_COMMAND   "[MODEM_INIT_COMMAND %u] "
+#define MODEM_SOCKET    "[MODEM_SOCKET_COMMAND %u] "
 
 
 static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, char *buffer, unsigned char showCommandOutput)
@@ -108,14 +109,17 @@ static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, char *buffe
 }
 
 
-static void runInitTests()
+static void runBatchCommands(const char *batchName, unsigned char giveModemSleep)
 {
     int i, j, passed, failed;
 
 start_commands:
 
-    info_log("Giving modem [%u] seconds, before checking all the settings and statuses", MODEM_SLEEP_INTERVAL);
-    startAndCountdownTimer(MODEM_SLEEP_INTERVAL, 1);
+    if(giveModemSleep == 1)
+    {
+        info_log("Giving modem [%u] seconds, before checking all the settings and statuses", MODEM_SLEEP_INTERVAL);
+        startAndCountdownTimer(MODEM_SLEEP_INTERVAL, 1);
+    }
 
     passed = 0;
     failed = 0;
@@ -126,12 +130,12 @@ start_commands:
 
         if(commands[i].command == NULL)
         {
-            info_log("\n\nTOTAL MODEM-INIT-COMMANDS: [%u], PASSED: [%u], FAILED: [%u]\n\n", i, passed, failed);
+            info_log("\n\n[%s] TOTAL COMMANDS: [%u], PASSED: [%u], FAILED: [%u]\n\n", batchName, i, passed, failed);
             break;
         }
 
         info_log("\n\n");
-        info_log(MODEM_COMMAND "Running [%s] for \"%s\"", i + 1, commands[i].command, commands[i].logInfoCommand);
+        info_log(COMMAND "Running [%s] for \"%s\"", i + 1, commands[i].command, commands[i].logInfoCommand);
 
         SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].command, result, 1);
 
@@ -146,15 +150,15 @@ start_commands:
                 {
                     if(commands[i].commandInCaseNoSuccessStringPresent != NULL)
                     {
-                        info_log(MODEM_COMMAND "Initial Check for \"%s\" Failed.. trying to rectify with [%s]",
-                                               i + 1, commands[i].logInfoCommand, commands[i].commandInCaseNoSuccessStringPresent);
+                        info_log(COMMAND "Initial Check for \"%s\" Failed.. trying to rectify with [%s]",
+                                 i + 1, commands[i].logInfoCommand, commands[i].commandInCaseNoSuccessStringPresent);
 
                         SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].commandInCaseNoSuccessStringPresent, result, 1);
                         goto start_commands;
                     }
                     else
                     {
-                        info_log(MODEM_COMMAND "\"%s\" Failed :(", i + 1, commands[i].logInfoCommand);
+                        info_log(COMMAND "\"%s\" Failed :(", i + 1, commands[i].logInfoCommand);
 
                         failed++;
                         break;
@@ -174,7 +178,7 @@ start_commands:
                         token = strtok_r(temp, "&", &saveptr);
                         if(token == NULL)
                         {
-                            info_log(MODEM_COMMAND "\"%s\" Passed", i + 1, commands[i].logInfoCommand);
+                            info_log(COMMAND "\"%s\" Passed", i + 1, commands[i].logInfoCommand);
                             passed++;
 
                             goto continue_with_next_command;
@@ -182,7 +186,7 @@ start_commands:
 
                         if(strstr(readBuffer, token) != NULL)
                         {
-                            info_log(MODEM_COMMAND "Found [%s] in output", i + 1, token);
+                            info_log(COMMAND "Found [%s] in output", i + 1, token);
                         }
                         else
                         {
@@ -390,7 +394,7 @@ static void setUpModem()
     /*
      */
     commands[7].command = NULL;
-    runInitTests();
+    runBatchCommands("MODEM-CONFIGURATION", 1);
 
 exit:
     if(commands[3].successStrings[0])
@@ -398,6 +402,50 @@ exit:
 
     if(commands[3].commandInCaseNoSuccessStringPresent)
         sg_free(commands[3].commandInCaseNoSuccessStringPresent);
+}
+
+
+static void setUpModemSocket(int socketId)
+{
+    /*
+     */
+    commands[0].command = (char*)sg_malloc(MAX_BUFFER_SIZE);
+    if(commands[0].command == NULL)
+    {
+        error_log(MODEM_SOCKET "Could not allocate memory for AT#SCFG", socketId);
+        goto exit;
+    }
+    sg_sprintf(commands[0].command, "AT#SCFG=%u,1,512,0,600,50\r\n", socketId);
+    commands[0].logInfoCommand = "Socket-Configuration";
+    commands[0].successStrings[0] = "\r\nOK\r\n";
+    commands[0].successStrings[1] = NULL;
+    commands[0].commandInCaseNoSuccessStringPresent = NULL;
+
+
+    /*
+     */
+    commands[1].command = (char*)sg_malloc(MAX_BUFFER_SIZE);
+    if(commands[1].command == NULL)
+    {
+        error_log(MODEM_SOCKET "Could not allocate memory for AT#SCFGEXT", socketId);
+        goto exit;
+    }
+    sg_sprintf(commands[1].command, "AT#SCFGEXT= %u,0,0,0,0\r\n", socketId);
+    commands[1].logInfoCommand = "Extended-Socket-Configuration";
+    commands[1].successStrings[0] = "\r\nOK\r\n";
+    commands[1].successStrings[1] = NULL;
+    commands[1].commandInCaseNoSuccessStringPresent = NULL;
+
+
+    /*
+     */
+    commands[2].command = NULL;
+    runBatchCommands("MODEM-SOCKET-CONFIGURATION", 0);
+
+exit:
+    if(commands[0].command)
+        sg_free(commands[0].command);
+
 }
 
 
@@ -456,10 +504,11 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
             }
 
             network->socket = sg_atoi(smallBufCorrect);
-            info_log("Socket-Id obtained = [%u]", network->socket);
+            info_log(MODEM "Socket-Id obtained = [%u]", network->socket);
         }
     }
 
+    setUpModemSocket(network->socket);
     while(1)
     {
     }
