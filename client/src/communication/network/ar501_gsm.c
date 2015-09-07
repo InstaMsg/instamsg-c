@@ -125,10 +125,10 @@ start_commands:
         }
 
         info_log("\n\n");
-        info_log(MODEM_COMMAND "Running [%s] for \"%s\"", i, commands[i].command, commands[i].logInfoCommand);
+        info_log(MODEM_COMMAND "Running [%s] for \"%s\"", i + 1, commands[i].command, commands[i].logInfoCommand);
 
         SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].command, result);
-        info_log(MODEM_COMMAND "Comand-Output = [%s]", i, readBuffer);
+        info_log(MODEM_COMMAND "Comand-Output = [%s]", i + 1, readBuffer);
 
         while(1)
         {
@@ -142,14 +142,14 @@ start_commands:
                     if(commands[i].commandInCaseNoSuccessStringPresent != NULL)
                     {
                         info_log(MODEM_COMMAND "Initial Check for \"%s\" Failed.. trying to rectify with [%s]",
-                                               i, commands[i].logInfoCommand, commands[i].commandInCaseNoSuccessStringPresent);
+                                               i + 1, commands[i].logInfoCommand, commands[i].commandInCaseNoSuccessStringPresent);
 
                         SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].commandInCaseNoSuccessStringPresent, result);
                         goto start_commands;
                     }
                     else
                     {
-                        info_log(MODEM_COMMAND "\"%s\" Failed :(", i, commands[i].logInfoCommand);
+                        info_log(MODEM_COMMAND "\"%s\" Failed :(", i + 1, commands[i].logInfoCommand);
 
                         failed++;
                         break;
@@ -169,7 +169,7 @@ start_commands:
                         token = strtok_r(temp, "&", &saveptr);
                         if(token == NULL)
                         {
-                            info_log(MODEM_COMMAND "\"%s\" Passed", i, commands[i].logInfoCommand);
+                            info_log(MODEM_COMMAND "\"%s\" Passed", i + 1, commands[i].logInfoCommand);
                             passed++;
 
                             goto continue_with_next_command;
@@ -177,7 +177,7 @@ start_commands:
 
                         if(strstr(readBuffer, token) != NULL)
                         {
-                            info_log(MODEM_COMMAND "Found [%s] in output", i, token);
+                            info_log(MODEM_COMMAND "Found [%s] in output", i + 1, token);
                         }
                         else
                         {
