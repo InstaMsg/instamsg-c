@@ -1,0 +1,4 @@
+#ifndef INSTAMSG_COMMON_UTILS
+#define INSTAMSG_COMMON_UTILS
+
+#endif

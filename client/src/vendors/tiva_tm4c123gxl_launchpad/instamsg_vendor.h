@@ -15,7 +15,7 @@
 
 struct Network
 {
-    // Feel free to add any additional fields as desired.
+    int socket;
 
     char host[MAX_BUFFER_SIZE];
     int port;

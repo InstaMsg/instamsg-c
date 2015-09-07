@@ -10,6 +10,7 @@
 
 #include "../../common/include/instamsg.h"
 #include "../../common/include/sg_mem.h"
+#include "../../common/include/sg_stdlib.h"
 
 #include <string.h>
 
@@ -416,7 +417,49 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
     /*
      * Next, we setup a socket, which will then be used for the usual read/write.
      */
-    SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", result, 1);
+
+    /*
+     * 1. Get a free-socket
+     */
+    {
+        char *pch;
+
+        SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", result, 1);
+
+        /*
+         * Search for a row, ending with ",0".
+         * If such a row is found, it means there is a free-socket, waiting to be used !!
+         */
+        pch = strstr(result, ",0\r\n");
+        if(pch != NULL)
+        {
+            /*
+             * Get the connection/socket-id available.
+             */
+            char smallBufReversed[4] = {0};
+            char smallBufCorrect[4] = {0};
+            int i, j;
+
+            pch--;
+            i = 0;
+
+            while((*pch) != ':')
+            {
+                memcpy(smallBufReversed + i, pch, 1);
+                pch--;
+                i++;
+            }
+
+            for(j = 0; j < i; j++)
+            {
+                memcpy(smallBufCorrect + j, smallBufReversed + i - 1 - j, 1);
+            }
+
+            network->socket = sg_atoi(smallBufCorrect);
+            info_log("Socket-Id obtained = [%u]", network->socket);
+        }
+    }
+
     while(1)
     {
     }
