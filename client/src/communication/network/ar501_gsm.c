@@ -109,7 +109,7 @@ static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, char *buffe
 }
 
 
-static void runBatchCommands(const char *batchName, unsigned char giveModemSleep)
+static int runBatchCommands(const char *batchName, unsigned char giveModemSleep)
 {
     int i, j, passed, failed;
 
@@ -209,6 +209,15 @@ continue_with_next_success_string:
 continue_with_next_command:
         i++;
     }
+
+    if(failed == 0)
+    {
+        return SUCCESS;
+    }
+    else
+    {
+        return FAILURE;
+    }
 }
 
 /*
@@ -221,13 +230,15 @@ static void release_underlying_medium_guaranteed(Network* network)
 }
 
 
-static void setUpModem()
+static int setUpModem()
 {
 #if 1
-    const char *apn = "live.vodafone.com";
+    const char *apn = "www";
     const char *userid = "";
     const char *passw = "";
 #endif
+    int rc = FAILURE;
+
     /*
      * Enable UART1.
      */
@@ -394,7 +405,7 @@ static void setUpModem()
     /*
      */
     commands[7].command = NULL;
-    runBatchCommands("MODEM-CONFIGURATION", 1);
+    rc = runBatchCommands("MODEM-CONFIGURATION", 1);
 
 exit:
     if(commands[3].successStrings[0])
@@ -402,11 +413,16 @@ exit:
 
     if(commands[3].commandInCaseNoSuccessStringPresent)
         sg_free(commands[3].commandInCaseNoSuccessStringPresent);
+
+
+    return rc;
 }
 
 
-static void setUpModemSocket(int socketId)
+static int setUpModemSocket(int socketId)
 {
+    int rc = FAILURE;
+
     /*
      */
     commands[0].command = (char*)sg_malloc(MAX_BUFFER_SIZE);
@@ -439,13 +455,36 @@ static void setUpModemSocket(int socketId)
 
     /*
      */
-    commands[2].command = NULL;
-    runBatchCommands("MODEM-SOCKET-CONFIGURATION", 0);
+    commands[2].command = (char*)sg_malloc(MAX_BUFFER_SIZE);
+    if(commands[2].command == NULL)
+    {
+        error_log(MODEM_SOCKET "Could not allocate memory for AT#SD", socketId);
+        goto exit;
+    }
+    sg_sprintf(commands[2].command, "AT#SD=%u,0,32000,\"platform.instamsg.io\",0,0,1\r\n", socketId);
+    commands[2].logInfoCommand = "Socket-Connection-To-Server";
+    commands[2].successStrings[0] = "\r\nOK\r\n";
+    commands[2].successStrings[1] = NULL;
+    commands[2].commandInCaseNoSuccessStringPresent = NULL;
+
+
+    /*
+     */
+    commands[3].command = NULL;
+    rc = runBatchCommands("MODEM-SOCKET-CONFIGURATION", 0);
 
 exit:
     if(commands[0].command)
         sg_free(commands[0].command);
 
+    if(commands[1].command)
+        sg_free(commands[1].command);
+
+    if(commands[2].command)
+        sg_free(commands[2].command);
+
+
+    return rc;
 }
 
 
@@ -459,56 +498,67 @@ exit:
  */
 static void connect_underlying_medium_try_once(Network* network, char *hostName, int port)
 {
-    setUpModem();
-    info_log("MODEM INITIALIZATION DONE.");
+    int rc = FAILURE;
 
-    /*
-     * Next, we setup a socket, which will then be used for the usual read/write.
-     */
-
-    /*
-     * 1. Get a free-socket
-     */
+    do
     {
-        char *pch;
+        do
+        {
+            info_log("(RE-)INITIALIZING MODEM");
+            rc = setUpModem();
+        } while(rc == FAILURE);
 
-        SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", result, 1);
+        info_log("MODEM INITIALIZATION DONE.");
 
         /*
-         * Search for a row, ending with ",0".
-         * If such a row is found, it means there is a free-socket, waiting to be used !!
-         */
-        pch = strstr(result, ",0\r\n");
-        if(pch != NULL)
+        * Next, we setup a socket, which will then be used for the usual read/write.
+        */
+
+        /*
+        * 1. Get a free-socket
+        */
         {
+            char *pch;
+
+            SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", result, 1);
+
             /*
-             * Get the connection/socket-id available.
-             */
-            char smallBufReversed[4] = {0};
-            char smallBufCorrect[4] = {0};
-            int i, j;
-
-            pch--;
-            i = 0;
-
-            while((*pch) != ':')
+            * Search for a row, ending with ",0".
+            * If such a row is found, it means there is a free-socket, waiting to be used !!
+            */
+            pch = strstr(result, ",0\r\n");
+            if(pch != NULL)
             {
-                memcpy(smallBufReversed + i, pch, 1);
+                /*
+                 * Get the connection/socket-id available.
+                 */
+                char smallBufReversed[4] = {0};
+                char smallBufCorrect[4] = {0};
+                int i, j;
+
                 pch--;
-                i++;
-            }
+                i = 0;
 
-            for(j = 0; j < i; j++)
-            {
-                memcpy(smallBufCorrect + j, smallBufReversed + i - 1 - j, 1);
-            }
+                while((*pch) != ':')
+                {
+                    memcpy(smallBufReversed + i, pch, 1);
+                    pch--;
+                    i++;
+                }
 
-            network->socket = sg_atoi(smallBufCorrect);
-            info_log(MODEM "Socket-Id obtained = [%u]", network->socket);
+                for(j = 0; j < i; j++)
+                {
+                    memcpy(smallBufCorrect + j, smallBufReversed + i - 1 - j, 1);
+                }
+
+                network->socket = sg_atoi(smallBufCorrect);
+                info_log(MODEM "Socket-Id obtained = [%u]", network->socket);
+            }
         }
-    }
 
-    setUpModemSocket(network->socket);
+        rc = setUpModemSocket(network->socket);
+    } while(rc == FAILURE);
+
     while(1)
     {
     }
