@@ -22,9 +22,11 @@ static const char *specialDelimiter;
 
 static unsigned int ind;
 static volatile char resultObtained;
+static unsigned char trackDebugResponse;
 
 #define SEND_COMMAND_BUFFER_SIZE 100
 static char sendCommandBuffer[SEND_COMMAND_BUFFER_SIZE];
+    static char small[10];
 
 #define MODEM_SLEEP_INTERVAL 30
 #define LENGTH_OF_COMMAND 0
@@ -50,6 +52,11 @@ void UART1Handler(void)
     }
 
     readBuffer[ind] = 0;
+    if(trackDebugResponse == 1)
+    {
+        info_log("%");
+        info_log(readBuffer);
+    }
 
     /*
      * Now check if any of the terminator-strings is present.
@@ -161,6 +168,7 @@ start_commands:
 
     while(1)
     {
+        startAndCountdownTimer(1, 0);
 
         if(commands[i].command == NULL)
         {
@@ -647,7 +655,14 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
  */
 static int ar501_gsm_socket_read(Network* network, unsigned char* buffer, int len, unsigned char guaranteed)
 {
-    return FAILURE;
+    memset(sendCommandBuffer, 0, SEND_COMMAND_BUFFER_SIZE);
+    sg_sprintf(sendCommandBuffer, "AT#SRECV=%u,%d\r\n", network->socket, len);
+
+    trackDebugResponse = 1;
+    SEND_CMD_AND_READ_RESPONSE_ON_UART1(sendCommandBuffer, LENGTH_OF_COMMAND, (char*)buffer, 1, NULL);
+
+    return SUCCESS;
+
 }
 
 
@@ -669,9 +684,9 @@ static int ar501_gsm_socket_write(Network* network, unsigned char* buffer, int l
 {
     memset(sendCommandBuffer, 0, SEND_COMMAND_BUFFER_SIZE);
     sg_sprintf(sendCommandBuffer, "AT#SSENDEXT=%u,%d\r\n", network->socket, len);
-    SEND_CMD_AND_READ_RESPONSE_ON_UART1(sendCommandBuffer, LENGTH_OF_COMMAND, result, 0, "\r\n>");
+    SEND_CMD_AND_READ_RESPONSE_ON_UART1(sendCommandBuffer, LENGTH_OF_COMMAND, result, 1, "\r\n>");
 
-    SEND_CMD_AND_READ_RESPONSE_ON_UART1((char*)buffer, len, result, 0, NULL);
+    SEND_CMD_AND_READ_RESPONSE_ON_UART1((char*)buffer, len, result, 1, NULL);
 
     return SUCCESS;
 }
@@ -702,6 +717,12 @@ void init_network(Network *network, const char *hostName, unsigned int port)
 
     //strictly
     network->write(network, (unsigned char*)test, strlen(test));
+    memset(small, 0, 10);
+    network->read(network, (unsigned char*)small, 3, 1);
+    memset(small, 0, 10);
+    network->read(network, (unsigned char*)small, 2, 1);
+    memset(small, 0, 10);
+    network->read(network, (unsigned char*)small, 3, 1);
     while(1)
     {
     }
