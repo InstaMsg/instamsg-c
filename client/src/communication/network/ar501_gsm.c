@@ -88,7 +88,7 @@ NetworkInitCommands commands[8];
 #define MODEM_COMMAND "[MODEM_INIT_COMMAND %u] "
 
 
-static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, char *buffer)
+static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, char *buffer, unsigned char showCommandOutput)
 {
     resultObtained = 0;
     ind = 0;
@@ -98,6 +98,11 @@ static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, char *buffe
     UARTSend(UART1_BASE, (unsigned char*)command, strlen(command));
     while(resultObtained == 0)
     {
+    }
+
+    if(showCommandOutput == 1)
+    {
+        info_log("Command = [%s], Output = [%s]", command, result);
     }
 }
 
@@ -127,8 +132,7 @@ start_commands:
         info_log("\n\n");
         info_log(MODEM_COMMAND "Running [%s] for \"%s\"", i + 1, commands[i].command, commands[i].logInfoCommand);
 
-        SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].command, result);
-        info_log(MODEM_COMMAND "Comand-Output = [%s]", i + 1, readBuffer);
+        SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].command, result, 1);
 
         while(1)
         {
@@ -144,7 +148,7 @@ start_commands:
                         info_log(MODEM_COMMAND "Initial Check for \"%s\" Failed.. trying to rectify with [%s]",
                                                i + 1, commands[i].logInfoCommand, commands[i].commandInCaseNoSuccessStringPresent);
 
-                        SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].commandInCaseNoSuccessStringPresent, result);
+                        SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].commandInCaseNoSuccessStringPresent, result, 1);
                         goto start_commands;
                     }
                     else
@@ -385,8 +389,6 @@ static void setUpModem()
     /*
      */
     commands[7].command = NULL;
-
-
     runInitTests();
 
 exit:
@@ -411,6 +413,10 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
     setUpModem();
     info_log("MODEM INITIALIZATION DONE.");
 
+    /*
+     * Next, we setup a socket, which will then be used for the usual read/write.
+     */
+    SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", result, 1);
     while(1)
     {
     }
