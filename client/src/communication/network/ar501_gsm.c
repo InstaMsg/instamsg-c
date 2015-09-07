@@ -54,7 +54,7 @@ void UART1Handler(void)
     readBuffer[ind] = 0;
     if(trackDebugResponse == 1)
     {
-        info_log("%");
+        info_log("*");
         info_log(readBuffer);
     }
 
@@ -324,8 +324,6 @@ static int setUpModem()
     GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD);
 
 
-#if 0
-    ////////////////////////////////////////////////////////////
     /*
      * D7 is used for RI detection of GPRS Modem
      */
@@ -333,12 +331,10 @@ static int setUpModem()
     HWREG(GPIO_PORTD_BASE + GPIO_O_IM) &= ~(0xFF); /* Substitute of "GPIOPinIntDisable(GPIO_PORTD_BASE, 0xFF);"  */
 
     /* This is to enable GPIO capability on Pin PD7... Work around for NMI signal on the pin */
-    HWREG(GPIO_PORTD_BASE + GPIO_O_LOCK) = GPIO_LOCK_KEY_DD;
+    HWREG(GPIO_PORTD_BASE + GPIO_O_LOCK) = GPIO_LOCK_KEY; /* Substitute of "HWREG(GPIO_PORTD_BASE + GPIO_O_LOCK) = GPIO_LOCK_KEY_DD; */
     HWREG(GPIO_PORTD_BASE + GPIO_O_CR) = 0xff;
     GPIOPinTypeGPIOInput(GPIO_PORTD_BASE, GPIO_PIN_7);
     GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_7, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD);
-    ////////////////////////////////////////////////////////////
-#endif
 
 
     /*
