@@ -55,7 +55,7 @@ void UART1Handler(void)
     if(trackDebugResponse == 1)
     {
         info_log("*");
-        info_log(readBuffer);
+        info_log("[%s]", readBuffer);
     }
 
     /*
