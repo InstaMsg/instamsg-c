@@ -200,10 +200,6 @@ continue_with_next_success_string:
 continue_with_next_command:
         i++;
     }
-
-    while(1)
-    {
-    }
 }
 
 /*
@@ -216,15 +212,7 @@ static void release_underlying_medium_guaranteed(Network* network)
 }
 
 
-/*
- * This method tries to establish the network/socket to the "hostName" and "port".
- *
- * If the connection is successful, then the following must be done by the device-implementation ::
- *                          network->socketCorrupted = 0;
- *
- * Setting the above value will let InstaMsg know that the connection can be used fine for writing/reading.
- */
-static void connect_underlying_medium_try_once(Network* network, char *hostName, int port)
+static void setUpModem()
 {
 #if 1
     const char *apn = "live.vodafone.com";
@@ -409,6 +397,24 @@ exit:
         sg_free(commands[3].commandInCaseNoSuccessStringPresent);
 }
 
+
+/*
+ * This method tries to establish the network/socket to the "hostName" and "port".
+ *
+ * If the connection is successful, then the following must be done by the device-implementation ::
+ *                          network->socketCorrupted = 0;
+ *
+ * Setting the above value will let InstaMsg know that the connection can be used fine for writing/reading.
+ */
+static void connect_underlying_medium_try_once(Network* network, char *hostName, int port)
+{
+    setUpModem();
+    info_log("MODEM INITIALIZATION DONE.");
+
+    while(1)
+    {
+    }
+}
 
 /*
  * This method reads "len" bytes from network into "buffer".
