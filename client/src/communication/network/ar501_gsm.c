@@ -26,7 +26,7 @@ static unsigned char trackDebugResponse;
 
 #define SEND_COMMAND_BUFFER_SIZE 100
 static char sendCommandBuffer[SEND_COMMAND_BUFFER_SIZE];
-    static char small[10];
+    static char small[20];
 
 #define MODEM_SLEEP_INTERVAL 30
 #define LENGTH_OF_COMMAND 0
@@ -42,9 +42,19 @@ void UART1Handler(void)
     {
         if(1)
         {
+            if(trackDebugResponse != 1)
+            {
             while(ROM_UARTCharsAvail(UART1_BASE))
             {
                 readBuffer[ind++] = UARTCharGetNonBlocking(UART1_BASE);
+            }
+            }
+            else
+            {
+                while(1)
+                {
+                    ROM_UARTCharPut(UART0_BASE, UARTCharGet(UART1_BASE));
+                }
             }
         }
 
@@ -113,7 +123,7 @@ NetworkInitCommands commands[8];
 
 
 static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, int len, char *buffer, unsigned char showCommandOutput,
-                                                const char *delimiter)
+                                                const char *delimiter, unsigned char useInterrupt)
 {
     int lengthToSend = 0;
     if(len == LENGTH_OF_COMMAND)
@@ -129,6 +139,8 @@ static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, int len, ch
     ind = 0;
 
     readBuffer = buffer;
+    readBuffer[0] = 0;
+
     if(delimiter != NULL)
     {
         specialDelimiter = delimiter;
@@ -139,13 +151,20 @@ static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, int len, ch
     }
 
     UARTSend(UART1_BASE, (unsigned char*)command, lengthToSend);
-    while(resultObtained == 0)
+    if(useInterrupt == 1)
     {
+        while(resultObtained == 0)
+        {
+        }
+    }
+    else
+    {
+        UART1Handler();
     }
 
     if(showCommandOutput == 1)
     {
-        info_log("Command = [%s], Output = [%s]", command, result);
+        info_log("Command = [%s], Output = [%s]", command, readBuffer);
     }
 }
 
@@ -179,7 +198,7 @@ start_commands:
         info_log("\n\n");
         info_log(COMMAND "Running [%s] for \"%s\"", i + 1, commands[i].command, commands[i].logInfoCommand);
 
-        SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].command, LENGTH_OF_COMMAND, result, 1, NULL);
+        SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].command, LENGTH_OF_COMMAND, result, 1, NULL, 1);
 
         while(1)
         {
@@ -196,7 +215,7 @@ start_commands:
                                  i + 1, commands[i].logInfoCommand, commands[i].commandInCaseNoSuccessStringPresent);
 
                         SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].commandInCaseNoSuccessStringPresent, LENGTH_OF_COMMAND,
-                                                            result, 1, NULL);
+                                                            result, 1, NULL, 1);
                         goto start_commands;
                     }
                     else
@@ -517,6 +536,7 @@ static int setUpModemSocket(int socketId)
         error_log(MODEM_SOCKET "Could not allocate memory for AT#SD", socketId);
         goto exit;
     }
+    //sg_sprintf(commands[2].command, "AT#SD=%u,0,8000,\"101.63.73.120\",0,0,1\r\n", socketId);
     sg_sprintf(commands[2].command, "AT#SD=%u,0,32000,\"platform.instamsg.io\",0,0,1\r\n", socketId);
     commands[2].logInfoCommand = "Socket-Connection-To-Server";
     commands[2].successStrings[0] = "\r\nOK\r\n";
@@ -576,7 +596,7 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
         {
             char *pch;
 
-            SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", LENGTH_OF_COMMAND, result, 1, NULL);
+            SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", LENGTH_OF_COMMAND, result, 1, NULL, 1);
 
             /*
             * Search for a row, ending with ",0".
@@ -672,7 +692,7 @@ static int ar501_gsm_socket_read(Network* network, unsigned char* buffer, int le
     sg_sprintf(sendCommandBuffer, "AT#SRECV=%u,%d\r\n", network->socket, len);
 
     trackDebugResponse = 1;
-    SEND_CMD_AND_READ_RESPONSE_ON_UART1(sendCommandBuffer, LENGTH_OF_COMMAND, (char*)buffer, 1, NULL);
+    SEND_CMD_AND_READ_RESPONSE_ON_UART1(sendCommandBuffer, LENGTH_OF_COMMAND, (char*)buffer, 1, NULL, 0);
 
     return SUCCESS;
 
@@ -697,9 +717,9 @@ static int ar501_gsm_socket_write(Network* network, unsigned char* buffer, int l
 {
     memset(sendCommandBuffer, 0, SEND_COMMAND_BUFFER_SIZE);
     sg_sprintf(sendCommandBuffer, "AT#SSENDEXT=%u,%d\r\n", network->socket, len);
-    SEND_CMD_AND_READ_RESPONSE_ON_UART1(sendCommandBuffer, LENGTH_OF_COMMAND, result, 1, "\r\n>");
+    SEND_CMD_AND_READ_RESPONSE_ON_UART1(sendCommandBuffer, LENGTH_OF_COMMAND, result, 1, "\r\n>", 1);
 
-    SEND_CMD_AND_READ_RESPONSE_ON_UART1((char*)buffer, len, result, 1, NULL);
+    SEND_CMD_AND_READ_RESPONSE_ON_UART1((char*)buffer, len, result, 1, NULL, 1);
 
     return SUCCESS;
 }
@@ -711,7 +731,7 @@ static int ar501_gsm_socket_write(Network* network, unsigned char* buffer, int l
 void init_network(Network *network, const char *hostName, unsigned int port)
 {
     //strictly
-    char *test = "this is awesome";
+    char *test = "ajay";
 
     /* Register read-callback. */
 	network->read = ar501_gsm_socket_read;
@@ -730,12 +750,19 @@ void init_network(Network *network, const char *hostName, unsigned int port)
 
     //strictly
     network->write(network, (unsigned char*)test, strlen(test));
-    memset(small, 0, 10);
+
+
+    ROM_IntDisable(22); // Value of INT_UART1 from "inc/tm4c1230d5pm.h"
+    startAndCountdownTimer(5, 1);
+    memset(small, 0, 20);
     network->read(network, (unsigned char*)small, 3, 1);
-    memset(small, 0, 10);
+    //printf("got = [%s]", small);
+    memset(small, 0, 20);
     network->read(network, (unsigned char*)small, 2, 1);
-    memset(small, 0, 10);
+    //printf("got = [%s]", small);
+    memset(small, 0, 20);
     network->read(network, (unsigned char*)small, 3, 1);
+    //printf("got = [%s]", small);
     while(1)
     {
     }
