@@ -188,14 +188,15 @@ static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, int len, ch
     resultObtained = 0;
     ind = 0;
 
-    //readBuffer = buffer;
     readBuffer = result;
     if(desiredOutputBuffer != NULL)
     {
+        ROM_IntDisable(22); // Value of INT_UART1 from "inc/tm4c1230d5pm.h"
         responseBuffer = desiredOutputBuffer;
     }
     else
     {
+        ROM_IntEnable(22); // Value of INT_UART1 from "inc/tm4c1230d5pm.h"
         responseBuffer = NULL;
     }
 
@@ -215,21 +216,48 @@ static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, int len, ch
     {
         if(special == 1)
         {
-        while(1)
-        {
+            unsigned int newLineStart = 0;
+                   char *ok = "OK";
+    char *error = "ERROR";
+         while(1)
+         {
+
+                    readBuffer[ind++] = UARTCharGet(UART1_BASE);
+                    if(readBuffer[ind - 1] == '\n')   /* We reached an end of line */
+                    {
+                        /*
+                         * See if we got any of the terminators.
+                         */
+                        if( (strncmp(readBuffer + newLineStart, ok, strlen(ok)) == 0) ||
+                            (strncmp(readBuffer + newLineStart, error, strlen(error)) == 0) )
+                        {
+                            break;
+                        }
+                        newLineStart = ind;
+
+                    }
+                }
+
+
+        //UART1Handler();
+        //while(1)
+        //{
         // strictly
+        /*
         while(ROM_UARTCharsAvail(UART1_BASE))
                 {
                     readBuffer[ind++] = UARTCharGetNonBlocking(UART1_BASE);
                     UARTCharPut(UART0_BASE, readBuffer[ind - 1]);
                 }
-        }
+                */
+        //}
         }
         // strictly
 
-        ind = 0;
+        else{
         while(resultObtained == 0)
         {
+        }
         }
     }
     else
@@ -367,7 +395,7 @@ static void release_underlying_medium_guaranteed(Network* network)
 }
 
 
-static int setUpModem()
+static int setUpModem(Network *network)
 {
 #if 1
     const char *apn = "www";
@@ -656,7 +684,7 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
         do
         {
             info_log("(RE-)INITIALIZING MODEM");
-            rc = setUpModem();
+            rc = setUpModem(network);
         } while(rc == FAILURE);
 
         info_log("MODEM INITIALIZATION DONE.");
@@ -763,7 +791,7 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
  */
 static int ar501_gsm_socket_read(Network* network, unsigned char* buffer, int len, unsigned char guaranteed)
 {
-    special = 1;
+    //special = 1;
     memset(sendCommandBuffer, 0, SEND_COMMAND_BUFFER_SIZE);
     sg_sprintf(sendCommandBuffer, "AT#SRECV=%u,%d\r\n", network->socket, len);
 
@@ -823,19 +851,24 @@ void init_network(Network *network, const char *hostName, unsigned int port)
     /* Connect the medium. */
     connect_underlying_medium_try_once(network, network->host, network->port);
 
+    /*
+    memset(small, 0, 20);
+    network->read(network, (unsigned char*)small, 3, 1);
+    info_log("mila [%s]", small);
+    */
+ 
 
     //strictly
     network->write(network, (unsigned char*)test, strlen(test));
 
 
-    ROM_IntDisable(22); // Value of INT_UART1 from "inc/tm4c1230d5pm.h"
     startAndCountdownTimer(5, 1);
     memset(small, 0, 20);
     network->read(network, (unsigned char*)small, 3, 1);
     info_log("mila [%s]", small);
     //printf("got = [%s]", small);
     memset(small, 0, 20);
-    special = 1;
+    //special = 1;
     SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", LENGTH_OF_COMMAND, NULL, 1, NULL, 1);
     network->read(network, (unsigned char*)small, 2, 1);
     info_log("mila [%s]", small);
