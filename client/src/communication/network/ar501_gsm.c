@@ -26,7 +26,6 @@ static const char *specialDelimiter;
 
 static unsigned int ind;
 static volatile char resultObtained;
-unsigned char special;
 #define SEND_COMMAND_BUFFER_SIZE 100
 static char sendCommandBuffer[SEND_COMMAND_BUFFER_SIZE];
     static char small[20];
@@ -36,13 +35,15 @@ static char sendCommandBuffer[SEND_COMMAND_BUFFER_SIZE];
 
 void UART1Handler(void)
 {
-                unsigned long interrupts;
+    unsigned long interrupts;
 
     char *ok = "OK";
     char *error = "ERROR";
 
-                interrupts  = UARTIntStatus(UART1_BASE, true);
-                UARTIntClear(UART1_BASE, interrupts);
+    interrupts  = UARTIntStatus(UART1_BASE, true);
+    UARTIntClear(UART1_BASE, interrupts);
+
+
     while(1)
     {
         if(1)
@@ -53,7 +54,6 @@ void UART1Handler(void)
                 while(ROM_UARTCharsAvail(UART1_BASE))
                 {
                     readBuffer[ind++] = UARTCharGetNonBlocking(UART1_BASE);
-                    UARTCharPut(UART0_BASE, readBuffer[ind - 1]);
                 }
             }
             else
@@ -214,50 +214,8 @@ static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, int len, ch
     UARTSend(UART1_BASE, (unsigned char*)command, lengthToSend);
     if(useInterrupt == 1)
     {
-        if(special == 1)
-        {
-            unsigned int newLineStart = 0;
-                   char *ok = "OK";
-    char *error = "ERROR";
-         while(1)
-         {
-
-                    readBuffer[ind++] = UARTCharGet(UART1_BASE);
-                    if(readBuffer[ind - 1] == '\n')   /* We reached an end of line */
-                    {
-                        /*
-                         * See if we got any of the terminators.
-                         */
-                        if( (strncmp(readBuffer + newLineStart, ok, strlen(ok)) == 0) ||
-                            (strncmp(readBuffer + newLineStart, error, strlen(error)) == 0) )
-                        {
-                            break;
-                        }
-                        newLineStart = ind;
-
-                    }
-                }
-
-
-        //UART1Handler();
-        //while(1)
-        //{
-        // strictly
-        /*
-        while(ROM_UARTCharsAvail(UART1_BASE))
-                {
-                    readBuffer[ind++] = UARTCharGetNonBlocking(UART1_BASE);
-                    UARTCharPut(UART0_BASE, readBuffer[ind - 1]);
-                }
-                */
-        //}
-        }
-        // strictly
-
-        else{
         while(resultObtained == 0)
         {
-        }
         }
     }
     else
@@ -791,7 +749,6 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
  */
 static int ar501_gsm_socket_read(Network* network, unsigned char* buffer, int len, unsigned char guaranteed)
 {
-    //special = 1;
     memset(sendCommandBuffer, 0, SEND_COMMAND_BUFFER_SIZE);
     sg_sprintf(sendCommandBuffer, "AT#SRECV=%u,%d\r\n", network->socket, len);
 
@@ -851,13 +808,6 @@ void init_network(Network *network, const char *hostName, unsigned int port)
     /* Connect the medium. */
     connect_underlying_medium_try_once(network, network->host, network->port);
 
-    /*
-    memset(small, 0, 20);
-    network->read(network, (unsigned char*)small, 3, 1);
-    info_log("mila [%s]", small);
-    */
- 
-
     //strictly
     network->write(network, (unsigned char*)test, strlen(test));
 
@@ -866,18 +816,14 @@ void init_network(Network *network, const char *hostName, unsigned int port)
     memset(small, 0, 20);
     network->read(network, (unsigned char*)small, 3, 1);
     info_log("mila [%s]", small);
-    //printf("got = [%s]", small);
     memset(small, 0, 20);
-    //special = 1;
     SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", LENGTH_OF_COMMAND, NULL, 1, NULL, 1);
     network->read(network, (unsigned char*)small, 2, 1);
     info_log("mila [%s]", small);
-    //printf("got = [%s]", small);
     memset(small, 0, 20);
     SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", LENGTH_OF_COMMAND, NULL, 1, NULL, 1);
     network->read(network, (unsigned char*)small, 3, 1);
     info_log("mila [%s]", small);
-    //printf("got = [%s]", small);
     while(1)
     {
     }
