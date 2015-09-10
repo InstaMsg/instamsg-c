@@ -33,27 +33,75 @@ static char sendCommandBuffer[SEND_COMMAND_BUFFER_SIZE];
 
 void UART1Handler(void)
 {
-    unsigned long interrupts;
+                unsigned long interrupts;
 
-    interrupts  = UARTIntStatus(UART1_BASE, true);
-    UARTIntClear(UART1_BASE, interrupts);
+    char *ok = "OK";
+    char *error = "ERROR";
 
+                interrupts  = UARTIntStatus(UART1_BASE, true);
+                UARTIntClear(UART1_BASE, interrupts);
     while(1)
     {
         if(1)
         {
             if(trackDebugResponse != 1)
             {
-            while(ROM_UARTCharsAvail(UART1_BASE))
-            {
-                readBuffer[ind++] = UARTCharGetNonBlocking(UART1_BASE);
-            }
+
+                while(ROM_UARTCharsAvail(UART1_BASE))
+                {
+                    readBuffer[ind++] = UARTCharGetNonBlocking(UART1_BASE);
+                }
             }
             else
             {
+                char *triggerStringForActualData = "#SRECV";
+                unsigned int newLineStart = 0;
+                unsigned int actualDataStart = 0;
+
                 while(1)
                 {
-                    ROM_UARTCharPut(UART0_BASE, UARTCharGet(UART1_BASE));
+                    /*
+                     * Extract "fro" from the total blocking/polling output of type
+                     *
+                     *
+                     SRING: 1
+                     AT#SRECV=1,3
+
+                     #SRECV: 1,3
+                     fro
+
+                     OK
+
+                     SRING: 1
+
+                     NO CARRIER
+
+                     */
+                    readBuffer[ind++] = UARTCharGet(UART1_BASE);
+                    if(readBuffer[ind - 1] == '\n')   /* We reached an end of line */
+                    {
+                        /*
+                         * See if we got the trigger.
+                         */
+                        if(strncmp(readBuffer + newLineStart, triggerStringForActualData, strlen(triggerStringForActualData)) == 0)
+                        {
+                            actualDataStart = ind;
+                        }
+
+                        /*
+                         * See if we got any of the terminators.
+                         */
+                        if( (strncmp(readBuffer + newLineStart, ok, strlen(ok)) == 0) ||
+                            (strncmp(readBuffer + newLineStart, error, strlen(error)) == 0) )
+                        {
+                            break;
+                        }
+
+                        /*
+                         * Set the new-line-tracker.
+                         */
+                        newLineStart = ind;
+                    }
                 }
             }
         }
@@ -138,7 +186,8 @@ static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, int len, ch
     resultObtained = 0;
     ind = 0;
 
-    readBuffer = buffer;
+    //readBuffer = buffer;
+    readBuffer = result;
     readBuffer[0] = 0;
 
     if(delimiter != NULL)
