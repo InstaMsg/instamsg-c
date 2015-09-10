@@ -24,11 +24,16 @@ static unsigned int bytesRequired;
 
 static const char *specialDelimiter;
 
-static unsigned int ind;
 static volatile char resultObtained;
+static volatile char errorObtained;
+static volatile char noCarrierObtained;
+static unsigned int ind;
+
+unsigned char useInterrupt;
+
+
 #define SEND_COMMAND_BUFFER_SIZE 100
 static char sendCommandBuffer[SEND_COMMAND_BUFFER_SIZE];
-unsigned char useInterrupt;
 
 
 #define MODEM_SLEEP_INTERVAL 30
@@ -40,6 +45,7 @@ void UART1Handler(void)
 
     char *ok = "OK";
     char *error = "ERROR";
+    char *noCarrier = "NO CARRIER";
 
     interrupts  = UARTIntStatus(UART1_BASE, true);
     UARTIntClear(UART1_BASE, interrupts);
@@ -61,18 +67,35 @@ void UART1Handler(void)
                 /*
                  * Now check if any of the terminator-strings is present.
                  */
-                if(specialDelimiter == NULL)
+
+                /* Optimisation, check only if a newline is at the end
+                 * We are in an ISR, so not wasting time uselessly is paramount
+                 */
+                if(readBuffer[ind - 1] == '\n')
                 {
-                    if((strstr(readBuffer, "\r\nOK\r\n") != NULL) || (strstr(readBuffer, "ERROR") != NULL))
+                    if(specialDelimiter == NULL)
                     {
-                        resultObtained = 1;
+                        if((strstr(readBuffer, "\r\nOK\r\n") != NULL) || (strstr(readBuffer, "ERROR\r\n") != NULL))
+                        {
+                            resultObtained = 1;
+                        }
+                        else if(strstr(readBuffer, "ERROR\r\n") != NULL)
+                        {
+                            resultObtained = 1;
+                            errorObtained = 1;
+                        }
+                        else if(strstr(readBuffer, noCarrier) != NULL)
+                        {
+                            resultObtained = 1;
+                            noCarrierObtained = 1;
+                        }
                     }
-                }
-                else
-                {
-                    if(strstr(readBuffer, specialDelimiter) != NULL)
+                    else
                     {
-                        resultObtained = 1;
+                        if(strstr(readBuffer, specialDelimiter) != NULL)
+                        {
+                            resultObtained = 1;
+                        }
                     }
                 }
             }
@@ -120,6 +143,16 @@ void UART1Handler(void)
                         {
                             break;
                         }
+                        else if(strncmp(readBuffer + newLineStart, error, strlen(error)) == 0)
+                        {
+                            errorObtained = 1;
+                            break;
+                        }
+                        else if(strncmp(readBuffer + newLineStart, noCarrier, strlen(noCarrier)) == 0)
+                        {
+                            noCarrierObtained = 1;
+                            break;
+                        }
 
                         /*
                          * Set the new-line-tracker.
@@ -128,15 +161,19 @@ void UART1Handler(void)
                     }
                 }
 
-                memcpy(responseBuffer, readBuffer + actualDataStart, bytesRequired);
-
+                /*
+                 * If actualDataStart == 0, then we did not encounter the trigger "\r\n#SRECV" in the output
+                 * (probably because of a "ERROR" or "NO CARRIER").
+                 */
+                if(actualDataStart != 0)
+                {
+                    memcpy(responseBuffer, readBuffer + actualDataStart, bytesRequired);
+                }
             }
         }
 
         break;
     }
-
-
 }
 
 
@@ -188,7 +225,12 @@ static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, int len, ch
         lengthToSend = len;
     }
 
+    /*
+     * Reset the trackers for the command-status.
+     */
     resultObtained = 0;
+    errorObtained = 0;
+    noCarrierObtained = 0;
     ind = 0;
 
     readBuffer = result;
