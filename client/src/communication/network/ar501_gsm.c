@@ -55,6 +55,26 @@ void UART1Handler(void)
                 {
                     readBuffer[ind++] = UARTCharGetNonBlocking(UART1_BASE);
                 }
+
+                readBuffer[ind] = 0;
+
+                /*
+                 * Now check if any of the terminator-strings is present.
+                 */
+                if(specialDelimiter == NULL)
+                {
+                    if((strstr(readBuffer, "\r\nOK\r\n") != NULL) || (strstr(readBuffer, "ERROR") != NULL))
+                    {
+                        resultObtained = 1;
+                    }
+                }
+                else
+                {
+                    if(strstr(readBuffer, specialDelimiter) != NULL)
+                    {
+                        resultObtained = 1;
+                    }
+                }
             }
             else
             {
@@ -116,25 +136,7 @@ void UART1Handler(void)
         break;
     }
 
-    readBuffer[ind] = 0;
 
-    /*
-     * Now check if any of the terminator-strings is present.
-     */
-    if(specialDelimiter == NULL)
-    {
-        if((strstr(readBuffer, "\r\nOK\r\n") != NULL) || (strstr(readBuffer, "ERROR") != NULL))
-        {
-            resultObtained = 1;
-        }
-    }
-    else
-    {
-        if(strstr(readBuffer, specialDelimiter) != NULL)
-        {
-            resultObtained = 1;
-        }
-    }
 }
 
 
