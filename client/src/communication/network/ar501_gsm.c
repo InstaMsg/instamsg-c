@@ -28,7 +28,8 @@ static unsigned int ind;
 static volatile char resultObtained;
 #define SEND_COMMAND_BUFFER_SIZE 100
 static char sendCommandBuffer[SEND_COMMAND_BUFFER_SIZE];
-    static char small[20];
+unsigned char useInterrupt;
+
 
 #define MODEM_SLEEP_INTERVAL 30
 #define LENGTH_OF_COMMAND 0
@@ -50,7 +51,6 @@ void UART1Handler(void)
         {
             if(responseBuffer == NULL)
             {
-
                 while(ROM_UARTCharsAvail(UART1_BASE))
                 {
                     readBuffer[ind++] = UARTCharGetNonBlocking(UART1_BASE);
@@ -175,7 +175,6 @@ NetworkInitCommands commands[8];
 static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, int len, char *desiredOutputBuffer, const char *delimiter)
 {
     int lengthToSend = 0;
-    unsigned char useInterrupt = 0;
     unsigned char showCommandOutput = 1;
 
     if(len == LENGTH_OF_COMMAND)
@@ -197,6 +196,8 @@ static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, int len, ch
      */
     if(desiredOutputBuffer != NULL)
     {
+        useInterrupt = 0;
+
         ROM_IntDisable(22);
         responseBuffer = desiredOutputBuffer;
     }
@@ -786,14 +787,15 @@ static int ar501_gsm_socket_write(Network* network, unsigned char* buffer, int l
 {
     memset(sendCommandBuffer, 0, SEND_COMMAND_BUFFER_SIZE);
     sg_sprintf(sendCommandBuffer, "AT#SSENDEXT=%u,%d\r\n", network->socket, len);
-    SEND_CMD_AND_READ_RESPONSE_ON_UART1(sendCommandBuffer, LENGTH_OF_COMMAND, NULL, "\r\n>");
 
+    SEND_CMD_AND_READ_RESPONSE_ON_UART1(sendCommandBuffer, LENGTH_OF_COMMAND, NULL, "\r\n>");
     SEND_CMD_AND_READ_RESPONSE_ON_UART1((char*)buffer, len, NULL, NULL);
 
     return SUCCESS;
 }
 
 
+static char small[20];
 /*
  * NOTHING EXTRA NEEDS TO BE DONE HERE.
  */
