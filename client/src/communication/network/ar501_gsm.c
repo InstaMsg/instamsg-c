@@ -26,7 +26,7 @@ static const char *specialDelimiter;
 
 static unsigned int ind;
 static volatile char resultObtained;
-
+unsigned char special;
 #define SEND_COMMAND_BUFFER_SIZE 100
 static char sendCommandBuffer[SEND_COMMAND_BUFFER_SIZE];
     static char small[20];
@@ -53,6 +53,7 @@ void UART1Handler(void)
                 while(ROM_UARTCharsAvail(UART1_BASE))
                 {
                     readBuffer[ind++] = UARTCharGetNonBlocking(UART1_BASE);
+                    UARTCharPut(UART0_BASE, readBuffer[ind - 1]);
                 }
             }
             else
@@ -212,6 +213,21 @@ static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, int len, ch
     UARTSend(UART1_BASE, (unsigned char*)command, lengthToSend);
     if(useInterrupt == 1)
     {
+        if(special == 1)
+        {
+        while(1)
+        {
+        // strictly
+        while(ROM_UARTCharsAvail(UART1_BASE))
+                {
+                    readBuffer[ind++] = UARTCharGetNonBlocking(UART1_BASE);
+                    UARTCharPut(UART0_BASE, readBuffer[ind - 1]);
+                }
+        }
+        }
+        // strictly
+
+        ind = 0;
         while(resultObtained == 0)
         {
         }
@@ -747,6 +763,7 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
  */
 static int ar501_gsm_socket_read(Network* network, unsigned char* buffer, int len, unsigned char guaranteed)
 {
+    special = 1;
     memset(sendCommandBuffer, 0, SEND_COMMAND_BUFFER_SIZE);
     sg_sprintf(sendCommandBuffer, "AT#SRECV=%u,%d\r\n", network->socket, len);
 
@@ -818,10 +835,13 @@ void init_network(Network *network, const char *hostName, unsigned int port)
     info_log("mila [%s]", small);
     //printf("got = [%s]", small);
     memset(small, 0, 20);
+    special = 1;
+    SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", LENGTH_OF_COMMAND, NULL, 1, NULL, 1);
     network->read(network, (unsigned char*)small, 2, 1);
     info_log("mila [%s]", small);
     //printf("got = [%s]", small);
     memset(small, 0, 20);
+    SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", LENGTH_OF_COMMAND, NULL, 1, NULL, 1);
     network->read(network, (unsigned char*)small, 3, 1);
     info_log("mila [%s]", small);
     //printf("got = [%s]", small);
