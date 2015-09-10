@@ -173,9 +173,11 @@ NetworkInitCommands commands[8];
 
 
 static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, int len, char *desiredOutputBuffer, unsigned char showCommandOutput,
-                                                const char *delimiter, unsigned char useInterrupt)
+                                                const char *delimiter)
 {
     int lengthToSend = 0;
+    unsigned char useInterrupt = 0;
+
     if(len == LENGTH_OF_COMMAND)
     {
         lengthToSend = strlen(command);
@@ -189,14 +191,20 @@ static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, int len, ch
     ind = 0;
 
     readBuffer = result;
+
+    /*
+     * We need to disable interrupt, during "read" operation.
+     */
     if(desiredOutputBuffer != NULL)
     {
-        ROM_IntDisable(22); // Value of INT_UART1 from "inc/tm4c1230d5pm.h"
+        ROM_IntDisable(22);
         responseBuffer = desiredOutputBuffer;
     }
     else
     {
-        ROM_IntEnable(22); // Value of INT_UART1 from "inc/tm4c1230d5pm.h"
+        useInterrupt = 1;
+
+        ROM_IntEnable(22);
         responseBuffer = NULL;
     }
 
@@ -259,7 +267,7 @@ start_commands:
         info_log("\n\n");
         info_log(COMMAND "Running [%s] for \"%s\"", i + 1, commands[i].command, commands[i].logInfoCommand);
 
-        SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].command, LENGTH_OF_COMMAND, NULL, 1, NULL, 1);
+        SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].command, LENGTH_OF_COMMAND, NULL, 1, NULL);
 
         while(1)
         {
@@ -276,7 +284,7 @@ start_commands:
                                  i + 1, commands[i].logInfoCommand, commands[i].commandInCaseNoSuccessStringPresent);
 
                         SEND_CMD_AND_READ_RESPONSE_ON_UART1(commands[i].commandInCaseNoSuccessStringPresent, LENGTH_OF_COMMAND,
-                                                            NULL, 1, NULL, 1);
+                                                            NULL, 1, NULL);
                         goto start_commands;
                     }
                     else
@@ -657,7 +665,7 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
         {
             char *pch;
 
-            SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", LENGTH_OF_COMMAND, NULL, 1, NULL, 1);
+            SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", LENGTH_OF_COMMAND, NULL, 1, NULL);
 
             /*
             * Search for a row, ending with ",0".
@@ -753,7 +761,7 @@ static int ar501_gsm_socket_read(Network* network, unsigned char* buffer, int le
     sg_sprintf(sendCommandBuffer, "AT#SRECV=%u,%d\r\n", network->socket, len);
 
     bytesRequired = len;
-    SEND_CMD_AND_READ_RESPONSE_ON_UART1(sendCommandBuffer, LENGTH_OF_COMMAND, (char*)buffer, 1, NULL, 0);
+    SEND_CMD_AND_READ_RESPONSE_ON_UART1(sendCommandBuffer, LENGTH_OF_COMMAND, (char*)buffer, 1, NULL);
 
     return SUCCESS;
 
@@ -778,9 +786,9 @@ static int ar501_gsm_socket_write(Network* network, unsigned char* buffer, int l
 {
     memset(sendCommandBuffer, 0, SEND_COMMAND_BUFFER_SIZE);
     sg_sprintf(sendCommandBuffer, "AT#SSENDEXT=%u,%d\r\n", network->socket, len);
-    SEND_CMD_AND_READ_RESPONSE_ON_UART1(sendCommandBuffer, LENGTH_OF_COMMAND, NULL, 1, "\r\n>", 1);
+    SEND_CMD_AND_READ_RESPONSE_ON_UART1(sendCommandBuffer, LENGTH_OF_COMMAND, NULL, 1, "\r\n>");
 
-    SEND_CMD_AND_READ_RESPONSE_ON_UART1((char*)buffer, len, NULL, 1, NULL, 1);
+    SEND_CMD_AND_READ_RESPONSE_ON_UART1((char*)buffer, len, NULL, 1, NULL);
 
     return SUCCESS;
 }
@@ -817,11 +825,11 @@ void init_network(Network *network, const char *hostName, unsigned int port)
     network->read(network, (unsigned char*)small, 3, 1);
     info_log("mila [%s]", small);
     memset(small, 0, 20);
-    SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", LENGTH_OF_COMMAND, NULL, 1, NULL, 1);
+    SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", LENGTH_OF_COMMAND, NULL, 1, NULL);
     network->read(network, (unsigned char*)small, 2, 1);
     info_log("mila [%s]", small);
     memset(small, 0, 20);
-    SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", LENGTH_OF_COMMAND, NULL, 1, NULL, 1);
+    SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", LENGTH_OF_COMMAND, NULL, 1, NULL);
     network->read(network, (unsigned char*)small, 3, 1);
     info_log("mila [%s]", small);
     while(1)
