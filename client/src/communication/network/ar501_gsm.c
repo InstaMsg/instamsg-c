@@ -64,14 +64,7 @@ void UART1Handler(void)
 
                 readBuffer[ind] = 0;
 
-                /*
-                 * Now check if any of the terminator-strings is present.
-                 */
-
-                /* Optimisation, check only if a newline is at the end
-                 * We are in an ISR, so not wasting time uselessly is paramount
-                 */
-                if(readBuffer[ind - 1] == '\n')
+                if(1)
                 {
                     if(specialDelimiter == NULL)
                     {
@@ -835,7 +828,14 @@ static int ar501_gsm_socket_write(Network* network, unsigned char* buffer, int l
     SEND_CMD_AND_READ_RESPONSE_ON_UART1(sendCommandBuffer, LENGTH_OF_COMMAND, NULL, "\r\n>");
     SEND_CMD_AND_READ_RESPONSE_ON_UART1((char*)buffer, len, NULL, NULL);
 
-    return SUCCESS;
+    if((errorObtained == 0) && (noCarrierObtained == 0))
+    {
+        return SUCCESS;
+    }
+    else
+    {
+        return FAILURE;
+    }
 }
 
 
