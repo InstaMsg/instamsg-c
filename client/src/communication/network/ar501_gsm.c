@@ -179,8 +179,7 @@ void UART1Handler_Sync(void)
                         /*
                          * See if we got any of the terminators.
                          */
-                        if( (strncmp(readBuffer + newLineStart, ok, strlen(ok)) == 0) ||
-                            (strncmp(readBuffer + newLineStart, error, strlen(error)) == 0) )
+                        if(strncmp(readBuffer + newLineStart, ok, strlen(ok)) == 0)
                         {
                             break;
                         }
@@ -825,6 +824,14 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
  */
 static int ar501_gsm_socket_read(Network* network, unsigned char* buffer, int len, unsigned char guaranteed)
 {
+    /*
+     * TODO: Try to use the timer on SOC.
+     */
+    unsigned long cycles = (NETWORK_READ_TIMEOUT_SECS * 1000) /
+                           (singletonUtilityTimer.getMinimumDelayPossibleInMicroSeconds(&singletonUtilityTimer));
+
+    unsigned long retryAttempts = 0;
+
     bytesRequired = len;
     actualBytesRead = 0;
 
@@ -850,9 +857,19 @@ static int ar501_gsm_socket_read(Network* network, unsigned char* buffer, int le
             }
             else
             {
-                /*
-                 * TODO: Track if the allowed max-timeout is expired.
-                 */
+                singletonUtilityTimer.minimumDelay(&singletonUtilityTimer);
+
+                retryAttempts++;
+                if(retryAttempts > cycles)
+                {
+                    info_log("Timeout occurred of [%u] seconds", NETWORK_READ_TIMEOUT_SECS);
+                    return SOCKET_READ_TIMEOUT; /* Case c) */
+                }
+                else
+                {
+                    info_log("[%u]", retryAttempts);
+                    continue;
+                }
             }
         }
 
@@ -925,6 +942,9 @@ void init_network(Network *network, const char *hostName, unsigned int port)
 
     /* Connect the medium. */
     connect_underlying_medium_try_once(network, network->host, network->port);
+    memset(small, 0, 20);
+    network->read(network, (unsigned char*)small, 3, 0);
+    info_log("mila [%s]", small);
 
     //strictly
     network->write(network, (unsigned char*)test, strlen(test));
