@@ -31,6 +31,7 @@ static volatile char noCarrierObtained;
 static unsigned int ind;
 static volatile char interruptsToBeUsed;
 static volatile char commandIssued;
+static volatile char showCommandOutput;
 
 
 #define SEND_COMMAND_BUFFER_SIZE 100
@@ -68,8 +69,6 @@ static int parseNumberFromEndOfString(char *pch, char limiter)
 void UART1Handler(void)
 {
     unsigned long interrupts;
-    int i;
-
     interrupts  = UARTIntStatus(UART1_BASE, true);
     UARTIntClear(UART1_BASE, interrupts);
 
@@ -259,7 +258,6 @@ NetworkInitCommands commands[8];
 static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, int len, char *desiredOutputBuffer, const char *delimiter)
 {
     int lengthToSend = 0;
-    unsigned char showCommandOutput = 1;
 
     if(len == LENGTH_OF_COMMAND)
     {
@@ -731,6 +729,7 @@ exit:
 static void connect_underlying_medium_try_once(Network* network, char *hostName, int port)
 {
     int rc = FAILURE;
+    showCommandOutput = 1;
 
     do
     {
@@ -773,6 +772,7 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
     } while(rc == FAILURE);
 
     network->socketCorrupted = 0;
+    showCommandOutput = 0;
 }
 
 /*
