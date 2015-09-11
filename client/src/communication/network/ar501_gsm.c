@@ -67,43 +67,35 @@ static int parseNumberFromEndOfString(char *pch, char limiter)
 
 void UART1Handler(void)
 {
-#if 1
     unsigned long interrupts;
     int i;
 
     interrupts  = UARTIntStatus(UART1_BASE, true);
     UARTIntClear(UART1_BASE, interrupts);
-#endif
 
     /*
      * If we are in sync-mode, return immediately.
      */
-#if 1
     if((interruptsToBeUsed == 0) && (commandIssued == 1))
     {
-        
-        //UARTCharPut(UART0_BASE, ']');
         return;
     }
-#endif
 
     while(1)
     {
-                while(ROM_UARTCharsAvail(UART1_BASE))
+        if(1)
+        {
+            if(1)
+            {
+                if(1)
                 {
-                    readBuffer[ind++] = UARTCharGetNonBlocking(UART1_BASE);
-                }
-
-                readBuffer[ind] = 0;
-
-#if 0
-                    UARTCharPut(UART0_BASE, '[');
-                    for(i = 0; i < ind; i++)
+                    while(ROM_UARTCharsAvail(UART1_BASE))
                     {
-                        UARTCharPut(UART0_BASE, readBuffer[ind]);
+                        readBuffer[ind++] = UARTCharGetNonBlocking(UART1_BASE);
                     }
-        yy            UARTCharPut(UART0_BASE, ']');
-#endif
+
+                    readBuffer[ind] = 0;
+
                     if(specialDelimiter == NULL)
                     {
                         if(strstr(readBuffer, "\r\nOK\r\n") != NULL)
@@ -128,6 +120,9 @@ void UART1Handler(void)
                             resultObtained = 1;
                         }
                     }
+                }
+            }
+        }
 
         break;
     }
@@ -171,7 +166,6 @@ void UART1Handler_Sync(void)
 
                      */
                     readBuffer[ind++] = UARTCharGet(UART1_BASE);
-                    //UARTCharPut(UART0_BASE, readBuffer[ind - 1]);
                     if(readBuffer[ind - 1] == '\n')   /* We reached an end of line */
                     {
                         /*
@@ -181,8 +175,6 @@ void UART1Handler_Sync(void)
                         {
                             actualDataStart = ind;
                             actualBytesAvailableInCurrentCycle = parseNumberFromEndOfString(readBuffer + ind - 3, ',');
-
-                            info_log("Actual Bytes available = [%u]", actualBytesAvailableInCurrentCycle);
                         }
 
                         /*
@@ -293,13 +285,11 @@ static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, int len, ch
     if(desiredOutputBuffer != NULL)
     {
         interruptsToBeUsed = 0;
-        //ROM_IntDisable(22);
         responseBuffer = desiredOutputBuffer;
     }
     else
     {
         interruptsToBeUsed = 1;
-        //ROM_IntEnable(22);
         responseBuffer = NULL;
     }
 
