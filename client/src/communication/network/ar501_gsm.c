@@ -81,7 +81,6 @@ void UART1Handler(void)
 #if 1
     if((interruptsToBeUsed == 0) && (commandIssued == 1))
     {
-        UARTCharPut(UART0_BASE, 'r');
         
         //UARTCharPut(UART0_BASE, ']');
         return;
@@ -294,14 +293,12 @@ static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, int len, ch
     if(desiredOutputBuffer != NULL)
     {
         interruptsToBeUsed = 0;
-        UARTCharPut(UART0_BASE, 'n');
         //ROM_IntDisable(22);
         responseBuffer = desiredOutputBuffer;
     }
     else
     {
         interruptsToBeUsed = 1;
-        UARTCharPut(UART0_BASE, 'y');
         //ROM_IntEnable(22);
         responseBuffer = NULL;
     }
@@ -948,10 +945,12 @@ void init_network(Network *network, const char *hostName, unsigned int port)
     network->read(network, (unsigned char*)small, 3, 1);
     info_log("mila [%s]", small);
     memset(small, 0, 20);
+    startAndCountdownTimer(10, 0);
     SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", LENGTH_OF_COMMAND, NULL, NULL);
     network->read(network, (unsigned char*)small, 2, 1);
     info_log("mila [%s]", small);
     memset(small, 0, 20);
+    startAndCountdownTimer(10, 0);
     SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", LENGTH_OF_COMMAND, NULL, NULL);
     network->read(network, (unsigned char*)small, 5, 1);
     info_log("mila [%s]", small);
