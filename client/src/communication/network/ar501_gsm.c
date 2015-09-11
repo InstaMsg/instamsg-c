@@ -21,6 +21,7 @@ static char *readBuffer;
 
 static char *responseBuffer;
 static unsigned int bytesRequired;
+static unsigned int actualBytesRead;
 
 static const char *specialDelimiter;
 
@@ -28,35 +29,67 @@ static volatile char resultObtained;
 static volatile char errorObtained;
 static volatile char noCarrierObtained;
 static unsigned int ind;
-
-unsigned char useInterrupt;
+static volatile char interruptsToBeUsed;
+static volatile char commandIssued;
 
 
 #define SEND_COMMAND_BUFFER_SIZE 100
 static char sendCommandBuffer[SEND_COMMAND_BUFFER_SIZE];
 
+    char *noCarrier = "NO CARRIER";
 
-#define MODEM_SLEEP_INTERVAL 30
+#define MODEM_SLEEP_INTERVAL 3
 #define LENGTH_OF_COMMAND 0
+
+static int parseNumberFromEndOfString(char *pch, char limiter)
+{
+    char smallBufReversed[4] = {0};
+    char smallBufCorrect[4] = {0};
+    int i, j;
+
+    i = 0;
+
+    while((*pch) != limiter)
+    {
+        memcpy(smallBufReversed + i, pch, 1);
+        pch--;
+        i++;
+    }
+
+    for(j = 0; j < i; j++)
+    {
+        memcpy(smallBufCorrect + j, smallBufReversed + i - 1 - j, 1);
+    }
+
+    return sg_atoi(smallBufCorrect);
+}
+
 
 void UART1Handler(void)
 {
+#if 1
     unsigned long interrupts;
-
-    char *ok = "OK";
-    char *error = "ERROR";
-    char *noCarrier = "NO CARRIER";
+    int i;
 
     interrupts  = UARTIntStatus(UART1_BASE, true);
     UARTIntClear(UART1_BASE, interrupts);
+#endif
 
+    /*
+     * If we are in sync-mode, return immediately.
+     */
+#if 1
+    if((interruptsToBeUsed == 0) && (commandIssued == 1))
+    {
+        UARTCharPut(UART0_BASE, 'r');
+        
+        //UARTCharPut(UART0_BASE, ']');
+        return;
+    }
+#endif
 
     while(1)
     {
-        if(1)
-        {
-            if(responseBuffer == NULL)
-            {
                 while(ROM_UARTCharsAvail(UART1_BASE))
                 {
                     readBuffer[ind++] = UARTCharGetNonBlocking(UART1_BASE);
@@ -64,11 +97,17 @@ void UART1Handler(void)
 
                 readBuffer[ind] = 0;
 
-                if(1)
-                {
+#if 0
+                    UARTCharPut(UART0_BASE, '[');
+                    for(i = 0; i < ind; i++)
+                    {
+                        UARTCharPut(UART0_BASE, readBuffer[ind]);
+                    }
+        yy            UARTCharPut(UART0_BASE, ']');
+#endif
                     if(specialDelimiter == NULL)
                     {
-                        if((strstr(readBuffer, "\r\nOK\r\n") != NULL) || (strstr(readBuffer, "ERROR\r\n") != NULL))
+                        if(strstr(readBuffer, "\r\nOK\r\n") != NULL)
                         {
                             resultObtained = 1;
                         }
@@ -90,13 +129,28 @@ void UART1Handler(void)
                             resultObtained = 1;
                         }
                     }
-                }
-            }
-            else
+
+        break;
+    }
+}
+
+
+void UART1Handler_Sync(void)
+{
+    char *ok = "OK";
+    char *error = "ERROR";
+
+
+    while(1)
+    {
+        if(1)
+        {
+            if(1)
             {
                 char *triggerStringForActualData = "#SRECV";
                 unsigned int newLineStart = 0;
                 unsigned int actualDataStart = 0;
+                unsigned int actualBytesAvailableInCurrentCycle = 0;
 
                 while(1)
                 {
@@ -118,6 +172,7 @@ void UART1Handler(void)
 
                      */
                     readBuffer[ind++] = UARTCharGet(UART1_BASE);
+                    //UARTCharPut(UART0_BASE, readBuffer[ind - 1]);
                     if(readBuffer[ind - 1] == '\n')   /* We reached an end of line */
                     {
                         /*
@@ -126,6 +181,9 @@ void UART1Handler(void)
                         if(strncmp(readBuffer + newLineStart, triggerStringForActualData, strlen(triggerStringForActualData)) == 0)
                         {
                             actualDataStart = ind;
+                            actualBytesAvailableInCurrentCycle = parseNumberFromEndOfString(readBuffer + ind - 3, ',');
+
+                            info_log("Actual Bytes available = [%u]", actualBytesAvailableInCurrentCycle);
                         }
 
                         /*
@@ -160,13 +218,16 @@ void UART1Handler(void)
                  */
                 if(actualDataStart != 0)
                 {
-                    memcpy(responseBuffer, readBuffer + actualDataStart, bytesRequired);
+                    memcpy(responseBuffer, readBuffer + actualDataStart, actualBytesAvailableInCurrentCycle);
+                    actualBytesRead = actualBytesRead + actualBytesAvailableInCurrentCycle;
                 }
             }
         }
 
         break;
     }
+
+    readBuffer[ind] = 0;
 }
 
 
@@ -226,26 +287,26 @@ static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, int len, ch
     noCarrierObtained = 0;
     ind = 0;
 
-    readBuffer = result;
 
     /*
      * We need to disable interrupt, during "read" operation.
      */
     if(desiredOutputBuffer != NULL)
     {
-        useInterrupt = 0;
-
-        ROM_IntDisable(22);
+        interruptsToBeUsed = 0;
+        UARTCharPut(UART0_BASE, 'n');
+        //ROM_IntDisable(22);
         responseBuffer = desiredOutputBuffer;
     }
     else
     {
-        useInterrupt = 1;
-
-        ROM_IntEnable(22);
+        interruptsToBeUsed = 1;
+        UARTCharPut(UART0_BASE, 'y');
+        //ROM_IntEnable(22);
         responseBuffer = NULL;
     }
 
+    readBuffer = result;
     readBuffer[0] = 0;
 
     if(delimiter != NULL)
@@ -257,8 +318,9 @@ static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, int len, ch
         specialDelimiter = NULL;
     }
 
+    commandIssued = 1;
     UARTSend(UART1_BASE, (unsigned char*)command, lengthToSend);
-    if(useInterrupt == 1)
+    if(responseBuffer == NULL)
     {
         while(resultObtained == 0)
         {
@@ -266,7 +328,7 @@ static void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, int len, ch
     }
     else
     {
-        UART1Handler();
+        UART1Handler_Sync();
     }
 
     if(showCommandOutput == 1)
@@ -715,26 +777,7 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
                 /*
                  * Get the connection/socket-id available.
                  */
-                char smallBufReversed[4] = {0};
-                char smallBufCorrect[4] = {0};
-                int i, j;
-
-                pch--;
-                i = 0;
-
-                while((*pch) != ':')
-                {
-                    memcpy(smallBufReversed + i, pch, 1);
-                    pch--;
-                    i++;
-                }
-
-                for(j = 0; j < i; j++)
-                {
-                    memcpy(smallBufCorrect + j, smallBufReversed + i - 1 - j, 1);
-                }
-
-                network->socket = sg_atoi(smallBufCorrect);
+                network->socket = parseNumberFromEndOfString(pch - 1, ':');
                 info_log(MODEM "Socket-Id obtained = [%u]", network->socket);
             }
         }
@@ -795,14 +838,48 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
  */
 static int ar501_gsm_socket_read(Network* network, unsigned char* buffer, int len, unsigned char guaranteed)
 {
-    memset(sendCommandBuffer, 0, SEND_COMMAND_BUFFER_SIZE);
-    sg_sprintf(sendCommandBuffer, "AT#SRECV=%u,%d\r\n", network->socket, len);
-
     bytesRequired = len;
-    SEND_CMD_AND_READ_RESPONSE_ON_UART1(sendCommandBuffer, LENGTH_OF_COMMAND, (char*)buffer, NULL);
+    actualBytesRead = 0;
 
-    return SUCCESS;
+    while(len > actualBytesRead)
+    {
+        memset(sendCommandBuffer, 0, SEND_COMMAND_BUFFER_SIZE);
+        sg_sprintf(sendCommandBuffer, "AT#SRECV=%u,%d\r\n", network->socket, len - actualBytesRead);
 
+        SEND_CMD_AND_READ_RESPONSE_ON_UART1(sendCommandBuffer, LENGTH_OF_COMMAND, (char*)(buffer + actualBytesRead), NULL);
+
+        /*
+         * For "read", ERROR in AT#SRECV denotes no data in buffer.
+         * So, this is kinda pseudo-timeout.
+         */
+        if(errorObtained == 1)
+        {
+            if(guaranteed == 1)
+            {
+                /*
+                 * We don't care... we will wait till the data comes in ...
+                 */
+                continue;
+            }
+            else
+            {
+                /*
+                 * TODO: Track if the allowed max-timeout is expired.
+                 */
+            }
+        }
+
+        /*
+         * For "read", NO CARRIED in AT#SRECV denotes that the GPRS-connection was lost.
+         * Connection is broken.. so as per the API-requirement, return FAILURE.
+         */
+        if(noCarrierObtained)
+        {
+            return FAILURE; /* Case b) and e)  */
+        }
+    }
+
+    return SUCCESS; /* Case a) and d) */
 }
 
 
@@ -876,7 +953,7 @@ void init_network(Network *network, const char *hostName, unsigned int port)
     info_log("mila [%s]", small);
     memset(small, 0, 20);
     SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", LENGTH_OF_COMMAND, NULL, NULL);
-    network->read(network, (unsigned char*)small, 3, 1);
+    network->read(network, (unsigned char*)small, 5, 1);
     info_log("mila [%s]", small);
     while(1)
     {
