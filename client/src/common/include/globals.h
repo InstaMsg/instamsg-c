@@ -41,8 +41,7 @@ struct KeyValuePairs
 
 /****************************************************************************************/
 #if 1
-/*#define INSTAMSG_HOST       "test.ioeye.com" */
-#define INSTAMSG_HOST       "device.instamsg.io"
+#define INSTAMSG_HOST       "test.ioeye.com"
 #define INSTAMSG_PORT       1883
 #define INSTAMSG_HTTP_HOST  "platform.instamsg.io"
 #define INSTAMSG_HTTP_PORT  80
