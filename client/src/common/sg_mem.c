@@ -39,7 +39,7 @@ void* sg_malloc(unsigned short numBytes)
      * Set the global counter, to keep track of the area to be used for next memory-allocation.
      */
     currentBytesUsed = currentBytesUsed + numBytes;
-    info_log(MEM_ALLOC "Current memory remaining in bytes = [%u]", MAX_HEAP_SIZE - currentBytesUsed);
+    debug_log(MEM_ALLOC "Current memory remaining in bytes = [%u]", MAX_HEAP_SIZE - currentBytesUsed);
 
 exit:
     return mem;
