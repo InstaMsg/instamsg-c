@@ -872,7 +872,6 @@ void* MQTTConnect(void* arg)
     InstaMsg *c = (InstaMsg *)arg;
 
     RESET_GLOBAL_BUFFER;
-
     if ((len = MQTTSerialize_connect(GLOBAL_BUFFER, MAX_BUFFER_SIZE, &(c->connectOptions))) <= 0)
     {
         return NULL;

@@ -97,16 +97,16 @@ void UART1Handler(void)
 
                     if(specialDelimiter == NULL)
                     {
-                        if(strstr(readBuffer, "\r\nOK\r\n") != NULL)
+                        if(sg_mem_strstr(readBuffer, "\r\nOK\r\n", ind - 1) != NULL)
                         {
                             resultObtained = 1;
                         }
-                        else if(strstr(readBuffer, "ERROR\r\n") != NULL)
+                        else if(sg_mem_strstr(readBuffer, "ERROR\r\n", ind - 1) != NULL)
                         {
                             resultObtained = 1;
                             errorObtained = 1;
                         }
-                        else if(strstr(readBuffer, noCarrier) != NULL)
+                        else if(sg_mem_strstr(readBuffer, noCarrier, ind - 1) != NULL)
                         {
                             resultObtained = 1;
                             noCarrierObtained = 1;
@@ -114,7 +114,7 @@ void UART1Handler(void)
                     }
                     else
                     {
-                        if(strstr(readBuffer, specialDelimiter) != NULL)
+                        if(sg_mem_strstr(readBuffer, specialDelimiter, ind - 1) != NULL)
                         {
                             resultObtained = 1;
                         }
@@ -170,7 +170,7 @@ void UART1Handler_Sync(void)
                         /*
                          * See if we got the trigger.
                          */
-                        if(strncmp(readBuffer + newLineStart, triggerStringForActualData, strlen(triggerStringForActualData)) == 0)
+                        if(memcmp(readBuffer + newLineStart, triggerStringForActualData, strlen(triggerStringForActualData)) == 0)
                         {
                             actualDataStart = ind;
                             actualBytesAvailableInCurrentCycle = parseNumberFromEndOfString(readBuffer + ind - 3, ',');
@@ -179,16 +179,16 @@ void UART1Handler_Sync(void)
                         /*
                          * See if we got any of the terminators.
                          */
-                        if(strncmp(readBuffer + newLineStart, ok, strlen(ok)) == 0)
+                        if(memcmp(readBuffer + newLineStart, ok, strlen(ok)) == 0)
                         {
                             break;
                         }
-                        else if(strncmp(readBuffer + newLineStart, error, strlen(error)) == 0)
+                        else if(memcmp(readBuffer + newLineStart, error, strlen(error)) == 0)
                         {
                             errorObtained = 1;
                             break;
                         }
-                        else if(strncmp(readBuffer + newLineStart, noCarrier, strlen(noCarrier)) == 0)
+                        else if(memcmp(readBuffer + newLineStart, noCarrier, strlen(noCarrier)) == 0)
                         {
                             noCarrierObtained = 1;
                             break;
@@ -690,7 +690,8 @@ static int setUpModemSocket(int socketId)
         goto exit;
     }
     //sg_sprintf(commands[2].command, "AT#SD=%u,0,8000,\"101.63.73.120\",0,0,1\r\n", socketId);
-    sg_sprintf(commands[2].command, "AT#SD=%u,0,32000,\"platform.instamsg.io\",0,0,1\r\n", socketId);
+    //sg_sprintf(commands[2].command, "AT#SD=%u,0,32000,\"platform.instamsg.io\",0,0,1\r\n", socketId);
+    sg_sprintf(commands[2].command, "AT#SD=%u,0,%u,\"%s\",0,0,1\r\n", socketId, INSTAMSG_PORT, INSTAMSG_HOST);
     commands[2].logInfoCommand = "Socket-Connection-To-Server";
     commands[2].successStrings[0] = "\r\nOK\r\n";
     commands[2].successStrings[1] = NULL;
@@ -827,8 +828,11 @@ static int ar501_gsm_socket_read(Network* network, unsigned char* buffer, int le
     /*
      * TODO: Try to use the timer on SOC.
      */
+    /*
     unsigned long cycles = (NETWORK_READ_TIMEOUT_SECS * 1000) /
                            (singletonUtilityTimer.getMinimumDelayPossibleInMicroSeconds(&singletonUtilityTimer));
+                           */
+    unsigned long cycles = 40; // TODO: HACK: This approximately causes 1 second delay.
 
     unsigned long retryAttempts = 0;
 
@@ -867,7 +871,7 @@ static int ar501_gsm_socket_read(Network* network, unsigned char* buffer, int le
                 }
                 else
                 {
-                    info_log("[%u]", retryAttempts);
+                    //info_log("[%u]", retryAttempts);
                     continue;
                 }
             }
@@ -942,6 +946,27 @@ void init_network(Network *network, const char *hostName, unsigned int port)
 
     /* Connect the medium. */
     connect_underlying_medium_try_once(network, network->host, network->port);
+
+#if 0
+    memset(small, 0, 20);
+    network->write(network, "ajay", 4);
+    info_log("step 1");
+
+    small[0] = 'g';
+    small[1] = 0;
+    small[2] = 'r';
+    small[3] = 'g';
+    network->write(network, small, 4);
+    info_log("step 2");
+    network->write(network, "is", 2);
+    info_log("step 3");
+    network->write(network, "awesome", 7);
+    info_log("step 4");
+    network->write(network, "yes", 3);
+
+    info_log("step 5");
+#endif
+#if 0
     memset(small, 0, 20);
     network->read(network, (unsigned char*)small, 3, 0);
     info_log("mila [%s]", small);
@@ -967,6 +992,7 @@ void init_network(Network *network, const char *hostName, unsigned int port)
     while(1)
     {
     }
+#endif
 }
 
 
