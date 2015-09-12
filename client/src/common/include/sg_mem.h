@@ -9,6 +9,6 @@ char sg_heap[MAX_HEAP_SIZE];
 
 void* sg_malloc(unsigned short numBytes);
 void sg_free(void *ptr);
-char *sg_mem_strstr(char *string, char *substring, int len);
+char* sg_mem_strstr(char *string, const char *substring, int len);
 
 #endif

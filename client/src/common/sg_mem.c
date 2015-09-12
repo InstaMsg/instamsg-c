@@ -65,9 +65,9 @@ void sg_free(void *ptr)
 }
 
 
-char *sg_mem_strstr(char *string, char *substring, int len)
+char *sg_mem_strstr(char *string, const char *substring, int len)
 {
-    register char *a, *b;
+    register const char *a, *b;
 
     /* First scan quickly through the two strings looking for a
      * single-character match.  When it's found, then compare the
