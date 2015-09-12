@@ -584,8 +584,10 @@ void removeExpiredResultHandlers(InstaMsg *c)
 
 void sendPingReqToServer(InstaMsg *c)
 {
-    unsigned char buf[1000];
-    int len = MQTTSerialize_pingreq(buf, 1000);
+    int len;
+
+    RESET_GLOBAL_BUFFER;
+    len = MQTTSerialize_pingreq(GLOBAL_BUFFER, MAX_BUFFER_SIZE);
 
     if((c->ipstack).socketCorrupted == 1)
     {
@@ -595,7 +597,7 @@ void sendPingReqToServer(InstaMsg *c)
 
     if (len > 0)
     {
-        sendPacket(c, buf, len);
+        sendPacket(c, GLOBAL_BUFFER, len);
     }
 }
 
