@@ -866,12 +866,10 @@ static int ar501_gsm_socket_read(Network* network, unsigned char* buffer, int le
                 retryAttempts++;
                 if(retryAttempts > cycles)
                 {
-                    info_log("Timeout occurred of [%u] seconds", NETWORK_READ_TIMEOUT_SECS);
                     return SOCKET_READ_TIMEOUT; /* Case c) */
                 }
                 else
                 {
-                    //info_log("[%u]", retryAttempts);
                     continue;
                 }
             }
@@ -924,15 +922,11 @@ static int ar501_gsm_socket_write(Network* network, unsigned char* buffer, int l
 }
 
 
-static char small[20];
 /*
  * NOTHING EXTRA NEEDS TO BE DONE HERE.
  */
 void init_network(Network *network, const char *hostName, unsigned int port)
 {
-    //strictly
-    char *test = "ajay";
-
     /* Register read-callback. */
 	network->read = ar501_gsm_socket_read;
 
@@ -946,53 +940,6 @@ void init_network(Network *network, const char *hostName, unsigned int port)
 
     /* Connect the medium. */
     connect_underlying_medium_try_once(network, network->host, network->port);
-
-#if 0
-    memset(small, 0, 20);
-    network->write(network, "ajay", 4);
-    info_log("step 1");
-
-    small[0] = 'g';
-    small[1] = 0;
-    small[2] = 'r';
-    small[3] = 'g';
-    network->write(network, small, 4);
-    info_log("step 2");
-    network->write(network, "is", 2);
-    info_log("step 3");
-    network->write(network, "awesome", 7);
-    info_log("step 4");
-    network->write(network, "yes", 3);
-
-    info_log("step 5");
-#endif
-#if 0
-    memset(small, 0, 20);
-    network->read(network, (unsigned char*)small, 3, 0);
-    info_log("mila [%s]", small);
-
-    //strictly
-    network->write(network, (unsigned char*)test, strlen(test));
-
-
-    startAndCountdownTimer(5, 1);
-    memset(small, 0, 20);
-    network->read(network, (unsigned char*)small, 3, 1);
-    info_log("mila [%s]", small);
-    memset(small, 0, 20);
-    startAndCountdownTimer(10, 0);
-    SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", LENGTH_OF_COMMAND, NULL, NULL);
-    network->read(network, (unsigned char*)small, 2, 1);
-    info_log("mila [%s]", small);
-    memset(small, 0, 20);
-    startAndCountdownTimer(10, 0);
-    SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", LENGTH_OF_COMMAND, NULL, NULL);
-    network->read(network, (unsigned char*)small, 5, 1);
-    info_log("mila [%s]", small);
-    while(1)
-    {
-    }
-#endif
 }
 
 
