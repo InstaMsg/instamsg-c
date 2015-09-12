@@ -160,7 +160,7 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
 
     if((c->ipstack).socketCorrupted == 1)
     {
-        return FAILURE;
+        goto exit;
     }
 
 
