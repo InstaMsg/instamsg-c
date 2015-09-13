@@ -144,6 +144,9 @@ void UART1Handler_Sync(void)
                 unsigned int newLineStart = 0;
                 unsigned int actualDataStart = 0;
                 unsigned int actualBytesAvailableInCurrentCycle = 0;
+#if ENABLE_DEBUG_PROCESSING
+                unsigned char commandEchoedFromGPSModule = 0;
+#endif
 
                 while(1)
                 {
@@ -192,6 +195,28 @@ void UART1Handler_Sync(void)
                         {
                             noCarrierObtained = 1;
                             break;
+                        }
+                        else
+                        {
+                            /*
+                             * Bug in AR501's Micro-controller <==> Telit modules.
+                             *
+                             * Sometimes (indeterministically), we keep on getting the command-fired-to-Telit as response from Telit,
+                             * and it enters into an infinite loop.
+                             *
+                             * See HANDLE_INIFINITE_RESPONSE_FROM_TELIT for the solution.
+                             */
+#if ENABLE_DEBUG_PROCESSING
+                            if(sg_mem_strstr(readBuffer + newLineStart, sendCommandBuffer, strlen(sendCommandBuffer)) == 0)
+                            {
+                                if(commandEchoedFromGPSModule == 1)
+                                {
+                                    info_log("Entered into infinite loop :(");
+                                }
+
+                                commandEchoedFromGPSModule = 1;
+                            }
+#endif
                         }
 
                         /*
@@ -826,15 +851,10 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
 static int ar501_gsm_socket_read(Network* network, unsigned char* buffer, int len, unsigned char guaranteed)
 {
     /*
-     * TODO: Try to use the timer on SOC.
+     * To resolve the issue mentioned in the HANDLE_INIFINITE_RESPONSE_FROM_TELIT marker, we MUST MUST MUST MUST
+     * put a delay between any two "AT#SRECV" commands.
      */
-    /*
-    unsigned long cycles = (NETWORK_READ_TIMEOUT_SECS * 1000) /
-                           (singletonUtilityTimer.getMinimumDelayPossibleInMicroSeconds(&singletonUtilityTimer));
-                           */
-    unsigned long cycles = 40; // TODO: HACK: This approximately causes 1 second delay.
-
-    unsigned long retryAttempts = 0;
+    startAndCountdownTimer(NETWORK_READ_TIMEOUT_SECS, 0);
 
     bytesRequired = len;
     actualBytesRead = 0;
@@ -845,6 +865,7 @@ static int ar501_gsm_socket_read(Network* network, unsigned char* buffer, int le
         sg_sprintf(sendCommandBuffer, "AT#SRECV=%u,%d\r\n", network->socket, len - actualBytesRead);
 
         SEND_CMD_AND_READ_RESPONSE_ON_UART1(sendCommandBuffer, LENGTH_OF_COMMAND, (char*)(buffer + actualBytesRead), NULL);
+
 
         /*
          * For "read", ERROR in AT#SRECV denotes no data in buffer.
@@ -861,17 +882,13 @@ static int ar501_gsm_socket_read(Network* network, unsigned char* buffer, int le
             }
             else
             {
-                singletonUtilityTimer.minimumDelay(&singletonUtilityTimer);
-
-                retryAttempts++;
-                if(retryAttempts > cycles)
-                {
-                    return SOCKET_READ_TIMEOUT; /* Case c) */
-                }
-                else
-                {
-                    continue;
-                }
+                /*
+                 * Due to issue-and-its-corresponding-fix for HANDLE_INIFINITE_RESPONSE_FROM_TELIT marker, we do not need
+                 * to do any extra timeout-processing here.
+                 *
+                 * So, if we still did not the response, we have genuinely timed-out !!
+                 */
+                return SOCKET_READ_TIMEOUT; /* Case c) */
             }
         }
 
