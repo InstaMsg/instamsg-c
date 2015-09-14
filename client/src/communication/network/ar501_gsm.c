@@ -196,7 +196,8 @@ void UART1Handler_Sync(void)
                             noCarrierObtained = 1;
                             break;
                         }
-                        else
+#if ENABLE_DEBUG_PROCESSING
+                        else if(sg_mem_strstr(readBuffer + newLineStart, sendCommandBuffer, strlen(sendCommandBuffer)) == 0)
                         {
                             /*
                              * Bug in AR501's Micro-controller <==> Telit modules.
@@ -206,18 +207,13 @@ void UART1Handler_Sync(void)
                              *
                              * See HANDLE_INIFINITE_RESPONSE_FROM_TELIT for the solution.
                              */
-#if ENABLE_DEBUG_PROCESSING
-                            if(sg_mem_strstr(readBuffer + newLineStart, sendCommandBuffer, strlen(sendCommandBuffer)) == 0)
+                            if(commandEchoedFromGPSModule == 1)
                             {
-                                if(commandEchoedFromGPSModule == 1)
-                                {
-                                    info_log("Entered into infinite loop :(");
-                                }
-
-                                commandEchoedFromGPSModule = 1;
+                                info_log("Entered into infinite loop :(");
                             }
-#endif
+                            commandEchoedFromGPSModule = 1;
                         }
+#endif
 
                         /*
                          * Set the new-line-tracker.
