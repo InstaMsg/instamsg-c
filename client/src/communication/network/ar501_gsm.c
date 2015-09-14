@@ -37,7 +37,9 @@ static volatile char showCommandOutput;
 #define SEND_COMMAND_BUFFER_SIZE 100
 static char sendCommandBuffer[SEND_COMMAND_BUFFER_SIZE];
 
-    char *noCarrier = "NO CARRIER";
+char *noCarrier = "NO CARRIER";
+char *noDial = "NO DIAL";
+char *busy = "BUSY";
 
 #define MODEM_SLEEP_INTERVAL 3
 #define LENGTH_OF_COMMAND 0
@@ -182,7 +184,7 @@ void UART1Handler_Sync(void)
                         /*
                          * See if we got any of the terminators.
                          */
-                        if(memcmp(readBuffer + newLineStart, ok, strlen(ok)) == 0)
+                        else if(memcmp(readBuffer + newLineStart, ok, strlen(ok)) == 0)
                         {
                             break;
                         }
@@ -191,13 +193,15 @@ void UART1Handler_Sync(void)
                             errorObtained = 1;
                             break;
                         }
-                        else if(memcmp(readBuffer + newLineStart, noCarrier, strlen(noCarrier)) == 0)
+                        else if((memcmp(readBuffer + newLineStart, noCarrier, strlen(noCarrier)) == 0) ||
+                                (memcmp(readBuffer + newLineStart, noDial, strlen(noDial)) == 0) ||
+                                (memcmp(readBuffer + newLineStart, busy, strlen(busy)) == 0))
                         {
                             noCarrierObtained = 1;
                             break;
                         }
 #if ENABLE_DEBUG_PROCESSING
-                        else if(sg_mem_strstr(readBuffer + newLineStart, sendCommandBuffer, strlen(sendCommandBuffer)) == 0)
+                        else if(memcmp(readBuffer + newLineStart, sendCommandBuffer, strlen(sendCommandBuffer)) == 0)
                         {
                             /*
                              * Bug in AR501's Micro-controller <==> Telit modules.
