@@ -306,12 +306,7 @@ static void
 NmiSR(void)
 {
     info_log("Interrupt TYPE-1 called.");
-    //
-    // Enter an infinite loop.
-    //
-    while(1)
-    {
-    }
+    ResetISR();
 }
 
 //*****************************************************************************
@@ -325,12 +320,7 @@ static void
 FaultISR(void)
 {
     info_log("Interrupt TYPE-2 called.");
-    //
-    // Enter an infinite loop.
-    //
-    while(1)
-    {
-    }
+    ResetISR();
 }
 
 //*****************************************************************************
@@ -344,11 +334,6 @@ static void
 IntDefaultHandler(void)
 {
     info_log("Interrupt TYPE-3 called.");
-    //
-    // Go into an infinite loop.
-    //
-    while(1)
-    {
-    }
+    ResetISR();
 }
 
