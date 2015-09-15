@@ -9,12 +9,12 @@
 #include "inc/hw_memmap.h"
 
 #include "instamsg_vendor.h"
-#include "serial_logger.h"
+#include "./serial_logger.h"
 #include "../uart/uart_utils.h"
 #include "../../common/include/globals.h"
 
 
-static int tiva_serial_logger_write(SerialLoggerInterface* serialLoggerInterface, unsigned char* buffer, int len)
+static int serial_logger_write(SerialLoggerInterface* serialLoggerInterface, unsigned char* buffer, int len)
 {
     UARTSend(UART0_BASE, buffer, len);
     return SUCCESS;
@@ -48,7 +48,7 @@ void init_serial_logger_interface(SerialLoggerInterface *serialLoggerInterface, 
 
 
     /* Register write-callback. */
-	serialLoggerInterface->write = tiva_serial_logger_write;
+	serialLoggerInterface->write = serial_logger_write;
 }
 
 
