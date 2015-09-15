@@ -4,18 +4,6 @@
 #include "../../common/include/instamsg_vendor_common.h"
 #include "../../common/include/globals.h"
 
-struct Network
-{
-    int socket;
-
-    char host[MAX_BUFFER_SIZE];
-    int port;
-
-    unsigned char socketCorrupted;
-
-    COMMUNICATION_INTERFACE(Network)
-};
-
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
 #include <stdio.h>

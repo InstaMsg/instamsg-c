@@ -19,6 +19,7 @@
 #include "include/httpclient.h"
 #include "include/json.h"
 #include "include/sg_mem.h"
+#include "include/network.h"
 
 #include <string.h>
 

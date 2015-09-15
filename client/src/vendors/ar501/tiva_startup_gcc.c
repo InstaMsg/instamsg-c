@@ -26,6 +26,7 @@
 #include <stdint.h>
 #include "inc/hw_nvic.h"
 #include "inc/hw_types.h"
+#include "instamsg_vendor.h"
 
 //*****************************************************************************
 //
@@ -44,12 +45,17 @@ static void IntDefaultHandler(void);
 //*****************************************************************************
 extern int main(void);
 
+/*
+ * More extern functions.
+ */
+extern void info_log(char *fmt, ...);
+extern void UART1Handler(void);
 //*****************************************************************************
 //
 // Reserve space for the system stack.
 //
 //*****************************************************************************
-static unsigned long pulStack[64];
+static unsigned long pulStack[128];
 
 //*****************************************************************************
 //
@@ -83,7 +89,8 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // GPIO Port D
     IntDefaultHandler,                      // GPIO Port E
     IntDefaultHandler,                      // UART0 Rx and Tx
-    IntDefaultHandler,                      // UART1 Rx and Tx
+    //IntDefaultHandler,                      // UART1 Rx and Tx
+    UART1Handler,                      // UART1 Rx and Tx
     IntDefaultHandler,                      // SSI0 Rx and Tx
     IntDefaultHandler,                      // I2C0 Master and Slave
     IntDefaultHandler,                      // PWM Fault
@@ -298,12 +305,8 @@ ResetISR(void)
 static void
 NmiSR(void)
 {
-    //
-    // Enter an infinite loop.
-    //
-    while(1)
-    {
-    }
+    info_log("Interrupt TYPE-1 called.");
+    ResetISR();
 }
 
 //*****************************************************************************
@@ -316,12 +319,8 @@ NmiSR(void)
 static void
 FaultISR(void)
 {
-    //
-    // Enter an infinite loop.
-    //
-    while(1)
-    {
-    }
+    info_log("Interrupt TYPE-2 called.");
+    ResetISR();
 }
 
 //*****************************************************************************
@@ -334,10 +333,7 @@ FaultISR(void)
 static void
 IntDefaultHandler(void)
 {
-    //
-    // Go into an infinite loop.
-    //
-    while(1)
-    {
-    }
+    info_log("Interrupt TYPE-3 called.");
+    ResetISR();
 }
+

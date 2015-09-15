@@ -4,7 +4,6 @@
  *    Ajay Garg <ajay.garg@sensegrow.com>
  *******************************************************************************/
 
-
 #include <stdio.h>
 #include <string.h>
 #include <signal.h>
@@ -49,6 +48,4 @@ void init_system_utils(System *system, void *arg)
 void release_system_utils(System *system)
 {
 }
-
-
 

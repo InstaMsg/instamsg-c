@@ -57,14 +57,6 @@
     int (*write)(type *interface, unsigned char* buffer, int len);
 
 
-/*
- * Interface for sending/receiving bytes between the device and instamsg-server.
- */
-typedef struct Network Network;
-void init_network(Network *network, const char *hostName, unsigned int port);
-void release_network(Network *network);
-
-
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
 /*
  * Interface for sending/receiving bytes between the instamg-client (on the device) and the device-file(system).

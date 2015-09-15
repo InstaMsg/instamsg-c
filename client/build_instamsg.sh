@@ -3,6 +3,7 @@
 TOTAL_INCLUDES=`echo                                                \
         ${SYSTEM_INCLUDES}                                          \
         -Isrc/vendors/${VENDOR}/                                    \
+        -Isrc/${VENDOR}/                                            \
         -I ../MQTTPacket/src    `
 
 
@@ -26,6 +27,7 @@ SOURCES=`echo                                                                   
         src/common/globals.c                                                            \
         src/common/sg_mem.c                                                             \
         src/common/sg_stdlib.c                                                          \
+        src/common/network.c                                                            \
                                                                                         \
         ../MQTTPacket/src/MQTTFormat.c                                                  \
         ../MQTTPacket/src/MQTTPacket.c                                                  \
@@ -40,7 +42,7 @@ SOURCES=`echo                                                                   
                                                                                         \
         src/system/${SYSTEM_IMPL}                                                       \
         src/time/${TIME_IMPL}                                                           \
-        src/communication/network/${NETWORK_COMMUNICATION_IMPL}                         \
+        src/${VENDOR}/communication/network.c                                           \
         src/communication/modbus_command/${MODBUS_COMMAND_COMMUNICATION_IMPL}           \
         src/communication/serial_logger/${SERIAL_LOGGER_COMMUNICATION_IMPL} `
 

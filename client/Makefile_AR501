@@ -3,39 +3,32 @@ SYSTEM_INCLUDES=`echo                                               \
 
 VENDOR="ar501"
 
-SYSTEM_IMPL="ar501_system"
-TIME_IMPL="ar501_time"
-NETWORK_COMMUNICATION_IMPL="ar501_gsm"
+SYSTEM_IMPL="tiva_tm4c123gxl_launchpad_system.c"
+TIME_IMPL="tiva_tm4c123gxl_launchpad_time.c"
+NETWORK_COMMUNICATION_IMPL="ar501_gsm.c"
 FS_COMMUNICATION_IMPL=""
-MODBUS_COMMAND_COMMUNICATION_IMPL="ar501_modbus_command"
-SERIAL_LOGGER_COMMUNICATION_IMPL="ar501_serial_logger"
+MODBUS_COMMAND_COMMUNICATION_IMPL="ar501_modbus_command.c"
+SERIAL_LOGGER_COMMUNICATION_IMPL="tiva_tm4c123gxl_launchpad_serial_logger.c"
 
 EXTRA_SOURCES=`echo													\
-			  src/vendors/ar501/tiva_startup_gcc`
+			  src/vendors/${VENDOR}/tiva_startup_gcc.c					\
+			  src/vendors/${VENDOR}/uart_utils.c	`
 
-EXTRA_OBJECT_FILES=`echo														\
-					../embedded-flash-environment/tivaware/driverlib/gcc/*.o	`
+EXTRA_OBJECT_FILES=`echo																\
+					../embedded-flash-environment/tivaware/driverlib/gcc/gpio.o			\
+					../embedded-flash-environment/tivaware/driverlib/gcc/sysctl.o		\
+					../embedded-flash-environment/tivaware/driverlib/gcc/systick.o		\
+					../embedded-flash-environment/tivaware/driverlib/gcc/interrupt.o 	\
+					../embedded-flash-environment/tivaware/driverlib/gcc/uart.o			`
 
-MAIN_CLASS="device"
+MAIN_CLASS="device.c"
 
 #################################################################
 MCU="TM4C123GH6PM"
 TIVAWARE_PATH="../embedded-flash-environment/tivaware"
-#################################################################
-
-COMPILE_COMMAND="../embedded-flash-environment/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-gcc  -g -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -Os -ffunction-sections -fdata-sections -MD -std=c99 -Wall -pedantic -DPART_${MCU} -c -I${TIVAWARE_PATH} -DTARGET_IS_BLIZZARD_RA1  "
-
-#"-mfloat-abi=softfp" removed, "-mfloat-abi=hard" added
-#COMPILE_COMMAND="../embedded-flash-environment/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-gcc  -g -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -Os -ffunction-sections -fdata-sections -MD -std=c99 -Wall -pedantic -DPART_${MCU} -c -I${TIVAWARE_PATH} -DTARGET_IS_BLIZZARD_RA1 -fshort-wchar "
-
-
-#################################################################
 LD_SCRIPT="../embedded-flash-environment/tiva-template/${MCU}.ld"
-#LD_SCRIPT="src/vendors/ar501/tm4c123gh6pm.cmd"
 #################################################################
 
-#LINK_COMMAND="../embedded-flash-environment/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-ld -T ${LD_SCRIPT} --entry ResetISR --gc-sections "
-LINK_COMMAND="../embedded-flash-environment/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-gcc -T ${LD_SCRIPT} --entry ResetISR -Wl,--gc-sections "
-#LINK_COMMAND="../embedded-flash-environment/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-gcc -T ${LD_SCRIPT} --entry ResetISR -Wl,--gc-sections "
+COMPILE_COMMAND="../embedded-flash-environment/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-gcc  -g -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -Os -ffunction-sections -fdata-sections -MD -std=c99 -Wall -pedantic -DPART_${MCU} -I${TIVAWARE_PATH} -DTARGET_IS_BLIZZARD_RA1 -T ${LD_SCRIPT} --entry ResetISR -Wl,--gc-sections "
 
-declare -a FINAL_COMMANDS=("../embedded-flash-environment/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-objcopy -O binary build/${VENDOR}/instamsg build/${VENDOR}/instamsg_to_flash" "../embedded-flash-environment/lm4tools/lm4flash/lm4flash instamsg_to_flash")
+declare -a FINAL_COMMANDS=("../embedded-flash-environment/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-objcopy -O binary build/${VENDOR}/instamsg build/${VENDOR}/instamsg_to_flash" "../embedded-flash-environment/lm4tools/lm4flash/lm4flash build/${VENDOR}/instamsg_to_flash")

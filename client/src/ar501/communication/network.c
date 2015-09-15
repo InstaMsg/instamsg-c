@@ -460,15 +460,6 @@ continue_with_next_command:
     }
 }
 
-/*
- * This method does the cleaning up (for eg. closing a socket) when the network is cleaned up.
- *
- * Note that this method MUST DO """ONLY""" per-socket level cleanup, NO GLOBAL-LEVEL CLEANING/REINIT MUST BE DONE.
- */
-static void release_underlying_medium_guaranteed(Network* network)
-{
-}
-
 
 static int setUpModem(Network *network)
 {
@@ -751,7 +742,7 @@ exit:
  *
  * Setting the above value will let InstaMsg know that the connection can be used fine for writing/reading.
  */
-static void connect_underlying_medium_try_once(Network* network, char *hostName, int port)
+void connect_underlying_medium_try_once(Network* network, char *hostName, int port)
 {
     int rc = FAILURE;
     showCommandOutput = 1;
@@ -848,7 +839,7 @@ static void connect_underlying_medium_try_once(Network* network, char *hostName,
  * However, an error occurs while reading.
  * So, FAILURE must be returned immediately (i.e. no socket-reinstantiation must be done in this method).
  */
-static int ar501_gsm_socket_read(Network* network, unsigned char* buffer, int len, unsigned char guaranteed)
+int network_read(Network* network, unsigned char* buffer, int len, unsigned char guaranteed)
 {
     /*
      * To resolve the issue mentioned in the HANDLE_INIFINITE_RESPONSE_FROM_TELIT marker, we MUST MUST MUST MUST
@@ -920,7 +911,7 @@ static int ar501_gsm_socket_read(Network* network, unsigned char* buffer, int le
  * An error occurred while writing.
  * In this case, FAILURE must be returned immediately (i.e. no socket-reinstantiation must be done in this method).
  */
-static int ar501_gsm_socket_write(Network* network, unsigned char* buffer, int len)
+int network_write(Network* network, unsigned char* buffer, int len)
 {
     memset(sendCommandBuffer, 0, SEND_COMMAND_BUFFER_SIZE);
     sg_sprintf(sendCommandBuffer, "AT#SSENDEXT=%u,%d\r\n", network->socket, len);
@@ -940,33 +931,11 @@ static int ar501_gsm_socket_write(Network* network, unsigned char* buffer, int l
 
 
 /*
- * NOTHING EXTRA NEEDS TO BE DONE HERE.
+ * This method does the cleaning up (for eg. closing a socket) when the network is cleaned up.
+ *
+ * Note that this method MUST DO """ONLY""" per-socket level cleanup, NO GLOBAL-LEVEL CLEANING/REINIT MUST BE DONE.
  */
-void init_network(Network *network, const char *hostName, unsigned int port)
+void release_underlying_medium_guaranteed(Network* network)
 {
-    /* Register read-callback. */
-	network->read = ar501_gsm_socket_read;
-
-    /* Register write-callback. */
-	network->write = ar501_gsm_socket_write;
-
-    /* Keep a copy of connection-parameters, for easy book-keeping. */
-    memset(network->host, 0, MAX_BUFFER_SIZE);
-    sg_sprintf(network->host, "%s", hostName);
-    network->port = port;
-
-    /* Connect the medium. */
-    connect_underlying_medium_try_once(network, network->host, network->port);
 }
 
-
-/*
- * NOTHING EXTRA NEEDS TO BE DONE HERE.
- */
-void release_network(Network *network)
-{
-    release_underlying_medium_guaranteed(network);
-
-    info_log("COMPLETE [TCP-SOCKET] STRUCTURE, INCLUDING THE UNDERLYING MEDIUM (SOCKET) CLEANED FOR HOST = [%s], PORT = [%d].",
-             network->host, network->port);
-}

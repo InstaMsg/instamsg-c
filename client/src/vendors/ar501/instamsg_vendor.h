@@ -13,19 +13,6 @@
  */
 
 
-struct Network
-{
-    // Feel free to add any additional fields as desired.
-
-    char host[MAX_BUFFER_SIZE];
-    int port;
-
-    unsigned char socketCorrupted;
-
-    COMMUNICATION_INTERFACE(Network)
-};
-
-
 struct SerialLoggerInterface
 {
     // Feel free to add any additional fields as desired.
@@ -57,5 +44,16 @@ struct System
     SYSTEM_INTERFACE
 };
 
+#include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
+#include "inc/hw_memmap.h"
+#include "inc/hw_gpio.h"
+#include "inc/hw_types.h"
+#include "driverlib/gpio.h"
+#include "driverlib/pin_map.h"
+#include "driverlib/sysctl.h"
+#include "driverlib/uart.h"
+#include "driverlib/rom.h"
 
 #endif
