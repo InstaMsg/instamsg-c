@@ -97,13 +97,6 @@ void release_file_system(FileSystem *fs);
 #endif
 
 
-/*
- * Interface for sending/receiving bytes over a serial-interface (eg. UART).
- */
-typedef struct SerialLoggerInterface SerialLoggerInterface;
-void init_serial_logger_interface(SerialLoggerInterface *serialLoggerInterface, void *arg);
-void release_serial_logger_interface(SerialLoggerInterface *serialLoggerInterface);
-
 
 /*
  * Interface for sending/receiving bytes between the instamg-client (on the device) and the device-command-interface.

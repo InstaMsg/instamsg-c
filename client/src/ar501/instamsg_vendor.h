@@ -1,8 +1,8 @@
 #ifndef INSTAMSG_VENDOR
 #define INSTAMSG_VENDOR
 
-#include "../../common/include/instamsg_vendor_common.h"
-#include "../../common/include/globals.h"
+#include "../common/include/instamsg_vendor_common.h"
+#include "../common/include/globals.h"
 
 /*
  * VERY IMPORTANT NOTE ::
@@ -11,14 +11,6 @@
  * then be accessed through the struct-pointers passed to the APIs.
  *
  */
-
-
-struct SerialLoggerInterface
-{
-    // Feel free to add any additional fields as desired.
-
-    int (*write)(SerialLoggerInterface *serialLoggerInterface, unsigned char* buffer, int len);
-};
 
 
 struct ModbusCommandInterface

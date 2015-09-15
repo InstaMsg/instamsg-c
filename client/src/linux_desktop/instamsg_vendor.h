@@ -1,8 +1,8 @@
 #ifndef INSTAMSG_VENDOR
 #define INSTAMSG_VENDOR
 
-#include "../../common/include/instamsg_vendor_common.h"
-#include "../../common/include/globals.h"
+#include "../common/include/instamsg_vendor_common.h"
+#include "../common/include/globals.h"
 
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
@@ -14,11 +14,6 @@ struct FileSystem
 };
 #endif
 
-
-struct SerialLoggerInterface
-{
-    int (*write)(SerialLoggerInterface *serialLoggerInterface, unsigned char* buffer, int len);
-};
 
 
 struct ModbusCommandInterface

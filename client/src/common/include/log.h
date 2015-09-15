@@ -2,6 +2,7 @@
 #define INSTAMSG_LOGGER
 
 #include "instamsg_vendor.h"
+#include "serial_logger.h"
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
 typedef struct FileLogger FileLogger;

@@ -2,7 +2,6 @@
 
 TOTAL_INCLUDES=`echo                                                \
         ${SYSTEM_INCLUDES}                                          \
-        -Isrc/vendors/${VENDOR}/                                    \
         -Isrc/${VENDOR}/                                            \
         -I ../MQTTPacket/src    `
 
@@ -43,8 +42,8 @@ SOURCES=`echo                                                                   
         src/system/${SYSTEM_IMPL}                                                       \
         src/time/${TIME_IMPL}                                                           \
         src/${VENDOR}/communication/network.c                                           \
-        src/communication/modbus_command/${MODBUS_COMMAND_COMMUNICATION_IMPL}           \
-        src/communication/serial_logger/${SERIAL_LOGGER_COMMUNICATION_IMPL} `
+        src/${VENDOR}/communication/serial_logger.c                                     \
+        src/communication/modbus_command/${MODBUS_COMMAND_COMMUNICATION_IMPL}           `
 
 
 mkdir -p build/${VENDOR}
