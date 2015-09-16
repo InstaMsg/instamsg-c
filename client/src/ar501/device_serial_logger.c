@@ -29,7 +29,7 @@
 /*
  * This method MUST connect the underlying medium (even if it means to retry continuously).
  */
-void connect_underlying_medium_guaranteed(SerialLoggerInterface *serialLoggerInterface)
+void connect_underlying_serial_logger_medium_guaranteed(SerialLoggerInterface *serialLoggerInterface)
 {
     /*
      * UART-initialiazation.
@@ -78,6 +78,6 @@ int serial_logger_write(SerialLoggerInterface* serialLoggerInterface, unsigned c
 /*
  * This method MUST release the underlying medium (even if it means to retry continuously).
  */
-void release_underlying_medium_guaranteed(SerialLoggerInterface *serialLoggerInterface)
+void release_underlying_serial_logger_medium_guaranteed(SerialLoggerInterface *serialLoggerInterface)
 {
 }
