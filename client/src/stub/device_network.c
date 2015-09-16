@@ -89,6 +89,7 @@ int network_write(struct Network* network, unsigned char* buffer, int len)
 
 /*
  * This method does the cleaning up (for eg. closing a socket) when the network is cleaned up.
+ * But if it is ok to re-connect without releasing the underlying-system-resource, then this can be left empty.
  *
  * Note that this method MUST DO """ONLY""" per-socket level cleanup, NO GLOBAL-LEVEL CLEANING/REINIT MUST BE DONE.
  */

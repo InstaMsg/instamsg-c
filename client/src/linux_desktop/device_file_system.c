@@ -153,6 +153,7 @@ long getFileSize(FileSystem *fs, const char *filepath)
 
 /*
  * This method MUST release the underlying medium (even if it means to retry continuously).
+ * But if it is ok to re-connect without releasing the underlying-system-resource, then this can be left empty.
  */
 void release_underlying_file_system_medium_guaranteed(FileSystem* fs)
 {
