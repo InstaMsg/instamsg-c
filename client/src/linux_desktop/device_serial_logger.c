@@ -5,8 +5,8 @@
  *
  *******************************************************************************/
 
-#include "./serial_logger.h"
-#include "../../common/include/globals.h"
+#include "./device_serial_logger.h"
+#include "../common/include/globals.h"
 
 
 /*

@@ -5,7 +5,7 @@
  *
  *******************************************************************************/
 
-#include "./time.h"
+#include "./device_time.h"
 
 /*
  * This method MUST connect the underlying medium (even if it means to retry continuously).
