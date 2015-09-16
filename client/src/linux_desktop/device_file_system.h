@@ -3,6 +3,8 @@
 #ifndef INSTAMSG_FILE_SYSTEM
 #define INSTAMSG_FILE_SYSTEM
 
+#include <stdio.h>
+
 typedef struct FileSystem FileSystem;
 
 struct FileSystem
@@ -12,6 +14,7 @@ struct FileSystem
     /*
      * Any extra fields may be added here.
      */
+    FILE *fp;
 
     int (*read) (FileSystem *fs, unsigned char* buffer, int len, unsigned char guaranteed);
     int (*write)(FileSystem *fs, unsigned char* buffer, int len);

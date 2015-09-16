@@ -2,7 +2,6 @@
 #define INSTAMSG_HTTPCLIENT
 
 #include "./globals.h"
-#include "./instamsg_vendor_common.h"
 
 typedef struct HTTPResponse HTTPResponse;
 struct HTTPResponse

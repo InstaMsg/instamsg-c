@@ -3,6 +3,8 @@
 #ifndef INSTAMSG_FILE_SYSTEM_COMMON
 #define INSTAMSG_FILE_SYSTEM_COMMON
 
+#include "device_file_system.h"
+
 void init_file_system(FileSystem *fs, void *arg);
 void release_file_system(FileSystem *fs);
 

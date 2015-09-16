@@ -1,6 +1,13 @@
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
 
+#include "./device_file_system.h"
 #include "../common/include/globals.h"
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <sys/stat.h>
 
 
 /*
@@ -8,7 +15,7 @@
  */
 void connect_underlying_file_system_medium_guaranteed(FileSystem* fs)
 {
-    fs->fp = fopen(fileName, "a+");
+    fs->fp = fopen(fs->fileName, "a+");
 }
 
 

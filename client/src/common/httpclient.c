@@ -1,10 +1,11 @@
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
 
-#include "include/globals.h"
-#include "include/instamsg.h"
-#include "include/httpclient.h"
+#include "./include/globals.h"
+#include "./include/instamsg.h"
+#include "./include/httpclient.h"
 
-#include "include/instamsg_vendor_common.h"
+#include "device_file_system.h"
+
 #include "instamsg_vendor.h"
 
 #include <string.h>
