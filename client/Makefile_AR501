@@ -3,13 +3,6 @@ SYSTEM_INCLUDES=`echo                                               \
 
 VENDOR="ar501"
 
-SYSTEM_IMPL="tiva_tm4c123gxl_launchpad_system.c"
-TIME_IMPL="tiva_tm4c123gxl_launchpad_time.c"
-NETWORK_COMMUNICATION_IMPL="ar501_gsm.c"
-FS_COMMUNICATION_IMPL=""
-MODBUS_COMMAND_COMMUNICATION_IMPL="ar501_modbus_command.c"
-SERIAL_LOGGER_COMMUNICATION_IMPL="tiva_tm4c123gxl_launchpad_serial_logger.c"
-
 EXTRA_SOURCES=`echo													\
 			  src/${VENDOR}/tiva_startup_gcc.c						\
 			  src/${VENDOR}/uart_utils.c	`

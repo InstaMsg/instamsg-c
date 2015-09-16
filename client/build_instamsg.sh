@@ -6,17 +6,6 @@ TOTAL_INCLUDES=`echo                                                \
         -I ../MQTTPacket/src    `
 
 
-if [ -z "${SERIAL_LOGGER_COMMUNICATION_IMPL}" ];
-then
-    SERIAL_LOGGER_COMMUNICATION_IMPL="serial_logger_empty.c"
-fi
-
-if [ -z "${MODBUS_COMMAND_COMMUNICATION_IMPL}" ];
-then
-    MODBUS_COMMAND_COMMUNICATION_IMPL="modbus_command_empty.c"
-fi
-
-
 SOURCES=`echo                                                                           \
         ${EXTRA_SOURCES}                                                                \
         ${MAIN_CLASS}                                                                   \
