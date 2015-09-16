@@ -736,7 +736,7 @@ exit:
 
 
 /*
- * This method tries to establish the network/socket to the "hostName" and "port".
+ * This method tries to establish the network/socket to "network->host" on "network->port".
  *
  * If the connection is successful, then the following must be done by the device-implementation ::
  *                          network->socketCorrupted = 0;
