@@ -189,7 +189,7 @@ int network_read(Network* network, unsigned char* buffer, int len, unsigned char
                      * Return this info, and let the calling-function take appropriate action.
                      */
                     debug_log(SOCKET_READ "Timeout occurred while waiting for data.. NOT retrying");
-                    return SOCKET_READ_TIMEOUT;
+                    return SOCKET_READ_TIMEOUT; /* Case c) */
                 }
             }
             else
@@ -198,7 +198,7 @@ int network_read(Network* network, unsigned char* buffer, int len, unsigned char
                  * There was some error on the socket.
                  */
                 error_log(SOCKET_READ "Errno [%d] occurred while reading from socket", errBackup);
-                return FAILURE;
+                return FAILURE; /* Case b) and e) */
             }
         }
 
@@ -220,7 +220,7 @@ int network_read(Network* network, unsigned char* buffer, int len, unsigned char
             if(errBackup != 0)
             {
                 error_log(SOCKET_READ "Errno [%d] occurred while reading from socket", errBackup);
-                return FAILURE;
+                return FAILURE; /* Another leg of case b) and e) */
             }
             else
             {
@@ -233,7 +233,7 @@ int network_read(Network* network, unsigned char* buffer, int len, unsigned char
         }
 	}
 
-    return SUCCESS;
+    return SUCCESS; /* Case a) and d) */
 }
 
 
