@@ -1,6 +1,8 @@
-#include "include/globals.h"
-#include "include/instamsg.h"
-#include "include/time.h"
+#include "./include/globals.h"
+#include "./include/instamsg.h"
+#include "./include/time.h"
+
+#include "device_misc.h"
 
 #include <string.h>
 #include <stdarg.h>
@@ -442,13 +444,12 @@ void startAndCountdownTimer(int seconds, unsigned char showRunningStatus)
 
 void globalSystemInit()
 {
+    bootstrapInit();
+
     currentLogLevel = LOG_LEVEL;
     init_serial_logger(&serialLogger, NULL);
 
     init_timer(&singletonUtilityTimer, NULL);
-
-    init_system_utils(&singletonSystemUtils, NULL);
-    singletonSystemUtils.localSystemInit(&singletonSystemUtils);
 }
 
 
