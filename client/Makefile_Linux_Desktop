@@ -1,17 +1,36 @@
-SYSTEM_INCLUDES=`echo                                               \
-        -isystem/usr/lib/gcc/i686-linux-gnu/4.8/include                   \
-        -isystem/usr/local/include                                        \
-        -isystem/usr/lib/gcc/i686-linux-gnu/4.8/include-fixed             \
-        -isystem/usr/include/i386-linux-gnu                               \
-        -isystem/usr/include  `
+# Device-specific extra includes
+#
+SYSTEM_INCLUDES=`echo                                               		\
+        -isystem/usr/lib/gcc/i686-linux-gnu/4.8/include                   	\
+        -isystem/usr/local/include                                        	\
+        -isystem/usr/lib/gcc/i686-linux-gnu/4.8/include-fixed             	\
+        -isystem/usr/include/i386-linux-gnu                               	\
+        -isystem/usr/include  												`
 
+
+# The platform on which InstaMsg needs to be built.
+# This name must be equal to the name of the folder, created/copied from "src/stub".
+#
 VENDOR="linux_desktop"
 
+
+# This parameter should be set, if file-system-support needs to be defined.
+# If file-system-support is not required, then this parameter MUST NOT be defined.
+#
 FS_COMMUNICATION_IMPL="Y"
 
-EXTRA_SOURCES=""
+
+# Device-specific extra source-files.
+#
+EXTRA_SOURCES=`echo															\
+			  ./stdoutsub.c													`
+
+
+# Device-specific extra object-files that need to linked.
+#
 EXTRA_OBJECT_FILES=""
 
-MAIN_CLASS="stdoutsub.c"
 
+# Compile-cum-Link command for the platform.
+#
 COMPILE_COMMAND="gcc -g -nostdinc -pedantic "

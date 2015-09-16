@@ -8,7 +8,6 @@ TOTAL_INCLUDES=`echo                                                \
 
 SOURCES=`echo                                                                           \
         ${EXTRA_SOURCES}                                                                \
-        ${MAIN_CLASS}                                                                   \
         src/common/instamsg.c                                                           \
         src/common/log.c                                                                \
         src/common/json.c                                                               \
