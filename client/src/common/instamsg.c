@@ -21,6 +21,8 @@
 #include "include/sg_mem.h"
 #include "include/network.h"
 
+#include "device_misc.h"
+
 #include <string.h>
 
 static void serverLoggingTopicMessageArrived(InstaMsg *c, MQTTMessage *msg)
@@ -818,7 +820,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                     }
                     else if(strcmp(topicName, c->rebootTopic) == 0)
                     {
-                        singletonSystemUtils.rebootDevice(&singletonSystemUtils);
+                        rebootDevice();
                     }
                     else
                     {

@@ -44,8 +44,7 @@ SOURCES=`echo                                                                   
         src/${VENDOR}/device_network.c                                                  \
         src/${VENDOR}/device_serial_logger.c                                            \
         src/${VENDOR}/device_time.c                                                     \
-        src/${VENDOR}/device_misc.c                                                     \
-        src/communication/modbus_command/${MODBUS_COMMAND_COMMUNICATION_IMPL}           `
+        src/${VENDOR}/device_misc.c                                                     `
 
 
 mkdir -p build/${VENDOR}

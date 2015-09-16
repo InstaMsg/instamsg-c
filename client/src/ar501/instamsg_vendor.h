@@ -4,30 +4,6 @@
 #include "../common/include/instamsg_vendor_common.h"
 #include "../common/include/globals.h"
 
-/*
- * VERY IMPORTANT NOTE ::
- *
- * A device-implementor is free to add any additional fields/variables in the following structs, which can
- * then be accessed through the struct-pointers passed to the APIs.
- *
- */
-
-
-struct ModbusCommandInterface
-{
-    // Feel free to add any additional fields as desired.
-
-    COMMUNICATION_INTERFACE(ModbusCommandInterface)
-};
-
-
-struct System
-{
-    // Feel free to add any additional fields as desired.
-
-    SYSTEM_INTERFACE
-};
-
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>

@@ -97,53 +97,5 @@ void release_file_system(FileSystem *fs);
 #endif
 
 
-
-/*
- * Interface for sending/receiving bytes between the instamg-client (on the device) and the device-command-interface.
- *
- * Generally, the interface would be a serial-port, through which the instamsg-client can send the command-bytes, and
- * receive the command-response-bytes.
- */
-typedef struct ModbusCommandInterface ModbusCommandInterface;
-void init_modbus_command_interface(ModbusCommandInterface *modbusCommandInterface, void *arg);
-void release_modbus_command_interface(ModbusCommandInterface *modbusCommandInterface);
-
-
-/*
- * System-Utilities Interface
- */
-#define SYSTEM_INTERFACE                                                                                            \
-    /*                                                                                                              \
-     * Note that the "buf" will be all-0-initialized from the callee, so the vendor-implementation                  \
-     * does not need to bother about that.                                                                          \
-     */                                                                                                             \
-    void (*getManufacturer)(System *system, char *buf, int maxValueLenAllowed);                                     \
-                                                                                                                    \
-                                                                                                                    \
-    /*                                                                                                              \
-     * Note that the "buf" will be all-0-initialized from the callee, so the vendor-implementation                  \
-     * does not need to bother about that.                                                                          \
-     */                                                                                                             \
-    void (*getSerialNumber)(System *system, char *buf, int maxValueLenAllowed);                                     \
-                                                                                                                    \
-                                                                                                                    \
-    /*                                                                                                              \
-     * Reboots the device.                                                                                          \
-     */                                                                                                             \
-    void (*rebootDevice)(System *system);                                                                           \
-                                                                                                                    \
-                                                                                                                    \
-    /*                                                                                                              \
-     * Does the device-specific initialization.                                                                     \
-     */                                                                                                             \
-    void (*localSystemInit)(System *system);
-
-typedef struct System System;
-void init_system_utils(System *system, void *arg);
-void release_system_utils(System *system);
-
-
-System singletonSystemUtils;
-
 #endif
 

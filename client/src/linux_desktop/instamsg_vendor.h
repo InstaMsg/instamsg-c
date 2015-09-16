@@ -15,16 +15,4 @@ struct FileSystem
 #endif
 
 
-
-struct ModbusCommandInterface
-{
-    COMMUNICATION_INTERFACE(ModbusCommandInterface)
-};
-
-
-struct System
-{
-    SYSTEM_INTERFACE
-};
-
 #endif
