@@ -21,14 +21,6 @@ struct ModbusCommandInterface
 };
 
 
-struct Timer
-{
-    // Feel free to add any additional fields as desired.
-
-    TIMER_INTERFACE
-};
-
-
 struct System
 {
     // Feel free to add any additional fields as desired.
@@ -47,5 +39,9 @@ struct System
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
 #include "driverlib/rom.h"
+#include "driverlib/sysctl.h"
+#include "driverlib/systick.h"
+#include "driverlib/rom.h"
+#include "driverlib/rom_map.h"
 
 #endif

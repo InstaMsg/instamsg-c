@@ -1,8 +1,10 @@
 #include "include/globals.h"
 #include "include/instamsg.h"
+#include "include/time.h"
 
 #include <string.h>
 #include <stdarg.h>
+
 
 void sg_varargs(char *out, const char *pcString, va_list vaArgP)
 {

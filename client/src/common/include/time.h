@@ -6,8 +6,12 @@
 void init_timer(Timer *timer, void *arg);
 void release_timer(Timer* timer);
 
+void connect_underlying_time_medium_guaranteed(Timer *timer);
 unsigned int getMinimumDelayPossibleInMicroSeconds(Timer *timer);
 void minimumDelay(Timer *timer);
+void release_underlying_time_medium_guaranteed(Timer* timer);
+
+Timer singletonUtilityTimer;
 
 #endif
 

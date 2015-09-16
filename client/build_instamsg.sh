@@ -28,6 +28,7 @@ SOURCES=`echo                                                                   
         src/common/sg_stdlib.c                                                          \
         src/common/network.c                                                            \
         src/common/serial_logger.c                                                      \
+        src/common/time.c                                                               \
                                                                                         \
         ../MQTTPacket/src/MQTTFormat.c                                                  \
         ../MQTTPacket/src/MQTTPacket.c                                                  \
@@ -41,9 +42,9 @@ SOURCES=`echo                                                                   
         ../MQTTPacket/src/MQTTUnsubscribeClient.c                                       \
                                                                                         \
         src/system/${SYSTEM_IMPL}                                                       \
-        src/time/${TIME_IMPL}                                                           \
         src/${VENDOR}/communication/network.c                                           \
         src/${VENDOR}/communication/serial_logger.c                                     \
+        src/${VENDOR}/time/time.c                                                       \
         src/communication/modbus_command/${MODBUS_COMMAND_COMMUNICATION_IMPL}           `
 
 

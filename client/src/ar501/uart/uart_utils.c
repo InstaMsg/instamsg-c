@@ -1,20 +1,8 @@
-#include <stdint.h>
-#include "driverlib/rom.h"
-
-#include <stdint.h>
-#include <stdbool.h>
-#include <string.h>
-#include "inc/hw_memmap.h"
-#include "driverlib/gpio.h"
-#include "driverlib/pin_map.h"
-#include "driverlib/sysctl.h"
-#include "driverlib/uart.h"
-#include "driverlib/rom.h"
-
-
 #include "../../common/include/globals.h"
 #include "../../common/include/instamsg.h"
+#include "../../common/include/time.h"
 
+#include "../instamsg_vendor.h"
 #if 1
 void UARTSend(const unsigned int UART_ID, const unsigned char *buf, unsigned int len)
 {

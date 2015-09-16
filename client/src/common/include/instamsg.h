@@ -23,6 +23,7 @@
 #include "../../../../MQTTPacket/src/MQTTPacket.h"
 
 #include "communication/network.h"
+#include "time/time.h"
 
 #define MAX_PACKET_ID 30000
 #define MAX_MESSAGE_HANDLERS 5
@@ -30,8 +31,6 @@
 #define MQTT_RESULT_HANDLER_TIMEOUT 10
 
 
-
-void NewTimer(Timer*);
 
 typedef struct MQTTMessage MQTTMessage;
 typedef struct MessageData MessageData;

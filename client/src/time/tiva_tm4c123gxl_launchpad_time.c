@@ -50,15 +50,8 @@ static void getOffset(Timer *timer, char *buf)
 }
 
 
-unsigned int getMinimumDelayPossibleInMicroSeconds(Timer *timer)
-{
-    return 5;
-}
-
-
 void minimumDelay(Timer *timer)
 {
-    ROM_SysCtlDelay(ROM_SysCtlClockGet() / 3000000);
 }
 
 
