@@ -2,10 +2,10 @@
 
 void init_serial_logger_interface(SerialLoggerInterface *serialLoggerInterface, void *arg)
 {
-    connect_underlying_medium_guaranteed(serialLoggerInterface);
-
     /* Register write-callback. */
 	serialLoggerInterface->write = serial_logger_write;
+
+    connect_underlying_medium_guaranteed(serialLoggerInterface);
 }
 
 

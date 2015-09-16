@@ -1,3 +1,5 @@
+#include "../common/include/globals.h"
+
 /*
  * This method tries to establish the network/socket to "network->host" on "network->port".
  *

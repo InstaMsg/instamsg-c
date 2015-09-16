@@ -53,7 +53,7 @@ rm -f build/${VENDOR}/*
 # Compile the File-System-Module only if applicable.
 if [ ! -z ${FS_COMMUNICATION_IMPL} ];
 then
-    SOURCES="${SOURCES} src/communication/fs/${FS_COMMUNICATION_IMPL} src/common/httpclient.c  "
+    SOURCES="${SOURCES} src/${VENDOR}/device_file_system.c src/common/httpclient.c  "
     COMPILE_COMMAND="${COMPILE_COMMAND} -DFILE_SYSTEM_INTERFACE_ENABLED"
 fi
 

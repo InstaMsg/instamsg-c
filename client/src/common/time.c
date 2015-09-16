@@ -2,10 +2,10 @@
 
 void init_timer(Timer *timer, void *arg)
 {
-    connect_underlying_time_medium_guaranteed(timer);
-
     timer->getMinimumDelayPossibleInMicroSeconds = getMinimumDelayPossibleInMicroSeconds;
     timer->minimumDelay = minimumDelay;
+
+    connect_underlying_time_medium_guaranteed(timer);
 }
 
 

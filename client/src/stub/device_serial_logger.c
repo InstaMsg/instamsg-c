@@ -6,6 +6,7 @@
  *******************************************************************************/
 
 #include "./serial_logger.h"
+#include "../common/include/globals.h"
 
 /*
  * This method MUST connect the underlying medium (even if it means to retry continuously).
@@ -38,7 +39,7 @@ int serial_logger_write(SerialLoggerInterface* serialLoggerInterface, unsigned c
 /*
  * This method MUST release the underlying medium (even if it means to retry continuously).
  */
-vioid release_underlying_medium_guaranteed(SerialLoggerInterface *serialLoggerInterface)
+void release_underlying_medium_guaranteed(SerialLoggerInterface *serialLoggerInterface)
 {
 }
 
