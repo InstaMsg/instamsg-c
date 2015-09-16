@@ -314,5 +314,3 @@ void release_underlying_network_medium_guaranteed(Network* network)
 {
     close(network->socket);
 }
-
-

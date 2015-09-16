@@ -39,5 +39,3 @@ void minimumDelay(Timer *timer)
 void release_underlying_time_medium_guaranteed(Timer *timer)
 {
 }
-
-
