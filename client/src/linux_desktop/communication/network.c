@@ -87,6 +87,9 @@ void connect_underlying_medium_try_once(Network* network, char *hostName, int po
                 }
                 else
                 {
+                    /*
+                     * VERY IMPORTANT.. MUST BE DONE.
+                     */
                     network->socketCorrupted = 0;
                 }
 		    }

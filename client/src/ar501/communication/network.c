@@ -747,48 +747,64 @@ void connect_underlying_medium_try_once(Network* network, char *hostName, int po
     int rc = FAILURE;
     showCommandOutput = 1;
 
-    do
+    info_log("(RE-)INITIALIZING MODEM");
+
+    rc = setUpModem(network);
+    if(rc != SUCCESS)
     {
-        do
-        {
-            info_log("(RE-)INITIALIZING MODEM");
-            rc = setUpModem(network);
-        } while(rc == FAILURE);
+        info_log("COULD NOT INITIALIZE MODEM :(");
+        return;
+    }
 
-        info_log("MODEM INITIALIZATION DONE.");
+
+    info_log("MODEM INITIALIZATION DONE.");
+
+
+
+    /*
+     * Next, we setup a socket, which will then be used for the usual read/write.
+     */
+
+    /*
+     * 1. Get a free-socket
+     */
+    {
+        char *pch;
+        SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", LENGTH_OF_COMMAND, NULL, NULL);
 
         /*
-        * Next, we setup a socket, which will then be used for the usual read/write.
-        */
-
-        /*
-        * 1. Get a free-socket
-        */
+         * Search for a row, ending with ",0".
+         * If such a row is found, it means there is a free-socket, waiting to be used !!
+         */
+        pch = strstr(result, ",0\r\n");
+        if(pch != NULL)
         {
-            char *pch;
-
-            SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT#SS\r\n", LENGTH_OF_COMMAND, NULL, NULL);
-
             /*
-            * Search for a row, ending with ",0".
-            * If such a row is found, it means there is a free-socket, waiting to be used !!
-            */
-            pch = strstr(result, ",0\r\n");
-            if(pch != NULL)
-            {
-                /*
-                 * Get the connection/socket-id available.
-                 */
-                network->socket = parseNumberFromEndOfString(pch - 1, ':');
-                info_log(MODEM "Socket-Id obtained = [%u]", network->socket);
-            }
+             * Get the connection/socket-id available.
+             */
+            network->socket = parseNumberFromEndOfString(pch - 1, ':');
+            info_log(MODEM "Socket-Id obtained = [%u]", network->socket);
         }
+    }
 
-        rc = setUpModemSocket(network->socket);
-    } while(rc == FAILURE);
 
-    network->socketCorrupted = 0;
-    showCommandOutput = 0;
+    /*
+     * 2. Configure and Connect the socket.
+     */
+    rc = setUpModemSocket(network->socket);
+    if(rc == SUCCESS)
+    {
+        /*
+         * VERY IMPORTANT.. MUST BE DONE.
+         */
+        network->socketCorrupted = 0;
+
+        showCommandOutput = 0;
+    }
+    else
+    {
+        info_log("MODEM-INITIALIZATION DONE... BUT SOCKET COULD NOT BE CONNECTED :(");
+    }
 }
 
 /*
