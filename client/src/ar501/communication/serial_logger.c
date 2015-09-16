@@ -13,15 +13,10 @@
 #include "../uart/uart_utils.h"
 #include "../../common/include/globals.h"
 
-
-static int serial_logger_write(SerialLoggerInterface* serialLoggerInterface, unsigned char* buffer, int len)
-{
-    UARTSend(UART0_BASE, buffer, len);
-    return SUCCESS;
-}
-
-
-void init_serial_logger_interface(SerialLoggerInterface *serialLoggerInterface, void *arg)
+/*
+ * This method MUST connect the underlying medium (even if it means to retry continuously).
+ */
+void connect_underlying_medium_guaranteed(SerialLoggerInterface *serialLoggerInterface)
 {
     /*
      * UART-initialiazation.
@@ -43,19 +38,33 @@ void init_serial_logger_interface(SerialLoggerInterface *serialLoggerInterface, 
                              UART_CONFIG_PAR_NONE));
 
     UARTEnable(UART0_BASE);
-
-
-
-
-    /* Register write-callback. */
-	serialLoggerInterface->write = serial_logger_write;
 }
 
 
-void release_serial_logger_interface(SerialLoggerInterface *serialLoggerInterface)
+/*
+ * This method writes first "len" bytes from "buffer" onto the serial-logger-interface.
+ *
+ * This is a blocking function. So, either of the following must hold true ::
+ *
+ * a)
+ * All "len" bytes are written.
+ * In this case, SUCCESS must be returned.
+ *
+ *                      OR
+ * b)
+ * An error occurred while writing.
+ * In this case, FAILURE must be returned immediately.
+ */
+int serial_logger_write(SerialLoggerInterface* serialLoggerInterface, unsigned char* buffer, int len)
 {
-    /*
-     * Nothing to be done as such.
-     * Multiple re-inits (without any so-called previous cleanups) SHOULD not cause any issues.
-     */
+    UARTSend(UART0_BASE, buffer, len);
+    return SUCCESS;
+}
+
+
+/*
+ * This method MUST release the underlying medium (even if it means to retry continuously).
+ */
+void release_underlying_medium_guaranteed(SerialLoggerInterface *serialLoggerInterface)
+{
 }

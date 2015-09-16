@@ -7,23 +7,39 @@
 
 #include "./serial_logger.h"
 
-static int serial_logger_write(SerialLoggerInterface* serialLoggerInterface, unsigned char* buffer, int len)
+/*
+ * This method MUST connect the underlying medium (even if it means to retry continuously).
+ */
+void connect_underlying_medium_guaranteed(SerialLoggerInterface *serialLoggerInterface)
+{
+}
+
+
+/*
+ * This method writes first "len" bytes from "buffer" onto the serial-logger-interface.
+ *
+ * This is a blocking function. So, either of the following must hold true ::
+ *
+ * a)
+ * All "len" bytes are written.
+ * In this case, SUCCESS must be returned.
+ *
+ *                      OR
+ * b)
+ * An error occurred while writing.
+ * In this case, FAILURE must be returned immediately.
+ */
+int serial_logger_write(SerialLoggerInterface* serialLoggerInterface, unsigned char* buffer, int len)
 {
     return FAILURE;
 }
 
 
-void init_serial_logger_interface(SerialLoggerInterface *serialLoggerInterface, void *arg)
-{
-    /*
-     * The init-logic goes here.
-     */
-
-    /* Register write-callback. */
-	serialLoggerInterface->write = serial_logger_write;
-}
-
-
-void release_serial_logger_interface(SerialLoggerInterface *serialLoggerInterface)
+/*
+ * This method MUST release the underlying medium (even if it means to retry continuously).
+ */
+vioid release_underlying_medium_guaranteed(SerialLoggerInterface *serialLoggerInterface)
 {
 }
+
+

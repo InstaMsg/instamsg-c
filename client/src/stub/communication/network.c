@@ -6,7 +6,7 @@
  *
  * Setting the above value will let InstaMsg know that the connection can be used fine for writing/reading.
  */
-void connect_underlying_medium_try_once(Network* network, char *hostName, int port)
+void connect_underlying_network_medium_try_once(Network* network)
 {
 }
 
@@ -61,6 +61,7 @@ void connect_underlying_medium_try_once(Network* network, char *hostName, int po
  */
 int network_read(Network* network, unsigned char* buffer, int len, unsigned char guaranteed)
 {
+    return FAILURE;
 }
 
 
@@ -80,6 +81,7 @@ int network_read(Network* network, unsigned char* buffer, int len, unsigned char
  */
 int network_write(struct Network* network, unsigned char* buffer, int len)
 {
+    return FAILURE;
 }
 
 
@@ -88,6 +90,6 @@ int network_write(struct Network* network, unsigned char* buffer, int len)
  *
  * Note that this method MUST DO """ONLY""" per-socket level cleanup, NO GLOBAL-LEVEL CLEANING/REINIT MUST BE DONE.
  */
-void release_underlying_medium_guaranteed(Network* network)
+void release_underlying_network_medium_guaranteed(Network* network)
 {
 }

@@ -31,7 +31,7 @@
  *
  * Setting the above value will let InstaMsg know that the connection can be used fine for writing/reading.
  */
-void connect_underlying_medium_try_once(Network* network, char *hostName, int port)
+void connect_underlying_network_medium_try_once(Network* network)
 {
 	int type = SOCK_STREAM;
 	struct sockaddr_in address;
@@ -43,7 +43,7 @@ void connect_underlying_medium_try_once(Network* network, char *hostName, int po
 	struct addrinfo *result = NULL;
 	struct addrinfo hints = {0, AF_UNSPEC, SOCK_STREAM, IPPROTO_TCP, 0, NULL, NULL, NULL};
 
-	if ((rc = getaddrinfo(hostName, NULL, &hints, &result)) == 0)
+	if ((rc = getaddrinfo(network->host, NULL, &hints, &result)) == 0)
 	{
 		struct addrinfo* res = result;
 
@@ -60,7 +60,7 @@ void connect_underlying_medium_try_once(Network* network, char *hostName, int po
 
 		if (result->ai_family == AF_INET)
 		{
-			address.sin_port = htons(port);
+			address.sin_port = htons(network->port);
 			address.sin_family = family = AF_INET;
 			address.sin_addr = ((struct sockaddr_in*)(result->ai_addr))->sin_addr;
 		}
@@ -309,7 +309,7 @@ int network_write(Network* network, unsigned char* buffer, int len)
  *
  * Note that this method MUST DO """ONLY""" per-socket level cleanup, NO GLOBAL-LEVEL CLEANING/REINIT MUST BE DONE.
  */
-void release_underlying_medium_guaranteed(Network* network)
+void release_underlying_network_medium_guaranteed(Network* network)
 {
     close(network->socket);
 }

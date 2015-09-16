@@ -16,14 +16,14 @@ void init_network(Network *network, const char *hostName, unsigned int port)
     network->port = port;
 
     /* Connect the medium (socket). */
-    connect_underlying_medium_try_once(network, network->host, network->port);
+    connect_underlying_network_medium_try_once(network, network->host, network->port);
 }
 
 
 void release_network(Network *network)
 {
-    release_underlying_medium_guaranteed(network);
+    release_underlying_network_medium_guaranteed(network);
 
-    info_log("COMPLETE [TCP-SOCKET] STRUCTURE, INCLUDING THE UNDERLYING MEDIUM (SOCKET) CLEANED FOR HOST = [%s], PORT = [%d].",
+    info_log("COMPLETE [TCP-SOCKET] STRUCTURE, INCLUDING THE UNDERLYING MEDIUM CLEANED FOR HOST = [%s], PORT = [%d].",
              network->host, network->port);
 }

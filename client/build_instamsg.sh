@@ -27,6 +27,7 @@ SOURCES=`echo                                                                   
         src/common/sg_mem.c                                                             \
         src/common/sg_stdlib.c                                                          \
         src/common/network.c                                                            \
+        src/common/serial_logger.c                                                      \
                                                                                         \
         ../MQTTPacket/src/MQTTFormat.c                                                  \
         ../MQTTPacket/src/MQTTPacket.c                                                  \
