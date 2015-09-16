@@ -1,5 +1,5 @@
-#ifndef SERIAL_LOGGER
-#define SERIAL_LOGGER
+#ifndef INSTAMSG_SERIAL_LOGGER
+#define INSTAMSG_SERIAL_LOGGER
 
 typedef struct SerialLoggerInterface SerialLoggerInterface;
 
