@@ -42,9 +42,9 @@ SOURCES=`echo                                                                   
         ../MQTTPacket/src/MQTTUnsubscribeClient.c                                       \
                                                                                         \
         src/system/${SYSTEM_IMPL}                                                       \
-        src/${VENDOR}/communication/network.c                                           \
-        src/${VENDOR}/communication/serial_logger.c                                     \
-        src/${VENDOR}/time/time.c                                                       \
+        src/${VENDOR}/network.c                                                         \
+        src/${VENDOR}/serial_logger.c                                                   \
+        src/${VENDOR}/time.c                                                            \
         src/communication/modbus_command/${MODBUS_COMMAND_COMMUNICATION_IMPL}           `
 
 

@@ -22,8 +22,8 @@
 #include "./log.h"
 #include "../../../../MQTTPacket/src/MQTTPacket.h"
 
-#include "communication/network.h"
-#include "time/time.h"
+#include "network.h"
+#include "time.h"
 
 #define MAX_PACKET_ID 30000
 #define MAX_MESSAGE_HANDLERS 5

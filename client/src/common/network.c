@@ -16,7 +16,7 @@ void init_network(Network *network, const char *hostName, unsigned int port)
     network->port = port;
 
     /* Connect the medium (socket). */
-    connect_underlying_network_medium_try_once(network, network->host, network->port);
+    connect_underlying_network_medium_try_once(network);
 }
 
 

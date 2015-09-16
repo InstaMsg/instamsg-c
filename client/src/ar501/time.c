@@ -5,8 +5,8 @@
  *
  *******************************************************************************/
 
-#include "./time.h"
-#include "../instamsg_vendor.h"
+#include "./device_time.h"
+#include "./instamsg_vendor.h"
 
 /*
  * This method MUST connect the underlying medium (even if it means to retry continuously).

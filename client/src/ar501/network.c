@@ -6,11 +6,12 @@
  *******************************************************************************/
 
 #include "instamsg_vendor.h"
-#include "../uart/uart_utils.h"
 
-#include "../../common/include/instamsg.h"
-#include "../../common/include/sg_mem.h"
-#include "../../common/include/sg_stdlib.h"
+#include "./uart_utils.h"
+
+#include "../common/include/instamsg.h"
+#include "../common/include/sg_mem.h"
+#include "../common/include/sg_stdlib.h"
 
 #include <string.h>
 

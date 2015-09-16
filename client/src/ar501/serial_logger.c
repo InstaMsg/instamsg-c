@@ -6,12 +6,12 @@
  *******************************************************************************/
 
 
-#include "inc/hw_memmap.h"
-
 #include "instamsg_vendor.h"
-#include "./serial_logger.h"
-#include "../uart/uart_utils.h"
-#include "../../common/include/globals.h"
+
+#include "./device_serial_logger.h"
+#include "./uart_utils.h"
+
+#include "../common/include/globals.h"
 
 /*
  * This method MUST connect the underlying medium (even if it means to retry continuously).
