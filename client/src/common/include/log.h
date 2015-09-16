@@ -1,7 +1,6 @@
 #ifndef INSTAMSG_LOGGER
 #define INSTAMSG_LOGGER
 
-#include "instamsg_vendor.h"
 #include "./serial_logger.h"
 #include "device_file_system.h"
 

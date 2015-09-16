@@ -6,8 +6,6 @@
 
 #include "device_file_system.h"
 
-#include "instamsg_vendor.h"
-
 #include <string.h>
 
 #define HTTP_RESPONSE_STATUS_PREFIX "HTTP/1.0"

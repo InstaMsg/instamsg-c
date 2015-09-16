@@ -19,8 +19,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "instamsg_vendor.h"
-
 #include "../common/include/globals.h"
 #include "../common/include/instamsg.h"
 

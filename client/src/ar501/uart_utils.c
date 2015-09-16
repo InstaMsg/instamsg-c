@@ -1,8 +1,5 @@
-#include "./instamsg_vendor.h"
-
-#include "../common/include/globals.h"
-#include "../common/include/instamsg.h"
-#include "../common/include/time.h"
+#include <stdint.h>
+#include "driverlib/rom.h"
 
 void UARTSend(const unsigned int UART_ID, const unsigned char *buf, unsigned int len)
 {

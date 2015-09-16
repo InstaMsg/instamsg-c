@@ -26,7 +26,6 @@
 #include <stdint.h>
 #include "inc/hw_nvic.h"
 #include "inc/hw_types.h"
-#include "instamsg_vendor.h"
 
 //*****************************************************************************
 //
