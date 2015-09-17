@@ -718,20 +718,20 @@ static int setUpModemSocket(Network *network)
     rc = runBatchCommands("MODEM-SOCKET-SETUP", 0);
 
 exit:
-    if(commands[1].successStrings[0])
-        sg_free(commands[1].successStrings[0]);
+    if(commands[0].successStrings[0])
+        sg_free(commands[0].successStrings[0]);
 
-    if(commands[1].commandInCaseNoSuccessStringPresent)
-        sg_free(commands[1].commandInCaseNoSuccessStringPresent);
+    if(commands[0].commandInCaseNoSuccessStringPresent)
+        sg_free(commands[0].commandInCaseNoSuccessStringPresent);
+
+    if(commands[4].command)
+        sg_free(commands[4].command);
 
     if(commands[5].command)
         sg_free(commands[5].command);
 
     if(commands[6].command)
         sg_free(commands[6].command);
-
-    if(commands[7].command)
-        sg_free(commands[7].command);
 
 
     return rc;
