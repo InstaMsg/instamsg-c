@@ -476,6 +476,7 @@ continue_with_next_command:
 static int setUpModem(Network *network)
 {
     int rc = FAILURE;
+    showCommandOutput = 1;
 
     /*
      * Enable UART1.
@@ -750,6 +751,136 @@ exit:
  */
 void get_latest_sms_containing_prefix(Network *network, char *buffer, const char *prefix)
 {
+    /*
+     * The modem must be set-up properly (SIM in place, etc.) for us to retrieve the sms.
+     */
+    while(setUpModem(network) == FAILURE)
+    {
+    }
+
+    /*
+     * Enable retrieving of SMS.
+     */
+    while(1)
+    {
+        SEND_CMD_AND_READ_RESPONSE_ON_UART1("AT+CMGF=1\r\n", LENGTH_OF_COMMAND, NULL, NULL);
+        if(errorObtained == 0)
+        {
+            break;
+        }
+    }
+
+    while(1)
+    {
+        static int i = 1;
+
+        unsigned char readingPayload = 0;
+        int bufferIndex = 0;
+
+        buffer[0] = 0;
+
+        memset(sendCommandBuffer, 0, SEND_COMMAND_BUFFER_SIZE);
+        sg_sprintf(sendCommandBuffer, "AT+CMGR=%u\r\n", i);
+
+        info_log("\n\nScanning SMS [%u] for Provisioning-Params", i);
+        SEND_CMD_AND_READ_RESPONSE_ON_UART1(sendCommandBuffer, LENGTH_OF_COMMAND, NULL, NULL);
+
+        if(errorObtained == 1)
+        {
+            /*
+             * We stop scanning further SMSes.. if an ERROR-identifier was received as the command-output...
+             */
+            break;
+        }
+        else
+        {
+            /*
+             * or the SMS-payload is empty.
+             */
+            unsigned char newLineStart = 0;
+            int i;
+            char *metadataPrefix = "+CMGR:";
+
+            for(i = 0; i < ind; i++)
+            {
+                if(readBuffer[i] == '\n')
+                {
+                    if(readingPayload == 1)
+                    {
+                        /*
+                         * We have reached a newline while reading payload.. so we are done.
+                         */
+                        break;
+                    }
+                    else
+                    {
+                        /*
+                         * Check if this line had the required prefix.. if yes.. move to reading-payload mode.
+                         */
+                        if(1)
+                        {
+                            if(strncmp(readBuffer + newLineStart, metadataPrefix, strlen(metadataPrefix)) == 0)
+                            {
+                                readingPayload = 1;
+                            }
+                        }
+                    }
+
+                    newLineStart = i + 1;
+                }
+                else
+                {
+                    if(readingPayload == 1)
+                    {
+                        /*
+                        * We are in readingPayload-mode, keep reading..
+                        */
+                        buffer[bufferIndex] = readBuffer[i];
+                        bufferIndex++;
+                    }
+                }
+            }
+        }
+
+        i++;
+
+        /*
+         * Strip in trailing '\r', if any.
+         */
+        bufferIndex--;
+        while(1)
+        {
+            if(buffer[bufferIndex] == '\r')
+            {
+                buffer[bufferIndex] = 0;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        info_log("SMS-Payload = [%s]", buffer);
+
+        /*
+         * If the prefix does not match, pseudo-empty the SMS-Buffer.
+         */
+        if(strncmp(buffer, prefix, strlen(prefix)) != 0)
+        {
+            buffer[0] = 0;
+        }
+
+        /*
+         * If no payload was read in this cycle, means there are no more SMSes to scan.
+         */
+        if(readingPayload == 0)
+        {
+            break;
+        }
+    }
+
+    info_log("\n\n\n\nFinished scanning SMSes..");
+    info_log("Provisioning-Info SMS extracted = [%s]", buffer);
 }
 #endif
 
@@ -765,7 +896,6 @@ void get_latest_sms_containing_prefix(Network *network, char *buffer, const char
 void connect_underlying_network_medium_try_once(Network* network)
 {
     int rc = FAILURE;
-    showCommandOutput = 1;
 
     info_log("(RE-)INITIALIZING MODEM");
 
