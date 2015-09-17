@@ -715,7 +715,7 @@ static int setUpModemSocket(Network *network)
     /*
      */
     commands[7].command = NULL;
-    rc = runBatchCommands("MODEM-SOCKET-SETUP", 1);
+    rc = runBatchCommands("MODEM-SOCKET-SETUP", 0);
 
 exit:
     if(commands[1].successStrings[0])
