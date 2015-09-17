@@ -16,7 +16,8 @@ struct Network
     unsigned char socketCorrupted;
 
 #ifdef GSM_INTERFACE_ENABLED
-    char gsmClientId[MAX_GSM_PROVISION_PARAM_SIZE];
+    char gsmClientId[MAX_CLIENT_ID_SIZE];
+    char gsmAuth[MAX_GSM_PROVISION_PARAM_SIZE];
     char gsmApn[MAX_GSM_PROVISION_PARAM_SIZE];
     char gsmUser[MAX_GSM_PROVISION_PARAM_SIZE];
     char gsmPass[MAX_GSM_PROVISION_PARAM_SIZE];

@@ -110,12 +110,9 @@ struct InstaMsg {
 
     MQTTPacket_connectData connectOptions;
 
-#ifdef GSM_INTERFACE_ENABLED
-#else
-    char clientIdMachine[MAX_BUFFER_SIZE];
-#endif
+    char clientIdMachine[MAX_CLIENT_ID_SIZE];
+    char username[MAX_CLIENT_ID_SIZE];
 
-    char username[MAX_BUFFER_SIZE];
     char password[MAX_BUFFER_SIZE];
 
     unsigned char connected;
