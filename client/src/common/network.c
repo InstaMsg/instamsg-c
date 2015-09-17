@@ -27,7 +27,13 @@ void init_network(Network *network, const char *hostName, unsigned int port)
 
     /* Fill-in the provisioning-parameters from the SMS obtained from InstaMsg-Server */
     RESET_GLOBAL_BUFFER;
-    get_latest_sms_containing_prefix(network, (char*)GLOBAL_BUFFER, "{\"cid\":\"");
+    while(strlen((char*)GLOBAL_BUFFER) == 0)
+    {
+        info_log("\n\n\nProvisioning-SMS not available, retrying to fetch from storage area\n\n\n");
+        startAndCountdownTimer(5, 0);
+
+        get_latest_sms_containing_prefix(network, (char*)GLOBAL_BUFFER, "{\"cid\":\"");
+    }
 
     getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, "cid", network->gsmClientId);
     getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, "auth", network->gsmAuth);
