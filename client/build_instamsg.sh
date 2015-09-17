@@ -38,6 +38,13 @@ SOURCES=`echo                                                                   
 mkdir -p build/${VENDOR}
 rm -f build/${VENDOR}/*
 
+
+if [ ! -z ${IS_GSM_DEVICE} ];
+then
+    COMPILE_COMMAND="${COMPILE_COMMAND} -DGSM_INTERFACE_ENABLED"
+fi
+
+
 # Compile the File-System-Module only if applicable.
 if [ ! -z ${FS_COMMUNICATION_IMPL} ];
 then

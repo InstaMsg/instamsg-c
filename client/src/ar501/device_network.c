@@ -475,11 +475,6 @@ continue_with_next_command:
 
 static int setUpModem(Network *network)
 {
-#if 1
-    const char *apn = "www";
-    const char *userid = "";
-    const char *passw = "";
-#endif
     int rc = FAILURE;
 
     /*
@@ -615,7 +610,7 @@ static int setUpModem(Network *network)
     }
     else
     {
-        sg_sprintf(commands[3].successStrings[0],"1,\"IP\",\"%s\"&#USERID: \"%s\"", apn, userid);
+        sg_sprintf(commands[3].successStrings[0],"1,\"IP\",\"%s\"&#USERID: \"%s\"", network->gsmApn, network->gsmUser);
     }
     commands[3].successStrings[1] = NULL;
     commands[3].commandInCaseNoSuccessStringPresent = (char*)sg_malloc(MAX_BUFFER_SIZE);
@@ -627,7 +622,7 @@ static int setUpModem(Network *network)
     else
     {
         sg_sprintf(commands[3].commandInCaseNoSuccessStringPresent, "AT+CGDCONT=1,\"IP\",\"%s\";#USERID=\"%s\";#PASSW=\"%s\"\r\n",
-                   apn, userid, passw);
+                   network->gsmApn, network->gsmUser, network->gsmPass);
     }
 
 

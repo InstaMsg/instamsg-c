@@ -61,6 +61,7 @@ struct KeyValuePairs
 #define MAX_TRIES_ALLOWED_WHILE_READING_FROM_NETWORK_MEDIUM 5
 
 #define ENABLE_DEBUG_PROCESSING 0
+#define MAX_GSM_PROVISION_PARAM_SIZE 50
 /***************************************************************************************/
 
 static const char * const g_pcHex = "0123456789abcdef";

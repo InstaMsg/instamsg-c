@@ -9,20 +9,28 @@ typedef struct Network Network;
 
 struct Network
 {
+    /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
     char host[MAX_BUFFER_SIZE];
     int port;
 
     unsigned char socketCorrupted;
 
-    /*
-     * Any extra fields may be added here.
-     */
-    int socket;
+#ifdef GSM_INTERFACE_ENABLED
+    char gsmClientId[MAX_GSM_PROVISION_PARAM_SIZE];
+    char gsmApn[MAX_GSM_PROVISION_PARAM_SIZE];
+    char gsmUser[MAX_GSM_PROVISION_PARAM_SIZE];
+    char gsmPass[MAX_GSM_PROVISION_PARAM_SIZE];
+#endif
 
     int (*read) (Network *network, unsigned char* buffer, int len, unsigned char guaranteed);
     int (*write)(Network *network, unsigned char* buffer, int len);
+    /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
+
+
+
+    /* ============================= ANY EXTRA FIELDS GO HERE ============================================= */
+    int socket;
+    /* ============================= ANY EXTRA FIELDS GO HERE ============================================= */
 };
 
 #endif
-
-

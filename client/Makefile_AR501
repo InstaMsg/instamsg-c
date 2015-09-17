@@ -10,6 +10,13 @@ SYSTEM_INCLUDES=`echo                                               \
 VENDOR="ar501"
 
 
+# This parameter should be set, if the device is a GSM-one.
+# If not, then this parameter MUST NOT be defined.
+#
+# Setting of this parameter is required (when applicable), to enable provisioning.
+IS_GSM_DEVICE="Y"
+
+
 # Device-specific extra source-files.
 #
 EXTRA_SOURCES=`echo													\

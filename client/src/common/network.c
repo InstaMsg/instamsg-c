@@ -15,6 +15,14 @@ void init_network(Network *network, const char *hostName, unsigned int port)
     sg_sprintf(network->host, "%s", hostName);
     network->port = port;
 
+#ifdef GSM_INTERFACE_ENABLED
+    /* Empty-initialize the GSM-params. */
+    memset(network->gsmClientId, 0, MAX_GSM_PROVISION_PARAM_SIZE);
+    memset(network->gsmApn, 0, MAX_GSM_PROVISION_PARAM_SIZE);
+    memset(network->gsmUser, 0, MAX_GSM_PROVISION_PARAM_SIZE);
+    memset(network->gsmPass, 0, MAX_GSM_PROVISION_PARAM_SIZE);
+#endif
+
     /* Connect the medium (socket). */
     connect_underlying_network_medium_try_once(network);
 }
