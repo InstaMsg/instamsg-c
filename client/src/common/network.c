@@ -1,6 +1,8 @@
 #include "./include/network.h"
 #include "./include/globals.h"
 #include "./include/log.h"
+#include "./include/json.h"
+
 
 void init_network(Network *network, const char *hostName, unsigned int port)
 {
@@ -23,9 +25,18 @@ void init_network(Network *network, const char *hostName, unsigned int port)
     memset(network->gsmUser, 0, MAX_GSM_PROVISION_PARAM_SIZE);
     memset(network->gsmPass, 0, MAX_GSM_PROVISION_PARAM_SIZE);
 
-    strcpy(network->gsmClientId, "2ebb9430-aa9d-11e4-a4c6-404014d5dd81");
-    strcpy(network->gsmAuth, "ajaygarg789");
-    strcpy(network->gsmApn, "www");
+    /* Fill-in the provisioning-parameters from the SMS obtained from InstaMsg-Server */
+    RESET_GLOBAL_BUFFER;
+    get_latest_sms_containing_prefix(network, (char*)GLOBAL_BUFFER, "{\"cid\":\"");
+
+    getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, "cid", network->gsmClientId);
+    getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, "auth", network->gsmAuth);
+    getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, "apn", network->gsmApn);
+    getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, "user", network->gsmUser);
+    getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, "pass", network->gsmPass);
+
+    info_log("Provisioning-Params ::  cid : [%s], auth : [%s], apn : [%s], user : [%s], pass : [%s]",
+             network->gsmClientId, network->gsmAuth, network->gsmApn, network->gsmUser, network->gsmPass);
 #endif
 
     /* Connect the medium (socket). */

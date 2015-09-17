@@ -1,5 +1,18 @@
 #include "../common/include/globals.h"
 
+#ifdef GSM_INTERFACE_ENABLED
+/*
+ * This method returns the *****LATEST****** sms, which contains the desired prefix.
+ *
+ * Please note that this method is called by Instamsg-application, *****BEFORE***** calling
+ * "connect_underlying_network_medium_try_once".
+ */
+void get_latest_sms_containing_prefix(Network *network, char *buffer, const char *prefix)
+{
+}
+#endif
+
+
 /*
  * This method tries to establish the network/socket to "network->host" on "network->port".
  *
