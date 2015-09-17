@@ -23,7 +23,6 @@ void init_network(Network *network, const char *hostName, unsigned int port)
     memset(network->gsmUser, 0, MAX_GSM_PROVISION_PARAM_SIZE);
     memset(network->gsmPass, 0, MAX_GSM_PROVISION_PARAM_SIZE);
 
-    //strictly
     strcpy(network->gsmClientId, "2ebb9430-aa9d-11e4-a4c6-404014d5dd81");
     strcpy(network->gsmAuth, "ajaygarg789");
     strcpy(network->gsmApn, "www");
