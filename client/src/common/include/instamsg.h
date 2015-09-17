@@ -109,7 +109,12 @@ struct InstaMsg {
 #endif
 
     MQTTPacket_connectData connectOptions;
+
+#ifdef GSM_INTERFACE_ENABLED
+#else
     char clientIdMachine[MAX_BUFFER_SIZE];
+#endif
+
     char username[MAX_BUFFER_SIZE];
     char password[MAX_BUFFER_SIZE];
 

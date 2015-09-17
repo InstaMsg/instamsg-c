@@ -684,9 +684,14 @@ void initInstaMsg(InstaMsg* c,
 	c->connectOptions.MQTTVersion = 3;
 	c->connectOptions.cleansession = 1;
 
+#ifdef GSM_INTERFACE_ENABLED
+    c->connectOptions.clientID.cstring = (c->ipstack).gsmClientId;
+#else
     memset(c->clientIdMachine, 0, MAX_BUFFER_SIZE);
     strncpy(c->clientIdMachine, clientId, 23);
+
     c->connectOptions.clientID.cstring = c->clientIdMachine;
+#endif
 
     memset(c->username, 0, MAX_BUFFER_SIZE);
     strcpy(c->username, clientId + 24);
