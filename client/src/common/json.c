@@ -27,6 +27,9 @@ void getJsonKeyValueIfPresent(char *json, const char *key, char *buf)
         goto exit;
     }
 
+    memset(parsedKeyToken, 0, MAX_BUFFER_SIZE);
+    memset(parsedValueToken, 0, MAX_BUFFER_SIZE);
+
     NOT_FOUND = ' ';
     keyWrapper = NOT_FOUND;
     jsonStartingPointer = json;
@@ -45,15 +48,17 @@ void getJsonKeyValueIfPresent(char *json, const char *key, char *buf)
             /* This means we need to start parsing the key now. */
             keyWrapper = *json;
         }
+        else if((*json == ':') && (keyWrapper == NOT_FOUND))
+        {
+        }
         else if(    (*json == keyWrapper) ||
-                    ((*json == ':') && (keyWrapper == NOT_FOUND)) ||
                     ((*json == '}') && (keyWrapper == NOT_FOUND)))
         {
             /* We need to stop parsing the key now. */
             keyWrapper = NOT_FOUND;
 
             /* Now, if we were currrently parsing-key, move to parsing value. */
-            if(strlen(parsedValueToken) == 0)
+            if((strlen(parsedValueToken) == 0) && (token == parsedKeyToken))
             {
                 token = parsedValueToken;
             }
@@ -64,7 +69,7 @@ void getJsonKeyValueIfPresent(char *json, const char *key, char *buf)
                 {
                     strcat(buf, parsedValueToken);
 
-                    debug_log("Found key [%s] and value [%s] in json [%s]", parsedKeyToken, parsedValueToken, jsonStartingPointer);
+                    debug_log("Found key [%s] and value [%s] in json [%s]", parsedKeyToken, buf, jsonStartingPointer);
                     goto exit;
                 }
 

@@ -32,7 +32,33 @@ void init_network(Network *network, const char *hostName, unsigned int port)
         info_log("\n\n\nProvisioning-SMS not available, retrying to fetch from storage area\n\n\n");
         startAndCountdownTimer(5, 1);
 
-        get_latest_sms_containing_prefix(network, (char*)GLOBAL_BUFFER, "{\"cid\":\"");
+        get_latest_sms_containing_prefix(network, (char*)GLOBAL_BUFFER, "\"cid\":\"");
+    }
+
+    /*
+     * For some SIMs, the "{" and "}" sent from server are replaced by "(" and ")".
+     * Rectify them.
+     */
+    {
+        int i;
+        for(i = 0; i < strlen((char*)GLOBAL_BUFFER); i++)
+        {
+            if(GLOBAL_BUFFER[i] == '(')
+            {
+                GLOBAL_BUFFER[i] = '{';
+                break;
+            }
+        }
+
+        for(i = strlen((char*)GLOBAL_BUFFER) - 1; i >= 0; i--)
+        {
+            if(GLOBAL_BUFFER[i] == ')')
+            {
+                GLOBAL_BUFFER[i] = '}';
+                break;
+            }
+        }
+
     }
 
     getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, "cid", network->gsmClientId);
@@ -41,8 +67,9 @@ void init_network(Network *network, const char *hostName, unsigned int port)
     getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, "user", network->gsmUser);
     getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, "pass", network->gsmPass);
 
-    info_log("Provisioning-Params ::  cid : [%s], auth : [%s], apn : [%s], user : [%s], pass : [%s]",
+    info_log("\n\nProvisioning-Params ::  cid : [%s], auth : [%s], apn : [%s], user : [%s], pass : [%s]\n\n",
              network->gsmClientId, network->gsmAuth, network->gsmApn, network->gsmUser, network->gsmPass);
+    startAndCountdownTimer(3, 0);
 #endif
 
     /* Connect the medium (socket). */

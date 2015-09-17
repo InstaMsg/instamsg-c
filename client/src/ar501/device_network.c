@@ -29,6 +29,7 @@
 typedef struct NetworkInitCommands NetworkInitCommands;
 
 static char result[MAX_BUFFER_SIZE];
+static char tempSmsBuffer[170];
 static char *readBuffer;
 
 static char *responseBuffer;
@@ -740,13 +741,17 @@ exit:
 
 #ifdef GSM_INTERFACE_ENABLED
 /*
- * This method returns the *****LATEST****** sms, which contains the desired prefix.
+ * This method returns the *****LATEST****** sms, which contains the desired substring.
+ *
+ * Note that "{" are sometimes not processed correctly by some SIMs, so a prefix-match (which
+ * otherwise is a stronger check) is not being done.
  *
  * Please note that this method is called by Instamsg-application, *****BEFORE***** calling
  * "connect_underlying_network_medium_try_once".
  */
-void get_latest_sms_containing_prefix(Network *network, char *buffer, const char *prefix)
+void get_latest_sms_containing_prefix(Network *network, char *buffer, const char *substr)
 {
+    int smsIndex = 1;
     /*
      * The modem must be set-up properly (SIM in place, etc.) for us to retrieve the sms.
      */
@@ -768,17 +773,14 @@ void get_latest_sms_containing_prefix(Network *network, char *buffer, const char
 
     while(1)
     {
-        static int i = 1;
-
         unsigned char readingPayload = 0;
+        char *tempBuffer = tempSmsBuffer;
         int bufferIndex = 0;
 
-        buffer[0] = 0;
-
         memset(sendCommandBuffer, 0, SEND_COMMAND_BUFFER_SIZE);
-        sg_sprintf(sendCommandBuffer, "AT+CMGR=%u\r\n", i);
+        sg_sprintf(sendCommandBuffer, "AT+CMGR=%u\r\n", smsIndex);
 
-        info_log("\n\nScanning SMS [%u] for Provisioning-Params", i);
+        info_log("\n\nScanning SMS [%u] for Provisioning-Params", smsIndex);
         SEND_CMD_AND_READ_RESPONSE_ON_UART1(sendCommandBuffer, LENGTH_OF_COMMAND, NULL, NULL);
 
         if(errorObtained == 1)
@@ -831,14 +833,14 @@ void get_latest_sms_containing_prefix(Network *network, char *buffer, const char
                         /*
                         * We are in readingPayload-mode, keep reading..
                         */
-                        buffer[bufferIndex] = readBuffer[i];
+                        tempBuffer[bufferIndex] = readBuffer[i];
                         bufferIndex++;
                     }
                 }
             }
         }
 
-        i++;
+        smsIndex++;
 
         /*
          * Strip in trailing '\r', if any.
@@ -846,9 +848,10 @@ void get_latest_sms_containing_prefix(Network *network, char *buffer, const char
         bufferIndex--;
         while(1)
         {
-            if(buffer[bufferIndex] == '\r')
+            if(tempBuffer[bufferIndex] == '\r')
             {
-                buffer[bufferIndex] = 0;
+                tempBuffer[bufferIndex] = 0;
+                bufferIndex--;
             }
             else
             {
@@ -856,14 +859,28 @@ void get_latest_sms_containing_prefix(Network *network, char *buffer, const char
             }
         }
 
-        info_log("SMS-Payload = [%s]", buffer);
+        /*
+         * Null-Terminate the temporary-buffer.
+         */
+        tempBuffer[bufferIndex + 1] = 0;
+        info_log("SMS-Payload = [%s]", tempBuffer);
+
 
         /*
-         * If the prefix does not match, pseudo-empty the SMS-Buffer.
+         * If the substring is present, we copy from temporary-buffer to actual buffer.
          */
-        if(strncmp(buffer, prefix, strlen(prefix)) != 0)
+        if(strstr(tempBuffer, substr) != NULL)
         {
-            buffer[0] = 0;
+            int j;
+            for(j = 0; j < strlen(tempBuffer); j++)
+            {
+                buffer[j] = tempBuffer[j];
+            }
+
+            /*
+             * Null-Terminate the actual-buffer.
+             */
+            buffer[j] = 0;
         }
 
         /*
@@ -879,7 +896,7 @@ void get_latest_sms_containing_prefix(Network *network, char *buffer, const char
     info_log("Provisioning-Info SMS extracted = [%s]", buffer);
 
     //strictly
-    strcpy(buffer, "{\"cid\":\"2ebb9430-aa9d-11e4-a4c6-404014d5dd81\",\"auth\":\"ajaygarg789\",\"apn\":\"www\",\"user\":\"\",\"pass\":\"\"}");
+    //strcpy(buffer, "{\"cid\":\"2ebb9430-aa9d-11e4-a4c6-404014d5dd81\",\"auth\":\"ajaygarg789\",\"apn\":\"www\",\"user\":\"\",\"pass\":\"\"}");
 }
 #endif
 
