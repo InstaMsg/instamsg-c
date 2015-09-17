@@ -598,125 +598,61 @@ static int setUpModem(Network *network)
     commands[2].successStrings[2] = NULL;
     commands[2].commandInCaseNoSuccessStringPresent = NULL;
 
+    /*
+     */
+    commands[3].command = NULL;
+    rc = runBatchCommands("MODEM-SETUP", 1);
+
+    return rc;
+}
+
+
+static int setUpModemSocket(Network *network)
+{
+    int rc = FAILURE;
+
 
     /*
      */
-    commands[3].command = "AT+CGDCONT?;#USERID?\r\n";
-    commands[3].logInfoCommand = "GPRS-Context-Correctness";
-    commands[3].successStrings[0] = (char*)sg_malloc(MAX_BUFFER_SIZE);
-    if(commands[3].successStrings[0] == NULL)
+    commands[0].command = "AT+CGDCONT?;#USERID?\r\n";
+    commands[0].logInfoCommand = "GPRS-Context-Correctness";
+    commands[0].successStrings[0] = (char*)sg_malloc(MAX_BUFFER_SIZE);
+    if(commands[0].successStrings[0] == NULL)
     {
         error_log("Could not allocate memory for successStrings[0] while testing for GPRS-context");
         goto exit;
     }
     else
     {
-        sg_sprintf(commands[3].successStrings[0],"1,\"IP\",\"%s\"&#USERID: \"%s\"", network->gsmApn, network->gsmUser);
+        sg_sprintf(commands[0].successStrings[0],"1,\"IP\",\"%s\"&#USERID: \"%s\"", network->gsmApn, network->gsmUser);
     }
-    commands[3].successStrings[1] = NULL;
-    commands[3].commandInCaseNoSuccessStringPresent = (char*)sg_malloc(MAX_BUFFER_SIZE);
-    if(commands[3].commandInCaseNoSuccessStringPresent == NULL)
+    commands[0].successStrings[1] = NULL;
+    commands[0].commandInCaseNoSuccessStringPresent = (char*)sg_malloc(MAX_BUFFER_SIZE);
+    if(commands[0].commandInCaseNoSuccessStringPresent == NULL)
     {
         error_log("Could not allocate memory for commandInCaseNoSuccessStringPresent while testing for GPRS-context");
         goto exit;
     }
     else
     {
-        sg_sprintf(commands[3].commandInCaseNoSuccessStringPresent, "AT+CGDCONT=1,\"IP\",\"%s\";#USERID=\"%s\";#PASSW=\"%s\"\r\n",
+        sg_sprintf(commands[0].commandInCaseNoSuccessStringPresent, "AT+CGDCONT=1,\"IP\",\"%s\";#USERID=\"%s\";#PASSW=\"%s\"\r\n",
                    network->gsmApn, network->gsmUser, network->gsmPass);
     }
 
 
     /*
      */
-    commands[4].command = "AT+CGATT?\r\n";
-    commands[4].logInfoCommand = "GPRS-Attachment-State";
-    commands[4].successStrings[0] = "+CGATT: 1";
-    commands[4].successStrings[1] = NULL;
-    commands[4].commandInCaseNoSuccessStringPresent = NULL;
-
-
-    /*
-     */
-    commands[5].command = "AT#SGACTCFG=1,15,180\r\n";
-    commands[5].logInfoCommand = "Set-GPRS-Context-Config";
-    commands[5].successStrings[0] = "\r\nOK\r\n";
-    commands[5].successStrings[1] = NULL;
-    commands[5].commandInCaseNoSuccessStringPresent = NULL;
-
-
-    /*
-     */
-    commands[6].command = "AT#SGACT?\r\n";
-    commands[6].logInfoCommand = "Actiavte-GPRS-PDP-Context-If-Not-Already";
-    commands[6].successStrings[0] = "#SGACT: 1,1";
-    commands[6].successStrings[1] = NULL;
-    commands[6].commandInCaseNoSuccessStringPresent = "AT#SGACT=1,1\r\n";
-
-
-    /*
-     */
-    commands[7].command = NULL;
-    rc = runBatchCommands("MODEM-CONFIGURATION", 1);
-
-exit:
-    if(commands[3].successStrings[0])
-        sg_free(commands[3].successStrings[0]);
-
-    if(commands[3].commandInCaseNoSuccessStringPresent)
-        sg_free(commands[3].commandInCaseNoSuccessStringPresent);
-
-
-    return rc;
-}
-
-
-static int setUpModemSocket(int socketId)
-{
-    int rc = FAILURE;
-
-    /*
-     */
-    commands[0].command = (char*)sg_malloc(MAX_BUFFER_SIZE);
-    if(commands[0].command == NULL)
-    {
-        error_log(MODEM_SOCKET "Could not allocate memory for AT#SCFG", socketId);
-        goto exit;
-    }
-    sg_sprintf(commands[0].command, "AT#SCFG=%u,1,512,0,600,50\r\n", socketId);
-    commands[0].logInfoCommand = "Socket-Configuration";
-    commands[0].successStrings[0] = "\r\nOK\r\n";
-    commands[0].successStrings[1] = NULL;
-    commands[0].commandInCaseNoSuccessStringPresent = NULL;
-
-
-    /*
-     */
-    commands[1].command = (char*)sg_malloc(MAX_BUFFER_SIZE);
-    if(commands[1].command == NULL)
-    {
-        error_log(MODEM_SOCKET "Could not allocate memory for AT#SCFGEXT", socketId);
-        goto exit;
-    }
-    sg_sprintf(commands[1].command, "AT#SCFGEXT= %u,0,0,0,0\r\n", socketId);
-    commands[1].logInfoCommand = "Extended-Socket-Configuration";
-    commands[1].successStrings[0] = "\r\nOK\r\n";
+    commands[1].command = "AT+CGATT?\r\n";
+    commands[1].logInfoCommand = "GPRS-Attachment-State";
+    commands[1].successStrings[0] = "+CGATT: 1";
     commands[1].successStrings[1] = NULL;
     commands[1].commandInCaseNoSuccessStringPresent = NULL;
 
 
     /*
      */
-    commands[2].command = (char*)sg_malloc(MAX_BUFFER_SIZE);
-    if(commands[2].command == NULL)
-    {
-        error_log(MODEM_SOCKET "Could not allocate memory for AT#SD", socketId);
-        goto exit;
-    }
-    //sg_sprintf(commands[2].command, "AT#SD=%u,0,8000,\"101.63.73.120\",0,0,1\r\n", socketId);
-    //sg_sprintf(commands[2].command, "AT#SD=%u,0,32000,\"platform.instamsg.io\",0,0,1\r\n", socketId);
-    sg_sprintf(commands[2].command, "AT#SD=%u,0,%u,\"%s\",0,0,1\r\n", socketId, INSTAMSG_PORT, INSTAMSG_HOST);
-    commands[2].logInfoCommand = "Socket-Connection-To-Server";
+    commands[2].command = "AT#SGACTCFG=1,15,180\r\n";
+    commands[2].logInfoCommand = "Set-GPRS-Context-Config";
     commands[2].successStrings[0] = "\r\nOK\r\n";
     commands[2].successStrings[1] = NULL;
     commands[2].commandInCaseNoSuccessStringPresent = NULL;
@@ -724,18 +660,78 @@ static int setUpModemSocket(int socketId)
 
     /*
      */
-    commands[3].command = NULL;
-    rc = runBatchCommands("MODEM-SOCKET-CONFIGURATION", 0);
+    commands[3].command = "AT#SGACT?\r\n";
+    commands[3].logInfoCommand = "Actiavte-GPRS-PDP-Context-If-Not-Already";
+    commands[3].successStrings[0] = "#SGACT: 1,1";
+    commands[3].successStrings[1] = NULL;
+    commands[3].commandInCaseNoSuccessStringPresent = "AT#SGACT=1,1\r\n";
+
+
+    /*
+     */
+    commands[4].command = (char*)sg_malloc(MAX_BUFFER_SIZE);
+    if(commands[4].command == NULL)
+    {
+        error_log(MODEM_SOCKET "Could not allocate memory for AT#SCFG", network->socket);
+        goto exit;
+    }
+    sg_sprintf(commands[4].command, "AT#SCFG=%u,1,512,0,600,50\r\n", network->socket);
+    commands[4].logInfoCommand = "Socket-Configuration";
+    commands[4].successStrings[0] = "\r\nOK\r\n";
+    commands[4].successStrings[1] = NULL;
+    commands[4].commandInCaseNoSuccessStringPresent = NULL;
+
+
+    /*
+     */
+    commands[5].command = (char*)sg_malloc(MAX_BUFFER_SIZE);
+    if(commands[5].command == NULL)
+    {
+        error_log(MODEM_SOCKET "Could not allocate memory for AT#SCFGEXT", network->socket);
+        goto exit;
+    }
+    sg_sprintf(commands[5].command, "AT#SCFGEXT= %u,0,0,0,0\r\n", network->socket);
+    commands[5].logInfoCommand = "Extended-Socket-Configuration";
+    commands[5].successStrings[0] = "\r\nOK\r\n";
+    commands[5].successStrings[1] = NULL;
+    commands[5].commandInCaseNoSuccessStringPresent = NULL;
+
+
+    /*
+     */
+    commands[6].command = (char*)sg_malloc(MAX_BUFFER_SIZE);
+    if(commands[6].command == NULL)
+    {
+        error_log(MODEM_SOCKET "Could not allocate memory for AT#SD", network->socket);
+        goto exit;
+    }
+    sg_sprintf(commands[6].command, "AT#SD=%u,0,%u,\"%s\",0,0,1\r\n", network->socket, INSTAMSG_PORT, INSTAMSG_HOST);
+    commands[6].logInfoCommand = "Socket-Connection-To-Server";
+    commands[6].successStrings[0] = "\r\nOK\r\n";
+    commands[6].successStrings[1] = NULL;
+    commands[6].commandInCaseNoSuccessStringPresent = NULL;
+
+
+    /*
+     */
+    commands[7].command = NULL;
+    rc = runBatchCommands("MODEM-SOCKET-SETUP", 1);
 
 exit:
-    if(commands[0].command)
-        sg_free(commands[0].command);
+    if(commands[1].successStrings[0])
+        sg_free(commands[1].successStrings[0]);
 
-    if(commands[1].command)
-        sg_free(commands[1].command);
+    if(commands[1].commandInCaseNoSuccessStringPresent)
+        sg_free(commands[1].commandInCaseNoSuccessStringPresent);
 
-    if(commands[2].command)
-        sg_free(commands[2].command);
+    if(commands[5].command)
+        sg_free(commands[5].command);
+
+    if(commands[6].command)
+        sg_free(commands[6].command);
+
+    if(commands[7].command)
+        sg_free(commands[7].command);
 
 
     return rc;
@@ -881,6 +877,9 @@ void get_latest_sms_containing_prefix(Network *network, char *buffer, const char
 
     info_log("\n\n\n\nFinished scanning SMSes..");
     info_log("Provisioning-Info SMS extracted = [%s]", buffer);
+
+    //strictly
+    strcpy(buffer, "{\"cid\":\"2ebb9430-aa9d-11e4-a4c6-404014d5dd81\",\"auth\":\"ajaygarg789\",\"apn\":\"www\",\"user\":\"\",\"pass\":\"\"}");
 }
 #endif
 
@@ -941,7 +940,7 @@ void connect_underlying_network_medium_try_once(Network* network)
     /*
      * 2. Configure and Connect the socket.
      */
-    rc = setUpModemSocket(network->socket);
+    rc = setUpModemSocket(network);
     if(rc == SUCCESS)
     {
         /*

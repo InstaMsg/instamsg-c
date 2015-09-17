@@ -30,7 +30,7 @@ void init_network(Network *network, const char *hostName, unsigned int port)
     while(strlen((char*)GLOBAL_BUFFER) == 0)
     {
         info_log("\n\n\nProvisioning-SMS not available, retrying to fetch from storage area\n\n\n");
-        startAndCountdownTimer(5, 0);
+        startAndCountdownTimer(5, 1);
 
         get_latest_sms_containing_prefix(network, (char*)GLOBAL_BUFFER, "{\"cid\":\"");
     }
