@@ -749,7 +749,7 @@ exit:
  * Please note that this method is called by Instamsg-application, *****BEFORE***** calling
  * "connect_underlying_network_medium_try_once".
  */
-void get_latest_sms_containing_prefix(Network *network, char *buffer, const char *substr)
+void get_latest_sms_containing_substring(Network *network, char *buffer, const char *substr)
 {
     int smsIndex = 1;
     /*

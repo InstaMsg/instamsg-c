@@ -32,7 +32,7 @@ void init_network(Network *network, const char *hostName, unsigned int port)
         info_log("\n\n\nProvisioning-SMS not available, retrying to fetch from storage area\n\n\n");
         startAndCountdownTimer(5, 1);
 
-        get_latest_sms_containing_prefix(network, (char*)GLOBAL_BUFFER, "\"cid\":\"");
+        get_latest_sms_containing_substring(network, (char*)GLOBAL_BUFFER, "\"cid\":\"");
     }
 
     /*
