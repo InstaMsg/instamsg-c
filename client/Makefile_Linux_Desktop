@@ -20,6 +20,20 @@ VENDOR="linux_desktop"
 FS_COMMUNICATION_IMPL="Y"
 
 
+# This parameter should be set, if the device is a GSM-one.
+# If not, then this parameter MUST NOT be defined.
+#
+# Setting of this parameter is required (when applicable), to enable provisioning.
+#
+#IS_GSM_DEVICE="Y"
+
+
+# This parameter should be set, if the communication is over SSL.
+# If not, then this parameter MUST NOT be defined.
+#
+#IS_SSL="Y"
+
+
 # Device-specific extra source-files.
 #
 EXTRA_SOURCES=`echo															\

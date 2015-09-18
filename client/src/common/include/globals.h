@@ -42,7 +42,13 @@ struct KeyValuePairs
 /****************************************************************************************/
 #if 1
 #define INSTAMSG_HOST       "test.ioeye.com"
+
+#ifdef SSL_ENABLED
+#define INSTAMSG_PORT       8883
+#else
 #define INSTAMSG_PORT       1883
+#endif
+
 #define INSTAMSG_HTTP_HOST  "platform.instamsg.io"
 #define INSTAMSG_HTTP_PORT  80
 #define LOG_LEVEL           2

@@ -45,6 +45,13 @@ then
 fi
 
 
+if [ ! -z ${IS_SSL} ];
+then
+    COMPILE_COMMAND="${COMPILE_COMMAND} -DSSL_ENABLED"
+fi
+
+
+
 # Compile the File-System-Module only if applicable.
 if [ ! -z ${FS_COMMUNICATION_IMPL} ];
 then
