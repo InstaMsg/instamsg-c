@@ -25,6 +25,8 @@
 
 #include <string.h>
 
+#define NO_CLIENT_ID "NONE"
+
 static void serverLoggingTopicMessageArrived(InstaMsg *c, MQTTMessage *msg)
 {
     /*
@@ -628,8 +630,7 @@ void initInstaMsg(InstaMsg* c,
                   char *logFilePath)
 {
     int i;
-    char *clientId;
-    char *authKey;
+    char *clientId = NULL;
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
     init_file_logger(&fileLogger, logFilePath);
@@ -648,23 +649,6 @@ void initInstaMsg(InstaMsg* c,
         return;
     }
 
-#ifdef GSM_INTERFACE_ENABLED
-    /*
-     * Fill the connection-authentication parameters received from the InstaMsg-Server-SMS.
-     */
-    clientId = (c->ipstack).gsmClientId;
-    authKey = (c->ipstack).gsmAuth;
-#else
-    /*
-     * Prepare to let the server authenticate the device !!!
-     */
-    clientId = "NONE";
-
-    RESET_GLOBAL_BUFFER;
-    get_device_uuid(&(c->ipstack), (char*)GLOBAL_BUFFER);
-    authKey = (char*)GLOBAL_BUFFER;
-#endif
-
 
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {
@@ -682,19 +666,19 @@ void initInstaMsg(InstaMsg* c,
     c->oneToOneMessageCallback = oneToOneMessageHandler;
 
     memset(c->filesTopic, 0, MAX_BUFFER_SIZE);
-    sg_sprintf(c->filesTopic, "instamsg/clients/%s/files", clientId);
+    sg_sprintf(c->filesTopic, "instamsg/clients/%s/files", clientId); /* TODO: How do we do this for Non-GSM ???? */
 
     memset(c->rebootTopic, 0, MAX_BUFFER_SIZE);
-    sg_sprintf(c->rebootTopic, "instamsg/clients/%s/reboot", clientId);
+    sg_sprintf(c->rebootTopic, "instamsg/clients/%s/reboot", clientId); /* TODO: How do we do this for Non-GSM ???? */
 
     memset(c->enableServerLoggingTopic, 0, MAX_BUFFER_SIZE);
-    sg_sprintf(c->enableServerLoggingTopic, "instamsg/clients/%s/enableServerLogging", clientId);
+    sg_sprintf(c->enableServerLoggingTopic, "instamsg/clients/%s/enableServerLogging", clientId); /* TODO: How do we do this for Non-GSM ???? */
 
     memset(c->serverLogsTopic, 0, MAX_BUFFER_SIZE);
-    sg_sprintf(c->serverLogsTopic, "instamsg/clients/%s/logs", clientId);
+    sg_sprintf(c->serverLogsTopic, "instamsg/clients/%s/logs", clientId); /* TODO: How do we do this for Non-GSM ???? */
 
     memset(c->fileUploadUrl, 0, MAX_BUFFER_SIZE);
-    sg_sprintf(c->fileUploadUrl, "/api/beta/clients/%s/files", clientId);
+    sg_sprintf(c->fileUploadUrl, "/api/beta/clients/%s/files", clientId); /* TODO: How do we do this for Non-GSM ???? */
 
     c->serverLoggingEnabled = 0;
 
@@ -702,16 +686,31 @@ void initInstaMsg(InstaMsg* c,
 	c->connectOptions.MQTTVersion = 3;
 	c->connectOptions.cleansession = 1;
 
+
     memset(c->clientIdMachine, 0, MAX_CLIENT_ID_SIZE);
-    strncpy(c->clientIdMachine, clientId, 23);
+#ifdef GSM_INTERFACE_ENABLED
+    strncpy(c->clientIdMachine, (c->ipstack).gsmClientId, 23);
+#else
+    strcpy(c->clientIdMachine, NO_CLIENT_ID);
+#endif
     c->connectOptions.clientID.cstring = c->clientIdMachine;
 
+
     memset(c->username, 0, MAX_CLIENT_ID_SIZE);
-    strcpy(c->username, clientId + 24);
+#ifdef GSM_INTERFACE_ENABLED
+    strcpy(c->username, (c->ipstack).gsmClientId + 24);
+#else
+    strcpy(c->username, "");
+#endif
     c->connectOptions.username.cstring = c->username;
 
+
     memset(c->password, 0, MAX_BUFFER_SIZE);
-    strcpy(c->password, authKey);
+#ifdef GSM_INTERFACE_ENABLED
+    strcpy(c->password, (c->ipstack).gsmAuth);
+#else
+    get_device_uuid(&(c->ipstack), c->password);
+#endif
     c->connectOptions.password.cstring = c->password;
 
     c->connected = 0;
