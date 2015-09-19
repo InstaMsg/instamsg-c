@@ -272,7 +272,7 @@ int main(int argc, char** argv)
 
 
     globalSystemInit();
-    start(opts.clientid, opts.password, onConnectOneTimeOperations, onDisconnect, NULL,
+    start(onConnectOneTimeOperations, onDisconnect, NULL,
           coreLoopyBusinessLogicInitiatedBySelf, opts.logFilePath);
 }
 

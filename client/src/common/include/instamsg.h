@@ -146,8 +146,6 @@ void setDefaultMessageHandler(InstaMsg*, messageHandler);
 
 void clearInstaMsg(InstaMsg *c);
 void initInstaMsg(InstaMsg* c,
-                  char *clientId,
-                  char *authKey,
                   int (*connectHandler)(),
                   int (*disconnectHandler)(),
                   int (*oneToOneMessageHandler)(),
@@ -174,8 +172,7 @@ struct JSONParseStuff
 void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c);
 void removeExpiredResultHandlers(InstaMsg *c);
 void sendPingReqToServer(InstaMsg *c);
-void start(char *clientId, char *password,
-           int (*onConnectOneTimeOperations)(),
+void start(int (*onConnectOneTimeOperations)(),
            int (*onDisconnect)(),
            int (*oneToOneMessageHandler)(),
            void (*coreLoopyBusinessLogicInitiatedBySelf)(),

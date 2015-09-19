@@ -898,6 +898,13 @@ void get_latest_sms_containing_substring(Network *network, char *buffer, const c
     //strictly
     //strcpy(buffer, "{\"cid\":\"2ebb9430-aa9d-11e4-a4c6-404014d5dd81\",\"auth\":\"ajaygarg789\",\"apn\":\"www\",\"user\":\"\",\"pass\":\"\"}");
 }
+#else
+/*
+ * This method returns the univerally-unique-identifier for this device.
+ */
+void get_device_uuid(Network *network, char *buffer)
+{
+}
 #endif
 
 

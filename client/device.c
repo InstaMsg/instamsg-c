@@ -36,6 +36,6 @@ void coreLoopyBusinessLogicInitiatedBySelf()
 int main(int argc, char** argv)
 {
     globalSystemInit();
-    start("2ebb9430-aa9d-11e4-a4c6-404014d5dd81", "ajaygarg789", NULL, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, NULL);
+    start(NULL, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, NULL);
 }
 

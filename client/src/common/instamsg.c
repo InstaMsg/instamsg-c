@@ -622,14 +622,14 @@ void clearInstaMsg(InstaMsg *c)
 
 
 void initInstaMsg(InstaMsg* c,
-                  char *clientId,
-                  char *authKey,
                   int (*connectHandler)(),
                   int (*disconnectHandler)(),
                   int (*oneToOneMessageHandler)(),
                   char *logFilePath)
 {
     int i;
+    char *clientId;
+    char *authKey;
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
     init_file_logger(&fileLogger, logFilePath);
@@ -648,13 +648,23 @@ void initInstaMsg(InstaMsg* c,
         return;
     }
 
-    /*
-     * Point to the GSM-provisioning parameters received from Instamsg-server if applicable.
-     */
 #ifdef GSM_INTERFACE_ENABLED
+    /*
+     * Fill the connection-authentication parameters received from the InstaMsg-Server-SMS.
+     */
     clientId = (c->ipstack).gsmClientId;
     authKey = (c->ipstack).gsmAuth;
+#else
+    /*
+     * Prepare to let the server authenticate the device !!!
+     */
+    clientId = "NONE";
+
+    RESET_GLOBAL_BUFFER;
+    get_device_uuid(&(c->ipstack), (char*)GLOBAL_BUFFER);
+    authKey = (char*)GLOBAL_BUFFER;
 #endif
+
 
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {
@@ -1038,8 +1048,7 @@ int MQTTDisconnect(InstaMsg* c)
 }
 
 
-void start(char *clientId, char *password,
-           int (*onConnectOneTimeOperations)(),
+void start(int (*onConnectOneTimeOperations)(),
            int (*onDisconnect)(),
            int (*oneToOneMessageHandler)(),
            void (*coreLoopyBusinessLogicInitiatedBySelf)(),
@@ -1049,7 +1058,7 @@ void start(char *clientId, char *password,
 
     while(1)
     {
-        initInstaMsg(c, clientId, password, onConnectOneTimeOperations, onDisconnect, oneToOneMessageHandler, logFilePath);
+        initInstaMsg(c, onConnectOneTimeOperations, onDisconnect, oneToOneMessageHandler, logFilePath);
 
         while(1)
         {
