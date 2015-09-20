@@ -630,7 +630,7 @@ void initInstaMsg(InstaMsg* c,
                   char *logFilePath)
 {
     int i;
-    char *clientId = NULL;
+    char *clientId = "";
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
     init_file_logger(&fileLogger, logFilePath);
