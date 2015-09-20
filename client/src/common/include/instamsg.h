@@ -57,11 +57,9 @@ typedef void (*messageHandler)(MessageData*);
 
 struct opts_struct
 {
-	char* clientid;
 	int nodelimiter;
 	char* delimiter;
 	enum QoS qos;
-	char* password;
 	char* host;
 	int port;
 	int showtopics;

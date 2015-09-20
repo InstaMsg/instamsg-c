@@ -66,8 +66,6 @@ void usage()
 	printf("  --port <port> (default is 1883)\n");
 	printf("  --qos <qos> (default is 2)\n");
 	printf("  --delimiter <delim> (default is \\n)\n");
-	printf("  --clientid <clientid> (default is hostname+timestamp)\n");
-	printf("  --password none\n");
 	printf("  --showtopics <on or off> (default is on if the topic has a wildcard, else off)\n");
 	exit(-1);
 }
@@ -113,20 +111,6 @@ void getopts(int argc, char** argv, struct opts_struct *opts)
 		{
 			if (++count < argc)
 				opts->port = atoi(argv[count]);
-			else
-				usage();
-		}
-		else if (strcmp(argv[count], "--clientid") == 0)
-		{
-			if (++count < argc)
-				opts->clientid = argv[count];
-			else
-				usage();
-		}
-		else if (strcmp(argv[count], "--password") == 0)
-		{
-			if (++count < argc)
-				opts->password = argv[count];
 			else
 				usage();
 		}
@@ -248,7 +232,7 @@ int main(int argc, char** argv)
 
     struct opts_struct opts =
     {
-        (char*)"stdout-subscriber", 0, (char*)"\n", QOS2, NULL, (char*)"localhost", 1883, 0, 0, 0, ""
+        0, (char*)"\n", QOS2, (char*)"localhost", 1883, 0, 0, 0, ""
     };
 
 	int rc = 0;
