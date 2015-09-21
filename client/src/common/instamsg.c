@@ -625,6 +625,25 @@ void clearInstaMsg(InstaMsg *c)
 }
 
 
+static void setValuesOfSpecialTopics(InstaMsg *c)
+{
+    memset(c->filesTopic, 0, MAX_BUFFER_SIZE);
+    sg_sprintf(c->filesTopic, "instamsg/clients/%s/files", c->clientIdComplete);
+
+    memset(c->rebootTopic, 0, MAX_BUFFER_SIZE);
+    sg_sprintf(c->rebootTopic, "instamsg/clients/%s/reboot", c->clientIdComplete);
+
+    memset(c->enableServerLoggingTopic, 0, MAX_BUFFER_SIZE);
+    sg_sprintf(c->enableServerLoggingTopic, "instamsg/clients/%s/enableServerLogging", c->clientIdComplete);
+
+    memset(c->serverLogsTopic, 0, MAX_BUFFER_SIZE);
+    sg_sprintf(c->serverLogsTopic, "instamsg/clients/%s/logs", c->clientIdComplete);
+
+    memset(c->fileUploadUrl, 0, MAX_BUFFER_SIZE);
+    sg_sprintf(c->fileUploadUrl, "/api/beta/clients/%s/files", c->clientIdComplete);
+}
+
+
 void initInstaMsg(InstaMsg* c,
                   int (*connectHandler)(),
                   int (*disconnectHandler)(),
@@ -632,7 +651,6 @@ void initInstaMsg(InstaMsg* c,
                   char *logFilePath)
 {
     int i;
-    char *clientId = "";
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
     init_file_logger(&fileLogger, logFilePath);
@@ -729,24 +747,6 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc)
     }
 }
 
-
-static void setValuesOfSpecialTopics(InstaMsg *c)
-{
-    memset(c->filesTopic, 0, MAX_BUFFER_SIZE);
-    sg_sprintf(c->filesTopic, "instamsg/clients/%s/files", c->clientIdComplete);
-
-    memset(c->rebootTopic, 0, MAX_BUFFER_SIZE);
-    sg_sprintf(c->rebootTopic, "instamsg/clients/%s/reboot", c->clientIdComplete);
-
-    memset(c->enableServerLoggingTopic, 0, MAX_BUFFER_SIZE);
-    sg_sprintf(c->enableServerLoggingTopic, "instamsg/clients/%s/enableServerLogging", c->clientIdComplete);
-
-    memset(c->serverLogsTopic, 0, MAX_BUFFER_SIZE);
-    sg_sprintf(c->serverLogsTopic, "instamsg/clients/%s/logs", c->clientIdComplete);
-
-    memset(c->fileUploadUrl, 0, MAX_BUFFER_SIZE);
-    sg_sprintf(c->fileUploadUrl, "/api/beta/clients/%s/files", c->clientIdComplete);
-}
 
 
 void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
