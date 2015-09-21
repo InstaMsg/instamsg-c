@@ -41,8 +41,6 @@ void get_latest_sms_containing_substring(Network *network, char *buffer, const c
  */
 void get_device_uuid(Network *network, char *buffer)
 {
-    /* strictly */
-    strcpy(buffer, "ajay-subscriber-unique-id");
 }
 #endif
 

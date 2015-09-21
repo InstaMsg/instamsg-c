@@ -894,9 +894,6 @@ void get_latest_sms_containing_substring(Network *network, char *buffer, const c
 
     info_log("\n\n\n\nFinished scanning SMSes..");
     info_log("Provisioning-Info SMS extracted = [%s]", buffer);
-
-    //strictly
-    //strcpy(buffer, "{\"cid\":\"2ebb9430-aa9d-11e4-a4c6-404014d5dd81\",\"auth\":\"ajaygarg789\",\"apn\":\"www\",\"user\":\"\",\"pass\":\"\"}");
 }
 #else
 /*
