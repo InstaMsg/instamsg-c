@@ -108,6 +108,7 @@ struct InstaMsg {
 
     MQTTPacket_connectData connectOptions;
 
+    char clientIdComplete[MAX_CLIENT_ID_SIZE];
     char clientIdMachine[MAX_CLIENT_ID_SIZE];
     char username[MAX_CLIENT_ID_SIZE];
 

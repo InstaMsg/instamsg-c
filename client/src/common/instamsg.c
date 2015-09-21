@@ -153,6 +153,7 @@ static int sendPacket(InstaMsg *c, unsigned char *buf, int length)
 }
 
 
+
 static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
 {
     MQTTHeader header = {0};
@@ -573,6 +574,7 @@ exit:
 }
 
 
+
 void removeExpiredResultHandlers(InstaMsg *c)
 {
     int i;
@@ -665,21 +667,6 @@ void initInstaMsg(InstaMsg* c,
     c->onDisconnectCallback = disconnectHandler;
     c->oneToOneMessageCallback = oneToOneMessageHandler;
 
-    memset(c->filesTopic, 0, MAX_BUFFER_SIZE);
-    sg_sprintf(c->filesTopic, "instamsg/clients/%s/files", clientId); /* TODO: How do we do this for Non-GSM ???? */
-
-    memset(c->rebootTopic, 0, MAX_BUFFER_SIZE);
-    sg_sprintf(c->rebootTopic, "instamsg/clients/%s/reboot", clientId); /* TODO: How do we do this for Non-GSM ???? */
-
-    memset(c->enableServerLoggingTopic, 0, MAX_BUFFER_SIZE);
-    sg_sprintf(c->enableServerLoggingTopic, "instamsg/clients/%s/enableServerLogging", clientId); /* TODO: How do we do this for Non-GSM ???? */
-
-    memset(c->serverLogsTopic, 0, MAX_BUFFER_SIZE);
-    sg_sprintf(c->serverLogsTopic, "instamsg/clients/%s/logs", clientId); /* TODO: How do we do this for Non-GSM ???? */
-
-    memset(c->fileUploadUrl, 0, MAX_BUFFER_SIZE);
-    sg_sprintf(c->fileUploadUrl, "/api/beta/clients/%s/files", clientId); /* TODO: How do we do this for Non-GSM ???? */
-
     c->serverLoggingEnabled = 0;
 
 	c->connectOptions.willFlag = 0;
@@ -688,9 +675,14 @@ void initInstaMsg(InstaMsg* c,
 
 
     memset(c->clientIdMachine, 0, MAX_CLIENT_ID_SIZE);
+    memset(c->clientIdComplete, 0, MAX_CLIENT_ID_SIZE);
 #ifdef GSM_INTERFACE_ENABLED
+    strcpy(c->clientIdComplete, (c->ipstack).gsmClientId);
+    setValuesOfSpecialTopics(c);
+
     strncpy(c->clientIdMachine, (c->ipstack).gsmClientId, 23);
 #else
+    strcpy(c->clientIdComplete, "");
     strcpy(c->clientIdMachine, NO_CLIENT_ID);
 #endif
     c->connectOptions.clientID.cstring = c->clientIdMachine;
@@ -718,6 +710,45 @@ void initInstaMsg(InstaMsg* c,
 }
 
 
+static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc)
+{
+    if(connack_rc == 0x00)  /* Connection Accepted */
+    {
+        info_log("Connected successfully to InstaMsg-Server.");
+        c->connected = 1;
+
+        if(c->onConnectCallback != NULL)
+        {
+            c->onConnectCallback();
+            c->onConnectCallback = NULL;
+        }
+    }
+    else
+    {
+        info_log("Client-Connection failed with code [%d]", connack_rc);
+    }
+}
+
+
+static void setValuesOfSpecialTopics(InstaMsg *c)
+{
+    memset(c->filesTopic, 0, MAX_BUFFER_SIZE);
+    sg_sprintf(c->filesTopic, "instamsg/clients/%s/files", c->clientIdComplete);
+
+    memset(c->rebootTopic, 0, MAX_BUFFER_SIZE);
+    sg_sprintf(c->rebootTopic, "instamsg/clients/%s/reboot", c->clientIdComplete);
+
+    memset(c->enableServerLoggingTopic, 0, MAX_BUFFER_SIZE);
+    sg_sprintf(c->enableServerLoggingTopic, "instamsg/clients/%s/enableServerLogging", c->clientIdComplete);
+
+    memset(c->serverLogsTopic, 0, MAX_BUFFER_SIZE);
+    sg_sprintf(c->serverLogsTopic, "instamsg/clients/%s/logs", c->clientIdComplete);
+
+    memset(c->fileUploadUrl, 0, MAX_BUFFER_SIZE);
+    sg_sprintf(c->fileUploadUrl, "/api/beta/clients/%s/files", c->clientIdComplete);
+}
+
+
 void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
 {
     int rc = FAILURE;
@@ -740,20 +771,31 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                 char sessionPresent = 0;
                 if (MQTTDeserialize_connack((unsigned char*)&sessionPresent, &connack_rc, c->readbuf, MAX_BUFFER_SIZE) == 1)
                 {
+                    handleConnOrProvAckGeneric(c, connack_rc);
+                }
+
+                break;
+            }
+
+            case PROVACK:
+            {
+                MQTTMessage msg;
+                unsigned char connack_rc = 255;
+                char sessionPresent = 0;
+                if (MQTTDeserialize_provack((unsigned char*)&sessionPresent,
+                                             &connack_rc,
+                                             (unsigned char**)&msg.payload,
+                                             (int*)&msg.payloadlen,
+                                             c->readbuf,
+                                             MAX_BUFFER_SIZE) == 1)
+                {
+                    handleConnOrProvAckGeneric(c, connack_rc);
                     if(connack_rc == 0x00)  /* Connection Accepted */
                     {
-                        info_log("Connected successfully to InstaMsg-Server.");
-                        c->connected = 1;
+                        memcpy(c->clientIdComplete, msg.payload, msg.payloadlen);
+                        info_log("Received client-id from server via PROVACK [%s]", c->clientIdComplete);
 
-                        if(c->onConnectCallback != NULL)
-                        {
-                            c->onConnectCallback();
-                            c->onConnectCallback = NULL;
-                        }
-                    }
-                    else
-                    {
-                        info_log("Client-Connection failed with code [%d]", connack_rc);
+                        setValuesOfSpecialTopics(c);
                     }
                 }
 

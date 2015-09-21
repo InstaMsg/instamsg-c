@@ -159,6 +159,42 @@ exit:
 }
 
 
+int MQTTDeserialize_provack(unsigned char* sessionPresent,
+                            unsigned char* connack_rc,
+                            unsigned char** payload,
+                            int* payloadlen,
+                            unsigned char* buf,
+                            int buflen)
+{
+	MQTTHeader header = {0};
+	unsigned char* curdata = buf;
+	unsigned char* enddata = NULL;
+	int rc = FAILURE;
+	int mylen = 0;
+	MQTTConnackFlags flags = {0};
+
+	FUNC_ENTRY;
+	header.byte = readChar(&curdata);
+	if (header.bits.type != PROVACK)
+		goto exit;
+
+	curdata += (rc = MQTTPacket_decodeBuf(curdata, &mylen)); /* read remaining length */
+	enddata = curdata + mylen;
+
+	flags.all = readChar(&curdata);
+	*sessionPresent = flags.bits.sessionpresent;
+	*connack_rc = readChar(&curdata);
+
+	*payloadlen = enddata - curdata;
+	*payload = curdata;
+
+	rc = 1;
+
+exit:
+	FUNC_EXIT_RC(rc);
+	return rc;
+}
+
 /**
   * Serializes a 0-length packet into the supplied buffer, ready for writing to a socket
   * @param buf the buffer into which the packet will be serialized

@@ -129,6 +129,12 @@ DLLExport int MQTTDeserialize_connect(MQTTPacket_connectData* data, unsigned cha
 
 DLLExport int MQTTSerialize_connack(unsigned char* buf, int buflen, unsigned char connack_rc, unsigned char sessionPresent);
 DLLExport int MQTTDeserialize_connack(unsigned char* sessionPresent, unsigned char* connack_rc, unsigned char* buf, int buflen);
+DLLExport int MQTTDeserialize_provack(unsigned char* sessionPresent,
+                                      unsigned char* connack_rc,
+                                      unsigned char** payload,
+                                      int* payloadlen,
+                                      unsigned char* buf,
+                                      int buflen);
 
 DLLExport int MQTTSerialize_disconnect(unsigned char* buf, int buflen);
 DLLExport int MQTTSerialize_pingreq(unsigned char* buf, int buflen);
