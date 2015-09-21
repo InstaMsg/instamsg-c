@@ -674,8 +674,8 @@ void initInstaMsg(InstaMsg* c,
 	c->connectOptions.cleansession = 1;
 
 
-    memset(c->clientIdMachine, 0, MAX_CLIENT_ID_SIZE);
     memset(c->clientIdComplete, 0, MAX_CLIENT_ID_SIZE);
+    memset(c->clientIdMachine, 0, MAX_CLIENT_ID_SIZE);
 #ifdef GSM_INTERFACE_ENABLED
     strcpy(c->clientIdComplete, (c->ipstack).gsmClientId);
     setValuesOfSpecialTopics(c);
