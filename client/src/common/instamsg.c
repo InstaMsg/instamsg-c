@@ -641,6 +641,14 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
 
     memset(c->fileUploadUrl, 0, MAX_BUFFER_SIZE);
     sg_sprintf(c->fileUploadUrl, "/api/beta/clients/%s/files", c->clientIdComplete);
+
+
+    info_log("\n\nThe special-topics value :: \n\n"
+             "FILES_TOPIC = [%s],\n"
+             "REBOOT_TOPIC = [%s],\n"
+             "ENABLE_SERVER_LOGGING_TOPIC = [%s],\n"
+             "SERVER_LOGS_TOPIC = [%s],\n"
+             "FILE_UPLOAD_URL = [%s]\n\n\n", c->filesTopic, c->rebootTopic, c->enableServerLoggingTopic, c->serverLogsTopic, c->fileUploadUrl);
 }
 
 
