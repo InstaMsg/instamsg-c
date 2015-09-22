@@ -5,11 +5,52 @@
  *
  *******************************************************************************/
 
+
+#include "../common/include/log.h"
+
+#include <string.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
+#include "inc/hw_memmap.h"
+#include "inc/hw_gpio.h"
+#include "inc/hw_types.h"
+#include "driverlib/gpio.h"
+#include "driverlib/pin_map.h"
+#include "driverlib/uart.h"
+#include "driverlib/sysctl.h"
+#include "driverlib/systick.h"
+#include "driverlib/rom.h"
+#include "driverlib/rom_map.h"
+#include "driverlib/interrupt.h"
+
+
+extern void ResetISR(void);
+static uint32_t time;
+
+void SysTick_IntHandler(void)
+{
+    time--;
+    if(time == 0)
+    {
+        error_log("Watch-Dog-Timer is RESETTING DEVICE !!!!!!");
+
+        /*
+         * TODO: Actually reset the device !!
+         */
+    }
+}
+
+
 /*
  * This method initializes the watchdog-timer.
  */
 void watchdog_init()
 {
+    SysTickIntRegister(SysTick_IntHandler);
+    SysTickPeriodSet(SysCtlClockGet());
+    IntMasterEnable();
+    SysTickIntEnable();
 }
 
 
@@ -33,6 +74,8 @@ void watchdog_init()
  */
 void watchdog_reset_and_enable(int n)
 {
+    time = n;
+    SysTickEnable();
 }
 
 
@@ -41,4 +84,5 @@ void watchdog_reset_and_enable(int n)
  */
 void watchdog_disable()
 {
+    SysTickDisable();
 }
