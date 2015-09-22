@@ -34,10 +34,7 @@ void SysTick_IntHandler(void)
     if(time == 0)
     {
         error_log("Watch-Dog-Timer is RESETTING DEVICE !!!!!!");
-
-        /*
-         * TODO: Actually reset the device !!
-         */
+        SysCtlReset();
     }
 }
 
