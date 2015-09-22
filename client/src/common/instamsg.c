@@ -20,6 +20,7 @@
 #include "include/json.h"
 #include "include/sg_mem.h"
 #include "include/network.h"
+#include "include/watchdog.h"
 
 #include "device_misc.h"
 
@@ -164,6 +165,11 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     int multiplier = 1;
     int numRetries = MAX_TRIES_ALLOWED_WHILE_READING_FROM_NETWORK_MEDIUM;
 
+    /*
+     * We are assuming that a packet (if available) will be available within this much time.
+     */
+    watchdog_reset_and_enable(10 * MAX_TRIES_ALLOWED_WHILE_READING_FROM_NETWORK_MEDIUM * NETWORK_READ_TIMEOUT_SECS);
+
     if((c->ipstack).socketCorrupted == 1)
     {
         goto exit;
@@ -239,6 +245,8 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     rc = SUCCESS;
 
 exit:
+    watchdog_disable();
+
     return rc;
 }
 

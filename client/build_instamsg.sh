@@ -32,6 +32,7 @@ SOURCES=`echo                                                                   
         src/${VENDOR}/device_network.c                                                  \
         src/${VENDOR}/device_serial_logger.c                                            \
         src/${VENDOR}/device_time.c                                                     \
+        src/${VENDOR}/device_watchdog.c                                                 \
         src/${VENDOR}/device_misc.c                                                     `
 
 

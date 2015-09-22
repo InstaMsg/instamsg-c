@@ -1,6 +1,7 @@
 #include "./include/globals.h"
 #include "./include/instamsg.h"
 #include "./include/time.h"
+#include "./include/watchdog.h"
 
 #include "device_misc.h"
 
@@ -449,6 +450,7 @@ void globalSystemInit()
     currentLogLevel = LOG_LEVEL;
     init_serial_logger(&serialLogger, NULL);
 
+    watchdog_init();
     init_timer(&singletonUtilityTimer, NULL);
 }
 
