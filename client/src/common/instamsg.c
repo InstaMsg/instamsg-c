@@ -174,7 +174,7 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
      * 0. Before reading the packet, memset the read-buffer to all-empty, else there will be issues
      *    processing the buffer as a string.
      */
-    memset((char*)c->readbuf, 0, MAX_BUFFER_SIZE);
+    memset((char*)c->readbuf, 0, sizeof(c->readbuf));
 
 
     /*
@@ -318,11 +318,11 @@ static int deliverMessageToSelf(InstaMsg* c, MQTTString* topicName, MQTTMessage*
 
         if (qos == QOS1)
         {
-            len = MQTTSerialize_ack(GLOBAL_BUFFER, MAX_BUFFER_SIZE, PUBACK, 0, (message->fixedHeaderPlusMsgId).msgId);
+            len = MQTTSerialize_ack(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), PUBACK, 0, (message->fixedHeaderPlusMsgId).msgId);
         }
         else if (qos == QOS2)
         {
-            len = MQTTSerialize_ack(GLOBAL_BUFFER, MAX_BUFFER_SIZE, PUBREC, 0, (message->fixedHeaderPlusMsgId).msgId);
+            len = MQTTSerialize_ack(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), PUBREC, 0, (message->fixedHeaderPlusMsgId).msgId);
         }
 
         if (len > 0)
@@ -340,7 +340,7 @@ static int fireResultHandlerUsingMsgIdAsTheKey(InstaMsg *c)
     int msgId = -1;
 
     MQTTFixedHeaderPlusMsgId fixedHeaderPlusMsgId;
-    if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, c->readbuf, MAX_BUFFER_SIZE) == SUCCESS)
+    if (MQTTDeserialize_FixedHeaderAndMsgId(&fixedHeaderPlusMsgId, c->readbuf, sizeof(c->readbuf)) == SUCCESS)
     {
         msgId = fixedHeaderPlusMsgId.msgId;
         fireResultHandlerAndRemove(c, &fixedHeaderPlusMsgId);
@@ -594,7 +594,7 @@ void sendPingReqToServer(InstaMsg *c)
     int len;
 
     RESET_GLOBAL_BUFFER;
-    len = MQTTSerialize_pingreq(GLOBAL_BUFFER, MAX_BUFFER_SIZE);
+    len = MQTTSerialize_pingreq(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
 
     if((c->ipstack).socketCorrupted == 1)
     {
@@ -627,19 +627,19 @@ void clearInstaMsg(InstaMsg *c)
 
 static void setValuesOfSpecialTopics(InstaMsg *c)
 {
-    memset(c->filesTopic, 0, MAX_BUFFER_SIZE);
+    memset(c->filesTopic, 0, sizeof(c->filesTopic));
     sg_sprintf(c->filesTopic, "instamsg/clients/%s/files", c->clientIdComplete);
 
-    memset(c->rebootTopic, 0, MAX_BUFFER_SIZE);
+    memset(c->rebootTopic, 0, sizeof(c->rebootTopic));
     sg_sprintf(c->rebootTopic, "instamsg/clients/%s/reboot", c->clientIdComplete);
 
-    memset(c->enableServerLoggingTopic, 0, MAX_BUFFER_SIZE);
+    memset(c->enableServerLoggingTopic, 0, sizeof(c->enableServerLoggingTopic));
     sg_sprintf(c->enableServerLoggingTopic, "instamsg/clients/%s/enableServerLogging", c->clientIdComplete);
 
-    memset(c->serverLogsTopic, 0, MAX_BUFFER_SIZE);
+    memset(c->serverLogsTopic, 0, sizeof(c->serverLogsTopic));
     sg_sprintf(c->serverLogsTopic, "instamsg/clients/%s/logs", c->clientIdComplete);
 
-    memset(c->fileUploadUrl, 0, MAX_BUFFER_SIZE);
+    memset(c->fileUploadUrl, 0, sizeof(c->fileUploadUrl));
     sg_sprintf(c->fileUploadUrl, "/api/beta/clients/%s/files", c->clientIdComplete);
 
 
@@ -700,8 +700,8 @@ void initInstaMsg(InstaMsg* c,
 	c->connectOptions.cleansession = 1;
 
 
-    memset(c->clientIdComplete, 0, MAX_CLIENT_ID_SIZE);
-    memset(c->clientIdMachine, 0, MAX_CLIENT_ID_SIZE);
+    memset(c->clientIdComplete, 0, sizeof(c->clientIdComplete));
+    memset(c->clientIdMachine, 0, sizeof(c->clientIdMachine));
 #ifdef GSM_INTERFACE_ENABLED
     strcpy(c->clientIdComplete, (c->ipstack).gsmClientId);
     setValuesOfSpecialTopics(c);
@@ -714,7 +714,7 @@ void initInstaMsg(InstaMsg* c,
     c->connectOptions.clientID.cstring = c->clientIdMachine;
 
 
-    memset(c->username, 0, MAX_CLIENT_ID_SIZE);
+    memset(c->username, 0, sizeof(c->username));
 #ifdef GSM_INTERFACE_ENABLED
     strcpy(c->username, (c->ipstack).gsmClientId + 24);
 #else
@@ -723,7 +723,7 @@ void initInstaMsg(InstaMsg* c,
     c->connectOptions.username.cstring = c->username;
 
 
-    memset(c->password, 0, MAX_BUFFER_SIZE);
+    memset(c->password, 0, sizeof(c->password));
 #ifdef GSM_INTERFACE_ENABLED
     strcpy(c->password, (c->ipstack).gsmAuth);
 #else
@@ -777,7 +777,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
             {
                 unsigned char connack_rc = 255;
                 char sessionPresent = 0;
-                if (MQTTDeserialize_connack((unsigned char*)&sessionPresent, &connack_rc, c->readbuf, MAX_BUFFER_SIZE) == 1)
+                if (MQTTDeserialize_connack((unsigned char*)&sessionPresent, &connack_rc, c->readbuf, sizeof(c->readbuf)) == 1)
                 {
                     handleConnOrProvAckGeneric(c, connack_rc);
                 }
@@ -795,7 +795,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                                              (unsigned char**)&msg.payload,
                                              (int*)&msg.payloadlen,
                                              c->readbuf,
-                                             MAX_BUFFER_SIZE) == 1)
+                                             sizeof(c->readbuf)) == 1)
                 {
                     handleConnOrProvAckGeneric(c, connack_rc);
                     if(connack_rc == 0x00)  /* Connection Accepted */
@@ -827,7 +827,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
 
                 fireResultHandlerUsingMsgIdAsTheKey(c);
 
-                if (MQTTDeserialize_suback(&msgId, 1, &count, &grantedQoS, c->readbuf, MAX_BUFFER_SIZE) != 1)
+                if (MQTTDeserialize_suback(&msgId, 1, &count, &grantedQoS, c->readbuf, sizeof(c->readbuf)) != 1)
                 {
                     goto exit;
                 }
@@ -859,7 +859,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                                             (unsigned char**)&msg.payload,
                                             (int*)&msg.payloadlen,
                                             c->readbuf,
-                                            MAX_BUFFER_SIZE) != SUCCESS)
+                                            sizeof(c->readbuf)) != SUCCESS)
                 {
                     goto exit;
                 }
@@ -908,7 +908,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                 int msgId = fireResultHandlerUsingMsgIdAsTheKey(c);
 
                 RESET_GLOBAL_BUFFER;
-                if ((len = MQTTSerialize_ack(GLOBAL_BUFFER, MAX_BUFFER_SIZE, PUBREL, 0, msgId)) <= 0)
+                if ((len = MQTTSerialize_ack(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), PUBREL, 0, msgId)) <= 0)
                 {
                     goto exit;
                 }
@@ -944,7 +944,7 @@ void* MQTTConnect(void* arg)
     InstaMsg *c = (InstaMsg *)arg;
 
     RESET_GLOBAL_BUFFER;
-    if ((len = MQTTSerialize_connect(GLOBAL_BUFFER, MAX_BUFFER_SIZE, &(c->connectOptions))) <= 0)
+    if ((len = MQTTSerialize_connect(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), &(c->connectOptions))) <= 0)
     {
         return NULL;
     }
@@ -972,7 +972,7 @@ int MQTTSubscribe(InstaMsg* c,
     RESET_GLOBAL_BUFFER;
 
     id = getNextPacketId(c);
-    len = MQTTSerialize_subscribe(GLOBAL_BUFFER, MAX_BUFFER_SIZE, 0, id, 1, &topic, (int*)&qos);
+    len = MQTTSerialize_subscribe(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), 0, id, 1, &topic, (int*)&qos);
     if (len <= 0)
         goto exit;
 
@@ -1018,7 +1018,7 @@ int MQTTUnsubscribe(InstaMsg* c, const char* topicFilter)
 
     RESET_GLOBAL_BUFFER;
 
-    if ((len = MQTTSerialize_unsubscribe(GLOBAL_BUFFER, MAX_BUFFER_SIZE, 0, getNextPacketId(c), 1, &topic)) <= 0)
+    if ((len = MQTTSerialize_unsubscribe(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), 0, getNextPacketId(c), 1, &topic)) <= 0)
         goto exit;
     if ((rc = sendPacket(c, GLOBAL_BUFFER, len)) != SUCCESS) /* send the subscribe packet */
         goto exit; /* there was a problem */
@@ -1058,7 +1058,7 @@ int MQTTPublish(InstaMsg* c,
         attachResultHandler(c, id, resultHandlerTimeout, resultHandler);
     }
 
-    len = MQTTSerialize_publish(GLOBAL_BUFFER, MAX_BUFFER_SIZE, 0, qos, retain, id, topic, (unsigned char*)payload, strlen((char*)payload) + 1);
+    len = MQTTSerialize_publish(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), 0, qos, retain, id, topic, (unsigned char*)payload, strlen((char*)payload) + 1);
     if (len <= 0)
         goto exit;
     if ((rc = sendPacket(c, GLOBAL_BUFFER, len)) != SUCCESS) /* send the subscribe packet */
@@ -1083,7 +1083,7 @@ int MQTTDisconnect(InstaMsg* c)
 
     RESET_GLOBAL_BUFFER;
 
-    len = MQTTSerialize_disconnect(GLOBAL_BUFFER, MAX_BUFFER_SIZE);
+    len = MQTTSerialize_disconnect(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
 
     if (len > 0)
         rc = sendPacket(c, GLOBAL_BUFFER, len);            /* send the disconnect packet */
