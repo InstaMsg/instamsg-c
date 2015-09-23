@@ -147,6 +147,8 @@ static int sendPacket(InstaMsg *c, unsigned char *buf, int length)
 
     if((c->ipstack).socketCorrupted == 1)
     {
+        error_log("Network not available at physical layer .. so packet cannot be sent to server.");
+
         rc = FAILURE;
         goto exit;
     }
@@ -179,6 +181,7 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
 
     if((c->ipstack).socketCorrupted == 1)
     {
+        error_log("Network not available at physical layer .. so packet cannot be read from server.");
         goto exit;
     }
 
