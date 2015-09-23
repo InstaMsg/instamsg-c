@@ -7,6 +7,7 @@
 
 
 #include "../common/include/log.h"
+#include "../common/include/globals.h"
 
 #include <string.h>
 #include <stdint.h>
@@ -26,14 +27,22 @@
 
 
 extern void ResetISR(void);
-static uint32_t time;
+static volatile uint32_t time;
+static volatile char *trackString;
 
 void SysTick_IntHandler(void)
 {
     time--;
     if(time == 0)
     {
-        error_log("Watch-Dog-Timer is RESETTING DEVICE !!!!!!");
+        if(trackString == NULL)
+        {
+            trackString = "";
+        }
+
+        error_log("Watch-Dog-Timer is RESETTING DEVICE .... due to hang at [%s]", trackString);
+        startAndCountdownTimer(3, 1); /* Sleep a little, so that the above log is printed completely .. */
+
         SysCtlReset();
     }
 }
@@ -69,9 +78,11 @@ void watchdog_init()
  * "watch_dog_reset_and_enable" loop is repeated).
  *
  */
-void watchdog_reset_and_enable(int n)
+void watchdog_reset_and_enable(int n, char *callee)
 {
     time = n;
+    trackString = callee;
+
     SysTickEnable();
 }
 

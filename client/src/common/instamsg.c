@@ -139,9 +139,16 @@ static int sendPacket(InstaMsg *c, unsigned char *buf, int length)
 {
     int rc = SUCCESS;
 
+    /*
+     * We assume that if a packet cannot be sent within 30 seconds,
+     * there has been some (undetectable) issue somewehre.
+     */
+    watchdog_reset_and_enable(30, "sendPacket");
+
     if((c->ipstack).socketCorrupted == 1)
     {
-        return FAILURE;
+        rc = FAILURE;
+        goto exit;
     }
 
     if((c->ipstack).write(&(c->ipstack), buf, length) == FAILURE)
@@ -150,6 +157,8 @@ static int sendPacket(InstaMsg *c, unsigned char *buf, int length)
         rc = FAILURE;
     }
 
+exit:
+    watchdog_disable();
     return rc;
 }
 
@@ -164,6 +173,9 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     unsigned char i;
     int multiplier = 1;
     int numRetries = MAX_TRIES_ALLOWED_WHILE_READING_FROM_NETWORK_MEDIUM;
+
+    watchdog_reset_and_enable(10 * MAX_TRIES_ALLOWED_WHILE_READING_FROM_NETWORK_MEDIUM * NETWORK_READ_TIMEOUT_SECS,
+                              "readPacket");
 
     if((c->ipstack).socketCorrupted == 1)
     {
@@ -240,7 +252,7 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     rc = SUCCESS;
 
 exit:
-
+    watchdog_disable();
     return rc;
 }
 
@@ -1114,8 +1126,6 @@ void start(int (*onConnectOneTimeOperations)(),
         while(1)
         {
 
-            watchdog_reset_and_enable(100 * MAX_TRIES_ALLOWED_WHILE_READING_FROM_NETWORK_MEDIUM * NETWORK_READ_TIMEOUT_SECS);
-
             if((c->ipstack).socketCorrupted == 1)
             {
                 error_log("Network not available at physical layer .. so nothing can be read from network.");
@@ -1153,8 +1163,6 @@ void start(int (*onConnectOneTimeOperations)(),
                 clearInstaMsg(&instaMsg);
                 break;
             }
-
-            watchdog_disable();
         }
     }
 }

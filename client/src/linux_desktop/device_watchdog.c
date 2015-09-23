@@ -31,7 +31,7 @@ void watchdog_init()
  * "watch_dog_reset_and_enable" loop is repeated).
  *
  */
-void watchdog_reset_and_enable(int n)
+void watchdog_reset_and_enable(int n, char *callee)
 {
 }
 

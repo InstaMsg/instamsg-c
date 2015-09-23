@@ -26,6 +26,7 @@
 #include <stdint.h>
 #include "inc/hw_nvic.h"
 #include "inc/hw_types.h"
+#include "driverlib/sysctl.h"
 
 //*****************************************************************************
 //
@@ -305,7 +306,7 @@ static void
 NmiSR(void)
 {
     info_log("Interrupt TYPE-1 called.");
-    ResetISR();
+    SysCtlReset();
 }
 
 //*****************************************************************************
@@ -319,7 +320,7 @@ static void
 FaultISR(void)
 {
     info_log("Interrupt TYPE-2 called.");
-    ResetISR();
+    SysCtlReset();
 }
 
 //*****************************************************************************
@@ -333,6 +334,6 @@ static void
 IntDefaultHandler(void)
 {
     info_log("Interrupt TYPE-3 called.");
-    ResetISR();
+    SysCtlReset();
 }
 
