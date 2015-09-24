@@ -895,14 +895,15 @@ void get_latest_sms_containing_substring(Network *network, char *buffer, const c
     info_log("\n\n\n\nFinished scanning SMSes..");
     info_log("Provisioning-Info SMS extracted = [%s]", buffer);
 }
-#else
+#endif
+
+
 /*
  * This method returns the univerally-unique-identifier for this device.
  */
 void get_device_uuid(Network *network, char *buffer)
 {
 }
-#endif
 
 
 /*

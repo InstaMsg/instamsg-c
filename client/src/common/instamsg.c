@@ -661,11 +661,11 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
 
 
     info_log("\n\nThe special-topics value :: \n\n"
-             "FILES_TOPIC = [%s],\n"
-             "REBOOT_TOPIC = [%s],\n"
-             "ENABLE_SERVER_LOGGING_TOPIC = [%s],\n"
-             "SERVER_LOGS_TOPIC = [%s],\n"
-             "FILE_UPLOAD_URL = [%s]\n\n\n", c->filesTopic, c->rebootTopic, c->enableServerLoggingTopic, c->serverLogsTopic, c->fileUploadUrl);
+             "\r\nFILES_TOPIC = [%s],"
+             "\r\nREBOOT_TOPIC = [%s],"
+             "\r\nENABLE_SERVER_LOGGING_TOPIC = [%s],"
+             "\r\nSERVER_LOGS_TOPIC = [%s],"
+             "\r\nFILE_UPLOAD_URL = [%s]\n", c->filesTopic, c->rebootTopic, c->enableServerLoggingTopic, c->serverLogsTopic, c->fileUploadUrl);
 }
 
 
@@ -718,34 +718,18 @@ void initInstaMsg(InstaMsg* c,
 
 
     memset(c->clientIdComplete, 0, sizeof(c->clientIdComplete));
-    memset(c->clientIdMachine, 0, sizeof(c->clientIdMachine));
-#ifdef GSM_INTERFACE_ENABLED
-    strcpy(c->clientIdComplete, (c->ipstack).gsmClientId);
-    setValuesOfSpecialTopics(c);
-
-    strncpy(c->clientIdMachine, (c->ipstack).gsmClientId, 23);
-#else
     strcpy(c->clientIdComplete, "");
+
+    memset(c->clientIdMachine, 0, sizeof(c->clientIdMachine));
     strcpy(c->clientIdMachine, NO_CLIENT_ID);
-#endif
     c->connectOptions.clientID.cstring = c->clientIdMachine;
 
-
     memset(c->username, 0, sizeof(c->username));
-#ifdef GSM_INTERFACE_ENABLED
-    strcpy(c->username, (c->ipstack).gsmClientId + 24);
-#else
     strcpy(c->username, "");
-#endif
     c->connectOptions.username.cstring = c->username;
 
-
     memset(c->password, 0, sizeof(c->password));
-#ifdef GSM_INTERFACE_ENABLED
-    strcpy(c->password, (c->ipstack).gsmAuth);
-#else
     get_device_uuid(&(c->ipstack), c->password);
-#endif
     c->connectOptions.password.cstring = c->password;
 
     c->connected = 0;
