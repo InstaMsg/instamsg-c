@@ -6,9 +6,9 @@
  *******************************************************************************/
 
 
-#include "../common/include/log.h"
-#include "../common/include/globals.h"
-#include "../common/include/misc.h"
+#include "../driver/include/log.h"
+#include "../driver/include/globals.h"
+#include "../driver/include/misc.h"
 
 #include <string.h>
 #include <stdint.h>

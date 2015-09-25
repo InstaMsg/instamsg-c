@@ -33,7 +33,7 @@ extern "C" {
   #define DLLExport  
 #endif
 
-#include "../../client/src/common/include/globals.h"
+#include "../driver/include/globals.h"
 enum QoS { QOS0, QOS1, QOS2 };
 
 enum errors

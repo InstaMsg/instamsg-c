@@ -10,7 +10,7 @@
 #include "driverlib/rom.h"
 #include "driverlib/rom_map.h"
 
-#include "../common/include/globals.h"
+#include "../driver/include/globals.h"
 
 /*
  * Utility-function that reboots the device.

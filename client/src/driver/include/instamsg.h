@@ -20,7 +20,7 @@
 
 #include "./globals.h"
 #include "./log.h"
-#include "../../../../MQTTPacket/src/MQTTPacket.h"
+#include "../mqtt/src/MQTTPacket.h"
 
 #include "network.h"
 #include "time.h"

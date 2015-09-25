@@ -7,9 +7,9 @@
 
 #include "./uart_utils.h"
 
-#include "../common/include/instamsg.h"
-#include "../common/include/sg_mem.h"
-#include "../common/include/sg_stdlib.h"
+#include "../driver/include/instamsg.h"
+#include "../driver/include/sg_mem.h"
+#include "../driver/include/sg_stdlib.h"
 
 #include <stdint.h>
 #include <stdbool.h>

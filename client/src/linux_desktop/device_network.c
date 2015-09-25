@@ -19,8 +19,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../common/include/globals.h"
-#include "../common/include/instamsg.h"
+#include "../driver/include/globals.h"
+#include "../driver/include/instamsg.h"
 
 #ifdef GSM_INTERFACE_ENABLED
 /*

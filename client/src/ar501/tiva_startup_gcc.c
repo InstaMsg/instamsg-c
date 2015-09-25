@@ -28,7 +28,7 @@
 #include "inc/hw_types.h"
 #include "driverlib/sysctl.h"
 
-#include "../common/include/misc.h"
+#include "../driver/include/misc.h"
 
 //*****************************************************************************
 //

@@ -6,7 +6,7 @@
  *******************************************************************************/
 
 #include "./device_serial_logger.h"
-#include "../common/include/globals.h"
+#include "../driver/include/globals.h"
 
 
 /*
