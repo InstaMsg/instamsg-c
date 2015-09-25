@@ -768,6 +768,53 @@ exit:
 }
 
 
+static void get_actual_command_output_for_command_results_with_ok_status(const char *command, const char *completeOutput, char *usefulOutput)
+{
+    int i, j;
+
+    memcpy(usefulOutput,
+           completeOutput + strlen(command),
+           strlen(completeOutput) - strlen(strstr(completeOutput, "\r\nOK\r\n")) - strlen(command) + 1);
+
+    /*
+     * Remove trailing \r and \n (if any).
+     */
+    for(i = strlen(usefulOutput) - 1; i >= 0; i--)
+    {
+        if((usefulOutput[i] == '\r') || (usefulOutput[i] == '\n'))
+        {
+            usefulOutput[i] = 0;
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    /*
+     * Remove leading \r and \n (if any).
+     */
+    for(i = 0; i < strlen(usefulOutput); i++)
+    {
+        if((usefulOutput[i] == '\r') || (usefulOutput[i] == '\n'))
+        {
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    /*
+     * Fill the empty-spaces that may have been created.
+     */
+    for(j = 0; j < strlen(usefulOutput); j++)
+    {
+        usefulOutput[j] = usefulOutput[j + i];
+    }
+}
+
+
 #ifdef GSM_INTERFACE_ENABLED
 /*
  * This method returns the *****LATEST****** sms, which contains the desired substring.
@@ -937,6 +984,18 @@ void get_latest_sms_containing_substring(Network *network, char *buffer, const c
  */
 void get_device_uuid(Network *network, char *buffer)
 {
+    const char *command = "AT+CGSN\r\n";
+    const char *constantPrefix = "ATOLL:IMEI:";
+
+    do
+    {
+        SEND_CMD_AND_READ_RESPONSE_ON_UART1(command, LENGTH_OF_COMMAND, NULL, NULL);
+    } while(errorObtained == 1);
+
+    strcpy(buffer, constantPrefix);
+    get_actual_command_output_for_command_results_with_ok_status(command, readBuffer, buffer + strlen(constantPrefix));
+
+    info_log("\n\nIMEI received as UUID = [%s]\n\n", buffer);
 }
 
 
