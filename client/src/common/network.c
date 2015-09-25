@@ -4,6 +4,8 @@
 #include "./include/json.h"
 
 
+static char sms[200];
+
 void init_network(Network *network, const char *hostName, unsigned int port)
 {
     /* Register read-callback. */
@@ -24,13 +26,13 @@ void init_network(Network *network, const char *hostName, unsigned int port)
     memset(network->gsmPass, 0, MAX_GSM_PROVISION_PARAM_SIZE);
 
     /* Fill-in the provisioning-parameters from the SMS obtained from InstaMsg-Server */
-    RESET_GLOBAL_BUFFER;
-    while(strlen((char*)GLOBAL_BUFFER) == 0)
+    memset(sms, 0, sizeof(sms));
+    while(strlen(sms) == 0)
     {
         info_log("\n\n\nProvisioning-SMS not available, retrying to fetch from storage area\n\n\n");
         startAndCountdownTimer(5, 1);
 
-        get_latest_sms_containing_substring(network, (char*)GLOBAL_BUFFER, "\"sg_apn\":\"");
+        get_latest_sms_containing_substring(network, sms, "\"sg_apn\":\"");
     }
 
     /*
@@ -39,29 +41,29 @@ void init_network(Network *network, const char *hostName, unsigned int port)
      */
     {
         int i;
-        for(i = 0; i < strlen((char*)GLOBAL_BUFFER); i++)
+        for(i = 0; i < strlen(sms); i++)
         {
-            if(GLOBAL_BUFFER[i] == '(')
+            if(sms[i] == '(')
             {
-                GLOBAL_BUFFER[i] = '{';
+                sms[i] = '{';
                 break;
             }
         }
 
-        for(i = strlen((char*)GLOBAL_BUFFER) - 1; i >= 0; i--)
+        for(i = strlen(sms) - 1; i >= 0; i--)
         {
-            if(GLOBAL_BUFFER[i] == ')')
+            if(sms[i] == ')')
             {
-                GLOBAL_BUFFER[i] = '}';
+                sms[i] = '}';
                 break;
             }
         }
 
     }
 
-    getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, "sg_apn", network->gsmApn);
-    getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, "sg_user", network->gsmUser);
-    getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, "sg_pass", network->gsmPass);
+    getJsonKeyValueIfPresent(sms, "sg_apn", network->gsmApn);
+    getJsonKeyValueIfPresent(sms, "sg_user", network->gsmUser);
+    getJsonKeyValueIfPresent(sms, "sg_pass", network->gsmPass);
 
     info_log("\n\nProvisioning-Params ::  sg_apn : [%s], sg_user : [%s], sg_pass : [%s]\n\n",
              network->gsmApn, network->gsmUser, network->gsmPass);
