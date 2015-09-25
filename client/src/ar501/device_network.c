@@ -574,11 +574,20 @@ static int setUpModem(Network *network)
      *                 Surprisingly, even power-off does not automatically does this.
      *                 This has to be done via hardware-pin.
      */
-    info_log("Resetting GPS-module.");
-    GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 1);
-    startAndCountdownTimer(2, 0);
-    GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 0);
-    info_log("Resetting GPS-module Done.");
+    {
+        static unsigned char gpsResetDone = 0;
+
+        if(gpsResetDone == 0)
+        {
+            info_log("Resetting GPS-module.");
+            GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 1);
+            startAndCountdownTimer(2, 0);
+            GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 0);
+            info_log("Resetting GPS-module Done.\n\n");
+
+            gpsResetDone = 1;
+        }
+    }
 
 
     ROM_UARTEnable(UART1_BASE);
