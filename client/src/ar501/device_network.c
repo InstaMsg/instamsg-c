@@ -777,6 +777,11 @@ void get_latest_sms_containing_substring(Network *network, char *buffer, const c
         char *tempBuffer = tempSmsBuffer;
         int bufferIndex = 0;
 
+        /*
+         * Empty the temporary-buffer...
+         */
+        tempBuffer[0] = 0;
+
         memset(sendCommandBuffer, 0, SEND_COMMAND_BUFFER_SIZE);
         sg_sprintf(sendCommandBuffer, "AT+CMGR=%u\r\n", smsIndex);
 

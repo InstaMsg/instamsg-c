@@ -59,11 +59,11 @@ void init_network(Network *network, const char *hostName, unsigned int port)
 
     }
 
-    getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, "apn", network->gsmApn);
-    getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, "user", network->gsmUser);
-    getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, "pass", network->gsmPass);
+    getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, "sg_apn", network->gsmApn);
+    getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, "sg_user", network->gsmUser);
+    getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, "sg_pass", network->gsmPass);
 
-    info_log("\n\nProvisioning-Params ::  apn : [%s], user : [%s], pass : [%s]\n\n",
+    info_log("\n\nProvisioning-Params ::  sg_apn : [%s], sg_user : [%s], sg_pass : [%s]\n\n",
              network->gsmApn, network->gsmUser, network->gsmPass);
     startAndCountdownTimer(3, 0);
 #endif
