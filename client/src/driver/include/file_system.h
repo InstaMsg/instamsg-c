@@ -13,14 +13,6 @@ void release_file_system(FileSystem *fs);
 
 
 /*
- * Internally Used.
- * Must not be called by anyone.
- */
-void connect_underlying_file_system_medium_guaranteed(FileSystem* fs);
-void release_underlying_file_system_medium_guaranteed(FileSystem* fs);
-
-
-/*
  * Must not be called directly.
  * Instead must be called as ::
  *
@@ -37,6 +29,14 @@ int renameFile(FileSystem *fs, const char *oldPath, const char *newPath);
 int deleteFile(FileSystem *fs, const char *filePath);
 void getFileListing(FileSystem *fs, char *buf, int maxValueLenAllowed, const char *directoryPath);
 long getFileSize(FileSystem *fs, const char *filepath);
+
+
+/*
+ * Internally Used.
+ * Must not be called by anyone.
+ */
+void connect_underlying_file_system_medium_guaranteed(FileSystem* fs);
+void release_underlying_file_system_medium_guaranteed(FileSystem* fs);
 
 
 

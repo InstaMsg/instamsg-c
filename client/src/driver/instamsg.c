@@ -728,7 +728,7 @@ void initInstaMsg(InstaMsg* c,
     c->connectOptions.username.cstring = c->username;
 
     memset(c->password, 0, sizeof(c->password));
-    get_device_uuid(&(c->ipstack), c->password);
+    get_device_uuid(c->password);
     c->connectOptions.password.cstring = c->password;
 
     c->connected = 0;

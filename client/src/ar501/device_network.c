@@ -982,7 +982,7 @@ void get_latest_sms_containing_substring(Network *network, char *buffer, const c
 /*
  * This method returns the univerally-unique-identifier for this device.
  */
-void get_device_uuid(Network *network, char *buffer)
+void get_device_uuid(char *buffer)
 {
     const char *command = "AT+CGSN\r\n";
     const char *constantPrefix = "ATOLL:IMEI:";
