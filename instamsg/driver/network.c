@@ -15,15 +15,15 @@ void init_network(Network *network, const char *hostName, unsigned int port)
 	network->write = network_write;
 
     /* Keep a copy of connection-parameters, for easy book-keeping. */
-    memset(network->host, 0, MAX_BUFFER_SIZE);
+    memset(network->host, 0, sizeof(network->host));
     sg_sprintf(network->host, "%s", hostName);
     network->port = port;
 
 #ifdef GSM_INTERFACE_ENABLED
     /* Empty-initialize the GSM-params. */
-    memset(network->gsmApn, 0, MAX_GSM_PROVISION_PARAM_SIZE);
-    memset(network->gsmUser, 0, MAX_GSM_PROVISION_PARAM_SIZE);
-    memset(network->gsmPass, 0, MAX_GSM_PROVISION_PARAM_SIZE);
+    memset(network->gsmApn, 0, sizeof(network->gsmApn));
+    memset(network->gsmUser, 0, sizeof(network->gsmUser));
+    memset(network->gsmPass, 0, sizeof(network->gsmPass));
 
     /* Fill-in the provisioning-parameters from the SMS obtained from InstaMsg-Server */
     memset(sms, 0, sizeof(sms));
