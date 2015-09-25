@@ -561,6 +561,26 @@ static int setUpModem(Network *network)
                      GPIO_PIN_TYPE_STD);
     GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_5, GPIO_PIN_5);
 
+
+    /*
+     * Give time to Power-On to propel through ...
+     */
+    startAndCountdownTimer(2, 0);
+
+
+    /*
+     * VERY IMPORTANT: Reset GPS-module, to clear any left-over bytes in the buffers.
+     *
+     *                 Surprisingly, even power-off does not automatically does this.
+     *                 This has to be done via hardware-pin.
+     */
+    info_log("Resetting GPS-module.");
+    GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 1);
+    startAndCountdownTimer(2, 0);
+    GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 0);
+    info_log("Resetting GPS-module Done.");
+
+
     ROM_UARTEnable(UART1_BASE);
 
     /*
