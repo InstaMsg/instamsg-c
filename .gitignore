@@ -44,16 +44,16 @@ embedded-flash-environment/share/
 embedded-flash-environment/tiva-template/
 embedded-flash-environment/tivaware/
 
-client/subscriber.sh
-client/filetester.sh
-client/publisher.sh
+instamsg/subscriber.sh
+instamsg/filetester.sh
+instamsg/publisher.sh
 
-client/config.txt
-client/config.txt_local_testing
-client/config.txt_filetester
+instamsg/config.txt
+instamsg/config.txt_local_testing
+instamsg/config.txt_filetester
 
-client/tiva_tm4c123gxl_blinky/tiva_build/
-client/src/communication/serial_logger/tiva_tm4c123gxl_uart/tiva_build/
+instamsg/tiva_tm4c123gxl_blinky/tiva_build/
+instamsg/src/communication/serial_logger/tiva_tm4c123gxl_uart/tiva_build/
 
 build/
 tiva_cross_compilation_checks/
