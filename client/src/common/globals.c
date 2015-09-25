@@ -2,8 +2,8 @@
 #include "./include/instamsg.h"
 #include "./include/time.h"
 #include "./include/watchdog.h"
+#include "./include/misc.h"
 
-#include "device_misc.h"
 
 #include <string.h>
 #include <stdarg.h>

@@ -8,6 +8,7 @@
 
 #include "../common/include/log.h"
 #include "../common/include/globals.h"
+#include "../common/include/misc.h"
 
 #include <string.h>
 #include <stdint.h>
@@ -41,9 +42,7 @@ void SysTick_IntHandler(void)
         }
 
         error_log("Watch-Dog-Timer is RESETTING DEVICE .... due to hang at [%s]", trackString);
-        startAndCountdownTimer(3, 1); /* Sleep a little, so that the above log is printed completely .. */
-
-        SysCtlReset();
+        rebootDevice();
     }
 }
 

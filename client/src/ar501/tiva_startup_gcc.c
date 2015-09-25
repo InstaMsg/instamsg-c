@@ -28,6 +28,8 @@
 #include "inc/hw_types.h"
 #include "driverlib/sysctl.h"
 
+#include "../common/include/misc.h"
+
 //*****************************************************************************
 //
 // Forward declaration of the default fault handlers.
@@ -306,7 +308,7 @@ static void
 NmiSR(void)
 {
     info_log("Interrupt TYPE-1 called.");
-    SysCtlReset();
+    rebootDevice();
 }
 
 //*****************************************************************************
@@ -320,7 +322,7 @@ static void
 FaultISR(void)
 {
     info_log("Interrupt TYPE-2 called.");
-    SysCtlReset();
+    rebootDevice();
 }
 
 //*****************************************************************************
@@ -334,6 +336,6 @@ static void
 IntDefaultHandler(void)
 {
     info_log("Interrupt TYPE-3 called.");
-    SysCtlReset();
+    rebootDevice();
 }
 

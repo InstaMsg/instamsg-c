@@ -21,8 +21,7 @@
 #include "include/sg_mem.h"
 #include "include/network.h"
 #include "include/watchdog.h"
-
-#include "device_misc.h"
+#include "include/misc.h"
 
 #include <string.h>
 

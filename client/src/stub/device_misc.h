@@ -1,2 +1,0 @@
-void rebootDevice();
-void bootstrapInit();

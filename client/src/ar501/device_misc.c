@@ -10,12 +10,15 @@
 #include "driverlib/rom.h"
 #include "driverlib/rom_map.h"
 
+#include "../common/include/globals.h"
 
 /*
  * Utility-function that reboots the device.
  */
 void rebootDevice()
 {
+    startAndCountdownTimer(3, 1); /* Sleep a little, so that the above log is printed completely .. */
+    SysCtlReset();
 }
 
 
