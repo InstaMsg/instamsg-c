@@ -40,9 +40,9 @@
     stdoutsub topic/of/interest --host iot.eclipse.org
 
 */
-#include "src/driver/include/instamsg.h"
-#include "src/driver/include/log.h"
-#include "src/driver/include/globals.h"
+#include "./instamsg/driver/include/instamsg.h"
+#include "./instamsg/driver/include/log.h"
+#include "./instamsg/driver/include/globals.h"
 
 #include <stdio.h>
 #include <signal.h>

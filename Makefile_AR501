@@ -1,7 +1,7 @@
 # Device-specific extra includes
 #
-SYSTEM_INCLUDES=`echo                                               \
-				-I../embedded-flash-environment/tivaware			`
+SYSTEM_INCLUDES=`echo                                               					\
+				-Iembedded-flash-environment/tivaware									`
 
 
 # The platform on which InstaMsg needs to be built.
@@ -19,21 +19,21 @@ IS_GSM_DEVICE="Y"
 
 # Device-specific extra source-files.
 #
-EXTRA_SOURCES=`echo													\
-			  ./device.c											\
-			  src/${VENDOR}/tiva_startup_gcc.c						\
-			  src/${VENDOR}/uart_utils.c							`
+EXTRA_SOURCES=`echo																		\
+			  ./device.c																\
+			  instamsg/${VENDOR}/tiva_startup_gcc.c										\
+			  instamsg/${VENDOR}/uart_utils.c											`
 
 
 # Device-specific extra object-files that need to linked.
 #
 EXTRA_OBJECT_FILES=`echo																\
-					../embedded-flash-environment/tivaware/driverlib/gcc/gpio.o			\
-					../embedded-flash-environment/tivaware/driverlib/gcc/sysctl.o		\
-					../embedded-flash-environment/tivaware/driverlib/gcc/systick.o		\
-					../embedded-flash-environment/tivaware/driverlib/gcc/interrupt.o 	\
-					../embedded-flash-environment/tivaware/driverlib/gcc/cpu.o 			\
-					../embedded-flash-environment/tivaware/driverlib/gcc/uart.o			`
+					embedded-flash-environment/tivaware/driverlib/gcc/gpio.o			\
+					embedded-flash-environment/tivaware/driverlib/gcc/sysctl.o			\
+					embedded-flash-environment/tivaware/driverlib/gcc/systick.o			\
+					embedded-flash-environment/tivaware/driverlib/gcc/interrupt.o 		\
+					embedded-flash-environment/tivaware/driverlib/gcc/cpu.o 			\
+					embedded-flash-environment/tivaware/driverlib/gcc/uart.o			`
 
 
 
@@ -41,9 +41,9 @@ EXTRA_OBJECT_FILES=`echo																\
 #
 MCU="TM4C123GH6PM"
 #
-COMPILE_COMMAND="../embedded-flash-environment/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-gcc  -g -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -Os -ffunction-sections -fdata-sections -MD -std=c99 -Wall -pedantic -DPART_${MCU} -DTARGET_IS_BLIZZARD_RA1 -T ../embedded-flash-environment/tiva-template/${MCU}.ld --entry ResetISR -Wl,--gc-sections "
+COMPILE_COMMAND="embedded-flash-environment/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-gcc  -g -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -Os -ffunction-sections -fdata-sections -MD -std=c99 -Wall -pedantic -DPART_${MCU} -DTARGET_IS_BLIZZARD_RA1 -T embedded-flash-environment/tiva-template/${MCU}.ld --entry ResetISR -Wl,--gc-sections "
 
 
 # Any final-commands that need to be run...
 #
-declare -a FINAL_COMMANDS=("../embedded-flash-environment/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-objcopy -O binary build/${VENDOR}/instamsg build/${VENDOR}/instamsg_to_flash" "../embedded-flash-environment/lm4tools/lm4flash/lm4flash build/${VENDOR}/instamsg_to_flash")
+declare -a FINAL_COMMANDS=("embedded-flash-environment/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-objcopy -O binary build/${VENDOR}/instamsg build/${VENDOR}/instamsg_to_flash" "embedded-flash-environment/lm4tools/lm4flash/lm4flash build/${VENDOR}/instamsg_to_flash")

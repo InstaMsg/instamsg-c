@@ -1,39 +1,39 @@
 . ${1}
 
-TOTAL_INCLUDES=`echo                                                \
-        ${SYSTEM_INCLUDES}                                          \
-        -Isrc/${VENDOR}/                                            \
-        -Isrc/mqtt/                                                 `
+TOTAL_INCLUDES=`echo                                                                            \
+        ${SYSTEM_INCLUDES}                                                                      \
+        -Iinstamsg/${VENDOR}/                                                                   \
+        -Iinstamsg/mqtt/                                                                        `
 
 
-SOURCES=`echo                                                                           \
-        ${EXTRA_SOURCES}                                                                \
-        src/driver/instamsg.c                                                           \
-        src/driver/log.c                                                                \
-        src/driver/json.c                                                               \
-        src/driver/globals.c                                                            \
-        src/driver/sg_mem.c                                                             \
-        src/driver/sg_stdlib.c                                                          \
-        src/driver/network.c                                                            \
-        src/driver/serial_logger.c                                                      \
-        src/driver/time.c                                                               \
-                                                                                        \
-        src/mqtt/src/MQTTFormat.c                                                       \
-        src/mqtt/src/MQTTPacket.c                                                       \
-        src/mqtt/src/MQTTDeserializePublish.c                                           \
-        src/mqtt/src/MQTTConnectClient.c                                                \
-        src/mqtt/src/MQTTSubscribeClient.c                                              \
-        src/mqtt/src/MQTTSerializePublish.c                                             \
-        src/mqtt/src/MQTTConnectServer.c                                                \
-        src/mqtt/src/MQTTSubscribeServer.c                                              \
-        src/mqtt/src/MQTTUnsubscribeServer.c                                            \
-        src/mqtt/src/MQTTUnsubscribeClient.c                                            \
-                                                                                        \
-        src/${VENDOR}/device_network.c                                                  \
-        src/${VENDOR}/device_serial_logger.c                                            \
-        src/${VENDOR}/device_time.c                                                     \
-        src/${VENDOR}/device_watchdog.c                                                 \
-        src/${VENDOR}/device_misc.c                                                     `
+SOURCES=`echo                                                                                   \
+        ${EXTRA_SOURCES}                                                                        \
+        instamsg/driver/instamsg.c                                                              \
+        instamsg/driver/log.c                                                                   \
+        instamsg/driver/json.c                                                                  \
+        instamsg/driver/globals.c                                                               \
+        instamsg/driver/sg_mem.c                                                                \
+        instamsg/driver/sg_stdlib.c                                                             \
+        instamsg/driver/network.c                                                               \
+        instamsg/driver/serial_logger.c                                                         \
+        instamsg/driver/time.c                                                                  \
+                                                                                                \
+        instamsg/mqtt/src/MQTTFormat.c                                                          \
+        instamsg/mqtt/src/MQTTPacket.c                                                          \
+        instamsg/mqtt/src/MQTTDeserializePublish.c                                              \
+        instamsg/mqtt/src/MQTTConnectClient.c                                                   \
+        instamsg/mqtt/src/MQTTSubscribeClient.c                                                 \
+        instamsg/mqtt/src/MQTTSerializePublish.c                                                \
+        instamsg/mqtt/src/MQTTConnectServer.c                                                   \
+        instamsg/mqtt/src/MQTTSubscribeServer.c                                                 \
+        instamsg/mqtt/src/MQTTUnsubscribeServer.c                                               \
+        instamsg/mqtt/src/MQTTUnsubscribeClient.c                                               \
+                                                                                                \
+        instamsg/${VENDOR}/device_network.c                                                     \
+        instamsg/${VENDOR}/device_serial_logger.c                                               \
+        instamsg/${VENDOR}/device_time.c                                                        \
+        instamsg/${VENDOR}/device_watchdog.c                                                    \
+        instamsg/${VENDOR}/device_misc.c                                                        `
 
 
 mkdir -p build/${VENDOR}
@@ -56,7 +56,7 @@ fi
 # Compile the File-System-Module only if applicable.
 if [ ! -z ${FS_COMMUNICATION_IMPL} ];
 then
-    SOURCES="${SOURCES} src/driver/file_system.c src/${VENDOR}/device_file_system.c src/driver/httpclient.c  "
+    SOURCES="${SOURCES} instamsg/driver/file_system.c instamsg/${VENDOR}/device_file_system.c instamsg/driver/httpclient.c  "
     COMPILE_COMMAND="${COMPILE_COMMAND} -DFILE_SYSTEM_INTERFACE_ENABLED"
 fi
 

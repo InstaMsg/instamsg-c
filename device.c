@@ -1,5 +1,5 @@
-#include "src/driver/include/instamsg.h"
-#include "src/driver/include/globals.h"
+#include "./instamsg/driver/include/instamsg.h"
+#include "./instamsg/driver/include/globals.h"
 
 #include <string.h>
 
