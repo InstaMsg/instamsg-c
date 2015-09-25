@@ -93,11 +93,11 @@ struct InstaMsg {
     int (*onDisconnectCallback)();
     int (*oneToOneMessageCallback)();
 
-    char filesTopic[MAX_BUFFER_SIZE];
-    char rebootTopic[MAX_BUFFER_SIZE];
-    char enableServerLoggingTopic[MAX_BUFFER_SIZE];
-    char serverLogsTopic[MAX_BUFFER_SIZE];
-    char fileUploadUrl[MAX_BUFFER_SIZE];
+    char filesTopic[100];
+    char rebootTopic[100];
+    char enableServerLoggingTopic[100];
+    char serverLogsTopic[100];
+    char fileUploadUrl[100];
 
     unsigned char serverLoggingEnabled;
 
