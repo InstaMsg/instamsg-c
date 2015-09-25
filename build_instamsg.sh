@@ -3,7 +3,7 @@
 TOTAL_INCLUDES=`echo                                                \
         ${SYSTEM_INCLUDES}                                          \
         -Isrc/${VENDOR}/                                            \
-        -I src/mqtt/                                                `
+        -Isrc/mqtt/                                                 `
 
 
 SOURCES=`echo                                                                           \
