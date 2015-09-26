@@ -15,7 +15,7 @@ char result[MAX_BUFFER_SIZE];
 #define LENGTH_OF_COMMAND 0
 
 void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, int len, char *desiredOutputBuffer, const char *delimiter);
-void get_actual_command_output_for_command_results_with_ok_status(const char *command, const char *completeOutput, char *usefulOutput);
+void run_simple_at_command_and_get_output(const char *command, char *usefulOutput);
 int parseNumberFromEndOfString(char *pch, char limiter);
 
 #endif

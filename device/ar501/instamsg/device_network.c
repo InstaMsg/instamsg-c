@@ -648,13 +648,8 @@ void get_device_uuid(char *buffer)
     const char *command = "AT+CGSN\r\n";
     const char *constantPrefix = "ATOLL:IMEI:";
 
-    do
-    {
-        SEND_CMD_AND_READ_RESPONSE_ON_UART1(command, LENGTH_OF_COMMAND, NULL, NULL);
-    } while(errorObtained == 1);
-
     strcpy(buffer, constantPrefix);
-    get_actual_command_output_for_command_results_with_ok_status(command, readBuffer, buffer + strlen(constantPrefix));
+    run_simple_at_command_and_get_output(command, buffer + strlen(constantPrefix));
 
     info_log("\n\nIMEI received as UUID = [%s]\n\n", buffer);
 }

@@ -300,13 +300,18 @@ void SEND_CMD_AND_READ_RESPONSE_ON_UART1(const char *command, int len, char *des
 }
 
 
-void get_actual_command_output_for_command_results_with_ok_status(const char *command, const char *completeOutput, char *usefulOutput)
+void run_simple_at_command_and_get_output(const char *command, char *usefulOutput)
 {
     int i, j;
 
+    do
+    {
+        SEND_CMD_AND_READ_RESPONSE_ON_UART1(command, LENGTH_OF_COMMAND, NULL, NULL);
+    } while(errorObtained == 1);
+
     memcpy(usefulOutput,
-           completeOutput + strlen(command),
-           strlen(completeOutput) - strlen(strstr(completeOutput, "\r\nOK\r\n")) - strlen(command) + 1);
+           readBuffer + strlen(command),
+           strlen(readBuffer) - strlen(strstr(readBuffer, "\r\nOK\r\n")) - strlen(command) + 1);
 
     /*
      * Remove trailing \r and \n (if any).
