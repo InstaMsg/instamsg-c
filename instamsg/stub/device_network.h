@@ -1,7 +1,7 @@
 #ifndef INSTAMSG_NETWORK
 #define INSTAMSG_NETWORK
 
-#include "../common/include/globals.h"
+#include "../driver/include/globals.h"
 
 #include <string.h>
 

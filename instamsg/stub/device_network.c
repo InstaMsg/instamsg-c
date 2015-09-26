@@ -1,4 +1,4 @@
-#include "../common/include/globals.h"
+#include "../driver/include/globals.h"
 
 #ifdef GSM_INTERFACE_ENABLED
 /*

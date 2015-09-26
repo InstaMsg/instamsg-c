@@ -1,7 +1,7 @@
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
 
 #include "./device_file_system.h"
-#include "../common/include/globals.h"
+#include "../driver/include/globals.h"
 
 
 /*
