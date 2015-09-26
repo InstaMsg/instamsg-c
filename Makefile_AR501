@@ -21,8 +21,8 @@ IS_GSM_DEVICE="Y"
 #
 EXTRA_SOURCES=`echo																		\
 			  ./device.c																\
-			  instamsg/${VENDOR}/tiva_startup_gcc.c										\
-			  instamsg/${VENDOR}/uart_utils.c											`
+			  device/${VENDOR}/common/tiva_startup_gcc.c								\
+			  device/${VENDOR}/common/uart_utils.c										`
 
 
 # Device-specific extra object-files that need to linked.

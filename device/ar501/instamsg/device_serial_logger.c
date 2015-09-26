@@ -7,7 +7,7 @@
 
 
 #include "./device_serial_logger.h"
-#include "./uart_utils.h"
+#include "../common/uart_utils.h"
 
 #include "../driver/include/globals.h"
 

@@ -5,7 +5,7 @@
  *
  *******************************************************************************/
 
-#include "./uart_utils.h"
+#include "../common/uart_utils.h"
 
 #include "../driver/include/instamsg.h"
 #include "../driver/include/sg_mem.h"

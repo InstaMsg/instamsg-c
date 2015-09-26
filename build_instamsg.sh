@@ -2,7 +2,7 @@
 
 TOTAL_INCLUDES=`echo                                                                            \
         ${SYSTEM_INCLUDES}                                                                      \
-        -Iinstamsg/${VENDOR}/                                                                   \
+        -Idevice/${VENDOR}/instamsg/                                                            \
         -Iinstamsg/mqtt/                                                                        `
 
 
@@ -29,11 +29,11 @@ SOURCES=`echo                                                                   
         instamsg/mqtt/src/MQTTUnsubscribeServer.c                                               \
         instamsg/mqtt/src/MQTTUnsubscribeClient.c                                               \
                                                                                                 \
-        instamsg/${VENDOR}/device_network.c                                                     \
-        instamsg/${VENDOR}/device_serial_logger.c                                               \
-        instamsg/${VENDOR}/device_time.c                                                        \
-        instamsg/${VENDOR}/device_watchdog.c                                                    \
-        instamsg/${VENDOR}/device_misc.c                                                        `
+        device/${VENDOR}/instamsg/device_network.c                                              \
+        device/${VENDOR}/instamsg/device_serial_logger.c                                        \
+        device/${VENDOR}/instamsg/device_time.c                                                 \
+        device/${VENDOR}/instamsg/device_watchdog.c                                             \
+        device/${VENDOR}/instamsg/device_misc.c                                                 `
 
 
 mkdir -p build/${VENDOR}
@@ -56,7 +56,7 @@ fi
 # Compile the File-System-Module only if applicable.
 if [ ! -z ${FS_COMMUNICATION_IMPL} ];
 then
-    SOURCES="${SOURCES} instamsg/driver/file_system.c instamsg/${VENDOR}/device_file_system.c instamsg/driver/httpclient.c  "
+    SOURCES="${SOURCES} instamsg/driver/file_system.c device/${VENDOR}/instamsg/device_file_system.c instamsg/driver/httpclient.c  "
     COMPILE_COMMAND="${COMPILE_COMMAND} -DFILE_SYSTEM_INTERFACE_ENABLED"
 fi
 
