@@ -3,14 +3,14 @@
 
 #include "../driver/include/instamsg.h"
 
-static volatile char errorObtained;
-static volatile char noCarrierObtained;
-static volatile char showCommandOutput;
+volatile char errorObtained;
+volatile char noCarrierObtained;
+volatile char showCommandOutput;
 
-static unsigned int actualBytesRead;
-static unsigned int ind;
-static char *readBuffer;
-static char result[MAX_BUFFER_SIZE];
+unsigned int actualBytesRead;
+unsigned int ind;
+char *readBuffer;
+char result[MAX_BUFFER_SIZE];
 
 #define LENGTH_OF_COMMAND 0
 
