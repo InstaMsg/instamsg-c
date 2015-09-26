@@ -874,5 +874,10 @@ int network_write(Network* network, unsigned char* buffer, int len)
  */
 void release_underlying_network_medium_guaranteed(Network* network)
 {
+    memset(sendCommandBuffer, 0, SEND_COMMAND_BUFFER_SIZE);
+    sg_sprintf(sendCommandBuffer, "AT#SH=%u\r\n", network->socket);
+
+    SEND_CMD_AND_READ_RESPONSE_ON_UART1(sendCommandBuffer, LENGTH_OF_COMMAND, NULL, NULL);
+    info_log("Modem socket [%u] closed ..", network->socket);
 }
 
