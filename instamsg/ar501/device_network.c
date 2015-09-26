@@ -575,17 +575,13 @@ static int setUpModem(Network *network)
      *                 This has to be done via hardware-pin.
      */
     {
-        static unsigned char gpsResetDone = 0;
-
-        if(gpsResetDone == 0)
+        if(1)
         {
             info_log("Resetting GPS-module.");
             GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 1);
             startAndCountdownTimer(2, 0);
             GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 0);
             info_log("Resetting GPS-module Done.\n\n");
-
-            gpsResetDone = 1;
         }
     }
 
