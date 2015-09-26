@@ -563,8 +563,7 @@ terminateFileUpload:
                 (msg->fixedHeaderPlusMsgId).fixedHeader.dup,
                 NULL,
                 MQTT_RESULT_HANDLER_TIMEOUT,
-                0,
-                1);
+                0);
 
 exit:
     if(replyTopic)
@@ -1035,8 +1034,7 @@ int MQTTPublish(InstaMsg* c,
                 const char dup,
                 void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
                 unsigned int resultHandlerTimeout,
-                const char retain,
-                const char logging)
+                const char retain)
 {
     int rc = FAILURE;
     int len = 0;

@@ -184,7 +184,7 @@ void coreLoopyBusinessLogicInitiatedBySelf()
 
 		info_log("Publishing message [%s] to %s", buf, topic);
 		rc = MQTTPublish(&instaMsg, topic, (const char*)buf, opts_p->qos, 0,
-                         publishAckReceived, MQTT_RESULT_HANDLER_TIMEOUT, 0, 1);
+                         publishAckReceived, MQTT_RESULT_HANDLER_TIMEOUT, 0);
 		info_log("Published %d", rc);
 	}
 }
