@@ -1125,7 +1125,9 @@ void start(int (*onConnectOneTimeOperations)(),
             /* This is 1 means physical-network is fine, AND connection to InstaMsg-Server is fine at protocol level. */
             if(c->connected == 1)
             {
+#if 0
                 sendPingReqToServer(c);
+#endif
             }
             else if((c->ipstack).socketCorrupted == 0)
             {
