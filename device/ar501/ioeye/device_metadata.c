@@ -111,7 +111,7 @@ void get_client_session_data(char *messageBuffer, int maxBufferLength)
  */
 void get_client_metadata(char *messageBuffer, int maxBufferLength)
 {
-    watchdog_reset_and_enable(60, "get_client_session_data");
+    watchdog_reset_and_enable(60, "get_client_metadata");
 
 
     /*
@@ -133,7 +133,6 @@ void get_client_metadata(char *messageBuffer, int maxBufferLength)
 
     info_log("Client-Metadata = [%s]", messageBuffer);
     watchdog_disable();
-
 }
 
 
