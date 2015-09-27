@@ -9,22 +9,41 @@
 
 #include "../common/telit.h"
 
-static void addKeyValue(char *buffer, const char *key, const char *splitter, const char *defaultValue, const char *command)
+static void addKeyValue(char *buffer, const char *key, const char *splitter, const char *defaultValue, const char *command,
+                        unsigned char addComma)
 {
-    strcat(buffer, ", '");
+    if(addComma == 1)
+    {
+        strcat(buffer, ", ");
+    }
+
+    strcat(buffer, "'");
     strcat(buffer, key);
     strcat(buffer, "' : ");
 
     RESET_GLOBAL_BUFFER;
     run_simple_at_command_and_get_output(command, (char*)GLOBAL_BUFFER);
 
-    if(strstr((char*)GLOBAL_BUFFER, splitter) != NULL)
+    if(splitter != NULL)
     {
-        strcat(buffer, strstr((char*)GLOBAL_BUFFER, splitter) + 1);
+        /*
+         * Attach the splitted-value.
+         */
+        if(strstr((char*)GLOBAL_BUFFER, splitter) != NULL)
+        {
+            strcat(buffer, strstr((char*)GLOBAL_BUFFER, splitter) + 1);
+        }
+        else
+        {
+            strcat(buffer, defaultValue);
+        }
     }
     else
     {
-        strcat(buffer, defaultValue);
+        /*
+         * Attach direct, complete value.
+         */
+        strcat(buffer, (char*)GLOBAL_BUFFER);
     }
 }
 
@@ -45,8 +64,8 @@ void get_client_session_data(char *messageBuffer, int maxBufferLength)
     strcat(messageBuffer, "{");
 
     strcat(messageBuffer, "'method' : 'GPRS'");
-    addKeyValue(messageBuffer, "ip_address", ",", "\"\"", "AT+CGPADDR=\r\n");
-    addKeyValue(messageBuffer, "antina_status", ":", " -1", "AT#GSMAD=3\r\n");
+    addKeyValue(messageBuffer, "ip_address", ",", "\"\"", "AT+CGPADDR=\r\n", 1);
+    addKeyValue(messageBuffer, "antina_status", ":", " -1", "AT#GSMAD=3\r\n", 1);
 
     strcat(messageBuffer, ", 'signal_strength' : ");
     RESET_GLOBAL_BUFFER;
@@ -92,6 +111,29 @@ void get_client_session_data(char *messageBuffer, int maxBufferLength)
  */
 void get_client_metadata(char *messageBuffer, int maxBufferLength)
 {
+    watchdog_reset_and_enable(60, "get_client_session_data");
+
+
+    /*
+     * Start the JSON-Dict.
+     */
+    strcat(messageBuffer, "{");
+
+    addKeyValue(messageBuffer, "imei", NULL, NULL, "AT+CGSN\r\n", 0);
+    addKeyValue(messageBuffer, "serial_number", NULL, NULL, "AT+CGSN\r\n", 1);
+    addKeyValue(messageBuffer, "model", NULL, NULL, "AT+GMM\r\n", 1);
+    addKeyValue(messageBuffer, "firmware_version", NULL, NULL, "AT+GMR\r\n", 1);
+    addKeyValue(messageBuffer, "manufacturer", NULL, NULL, "AT+GMI\r\n", 1);
+
+
+    /*
+     * Terminate the JSON-Dict.
+     */
+    strcat(messageBuffer, "}");
+
+    info_log("Client-Metadata = [%s]", messageBuffer);
+    watchdog_disable();
+
 }
 
 
