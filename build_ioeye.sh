@@ -33,7 +33,9 @@ SOURCES=`echo                                                                   
         device/${VENDOR}/instamsg/device_serial_logger.c                                        \
         device/${VENDOR}/instamsg/device_time.c                                                 \
         device/${VENDOR}/instamsg/device_watchdog.c                                             \
-        device/${VENDOR}/instamsg/device_misc.c                                                 `
+        device/${VENDOR}/instamsg/device_misc.c                                                 \
+                                                                                                \
+        ioeye/main.c                                                                            `
 
 
 mkdir -p build/${VENDOR}

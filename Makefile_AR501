@@ -20,7 +20,6 @@ IS_GSM_DEVICE="Y"
 # Device-specific extra source-files.
 #
 EXTRA_SOURCES=`echo																		\
-			  ./device.c																\
 			  device/${VENDOR}/common/tiva_startup_gcc.c								\
 			  device/${VENDOR}/common/telit.c											\
 			  device/${VENDOR}/common/uart_utils.c										`
