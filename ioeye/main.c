@@ -2,16 +2,20 @@
 #include "../instamsg/driver/include/globals.h"
 
 #include "./include/globals.h"
+#include "./include/metadata.h"
 
 static char messageBuffer[MAX_BUFFER_SIZE];
-static int sendClientSessionData()
+
+static void sendClientData(void (*func)(char *messageBuffer, int maxBufferLength),
+                          const char *topicName)
 {
     int rc = FAILURE;
 
     memset(messageBuffer, 0, sizeof(messageBuffer));
+    func(messageBuffer, sizeof(messageBuffer));
 
     rc = MQTTPublish(&instaMsg,
-                     TOPIC_SESSION_DATA,
+                     topicName,
                      messageBuffer,
                      QOS0,
                      0,
@@ -20,24 +24,18 @@ static int sendClientSessionData()
                      0,
                      1);
 
-    return rc;
-}
-
-
-static int sendClientMetaData()
-{
-    return SUCCESS;
+    if(rc != SUCCESS)
+    {
+    }
 }
 
 
 static int onConnect()
 {
-    int rc = FAILURE;
+    sendClientData(get_client_session_data, TOPIC_SESSION_DATA);
+    sendClientData(get_client_metadata, TOPIC_METADATA);
 
-    rc = sendClientSessionData();
-    rc = sendClientMetaData();
-
-    return rc;
+    return SUCCESS;
 }
 
 
