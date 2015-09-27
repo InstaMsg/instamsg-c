@@ -636,6 +636,10 @@ void get_latest_sms_containing_substring(Network *network, char *buffer, const c
 
     info_log("\n\n\n\nFinished scanning SMSes..");
     info_log("Provisioning-Info SMS extracted = [%s]", buffer);
+
+#ifdef DEBUG_MODE
+    strcpy(buffer, "{\"sg_apn\":\"www\",\"sg_user\":\"\",\"sg_pass\":\"\"}");
+#endif
 }
 #endif
 
