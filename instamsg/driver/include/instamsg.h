@@ -128,7 +128,8 @@ int MQTTPublish(InstaMsg *c,
                 const char dup,
                 void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
                 unsigned int resultHandlerTimeout,
-                const char retain);
+                const char retain,
+                const char logging);
 
 
 int MQTTSubscribe(InstaMsg *c,

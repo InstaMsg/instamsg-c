@@ -37,6 +37,7 @@ static char LOG_GLOBAL_BUFFER[MAX_BUFFER_SIZE];
                     0,                                                                                  \
                     NULL,                                                                               \
                     MQTT_RESULT_HANDLER_TIMEOUT,                                                        \
+                    0,                                                                                  \
                     0);                                                                                 \
     }                                                                                                   \
     else if(level <= currentLogLevel)                                                                   \
@@ -69,6 +70,7 @@ static char LOG_GLOBAL_BUFFER[MAX_BUFFER_SIZE];
                     0,                                                                                  \
                     NULL,                                                                               \
                     MQTT_RESULT_HANDLER_TIMEOUT,                                                        \
+                    0,                                                                                  \
                     0);                                                                                 \
     }                                                                                                   \
     else if(level <= currentLogLevel)                                                                   \

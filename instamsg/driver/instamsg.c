@@ -563,6 +563,7 @@ terminateFileUpload:
                 (msg->fixedHeaderPlusMsgId).fixedHeader.dup,
                 NULL,
                 MQTT_RESULT_HANDLER_TIMEOUT,
+                0,
                 0);
 
 exit:
@@ -1034,7 +1035,8 @@ int MQTTPublish(InstaMsg* c,
                 const char dup,
                 void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
                 unsigned int resultHandlerTimeout,
-                const char retain)
+                const char retain,
+                const char logging)
 {
     int rc = FAILURE;
     int len = 0;
@@ -1056,6 +1058,11 @@ int MQTTPublish(InstaMsg* c,
         attachResultHandler(c, id, resultHandlerTimeout, resultHandler);
     }
 
+    if(logging == 1)
+    {
+		info_log("Publishing message [%s] to %s", payload, topicName);
+    }
+
     len = MQTTSerialize_publish(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), 0, qos, retain, id, topic, (unsigned char*)payload, strlen((char*)payload) + 1);
     if (len <= 0)
         goto exit;
@@ -1070,6 +1077,19 @@ int MQTTPublish(InstaMsg* c,
     }
 
 exit:
+
+    if(logging == 1)
+    {
+        if(rc == SUCCESS)
+        {
+            info_log("Published successfully.");
+        }
+        else
+        {
+            info_log("Publishing failed, error-code = [%u]", rc);
+        }
+    }
+
     return rc;
 }
 
