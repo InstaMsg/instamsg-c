@@ -19,7 +19,7 @@ static void addKeyValue(char *buffer, const char *key, const char *splitter, con
 
     strcat(buffer, "'");
     strcat(buffer, key);
-    strcat(buffer, "' : ");
+    strcat(buffer, "' : '");
 
     RESET_GLOBAL_BUFFER;
     run_simple_at_command_and_get_output(command, (char*)GLOBAL_BUFFER);
@@ -29,13 +29,33 @@ static void addKeyValue(char *buffer, const char *key, const char *splitter, con
         /*
          * Attach the splitted-value.
          */
-        if(strstr((char*)GLOBAL_BUFFER, splitter) != NULL)
+        char *starter = strstr((char*)GLOBAL_BUFFER, splitter);
+        if(starter != NULL)
         {
-            strcat(buffer, strstr((char*)GLOBAL_BUFFER, splitter) + 1);
+            /*
+             * Ignore the starting double-quote.
+             */
+            if(starter[1] == '"')
+            {
+                starter = starter + 1;
+            }
+
+            strcat(buffer, starter + 1);
+
+            /*
+             * Ignore the ending double-quote.
+             */
+            if(buffer[strlen(buffer) - 1] == '"')
+            {
+                buffer[strlen(buffer) - 1] = 0;
+            }
         }
         else
         {
-            strcat(buffer, defaultValue);
+            if(defaultValue != NULL)
+            {
+                strcat(buffer, defaultValue);
+            }
         }
     }
     else
@@ -45,6 +65,8 @@ static void addKeyValue(char *buffer, const char *key, const char *splitter, con
          */
         strcat(buffer, (char*)GLOBAL_BUFFER);
     }
+
+    strcat(buffer, "'");
 }
 
 
@@ -70,29 +92,24 @@ void get_client_session_data(char *messageBuffer, int maxBufferLength)
     strcat(messageBuffer, ", 'signal_strength' : ");
     RESET_GLOBAL_BUFFER;
     run_simple_at_command_and_get_output("AT+CSQ\r\n", (char*)GLOBAL_BUFFER);
-    strcat(messageBuffer, "\"[");
     {
         char *starter = (char*)GLOBAL_BUFFER + strlen("+CSQ: ");
-        while(1)
+
+        strcat(messageBuffer, "'");
+        if(1)
         {
             char *finder = strstr(starter, ",");
             if(finder != NULL)
             {
-                strcat(messageBuffer, "'");
                 strncat(messageBuffer, starter, finder - starter);
-                strcat(messageBuffer, "', ");
-                starter = finder + 1;
             }
             else
             {
-                strcat(messageBuffer, "'");
                 strcat(messageBuffer, starter);
-                strcat(messageBuffer, "'");
-                break;
             }
         }
+        strcat(messageBuffer, "'");
     }
-    strcat(messageBuffer, "]\"");
 
     /*
      * Terminate the JSON-Dict.

@@ -41,7 +41,6 @@ static int onConnect()
 
 void coreLoopyBusinessLogicInitiatedBySelf()
 {
-    onConnect();
     startAndCountdownTimer(300, 1);
 }
 
