@@ -34,6 +34,7 @@ static int onConnect()
 {
     sendClientData(get_client_session_data, TOPIC_SESSION_DATA);
     sendClientData(get_client_metadata, TOPIC_METADATA);
+    sendClientData(get_network_data, TOPIC_NETWORK_DATA);
 
     return SUCCESS;
 }
@@ -50,4 +51,3 @@ int main(int argc, char** argv)
     globalSystemInit();
     start(onConnect, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, NULL);
 }
-

@@ -177,4 +177,31 @@ void get_client_metadata(char *messageBuffer, int maxBufferLength)
 }
 
 
+/*
+ * This method returns the client-network-data, in simple JSON form, of type ::
+ *
+ * {key1 : value1, key2 : value2 .....}
+ */
+void get_network_data(char *messageBuffer, int maxBufferLength)
+{
+    watchdog_reset_and_enable(60, "get_network_data");
+
+    /*
+     * Start the JSON-Dict.
+     */
+    strcat(messageBuffer, "{");
+
+    addKeyValue(messageBuffer, "antina_status", ":", " -1", "AT#GSMAD=3\r\n", 0);
+    addSignalStrength(messageBuffer, 1);
+
+    /*
+     * Terminate the JSON-Dict.
+     */
+    strcat(messageBuffer, "}");
+
+    info_log("Client-Network-Data = [%s]", messageBuffer);
+    watchdog_disable();
+}
+
+
 #endif
