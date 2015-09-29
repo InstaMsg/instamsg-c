@@ -6,6 +6,7 @@
 #include "../../../../instamsg/driver/include/globals.h"
 #include "../../../../instamsg/driver/include/log.h"
 #include "../../../../instamsg/driver/include/watchdog.h"
+#include "../../../../instamsg/driver/include/sg_stdlib.h"
 
 #include "../common/telit.h"
 
@@ -70,6 +71,44 @@ static void addKeyValue(char *buffer, const char *key, const char *splitter, con
 }
 
 
+static void addSignalStrength(char *buffer, unsigned char addComma)
+{
+    if(addComma == 1)
+    {
+        strcat(buffer, ", ");
+    }
+
+    strcat(buffer, "'signal_strength' : '");
+
+    RESET_GLOBAL_BUFFER;
+    run_simple_at_command_and_get_output("AT+CSQ\r\n", (char*)GLOBAL_BUFFER);
+    info_log("Signal-Strength AT-Command Raw-Output = [%s]", GLOBAL_BUFFER);
+
+    /*
+     * At this point, we have the output as "+CSQ: 15,0"
+     */
+    char *firstValueStart = (char*)GLOBAL_BUFFER + strlen("+CSQ: ");
+    char *finder = strstr(firstValueStart, ",");
+
+    {
+        int intValue = -1;
+
+        char intString[6] = {0};
+        memcpy(intString, firstValueStart, finder - firstValueStart);
+
+        intValue = sg_atoi(intString);
+        intValue = -113 + (2 * intValue);
+
+        memset(intString, 0, sizeof(intString));
+        sg_sprintf(intString, "%d", intValue);
+
+        strcat(buffer, intString);
+    }
+
+    strcat(buffer, "'");
+}
+
+
 /*
  * This method returns the client-session-data, in simple JSON form, of type ::
  *
@@ -86,30 +125,11 @@ void get_client_session_data(char *messageBuffer, int maxBufferLength)
     strcat(messageBuffer, "{");
 
     strcat(messageBuffer, "'method' : 'GPRS'");
+
     addKeyValue(messageBuffer, "ip_address", ",", "\"\"", "AT+CGPADDR=\r\n", 1);
     addKeyValue(messageBuffer, "antina_status", ":", " -1", "AT#GSMAD=3\r\n", 1);
 
-    strcat(messageBuffer, ", 'signal_strength' : ");
-    RESET_GLOBAL_BUFFER;
-    run_simple_at_command_and_get_output("AT+CSQ\r\n", (char*)GLOBAL_BUFFER);
-    {
-        char *starter = (char*)GLOBAL_BUFFER + strlen("+CSQ: ");
-
-        strcat(messageBuffer, "'");
-        if(1)
-        {
-            char *finder = strstr(starter, ",");
-            if(finder != NULL)
-            {
-                strncat(messageBuffer, starter, finder - starter);
-            }
-            else
-            {
-                strcat(messageBuffer, starter);
-            }
-        }
-        strcat(messageBuffer, "'");
-    }
+    addSignalStrength(messageBuffer, 1);
 
     /*
      * Terminate the JSON-Dict.
@@ -141,6 +161,10 @@ void get_client_metadata(char *messageBuffer, int maxBufferLength)
     addKeyValue(messageBuffer, "model", NULL, NULL, "AT+GMM\r\n", 1);
     addKeyValue(messageBuffer, "firmware_version", NULL, NULL, "AT+GMR\r\n", 1);
     addKeyValue(messageBuffer, "manufacturer", NULL, NULL, "AT+GMI\r\n", 1);
+
+    strcat(messageBuffer, ", 'client_version' : '");
+    strcat(messageBuffer, INSTAMSG_VERSION);
+    strcat(messageBuffer, "'");
 
 
     /*

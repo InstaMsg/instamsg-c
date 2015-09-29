@@ -17,7 +17,7 @@ static void sendClientData(void (*func)(char *messageBuffer, int maxBufferLength
     rc = MQTTPublish(&instaMsg,
                      topicName,
                      messageBuffer,
-                     QOS0,
+                     QOS1,
                      0,
                      NULL,
                      MQTT_RESULT_HANDLER_TIMEOUT,
