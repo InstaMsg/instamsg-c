@@ -47,6 +47,7 @@ embedded-flash-environment/tivaware/
 subscriber.sh
 filetester.sh
 publisher.sh
+diff.sh
 
 config.txt
 config.txt_local_testing
@@ -57,3 +58,5 @@ build/
 tiva_cross_compilation_checks/
 lwip/
 lwip-contrib/
+
+device/ar501
