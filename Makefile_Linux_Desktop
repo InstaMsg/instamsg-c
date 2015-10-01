@@ -36,8 +36,7 @@ FS_COMMUNICATION_IMPL="Y"
 
 # Device-specific extra source-files.
 #
-EXTRA_SOURCES=`echo															\
-			  ./stdoutsub.c													`
+EXTRA_SOURCES=""
 
 
 # Device-specific extra object-files that need to linked.
