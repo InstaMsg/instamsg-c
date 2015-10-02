@@ -41,6 +41,7 @@ SOURCES=`echo                                                                   
         ioeye/modbus.c                                                                          \
                                                                                                 \
         device/${VENDOR}/ioeye/device_modbus.c                                                  \
+        device/${VENDOR}/ioeye/device_time.c                                                    \
         device/${VENDOR}/ioeye/device_metadata.c                                                `
 
 

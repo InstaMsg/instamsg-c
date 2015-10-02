@@ -7,6 +7,7 @@
 #include "./include/metadata.h"
 #include "./include/modbus.h"
 #include "./include/hex.h"
+#include "./include/time.h"
 
 #include "device_modbus.h"
 
@@ -52,6 +53,7 @@ static int onConnect()
 static void coreLoopyBusinessLogicInitiatedBySelf()
 {
     int rc;
+    char smallBuffer[20];
 
     unsigned char *responseByteBuffer;
     char *commandHexString = "03030064000A85F0";
@@ -68,7 +70,7 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
     RESET_GLOBAL_BUFFER;
     getByteStreamFromHexString(commandHexString, GLOBAL_BUFFER);
 
-    info_log("Sending modbus-command [%s], and expecting response of [%u] bytes", commandHexString, responseLength);
+    debug_log("Sending modbus-command [%s], and expecting response of [%u] bytes", commandHexString, responseLength);
 
     watchdog_reset_and_enable(10, "send_command_and_read_response_sync");
     rc = singletonModbusInterface.send_command_and_read_response_sync(&singletonModbusInterface,
@@ -96,10 +98,14 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
             strcat((char*)GLOBAL_BUFFER, hex);
         }
 
-        info_log("Modbus-Command [%s], Modbus-Response [%s]", commandHexString, (char*)GLOBAL_BUFFER);
+        debug_log("Modbus-Command [%s], Modbus-Response [%s]", commandHexString, (char*)GLOBAL_BUFFER);
     }
 
 
+    memset(smallBuffer, 0, sizeof(smallBuffer));
+    getTimeInDesiredFormat(smallBuffer);
+
+    debug_log("Time-Field = [%s]", smallBuffer);
 
 exit:
     if(responseByteBuffer)
