@@ -7,7 +7,7 @@
  * Global-functions callable.
  */
 void init_network(Network *network, const char *hostName, unsigned int port);
-void release_underlying_network_medium_guaranteed(Network* network);
+void release_network(Network *network);
 void get_device_uuid(char *buffer);
 
 
@@ -30,6 +30,6 @@ int network_write(Network *network, unsigned char* buffer, int len);
 void get_latest_sms_containing_substring(Network *network, char *buffer, const char *prefix);
 #endif
 void connect_underlying_network_medium_try_once(Network* network);
-void release_network(Network *network);
+void release_underlying_network_medium_guaranteed(Network* network);
 
 #endif
