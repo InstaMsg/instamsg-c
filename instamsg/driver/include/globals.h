@@ -82,11 +82,13 @@ void sg_sprintf(char *out, const char *format, ...);
 #define NO_TIMEOUT 0
 
 void startAndCountdownTimer(int seconds, unsigned char showRunningStatus);
-void globalSystemInit();
+void globalSystemInit(char *logFilePath);
 
 #define MAX_HEAP_SIZE (10 * 1024)
 #define MEM_ALLOC     "[MEM-ALLOC] "
 
 unsigned char GLOBAL_BUFFER[MAX_BUFFER_SIZE];
 #define RESET_GLOBAL_BUFFER memset(GLOBAL_BUFFER, 0, MAX_BUFFER_SIZE);
+
+#define LOG_FILE_PATH "/home/ajay/subscriber"
 #endif

@@ -671,14 +671,9 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
 void initInstaMsg(InstaMsg* c,
                   int (*connectHandler)(),
                   int (*disconnectHandler)(),
-                  int (*oneToOneMessageHandler)(),
-                  char *logFilePath)
+                  int (*oneToOneMessageHandler)())
 {
     int i;
-
-#ifdef FILE_SYSTEM_INTERFACE_ENABLED
-    init_file_logger(&fileLogger, logFilePath);
-#endif
 
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
@@ -1118,14 +1113,13 @@ int MQTTDisconnect(InstaMsg* c)
 void start(int (*onConnectOneTimeOperations)(),
            int (*onDisconnect)(),
            int (*oneToOneMessageHandler)(),
-           void (*coreLoopyBusinessLogicInitiatedBySelf)(),
-           char *logFilePath)
+           void (*coreLoopyBusinessLogicInitiatedBySelf)())
 {
     InstaMsg *c = &instaMsg;
 
     while(1)
     {
-        initInstaMsg(c, onConnectOneTimeOperations, onDisconnect, oneToOneMessageHandler, logFilePath);
+        initInstaMsg(c, onConnectOneTimeOperations, onDisconnect, oneToOneMessageHandler);
 
         while(1)
         {

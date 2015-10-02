@@ -111,6 +111,11 @@ exit:
 
 int main(int argc, char** argv)
 {
-    globalSystemInit();
-    start(onConnect, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, NULL);
+#ifdef FILE_SYSTEM_INTERFACE_ENABLED
+    globalSystemInit(LOG_FILE_PATH);
+#else
+    globalSystemInit(NULL);
+#endif
+
+    start(onConnect, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf);
 }

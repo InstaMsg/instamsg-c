@@ -147,8 +147,7 @@ void clearInstaMsg(InstaMsg *c);
 void initInstaMsg(InstaMsg* c,
                   int (*connectHandler)(),
                   int (*disconnectHandler)(),
-                  int (*oneToOneMessageHandler)(),
-                  char *logFilePath);
+                  int (*oneToOneMessageHandler)());
 
 
 typedef struct JSONParseStuff JSONParseStuff;
@@ -174,8 +173,7 @@ void sendPingReqToServer(InstaMsg *c);
 void start(int (*onConnectOneTimeOperations)(),
            int (*onDisconnect)(),
            int (*oneToOneMessageHandler)(),
-           void (*coreLoopyBusinessLogicInitiatedBySelf)(),
-           char *logFilePath);
+           void (*coreLoopyBusinessLogicInitiatedBySelf)());
 
 #define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}
 #endif

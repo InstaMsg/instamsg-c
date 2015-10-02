@@ -443,7 +443,7 @@ void startAndCountdownTimer(int seconds, unsigned char showRunningStatus)
 }
 
 
-void globalSystemInit()
+void globalSystemInit(char *logFilePath)
 {
     bootstrapInit();
 
@@ -452,6 +452,10 @@ void globalSystemInit()
 
     watchdog_init();
     init_timer(&singletonUtilityTimer, NULL);
+
+#ifdef FILE_SYSTEM_INTERFACE_ENABLED
+    init_file_logger(&fileLogger, logFilePath);
+#endif
 }
 
 
