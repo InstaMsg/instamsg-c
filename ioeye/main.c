@@ -12,6 +12,9 @@
 #include "device_modbus.h"
 
 static char messageBuffer[MAX_BUFFER_SIZE];
+static char smallBuffer[MAX_BUFFER_SIZE / 2];
+static char watchdogAssistant[50];
+
 Modbus singletonModbusInterface;
 
 static void sendClientData(void (*func)(char *messageBuffer, int maxBufferLength),
@@ -50,42 +53,85 @@ static int onConnect()
 }
 
 
+static void addXMLFieldsInPayload(char *messageBuffer,
+                                  char *tag,
+                                  void (*func)(char *messageBuffer, int maxBufferLength))
+{
+    memset(watchdogAssistant, 0, sizeof(watchdogAssistant));
+    strcat(watchdogAssistant, "Calculating-For-Payload ");
+    strcat(watchdogAssistant, tag);
+
+    strcat(messageBuffer, "<");
+    strcat(messageBuffer, tag);
+    strcat(messageBuffer, ">");
+
+    memset(smallBuffer, 0, sizeof(smallBuffer));
+
+    watchdog_reset_and_enable(10, watchdogAssistant);
+    func(smallBuffer, sizeof(smallBuffer));
+    watchdog_disable();
+
+    strcat(messageBuffer, smallBuffer);
+
+    strcat(messageBuffer, "</");
+    strcat(messageBuffer, tag);
+    strcat(messageBuffer, ">");
+}
+
+
 static void coreLoopyBusinessLogicInitiatedBySelf()
 {
     int rc;
-    char smallBuffer[20];
-
+    int i;
     unsigned char *responseByteBuffer;
-    char *commandHexString = "03030064000A85F0";
 
-    unsigned long responseLength = getExpectedModbusResponseLength(commandHexString);
 
-    responseByteBuffer = (unsigned char*) sg_malloc(responseLength);
-    if(responseByteBuffer == NULL)
+    /*
+     * Now, start forming the payload ....
+     */
+    memset(messageBuffer, 0, sizeof(messageBuffer));
+    strcat(messageBuffer, "<rtu>");
+
+    addXMLFieldsInPayload(messageBuffer, "manufacturer", get_manufacturer);
+
+
+    /*
+     * Modbus-Response
+     */
+    strcat(messageBuffer, "<data><![CDATA[");
+
     {
-        error_log("Could not allocate memory for modbus-response-buffer :(");
-        goto exit;
-    }
+        char *commandHexString = "03030064000A85F0";
 
-    RESET_GLOBAL_BUFFER;
-    getByteStreamFromHexString(commandHexString, GLOBAL_BUFFER);
+        unsigned long responseLength = getExpectedModbusResponseLength(commandHexString);
 
-    debug_log("Sending modbus-command [%s], and expecting response of [%u] bytes", commandHexString, responseLength);
-
-    watchdog_reset_and_enable(10, "send_command_and_read_response_sync");
-    rc = singletonModbusInterface.send_command_and_read_response_sync(&singletonModbusInterface,
-                                                                      GLOBAL_BUFFER,
-                                                                      strlen(commandHexString) / 2,
-                                                                      responseByteBuffer,
-                                                                      responseLength);
-    watchdog_disable();
-
-
-    if(rc == SUCCESS)
-    {
-        int i;
+        responseByteBuffer = (unsigned char*) sg_malloc(responseLength);
+        if(responseByteBuffer == NULL)
+        {
+            error_log("Could not allocate memory for modbus-response-buffer :(");
+            goto exit;
+        }
 
         RESET_GLOBAL_BUFFER;
+        getByteStreamFromHexString(commandHexString, GLOBAL_BUFFER);
+
+        debug_log("Sending modbus-command [%s], and expecting response of [%u] bytes", commandHexString, responseLength);
+
+        watchdog_reset_and_enable(10, "Getting-MODBUS-Response");
+        rc = singletonModbusInterface.send_command_and_read_response_sync(&singletonModbusInterface,
+                                                                          GLOBAL_BUFFER,
+                                                                          strlen(commandHexString) / 2,
+                                                                          responseByteBuffer,
+                                                                          responseLength);
+        watchdog_disable();
+
+        if(rc != SUCCESS)
+        {
+            error_log("Problem occured while fetching modbus-response... not proceeding further");
+            goto exit;
+        }
+
+
         for(i = 0; i < responseLength; i++)
         {
             char hex[3] = {0};
@@ -99,13 +145,19 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
         }
 
         debug_log("Modbus-Command [%s], Modbus-Response [%s]", commandHexString, (char*)GLOBAL_BUFFER);
+        strcat(messageBuffer, (char*) GLOBAL_BUFFER);
     }
 
+    strcat(messageBuffer, "]]></data>");
 
-    memset(smallBuffer, 0, sizeof(smallBuffer));
-    getTimeInDesiredFormat(smallBuffer);
 
-    debug_log("Time-Field = [%s]", smallBuffer);
+    addXMLFieldsInPayload(messageBuffer, "serial_number", get_serial_number);
+    addXMLFieldsInPayload(messageBuffer, "time", getTimeInDesiredFormat);
+    addXMLFieldsInPayload(messageBuffer, "offset", getTimezoneOffset);
+
+    strcat(messageBuffer, "</rtu>");
+
+    info_log("Sending device-data [%s]", messageBuffer);
 
 exit:
     if(responseByteBuffer)

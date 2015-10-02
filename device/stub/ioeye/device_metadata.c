@@ -30,4 +30,21 @@ void get_network_data(char *messageBuffer, int maxBufferLength)
 {
 }
 
+
+/*
+ * This method gets the device-manufacturer.
+ */
+void get_manufacturer(char *messagebuffer, int maxbufferlength)
+{
+}
+
+
+/*
+ * This method gets the device serial-number.
+ */
+void get_serial_number(char *messagebuffer, int maxbufferlength)
+{
+}
+
+
 #endif
