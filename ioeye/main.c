@@ -157,7 +157,21 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
 
     strcat(messageBuffer, "</rtu>");
 
-    info_log("Sending device-data [%s]", messageBuffer);
+    debug_log("Sending device-data [%s]", messageBuffer);
+    rc = MQTTPublish(&instaMsg,
+                     TOPIC_WEBHOOK,
+                     messageBuffer,
+                     QOS1,
+                     0,
+                     NULL,
+                     MQTT_RESULT_HANDLER_TIMEOUT,
+                     0,
+                     1);
+
+    if(rc != SUCCESS)
+    {
+    }
+
 
 exit:
     if(responseByteBuffer)
