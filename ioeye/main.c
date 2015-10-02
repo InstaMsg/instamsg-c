@@ -74,6 +74,28 @@ void coreLoopyBusinessLogicInitiatedBySelf()
                                                                       responseByteBuffer,
                                                                       responseLength);
 
+    if(rc == SUCCESS)
+    {
+        int i;
+
+        RESET_GLOBAL_BUFFER;
+        for(i = 0; i < responseLength; i++)
+        {
+            char hex[3] = {0};
+            sg_sprintf(hex, "%x", responseByteBuffer[i]);
+
+            if(responseByteBuffer[i] <= 0x0F)
+            {
+                strcat((char*)GLOBAL_BUFFER, "0");
+            }
+            strcat((char*)GLOBAL_BUFFER, hex);
+        }
+
+        info_log("Modbus-Command [%s], Modbus-Response [%s]", commandHexString, (char*)GLOBAL_BUFFER);
+    }
+
+
+
 exit:
     if(responseByteBuffer)
         sg_free(responseByteBuffer);
