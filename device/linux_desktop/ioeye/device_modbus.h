@@ -6,10 +6,11 @@ typedef struct Modbus Modbus;
 struct Modbus
 {
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
-    int (*modbus_send_command_and_read_response_sync)(Modbus *modbus,
-                                                      unsigned char *commandBytes,
-                                                      unsigned char *responseByteBuffer,
-                                                      int responseBytesLength);
+    int (*send_command_and_read_response_sync)(Modbus *modbus,
+                                               unsigned char *commandBytes,
+                                               int commandBytesLength,
+                                               unsigned char *responseByteBuffer,
+                                               int responseBytesLength);
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
 
 

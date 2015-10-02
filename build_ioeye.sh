@@ -3,6 +3,7 @@
 TOTAL_INCLUDES=`echo                                                                            \
         ${SYSTEM_INCLUDES}                                                                      \
         -Idevice/${VENDOR}/instamsg/                                                            \
+        -Idevice/${VENDOR}/ioeye/                                                               \
         -Iinstamsg/mqtt/                                                                        `
 
 
@@ -36,6 +37,10 @@ SOURCES=`echo                                                                   
         device/${VENDOR}/instamsg/device_misc.c                                                 \
                                                                                                 \
         ioeye/main.c                                                                            \
+        ioeye/hex.c                                                                             \
+        ioeye/modbus.c                                                                          \
+                                                                                                \
+        device/${VENDOR}/ioeye/device_modbus.c                                                  \
         device/${VENDOR}/ioeye/device_metadata.c                                                `
 
 

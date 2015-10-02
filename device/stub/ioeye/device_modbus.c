@@ -38,6 +38,7 @@ void connect_underlying_modbus_medium_guaranteed(Modbus *modbus)
  */
 int modbus_send_command_and_read_response_sync(Modbus *modbus,
                                                unsigned char *commandBytes,
+                                               int commandBytesLength,
                                                unsigned char *responseByteBuffer,
                                                int responseBytesLength)
 {

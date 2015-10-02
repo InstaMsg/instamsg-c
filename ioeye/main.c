@@ -1,10 +1,16 @@
 #include "../instamsg/driver/include/instamsg.h"
 #include "../instamsg/driver/include/globals.h"
+#include "../instamsg/driver/include/sg_mem.h"
 
 #include "./include/globals.h"
 #include "./include/metadata.h"
+#include "./include/modbus.h"
+#include "./include/hex.h"
+
+#include "device_modbus.h"
 
 static char messageBuffer[MAX_BUFFER_SIZE];
+Modbus singletonModbusInterface;
 
 static void sendClientData(void (*func)(char *messageBuffer, int maxBufferLength),
                           const char *topicName)
@@ -32,6 +38,8 @@ static void sendClientData(void (*func)(char *messageBuffer, int maxBufferLength
 
 static int onConnect()
 {
+    init_modbus(&singletonModbusInterface, NULL);
+
     sendClientData(get_client_session_data, TOPIC_SESSION_DATA);
     sendClientData(get_client_metadata, TOPIC_METADATA);
     sendClientData(get_network_data, TOPIC_NETWORK_DATA);
@@ -42,6 +50,34 @@ static int onConnect()
 
 void coreLoopyBusinessLogicInitiatedBySelf()
 {
+    int rc;
+
+    unsigned char *responseByteBuffer;
+    char *commandHexString = "03030064000A85F0";
+
+    unsigned long responseLength = getExpectedModbusResponseLength(commandHexString);
+
+    responseByteBuffer = (unsigned char*) sg_malloc(responseLength);
+    if(responseByteBuffer == NULL)
+    {
+        error_log("Could not allocate memory for modbus-response-buffer :(");
+        goto exit;
+    }
+
+    RESET_GLOBAL_BUFFER;
+    getByteStreamFromHexString(commandHexString, GLOBAL_BUFFER);
+
+    info_log("Sending modbus-command [%s], and expecting response of [%u] bytes", commandHexString, responseLength);
+    rc = singletonModbusInterface.send_command_and_read_response_sync(&singletonModbusInterface,
+                                                                      GLOBAL_BUFFER,
+                                                                      strlen(commandHexString) / 2,
+                                                                      responseByteBuffer,
+                                                                      responseLength);
+
+exit:
+    if(responseByteBuffer)
+        sg_free(responseByteBuffer);
+
     startAndCountdownTimer(300, 1);
 }
 

@@ -18,6 +18,7 @@ void release_modbus(Modbus *modbus);
  */
 int modbus_send_command_and_read_response_sync(Modbus *modbus,
                                                unsigned char *commandBytes,
+                                               int commandBytesLength,
                                                unsigned char *responseByteBuffer,
                                                int responseBytesLength);
 
@@ -28,5 +29,6 @@ int modbus_send_command_and_read_response_sync(Modbus *modbus,
  */
 void connect_underlying_modbus_medium_guaranteed(Modbus *modbus);
 void release_underlying_modbus_medium_guaranteed(Modbus *modbus);
+unsigned long getExpectedModbusResponseLength(char *commandNibbles);
 
 #endif
