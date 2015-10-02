@@ -1,6 +1,7 @@
 #include "../instamsg/driver/include/instamsg.h"
 #include "../instamsg/driver/include/globals.h"
 #include "../instamsg/driver/include/sg_mem.h"
+#include "../instamsg/driver/include/watchdog.h"
 
 #include "./include/globals.h"
 #include "./include/metadata.h"
@@ -68,11 +69,15 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
     getByteStreamFromHexString(commandHexString, GLOBAL_BUFFER);
 
     info_log("Sending modbus-command [%s], and expecting response of [%u] bytes", commandHexString, responseLength);
+
+    watchdog_reset_and_enable(10, "send_command_and_read_response_sync");
     rc = singletonModbusInterface.send_command_and_read_response_sync(&singletonModbusInterface,
                                                                       GLOBAL_BUFFER,
                                                                       strlen(commandHexString) / 2,
                                                                       responseByteBuffer,
                                                                       responseLength);
+    watchdog_disable();
+
 
     if(rc == SUCCESS)
     {
