@@ -48,7 +48,7 @@ static int onConnect()
 }
 
 
-void coreLoopyBusinessLogicInitiatedBySelf()
+static void coreLoopyBusinessLogicInitiatedBySelf()
 {
     int rc;
 
