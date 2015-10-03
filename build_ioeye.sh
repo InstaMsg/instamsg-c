@@ -16,7 +16,6 @@ SOURCES=`echo                                                                   
         instamsg/driver/sg_mem.c                                                                \
         instamsg/driver/sg_stdlib.c                                                             \
         instamsg/driver/network.c                                                               \
-        instamsg/driver/time.c                                                                  \
                                                                                                 \
         instamsg/mqtt/src/MQTTFormat.c                                                          \
         instamsg/mqtt/src/MQTTPacket.c                                                          \

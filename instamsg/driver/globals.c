@@ -426,7 +426,7 @@ void startAndCountdownTimer(int seconds, unsigned char showRunningStatus)
 {
     int i;
     long j;
-    long cycles = 1000000 / (singletonUtilityTimer.getMinimumDelayPossibleInMicroSeconds(&singletonUtilityTimer));
+    long cycles = 1000000 / getMinimumDelayPossibleInMicroSeconds();
 
     for(i = 0; i < seconds; i++)
     {
@@ -437,7 +437,7 @@ void startAndCountdownTimer(int seconds, unsigned char showRunningStatus)
 
         for(j = 0; j < cycles; j++)
         {
-            singletonUtilityTimer.minimumDelay(&singletonUtilityTimer);
+            minimumDelay();
         }
     }
 }
@@ -451,7 +451,6 @@ void globalSystemInit(char *logFilePath)
     init_serial_logger();
 
     watchdog_init();
-    init_timer(&singletonUtilityTimer, NULL);
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
     init_file_logger(&fileLogger, logFilePath);
