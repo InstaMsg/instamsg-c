@@ -18,18 +18,6 @@ FileLogger fileLogger;
 #endif
 
 
-typedef struct SerialLogger SerialLogger;
-struct SerialLogger
-{
-    SerialLoggerInterface serialLoggerInterface;
-};
-
-void init_serial_logger(SerialLogger *serialLogger, void *arg);
-void release_serial_logger(SerialLogger *serialLogger);
-
-SerialLogger serialLogger;
-
-
 #define INSTAMSG_LOG_LEVEL_DISABLED 0
 #define INSTAMSG_LOG_LEVEL_INFO     1
 #define INSTAMSG_LOG_LEVEL_ERROR    2

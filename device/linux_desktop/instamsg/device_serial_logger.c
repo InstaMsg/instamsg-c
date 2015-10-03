@@ -5,14 +5,13 @@
  *
  *******************************************************************************/
 
-#include "./device_serial_logger.h"
 #include "../driver/include/globals.h"
 
 
 /*
  * This method MUST connect the underlying medium (even if it means to retry continuously).
  */
-void connect_underlying_serial_logger_medium_guaranteed(SerialLoggerInterface *serialLoggerInterface)
+void init_serial_logger()
 {
 }
 
@@ -31,7 +30,7 @@ void connect_underlying_serial_logger_medium_guaranteed(SerialLoggerInterface *s
  * An error occurred while writing.
  * In this case, FAILURE must be returned immediately.
  */
-int serial_logger_write(SerialLoggerInterface* serialLoggerInterface, unsigned char* buffer, int len)
+int serial_logger_write(unsigned char* buffer, int len)
 {
     return SUCCESS;
 }
@@ -41,6 +40,6 @@ int serial_logger_write(SerialLoggerInterface* serialLoggerInterface, unsigned c
  * This method MUST release the underlying medium (even if it means to retry continuously).
  * But if it is ok to re-connect without releasing the underlying-system-resource, then this can be left empty.
  */
-void release_underlying_serial_logger_medium_guaranteed(SerialLoggerInterface *serialLoggerInterface)
+void release_serial_logger()
 {
 }

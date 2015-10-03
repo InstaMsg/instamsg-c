@@ -448,7 +448,7 @@ void globalSystemInit(char *logFilePath)
     bootstrapInit();
 
     currentLogLevel = LOG_LEVEL;
-    init_serial_logger(&serialLogger, NULL);
+    init_serial_logger();
 
     watchdog_init();
     init_timer(&singletonUtilityTimer, NULL);

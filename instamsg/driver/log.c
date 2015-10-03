@@ -42,9 +42,7 @@ static char LOG_GLOBAL_BUFFER[MAX_BUFFER_SIZE];
     }                                                                                                   \
     else if(level <= currentLogLevel)                                                                   \
     {                                                                                                   \
-        serialLogger.serialLoggerInterface.write(                                                       \
-                &(serialLogger.serialLoggerInterface),                                                  \
-                (unsigned char *)LOG_GLOBAL_BUFFER, strlen(LOG_GLOBAL_BUFFER));                         \
+        serial_logger_write((unsigned char *)LOG_GLOBAL_BUFFER, strlen(LOG_GLOBAL_BUFFER));             \
         fileLogger.fs.write(                                                                            \
                 &(fileLogger.fs),                                                                       \
                 (unsigned char *)LOG_GLOBAL_BUFFER, strlen(LOG_GLOBAL_BUFFER));                         \
@@ -75,9 +73,7 @@ static char LOG_GLOBAL_BUFFER[MAX_BUFFER_SIZE];
     }                                                                                                   \
     else if(level <= currentLogLevel)                                                                   \
     {                                                                                                   \
-        serialLogger.serialLoggerInterface.write(                                                       \
-                &(serialLogger.serialLoggerInterface),                                                  \
-                (unsigned char*)LOG_GLOBAL_BUFFER, strlen(LOG_GLOBAL_BUFFER));                          \
+        serial_logger_write((unsigned char *)LOG_GLOBAL_BUFFER, strlen(LOG_GLOBAL_BUFFER));             \
     }
 #endif
 
@@ -97,20 +93,6 @@ void release_file_logger(FileLogger *fileLogger)
     release_file_system(&(fileLogger->fs));
 }
 #endif
-
-void init_serial_logger(SerialLogger *serialLogger, void *arg)
-{
-    /* Here, physical medium is a serial-interface. */
-	init_serial_logger_interface(&(serialLogger->serialLoggerInterface), arg);
-}
-
-
-void release_serial_logger(SerialLogger *serialLogger)
-{
-    info_log("FREEING [LOG] RESOURCES (SERIAL-BASES).");
-
-    release_serial_logger_interface(&(serialLogger->serialLoggerInterface));
-}
 
 
 void info_log(char *fmt, ...)
