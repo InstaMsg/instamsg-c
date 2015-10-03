@@ -20,24 +20,27 @@ Modbus singletonModbusInterface;
 static void sendClientData(void (*func)(char *messageBuffer, int maxBufferLength),
                           const char *topicName)
 {
-    int rc = FAILURE;
+    /*
+     * This method sends the data upon client's connect.
+     *
+     * If the message(s) are not sent from this method, that means that the connection is not (fully) completed.
+     * Thus, the InstaMsg-Driver code will try again for the connection, and then these messages will be sent (again).
+     *
+     * Bottom-line : We do not need to re-attempt the message(s) sent by this method.
+     */
 
     memset(messageBuffer, 0, sizeof(messageBuffer));
     func(messageBuffer, sizeof(messageBuffer));
 
-    rc = MQTTPublish(&instaMsg,
-                     topicName,
-                     messageBuffer,
-                     QOS1,
-                     0,
-                     NULL,
-                     MQTT_RESULT_HANDLER_TIMEOUT,
-                     0,
-                     1);
-
-    if(rc != SUCCESS)
-    {
-    }
+    MQTTPublish(&instaMsg,
+                topicName,
+                messageBuffer,
+                QOS1,
+                0,
+                NULL,
+                MQTT_RESULT_HANDLER_TIMEOUT,
+                0,
+                1);
 }
 
 
