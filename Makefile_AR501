@@ -22,6 +22,7 @@ IS_GSM_DEVICE="Y"
 EXTRA_SOURCES=`echo																		\
 			  device/${VENDOR}/common/tiva_startup_gcc.c								\
 			  device/${VENDOR}/common/telit.c											\
+			  device/${VENDOR}/common/atoll_spiflash.c									\
 			  device/${VENDOR}/common/uart_utils.c										`
 
 
@@ -33,6 +34,7 @@ EXTRA_OBJECT_FILES=`echo																\
 					embedded-flash-environment/tivaware/driverlib/gcc/systick.o			\
 					embedded-flash-environment/tivaware/driverlib/gcc/interrupt.o 		\
 					embedded-flash-environment/tivaware/driverlib/gcc/cpu.o 			\
+					embedded-flash-environment/tivaware/driverlib/gcc/ssi.o 			\
 					embedded-flash-environment/tivaware/driverlib/gcc/uart.o			`
 
 
