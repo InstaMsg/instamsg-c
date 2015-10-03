@@ -173,6 +173,9 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
 
     if(rc != SUCCESS)
     {
+        /*
+         * If the data could not be sent, we need to log it, so that it can be re-attempted (later).
+         */
     }
 
 
