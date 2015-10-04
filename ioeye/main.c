@@ -8,14 +8,29 @@
 #include "./include/modbus.h"
 #include "./include/hex.h"
 #include "./include/time.h"
+#include "./include/data_logger.h"
 
 #include "device_modbus.h"
 
-static char messageBuffer[MAX_BUFFER_SIZE];
+static char messageBuffer[2 * MAX_BUFFER_SIZE];
 static char smallBuffer[MAX_BUFFER_SIZE / 2];
 static char watchdogAssistant[50];
 
 Modbus singletonModbusInterface;
+
+static int publishMessage(const char *topicName, char *message)
+{
+    return MQTTPublish(&instaMsg,
+                       topicName,
+                       message,
+                       QOS1,
+                       0,
+                       NULL,
+                       MQTT_RESULT_HANDLER_TIMEOUT,
+                       0,
+                       1);
+}
+
 
 static void sendClientData(void (*func)(char *messageBuffer, int maxBufferLength),
                           const char *topicName)
@@ -32,15 +47,7 @@ static void sendClientData(void (*func)(char *messageBuffer, int maxBufferLength
     memset(messageBuffer, 0, sizeof(messageBuffer));
     func(messageBuffer, sizeof(messageBuffer));
 
-    MQTTPublish(&instaMsg,
-                topicName,
-                messageBuffer,
-                QOS1,
-                0,
-                NULL,
-                MQTT_RESULT_HANDLER_TIMEOUT,
-                0,
-                1);
+    publishMessage(topicName, messageBuffer);
 }
 
 
@@ -51,6 +58,41 @@ static int onConnect()
     sendClientData(get_client_session_data, TOPIC_SESSION_DATA);
     sendClientData(get_client_metadata, TOPIC_METADATA);
     sendClientData(get_network_data, TOPIC_NETWORK_DATA);
+
+
+    /*
+     * Also, try sending the records stored in the persistent-storage (if any).
+     */
+    while(1)
+    {
+        int rc;
+
+        memset(messageBuffer, 0, sizeof(messageBuffer));
+        rc = get_next_record_from_persistent_storage(messageBuffer, sizeof(messageBuffer));
+
+        if(rc == SUCCESS)
+        {
+            /*
+             * We got the record.
+             */
+            info_log("Sending data that could not be sent sometime earlier");
+
+            rc = publishMessage(TOPIC_WEBHOOK, messageBuffer);
+            if(rc != SUCCESS)
+            {
+                error_log("Since the data could not be sent to InstaMsg-Server, so not retrying sending data from persistent-storage");
+                break;
+            }
+        }
+        else
+        {
+            /*
+             * We did not get any record.
+             */
+            info_log("\n\nNo more pending-data to be sent from persistent-storage\n\n");
+            break;
+        }
+    }
 
     return SUCCESS;
 }
@@ -161,21 +203,14 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
     strcat(messageBuffer, "</rtu>");
 
     debug_log("Sending device-data [%s]", messageBuffer);
-    rc = MQTTPublish(&instaMsg,
-                     TOPIC_WEBHOOK,
-                     messageBuffer,
-                     QOS1,
-                     0,
-                     NULL,
-                     MQTT_RESULT_HANDLER_TIMEOUT,
-                     0,
-                     1);
 
+    rc = publishMessage(TOPIC_WEBHOOK, messageBuffer);
     if(rc != SUCCESS)
     {
         /*
          * If the data could not be sent, we need to log it, so that it can be re-attempted (later).
          */
+        save_record_to_persistent_storage(messageBuffer);
     }
 
 
