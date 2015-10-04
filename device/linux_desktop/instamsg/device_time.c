@@ -9,7 +9,7 @@
 /*
  * This method returns the minimum-delay achievable via this device.
  */
-unsigned int getMinimumDelayPossibleInMicroSeconds()
+unsigned long getMinimumDelayPossibleInMicroSeconds()
 {
     return 500;
 }

@@ -12,7 +12,7 @@
 
 #include "device_modbus.h"
 
-static char messageBuffer[2 * MAX_BUFFER_SIZE];
+static char messageBuffer[MAX_BUFFER_SIZE];
 static char smallBuffer[MAX_BUFFER_SIZE / 2];
 static char watchdogAssistant[50];
 
