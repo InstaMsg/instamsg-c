@@ -6,5 +6,8 @@
 #define TOPIC_NETWORK_DATA      "instamsg/client/signalinfo"
 #define TOPIC_WEBHOOK           "instamsg/webhook"
 
+#define NETWORK_INFO_INTERVAL           300
+#define CORE_BUSINESS_LOGIC_INTERVAL    180
+
 
 #endif

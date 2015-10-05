@@ -16,6 +16,9 @@ static char messageBuffer[2 * MAX_BUFFER_SIZE];
 static char smallBuffer[MAX_BUFFER_SIZE / 2];
 static char watchdogAssistant[50];
 
+static unsigned int nextNetworkTick;
+static int countdown;
+
 Modbus singletonModbusInterface;
 
 static int publishMessage(const char *topicName, char *message)
@@ -241,7 +244,28 @@ exit:
     if(responseByteBuffer)
         sg_free(responseByteBuffer);
 
-    startAndCountdownTimer(180, 0);
+    while(1)
+    {
+        countdown--;
+        startAndCountdownTimer(1, 0);
+
+        {
+            unsigned int latestTick = getCurrentTick();
+            if(latestTick >= nextNetworkTick)
+            {
+                info_log("Time to send network-stats !!!");
+                sendClientData(get_network_data, TOPIC_NETWORK_DATA);
+
+                nextNetworkTick = getCurrentTick() + NETWORK_INFO_INTERVAL;
+            }
+        }
+
+        if(countdown == 0)
+        {
+            countdown = CORE_BUSINESS_LOGIC_INTERVAL;
+            break;
+        }
+    }
 }
 
 
@@ -253,6 +277,9 @@ int main(int argc, char** argv)
     globalSystemInit(NULL);
 #endif
     init_data_logger_persistent_storage();
+
+    countdown = CORE_BUSINESS_LOGIC_INTERVAL;
+    nextNetworkTick = getCurrentTick() + NETWORK_INFO_INTERVAL;
 
     start(onConnect, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf);
 }
