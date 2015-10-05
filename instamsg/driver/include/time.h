@@ -5,8 +5,10 @@
 /*
  * Global-functions callable.
  */
+void init_global_timer();
 unsigned long getMinimumDelayPossibleInMicroSeconds();
 void minimumDelay();
+unsigned int getCurrentTick();
 
 #endif
 

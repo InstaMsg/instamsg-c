@@ -450,6 +450,7 @@ void globalSystemInit(char *logFilePath)
     currentLogLevel = LOG_LEVEL;
     init_serial_logger();
 
+    init_global_timer();
     watchdog_init();
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED

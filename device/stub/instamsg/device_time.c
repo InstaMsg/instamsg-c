@@ -6,6 +6,14 @@
  *******************************************************************************/
 
 /*
+ * This method does the global-level-initialization for time (if any).
+ */
+void init_global_timer()
+{
+}
+
+
+/*
  * This method returns the minimum-delay achievable via this device.
  */
 unsigned long getMinimumDelayPossibleInMicroSeconds()
@@ -21,3 +29,10 @@ void minimumDelay()
 {
 }
 
+
+/*
+ * This method returns the current-tick/timestamp.
+ */
+unsigned int getCurrentTick()
+{
+}
