@@ -16,7 +16,7 @@ static char messageBuffer[2 * MAX_BUFFER_SIZE];
 static char smallBuffer[MAX_BUFFER_SIZE / 2];
 static char watchdogAssistant[50];
 
-static unsigned int nextNetworkTick;
+static volatile unsigned int nextNetworkTick;
 static int countdown;
 
 Modbus singletonModbusInterface;
@@ -250,7 +250,7 @@ exit:
         startAndCountdownTimer(1, 0);
 
         {
-            unsigned int latestTick = getCurrentTick();
+            volatile unsigned int latestTick = getCurrentTick();
             if(latestTick >= nextNetworkTick)
             {
                 info_log("Time to send network-stats !!!");
