@@ -204,7 +204,14 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
 
     debug_log("Sending device-data [%s]", messageBuffer);
 
+    /*
+     * The net-section can be used for testing the Flash-Memory Storage/Retrieval as and when required.
+     */
+#if 0
+    rc = FAILURE;
+#else
     rc = publishMessage(TOPIC_WEBHOOK, messageBuffer);
+#endif
     if(rc != SUCCESS)
     {
         /*
