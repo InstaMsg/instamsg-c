@@ -2,6 +2,7 @@
 #include "./include/hex.h"
 
 #include "../instamsg/driver/include/log.h"
+#include "../instamsg/driver/include/globals.h"
 
 #include <string.h>
 
@@ -23,15 +24,13 @@ void release_modbus(Modbus *modbus)
 }
 
 
-unsigned long getExpectedModbusResponseLength(char *commandNibbles)
+static int validationCheck(char *commandNibbles)
 {
-    unsigned long i = 0;
     int commandNibblesLength = strlen(commandNibbles);
-
     if(commandNibblesLength < 12)
     {
         error_log(MODBUS_ERROR "Modbus-Command Length less than 12");
-        return -1;
+        return FAILURE;
     }
 
     /*
@@ -40,7 +39,22 @@ unsigned long getExpectedModbusResponseLength(char *commandNibbles)
     if((commandNibbles[2] != '0') || (commandNibbles[3] != '3'))
     {
         error_log(MODBUS_ERROR "Modbus-Command Not for reading analog-registers [%c] [%c]", commandNibbles[2], commandNibbles[3]);
-        return -1;
+        return FAILURE;
+    }
+
+    return SUCCESS;
+}
+
+
+unsigned long getExpectedModbusResponseLength(char *commandNibbles)
+{
+    int rc;
+    unsigned long i = 0;
+
+    rc = validationCheck(commandNibbles);
+    if(rc != SUCCESS)
+    {
+        return rc;
     }
 
     /*
@@ -57,4 +71,21 @@ unsigned long getExpectedModbusResponseLength(char *commandNibbles)
     i = i + 2;      /* 2 bytes for CRC in the end */
 
     return i;
+}
+
+
+void fillPrefixIndices(char *commandNibbles, int *prefixStartIndex, int *prefixEndIndex)
+{
+    int rc = validationCheck(commandNibbles);
+    if(rc != SUCCESS)
+    {
+        *prefixStartIndex = *prefixEndIndex = -1;
+    }
+
+    /*
+     * Sample command being handled so far ::
+     *  03 03 00 64 00 0A 85 F0
+     */
+    *prefixStartIndex = 4;
+    *prefixEndIndex = 7;
 }

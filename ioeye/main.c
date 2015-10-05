@@ -146,9 +146,11 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
     strcat(messageBuffer, "<data><![CDATA[");
 
     {
+        int prefixStartIndex, prefixEndIndex;
         char *commandHexString = "03030064000A85F0";
 
         unsigned long responseLength = getExpectedModbusResponseLength(commandHexString);
+        fillPrefixIndices(commandHexString, &prefixStartIndex, &prefixEndIndex);
 
         responseByteBuffer = (unsigned char*) sg_malloc(responseLength);
         if(responseByteBuffer == NULL)
@@ -177,6 +179,20 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
         }
 
 
+        /*
+         * Fill in the prefix;
+         */
+        for(i = prefixStartIndex; i <= prefixEndIndex; i++)
+        {
+            char byte[2] = {0};
+            sg_sprintf(byte, "%c", commandHexString[i]);
+
+            strcat((char*)GLOBAL_BUFFER, byte);
+        }
+
+        /*
+         * Fill-in the modbus-response-nibbles.
+         */
         for(i = 0; i < responseLength; i++)
         {
             char hex[3] = {0};
