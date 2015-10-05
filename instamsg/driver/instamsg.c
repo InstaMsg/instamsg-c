@@ -1077,11 +1077,11 @@ exit:
     {
         if(rc == SUCCESS)
         {
-            info_log("Published successfully.");
+            info_log("Published successfully.\n");
         }
         else
         {
-            info_log("Publishing failed, error-code = [%u]", rc);
+            info_log("Publishing failed, error-code = [%u]\n", rc);
         }
     }
 
