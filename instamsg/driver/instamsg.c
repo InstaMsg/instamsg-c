@@ -1055,7 +1055,7 @@ int MQTTPublish(InstaMsg* c,
 
     if(logging == 1)
     {
-		info_log("Publishing message [%s] to %s", payload, topicName);
+		info_log("Publishing message [%s] to topic [%s]", payload, topicName);
     }
 
     len = MQTTSerialize_publish(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), 0, qos, retain, id, topic, (unsigned char*)payload, strlen((char*)payload) + 1);
