@@ -1081,7 +1081,7 @@ exit:
         }
         else
         {
-            info_log("Publishing failed, error-code = [%u]\n", rc);
+            info_log("Publishing failed, error-code = [%d]\n", rc);
         }
     }
 
