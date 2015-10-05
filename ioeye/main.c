@@ -225,7 +225,7 @@ exit:
     if(responseByteBuffer)
         sg_free(responseByteBuffer);
 
-    startAndCountdownTimer(300, 0);
+    startAndCountdownTimer(180, 0);
 }
 
 
