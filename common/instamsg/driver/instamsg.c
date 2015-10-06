@@ -986,7 +986,8 @@ int MQTTSubscribe(InstaMsg* c,
                   const enum QoS qos,
                   messageHandler messageHandler,
                   void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
-                  unsigned int resultHandlerTimeout)
+                  unsigned int resultHandlerTimeout,
+                  const char logging);
 {
     int rc = FAILURE;
     int len = 0;
@@ -994,6 +995,11 @@ int MQTTSubscribe(InstaMsg* c,
 
     MQTTString topic = MQTTString_initializer;
     topic.cstring = (char *)topicName;
+
+    if(logging == 1)
+    {
+		info_log("Subscribing to topic [%s]", topicName);
+    }
 
     RESET_GLOBAL_BUFFER;
 
@@ -1030,6 +1036,19 @@ int MQTTSubscribe(InstaMsg* c,
         goto exit;             /* there was a problem */
 
 exit:
+
+    if(logging == 1)
+    {
+        if(rc == SUCCESS)
+        {
+            info_log("Subscribed successfully.\n");
+        }
+        else
+        {
+            info_log("Subscribing failed, error-code = [%d]\n", rc);
+        }
+    }
+
     return rc;
 }
 

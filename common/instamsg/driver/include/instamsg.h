@@ -137,7 +137,8 @@ int MQTTSubscribe(InstaMsg *c,
                   const enum QoS qos,
                   messageHandler messageHandler,
                   void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
-                  unsigned int resultHandlerTimeout);
+                  unsigned int resultHandlerTimeout,
+                  const char logging);
 
 int MQTTUnsubscribe (InstaMsg*, const char*);
 int MQTTDisconnect (InstaMsg*);
