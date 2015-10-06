@@ -36,13 +36,13 @@ client/stdoutsub
 client/tiva_build
 
 # Generated-Files while setting up the embedded-environment
-embedded-flash-environment/bin/
-embedded-flash-environment/gcc-arm-none-eabi-4_9-2015q2/
-embedded-flash-environment/lm4tools/
-embedded-flash-environment/openocd/
-embedded-flash-environment/share/
-embedded-flash-environment/tiva-template/
-embedded-flash-environment/tivaware/
+third_party/ti-compiler-environment/bin/
+third_party/ti-compiler-environment/gcc-arm-none-eabi-4_9-2015q2/
+third_party/ti-compiler-environment/lm4tools/
+third_party/ti-compiler-environment/openocd/
+third_party/ti-compiler-environment/share/
+third_party/ti-compiler-environment/tiva-template/
+third_party/ti-compiler-environment/tivaware/
 
 subscriber.sh
 filetester.sh
