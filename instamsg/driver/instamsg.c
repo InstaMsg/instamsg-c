@@ -953,7 +953,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
 
             case PINGRESP:
             {
-                info_log("PINGRESP received... relations are intact !!");
+                info_log("PINGRESP received... relations are intact !!\n");
                 break;
             }
         }
@@ -1206,7 +1206,7 @@ void start(int (*onConnectOneTimeOperations)(),
                          */
                         if(latestTick >= nextPingReqTick)
                         {
-                            info_log("Time to play ping-pong with server !!!");
+                            info_log("Time to play ping-pong with server !!!\n");
                             sendPingReqToServer(c);
 
                             nextPingReqTick = getCurrentTick() + PING_REQ_INTERVAL;
