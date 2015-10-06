@@ -13,6 +13,10 @@ void rebootDevice()
 /*
  * This method does the initialization, that is needed on a global-basis.
  * All code in this method runs right at the beginning (followed by logger-initialization).
+ *
+ * THIS METHOD IS GENERALLY EXPECTED TO BE EMPTY, AS THE INITIALIZATION SHOULD HAPPEN ON
+ * PER-MODULE BASIS. ONLY IF SOMETHING IS REALLY NEEDED RIGHT AT THE START (WHICH IS THEN
+ * POTENTIALLY USED BY MORE THAN ONE MODULE), SHOULD SOMETHING BE REQUIRED TO COME HERE.
  */
 void bootstrapInit()
 {
