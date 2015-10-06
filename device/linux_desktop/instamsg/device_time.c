@@ -5,6 +5,8 @@
  *
  *******************************************************************************/
 
+#include <time.h>
+
 /*
  * This method does the global-level-initialization for time (if any).
  */
@@ -34,6 +36,7 @@ void minimumDelay()
 /*
  * This method returns the current-tick/timestamp.
  */
-unsigned int getCurrentTick()
+unsigned long getCurrentTick()
 {
+    return time(NULL);
 }

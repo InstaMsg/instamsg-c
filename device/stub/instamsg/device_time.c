@@ -33,6 +33,6 @@ void minimumDelay()
 /*
  * This method returns the current-tick/timestamp.
  */
-unsigned int getCurrentTick()
+unsigned long getCurrentTick()
 {
 }

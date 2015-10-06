@@ -1168,8 +1168,8 @@ void start(int (*onConnectOneTimeOperations)(),
 {
     unsigned char firstTimeBusinessLogicInitiated = 0;
     int countdown = businessLogicInterval;
-    int nextSocketTick = getCurrentTick() + NETWORK_INFO_INTERVAL;
-    int nextPingReqTick = getCurrentTick() + PING_REQ_INTERVAL;
+    unsigned long nextSocketTick = getCurrentTick() + NETWORK_INFO_INTERVAL;
+    unsigned long nextPingReqTick = getCurrentTick() + PING_REQ_INTERVAL;
 
     InstaMsg *c = &instaMsg;
 
@@ -1211,7 +1211,7 @@ void start(int (*onConnectOneTimeOperations)(),
                     startAndCountdownTimer(1, 0);
 
                     {
-                        volatile unsigned int latestTick = getCurrentTick();
+                        volatile unsigned long latestTick = getCurrentTick();
 
                         /*
                          * Send network-stats if time has arrived.

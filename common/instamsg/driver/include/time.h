@@ -8,7 +8,7 @@
 void init_global_timer();
 unsigned long getMinimumDelayPossibleInMicroSeconds();
 void minimumDelay();
-unsigned int getCurrentTick();
+unsigned long getCurrentTick();
 
 #endif
 
