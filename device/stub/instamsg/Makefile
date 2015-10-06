@@ -3,12 +3,6 @@
 SYSTEM_INCLUDES=`echo  	`
 
 
-# The platform on which InstaMsg needs to be built.
-# This name must be equal to the name of the folder, created/copied from "device/stub".
-#
-VENDOR=""
-
-
 # Uncomment the following, if device provides File-System-Implementation.
 #
 #FS_COMMUNICATION_IMPL="Y"

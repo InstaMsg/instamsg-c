@@ -1,4 +1,9 @@
-. ${1}
+APP=${1}
+. apps/${APP}/Makefile
+
+VENDOR=$2
+. device/${VENDOR}/instamsg/Makefile
+
 
 TOTAL_INCLUDES=`echo                                                                            \
         ${SYSTEM_INCLUDES}                                                                      \
@@ -8,6 +13,7 @@ TOTAL_INCLUDES=`echo                                                            
 
 
 SOURCES=`echo                                                                                   \
+        ${APP_SOURCES}                                                                          \
         ${EXTRA_SOURCES}                                                                        \
         instamsg/driver/instamsg.c                                                              \
         instamsg/driver/log.c                                                                   \
@@ -32,19 +38,14 @@ SOURCES=`echo                                                                   
         device/${VENDOR}/instamsg/device_serial_logger.c                                        \
         device/${VENDOR}/instamsg/device_time.c                                                 \
         device/${VENDOR}/instamsg/device_watchdog.c                                             \
-        device/${VENDOR}/instamsg/device_misc.c                                                 \
-                                                                                                \
-        apps/ioeye/main.c                                                                       \
-        apps/ioeye/hex.c                                                                        \
-        apps/ioeye/modbus.c                                                                     \
-                                                                                                \
-        device/${VENDOR}/apps/ioeye/device_modbus.c                                             \
-        device/${VENDOR}/apps/ioeye/device_time.c                                               \
-        device/${VENDOR}/apps/ioeye/device_data_logger.c                                        `
+        device/${VENDOR}/instamsg/device_misc.c                                                 `
 
 
-mkdir -p build/${VENDOR}
-rm -f build/${VENDOR}/*
+SOURCES=`echo ${SOURCES} | sed -e 's|VENDOR|'"${VENDOR}"'|g'`
+
+OUT_DIR="build/${APP}/${VENDOR}"
+mkdir -p ${OUT_DIR}
+rm -f ${OUT_DIR}/*
 
 
 if [ ! -z ${IS_GSM_DEVICE} ];
@@ -68,17 +69,19 @@ then
 fi
 
 
-TOTAL_COMPILE_COMMAND="${COMPILE_COMMAND} -DDEBUG_MODE ${TOTAL_INCLUDES} ${SOURCES} -o build/${VENDOR}/instamsg"
+
+TOTAL_COMPILE_COMMAND="${COMPILE_COMMAND} -DDEBUG_MODE ${TOTAL_INCLUDES} ${SOURCES} -o ${OUT_DIR}/instamsg"
 
 for obj in ${EXTRA_OBJECT_FILES}
 do
-    TOTAL_COMPILE_COMMAND="${COMPILE_COMMAND} -DDEBUG_MODE ${TOTAL_INCLUDES} ${SOURCES} build/${VENDOR}/* -o build/${VENDOR}/instamsg"
-    cp ${obj} build/${VENDOR}
+    TOTAL_COMPILE_COMMAND="${COMPILE_COMMAND} -DDEBUG_MODE ${TOTAL_INCLUDES} ${SOURCES} ${OUT_DIR}/* -o ${OUT_DIR}/instamsg"
+    cp ${obj} ${OUT_DIR}
 done
 
 ${TOTAL_COMPILE_COMMAND}
 
 for cmd in "${FINAL_COMMANDS[@]}"
 do
+    cmd=`echo ${cmd} | sed -e 's|OUT_DIR|'"${OUT_DIR}"'|g'`
     $cmd
 done
