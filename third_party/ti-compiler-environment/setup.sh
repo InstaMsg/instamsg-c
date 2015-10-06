@@ -12,7 +12,7 @@ tar -xvf gcc-arm-none-eabi-4_9-2015q2-20150609-linux.tar.bz2 -C .
 
 cd ../client
 . ./tiva_Env.ini
-cd ../embedded-flash-environment
+cd ../ti-compiler-environment
 
 sudo rm -r tivaware
 mkdir -p tivaware
