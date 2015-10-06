@@ -42,4 +42,11 @@ COMPILE_COMMAND=""
 
 # Any final commands that need to be run.
 #
+# Most-likely, these commands would (prepare to) flash the binaries on the end-device.
+# For this, these commands would need to require the location of the output-directory of "instamsg" binary.
+# Whenever this is required, use OUT_DIR (without any dollar sign or anything), and the main builder-script
+# will take care of that.
+#
+# For example, device_flashing_binary OUT_DIR/instamsg /dev/devID
+#
 declare -a FINAL_COMMANDS=("command-1" "command-2" "command-3")
