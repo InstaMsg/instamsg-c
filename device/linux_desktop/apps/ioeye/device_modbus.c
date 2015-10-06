@@ -1,4 +1,4 @@
-#include "../../../instamsg/driver/include/globals.h"
+#include "../../../common/instamsg/driver/include/globals.h"
 
 #include "device_modbus.h"
 

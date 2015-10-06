@@ -1,5 +1,5 @@
 APP=${1}
-. apps/${APP}/Makefile
+. common/apps/${APP}/Makefile
 
 VENDOR=$2
 . device/${VENDOR}/instamsg/Makefile
@@ -9,30 +9,30 @@ TOTAL_INCLUDES=`echo                                                            
         ${SYSTEM_INCLUDES}                                                                      \
         -Idevice/${VENDOR}/instamsg/                                                            \
         -Idevice/${VENDOR}/apps/ioeye/                                                          \
-        -Iinstamsg/mqtt/                                                                        `
+        -Icommon/instamsg/mqtt/                                                                 `
 
 
 SOURCES=`echo                                                                                   \
         ${APP_SOURCES}                                                                          \
         ${EXTRA_SOURCES}                                                                        \
-        instamsg/driver/instamsg.c                                                              \
-        instamsg/driver/log.c                                                                   \
-        instamsg/driver/json.c                                                                  \
-        instamsg/driver/globals.c                                                               \
-        instamsg/driver/sg_mem.c                                                                \
-        instamsg/driver/sg_stdlib.c                                                             \
-        instamsg/driver/socket.c                                                                \
+        common/instamsg/driver/instamsg.c                                                       \
+        common/instamsg/driver/log.c                                                            \
+        common/instamsg/driver/json.c                                                           \
+        common/instamsg/driver/globals.c                                                        \
+        common/instamsg/driver/sg_mem.c                                                         \
+        common/instamsg/driver/sg_stdlib.c                                                      \
+        common/instamsg/driver/socket.c                                                         \
                                                                                                 \
-        instamsg/mqtt/src/MQTTFormat.c                                                          \
-        instamsg/mqtt/src/MQTTPacket.c                                                          \
-        instamsg/mqtt/src/MQTTDeserializePublish.c                                              \
-        instamsg/mqtt/src/MQTTConnectClient.c                                                   \
-        instamsg/mqtt/src/MQTTSubscribeClient.c                                                 \
-        instamsg/mqtt/src/MQTTSerializePublish.c                                                \
-        instamsg/mqtt/src/MQTTConnectServer.c                                                   \
-        instamsg/mqtt/src/MQTTSubscribeServer.c                                                 \
-        instamsg/mqtt/src/MQTTUnsubscribeServer.c                                               \
-        instamsg/mqtt/src/MQTTUnsubscribeClient.c                                               \
+        common/instamsg/mqtt/src/MQTTFormat.c                                                   \
+        common/instamsg/mqtt/src/MQTTPacket.c                                                   \
+        common/instamsg/mqtt/src/MQTTDeserializePublish.c                                       \
+        common/instamsg/mqtt/src/MQTTConnectClient.c                                            \
+        common/instamsg/mqtt/src/MQTTSubscribeClient.c                                          \
+        common/instamsg/mqtt/src/MQTTSerializePublish.c                                         \
+        common/instamsg/mqtt/src/MQTTConnectServer.c                                            \
+        common/instamsg/mqtt/src/MQTTSubscribeServer.c                                          \
+        common/instamsg/mqtt/src/MQTTUnsubscribeServer.c                                        \
+        common/instamsg/mqtt/src/MQTTUnsubscribeClient.c                                        \
                                                                                                 \
         device/${VENDOR}/instamsg/device_socket.c                                               \
         device/${VENDOR}/instamsg/device_serial_logger.c                                        \
@@ -64,7 +64,7 @@ fi
 # Compile the File-System-Module only if applicable.
 if [ ! -z ${FS_COMMUNICATION_IMPL} ];
 then
-    SOURCES="${SOURCES} instamsg/driver/file_system.c device/${VENDOR}/instamsg/device_file_system.c instamsg/driver/httpclient.c  "
+    SOURCES="${SOURCES} common/instamsg/driver/file_system.c device/${VENDOR}/instamsg/device_file_system.c common/instamsg/driver/httpclient.c  "
     COMPILE_COMMAND="${COMPILE_COMMAND} -DFILE_SYSTEM_INTERFACE_ENABLED"
 fi
 
