@@ -46,7 +46,7 @@ void get_latest_sms_containing_substring(Socket *socket, char *buffer, const cha
  *
  * Setting the above value will let InstaMsg know that the connection can be used fine for writing/reading.
  */
-void connect_underlying_socket_medium_try_once(Socket* socket)
+void connect_underlying_socket_medium_try_once(Socket* s)
 {
 	int type = SOCK_STREAM;
 	struct sockaddr_in address;
@@ -58,7 +58,7 @@ void connect_underlying_socket_medium_try_once(Socket* socket)
 	struct addrinfo *result = NULL;
 	struct addrinfo hints = {0, AF_UNSPEC, SOCK_STREAM, IPPROTO_TCP, 0, NULL, NULL, NULL};
 
-	if ((rc = getaddrinfo(socket->host, NULL, &hints, &result)) == 0)
+	if ((rc = getaddrinfo(s->host, NULL, &hints, &result)) == 0)
 	{
 		struct addrinfo* res = result;
 
@@ -75,7 +75,7 @@ void connect_underlying_socket_medium_try_once(Socket* socket)
 
 		if (result->ai_family == AF_INET)
 		{
-			address.sin_port = htons(socket->port);
+			address.sin_port = htons(s->port);
 			address.sin_family = family = AF_INET;
 			address.sin_addr = ((struct sockaddr_in*)(result->ai_addr))->sin_addr;
 		}
@@ -89,11 +89,11 @@ void connect_underlying_socket_medium_try_once(Socket* socket)
 	{
         if(1)
         {
-		    socket->socket = socket(family, type, 0);
-		    if (socket->socket != -1)
+		    s->socket = socket(family, type, 0);
+		    if (s->socket != -1)
 		    {
 			    int opt = 1;
-                if(connect(socket->socket, (struct sockaddr*)&address, sizeof(address)) != 0)
+                if(connect(s->socket, (struct sockaddr*)&address, sizeof(address)) != 0)
                 {
                     info_log(SOCKET_NOT_AVAILABLE);
                     startAndCountdownTimer(1, 0);
@@ -105,7 +105,7 @@ void connect_underlying_socket_medium_try_once(Socket* socket)
                     /*
                      * VERY IMPORTANT.. MUST BE DONE.
                      */
-                    socket->socketCorrupted = 0;
+                    s->socketCorrupted = 0;
                 }
 		    }
         }
@@ -113,10 +113,10 @@ void connect_underlying_socket_medium_try_once(Socket* socket)
 
 
     /* Set timeout-limitation in the socket-receiving function */
-    setsockopt(socket->socket, SOL_SOCKET, SO_RCVTIMEO, (char *)&interval, sizeof(struct timeval));
+    setsockopt(s->socket, SOL_SOCKET, SO_RCVTIMEO, (char *)&interval, sizeof(struct timeval));
 
     info_log("TCP-SOCKET UNDERLYING_MEDIUM INITIATED FOR HOST = [%s], PORT = [%d].",
-             socket->host, socket->port);
+             s->host, s->port);
 }
 
 

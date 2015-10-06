@@ -1,8 +1,8 @@
 #include "./include/modbus.h"
 #include "./include/hex.h"
 
-#include "../instamsg/driver/include/log.h"
-#include "../instamsg/driver/include/globals.h"
+#include "../../instamsg/driver/include/log.h"
+#include "../../instamsg/driver/include/globals.h"
 
 #include <string.h>
 

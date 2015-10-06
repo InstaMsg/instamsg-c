@@ -1191,11 +1191,11 @@ void start(int (*onConnectOneTimeOperations)(),
                         volatile unsigned int latestTick = getCurrentTick();
 
                         /*
-                         * Send socket-stats if time has arrived.
+                         * Send network-stats if time has arrived.
                          */
                         if(latestTick >= nextSocketTick)
                         {
-                            info_log("Time to send socket-stats !!!");
+                            info_log("Time to send network-stats !!!");
                             sendClientData(get_network_data, TOPIC_NETWORK_DATA);
 
                             nextSocketTick = getCurrentTick() + NETWORK_INFO_INTERVAL;

@@ -1,8 +1,8 @@
-#include "../instamsg/driver/include/instamsg.h"
-#include "../instamsg/driver/include/globals.h"
-#include "../instamsg/driver/include/sg_mem.h"
-#include "../instamsg/driver/include/watchdog.h"
-#include "../instamsg/driver/include/misc.h"
+#include "../../instamsg/driver/include/instamsg.h"
+#include "../../instamsg/driver/include/globals.h"
+#include "../../instamsg/driver/include/sg_mem.h"
+#include "../../instamsg/driver/include/watchdog.h"
+#include "../../instamsg/driver/include/misc.h"
 
 #include "./include/globals.h"
 #include "./include/modbus.h"

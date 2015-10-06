@@ -3,7 +3,7 @@
 TOTAL_INCLUDES=`echo                                                                            \
         ${SYSTEM_INCLUDES}                                                                      \
         -Idevice/${VENDOR}/instamsg/                                                            \
-        -Idevice/${VENDOR}/ioeye/                                                               \
+        -Idevice/${VENDOR}/apps/ioeye/                                                          \
         -Iinstamsg/mqtt/                                                                        `
 
 
@@ -34,13 +34,13 @@ SOURCES=`echo                                                                   
         device/${VENDOR}/instamsg/device_watchdog.c                                             \
         device/${VENDOR}/instamsg/device_misc.c                                                 \
                                                                                                 \
-        ioeye/main.c                                                                            \
-        ioeye/hex.c                                                                             \
-        ioeye/modbus.c                                                                          \
+        apps/ioeye/main.c                                                                       \
+        apps/ioeye/hex.c                                                                        \
+        apps/ioeye/modbus.c                                                                     \
                                                                                                 \
-        device/${VENDOR}/ioeye/device_modbus.c                                                  \
-        device/${VENDOR}/ioeye/device_time.c                                                    \
-        device/${VENDOR}/ioeye/device_data_logger.c                                             `
+        device/${VENDOR}/apps/ioeye/device_modbus.c                                             \
+        device/${VENDOR}/apps/ioeye/device_time.c                                               \
+        device/${VENDOR}/apps/ioeye/device_data_logger.c                                        `
 
 
 mkdir -p build/${VENDOR}

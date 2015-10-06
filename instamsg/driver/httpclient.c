@@ -11,13 +11,13 @@
 #define HTTP_RESPONSE_STATUS_PREFIX "HTTP/1.0"
 
 
-static void getNextLine(Network *network, char *buf, int *responseCode)
+static void getNextLine(Socket *socket, char *buf, int *responseCode)
 {
     while(1)
     {
         char ch[2] = {0};
 
-        if(network->read(network, (unsigned char*)ch, 1, 1) == FAILURE) /* Pseudo-Blocking Call */
+        if(socket->read(socket, (unsigned char*)ch, 1, 1) == FAILURE) /* Pseudo-Blocking Call */
         {
             return;
         }
@@ -179,12 +179,12 @@ HTTPResponse downloadFile(const char *url,
                           KeyValuePairs *headers,
                           unsigned int timeout)
 {
-    Network network;
+    Socket socket;
     HTTPResponse response = {0};
 
     unsigned long numBytes;
 
-	init_network(&network, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
+	init_socket(&socket, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
 
     {
         char *urlComplete;
@@ -196,9 +196,9 @@ HTTPResponse downloadFile(const char *url,
         info_log(FILE_DOWNLOAD "Complete URL that will be hit : [%s]", urlComplete);
 
         /*
-        * Fire the request-bytes over the network-medium.
+        * Fire the request-bytes over the socket-medium.
         */
-        if(network.write(&network, (unsigned char*)urlComplete, strlen(urlComplete)) == FAILURE)
+        if(socket.write(&socket, (unsigned char*)urlComplete, strlen(urlComplete)) == FAILURE)
         {
             goto exit;
         }
@@ -216,7 +216,7 @@ HTTPResponse downloadFile(const char *url,
             newLine = (char*)GLOBAL_BUFFER;
 
             strcpy(newLine, "");
-            getNextLine(&network, newLine, &(response.status));
+            getNextLine(&socket, newLine, &(response.status));
 
             /*
             * The actual file-payload begins after we receive an empty line.
@@ -256,7 +256,7 @@ HTTPResponse downloadFile(const char *url,
             {
                 char ch[2] = {0};
 
-                if(network.read(&network, (unsigned char*)ch, 1, 1) == FAILURE) /* Pseudo-Blocking Call */
+                if(socket.read(&socket, (unsigned char*)ch, 1, 1) == FAILURE) /* Pseudo-Blocking Call */
                 {
                     release_file_system(&fs);
                     goto exit;
@@ -275,7 +275,7 @@ HTTPResponse downloadFile(const char *url,
             info_log(FILE_DOWNLOAD "File [%s] successfully moved to [%s] worth [%u] bytes", tempFileName, filename, numBytes);
 
 exit:
-            release_network(&network);
+            release_socket(&socket);
 
             info_log(FILE_DOWNLOAD "HTTP-Response Status = [%d]", response.status);
             return response;
@@ -321,7 +321,7 @@ HTTPResponse uploadFile(const char *url,
     int i = 0;
     unsigned long numBytes = 0;
 
-    Network network;
+    Socket socket;
     HTTPResponse response = {0};
     FileSystem fs;
 
@@ -338,7 +338,7 @@ HTTPResponse uploadFile(const char *url,
         goto exit;
     }
 
-	init_network(&network, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
+	init_socket(&socket, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
 
     /* Now, generate the isecond-level (form) data
      * Please consult ::
@@ -384,13 +384,13 @@ HTTPResponse uploadFile(const char *url,
         info_log(FILE_UPLOAD "First-stage URL that will be hit : [%s]", request);
     }
 
-    if(network.write(&network, (unsigned char*)request, strlen(request)) == FAILURE)
+    if(socket.write(&socket, (unsigned char*)request, strlen(request)) == FAILURE)
     {
         error_log(FILE_UPLOAD "Error occurred while uploading POST data (FIRST LEVEL) for [%s]", filename);
         goto exit;
     }
 
-    if(network.write(&network, (unsigned char*)secondLevel, strlen(secondLevel)) == FAILURE)
+    if(socket.write(&socket, (unsigned char*)secondLevel, strlen(secondLevel)) == FAILURE)
     {
         error_log(FILE_UPLOAD "Error occurred while uploading POST data (SECOND LEVEL) for [%s]", filename);
         goto exit;
@@ -406,7 +406,7 @@ HTTPResponse uploadFile(const char *url,
         char ch[2] = {0};
 
         fs.read(&fs, (unsigned char*)ch, 1, 1);
-        if(network.write(&network, (unsigned char*)ch, 1) == FAILURE)
+        if(socket.write(&socket, (unsigned char*)ch, 1) == FAILURE)
         {
             error_log(FILE_UPLOAD "Error occurred while uploading POST data (THIRD LEVEL) for [%s]", filename);
             release_file_system(&fs);
@@ -417,7 +417,7 @@ HTTPResponse uploadFile(const char *url,
     info_log(FILE_UPLOAD "File [%s] successfully uploaded worth [%u] bytes", filename, numBytes);
 
     release_file_system(&fs);
-    if(network.write(&network, (unsigned char*)fourthLevel, strlen(fourthLevel)) == FAILURE)
+    if(socket.write(&socket, (unsigned char*)fourthLevel, strlen(fourthLevel)) == FAILURE)
     {
         error_log(FILE_UPLOAD "Error occurred while uploading POST data (FOURTH LEVEL) for [%s]", filename);
         goto exit;
@@ -435,7 +435,7 @@ HTTPResponse uploadFile(const char *url,
         newLine = (char*)GLOBAL_BUFFER;
         strcpy(newLine, "");
 
-        getNextLine(&network, newLine, &(response.status));
+        getNextLine(&socket, newLine, &(response.status));
 
         /*
          * The actual payload begins after we receive an empty line.
@@ -453,7 +453,7 @@ HTTPResponse uploadFile(const char *url,
 
         if(beginPayloadDownload == 1)
         {
-            if(network.read(&network, (unsigned char*)response.body, numBytes, 1) == FAILURE) /* Pseudo-Blocking Call */
+            if(socket.read(&socket, (unsigned char*)response.body, numBytes, 1) == FAILURE) /* Pseudo-Blocking Call */
             {
                 error_log(FILE_UPLOAD "Socket error while reading URL-payload for uploaded file [%s]", filename);
                 goto exit;
@@ -477,7 +477,7 @@ exit:
     if(fourthLevel)
         sg_free(fourthLevel);
 
-    release_network(&network);
+    release_socket(&socket);
 
     info_log(FILE_UPLOAD "HTTP-Response Status = [%d]", response.status);
     return response;
