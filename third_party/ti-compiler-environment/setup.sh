@@ -1,6 +1,10 @@
 # All courtesy the GOD at http://chrisrm.com/howto-develop-on-the-ti-tiva-launchpad-using-linux/
 
+# Some repositories might not be updatable, so using "set -e" from here afterwards.
 sudo apt-get update
+
+set -e
+
 sudo apt-get install flex bison libgmp3-dev libmpfr-dev libncurses5-dev libmpc-dev autoconf texinfo build-essential libftdi-dev python-yaml zlib1g-dev libtool
 # I needed these as well flashing over USB
 sudo apt-get install libusb-1.0-0 libusb-1.0-0-dev
@@ -10,9 +14,7 @@ sudo rm -rf gcc-arm-none-eabi-4_9-2015q2
 tar -xvf gcc-arm-none-eabi-4_9-2015q2-20150609-linux.tar.bz2 -C .
 
 
-cd ../client
-. ./tiva_Env.ini
-cd ../ti-compiler-environment
+export PATH=$PATH:$PWD/../ti-compiler-environment/gcc-arm-none-eabi-4_9-2015q2/bin
 
 sudo rm -r tivaware
 mkdir -p tivaware
