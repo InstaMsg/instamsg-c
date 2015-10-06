@@ -762,12 +762,12 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc)
         info_log("Connected successfully to InstaMsg-Server.");
         c->connected = 1;
 
+        sendClientData(get_client_session_data, TOPIC_SESSION_DATA);
+        sendClientData(get_client_metadata, TOPIC_METADATA);
+        sendClientData(get_network_data, TOPIC_NETWORK_DATA);
+
         if(c->onConnectCallback != NULL)
         {
-            sendClientData(get_client_session_data, TOPIC_SESSION_DATA);
-            sendClientData(get_client_metadata, TOPIC_METADATA);
-            sendClientData(get_network_data, TOPIC_NETWORK_DATA);
-
             c->onConnectCallback();
             c->onConnectCallback = NULL;
         }
