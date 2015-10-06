@@ -60,3 +60,4 @@ lwip/
 lwip-contrib/
 
 device/ar501
+device/test_device

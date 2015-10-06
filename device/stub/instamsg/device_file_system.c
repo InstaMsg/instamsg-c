@@ -84,7 +84,7 @@ void getFileListing(FileSystem *fs, char *buf, int maxValueLenAllowed, const cha
 /*
  * This method returns a long-value, specifying the size of file in bytes.
  */
-long (*getFileSize)(FileSystem *fs, const char *filepath)
+long getFileSize(FileSystem *fs, const char *filepath)
 {
     return 0;
 }
