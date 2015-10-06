@@ -28,5 +28,11 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
 
 int main(int argc, char** argv)
 {
+#ifdef FILE_SYSTEM_INTERFACE_ENABLED
+    globalSystemInit(LOG_FILE_PATH);
+#else
+    globalSystemInit(NULL);
+#endif
+
     start(NULL, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, 3);
 }

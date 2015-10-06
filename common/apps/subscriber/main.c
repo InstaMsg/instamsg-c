@@ -27,5 +27,11 @@ static int onConnectOneTimeOperations()
 
 int main(int argc, char** argv)
 {
+#ifdef FILE_SYSTEM_INTERFACE_ENABLED
+    globalSystemInit(LOG_FILE_PATH);
+#else
+    globalSystemInit(NULL);
+#endif
+
     start(onConnectOneTimeOperations, NULL, NULL, NULL, 1);
 }
