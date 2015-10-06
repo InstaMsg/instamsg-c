@@ -634,10 +634,6 @@ void clearInstaMsg(InstaMsg *c)
     release_file_system(&(c->singletonUtilityFs));
 #endif
 
-#ifdef FILE_SYSTEM_INTERFACE_ENABLED
-    release_file_logger(&fileLogger);
-#endif
-
     c->connected = 0;
 }
 
