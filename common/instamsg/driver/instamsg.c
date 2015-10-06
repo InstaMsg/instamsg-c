@@ -987,7 +987,7 @@ int MQTTSubscribe(InstaMsg* c,
                   messageHandler messageHandler,
                   void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
                   unsigned int resultHandlerTimeout,
-                  const char logging);
+                  const char logging)
 {
     int rc = FAILURE;
     int len = 0;
