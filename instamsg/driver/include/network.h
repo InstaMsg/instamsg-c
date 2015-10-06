@@ -8,7 +8,6 @@
  */
 void init_network(Network *network, const char *hostName, unsigned int port);
 void release_network(Network *network);
-void get_device_uuid(char *buffer);
 
 
 /*

@@ -54,10 +54,8 @@ void get_manufacturer(char *messagebuffer, int maxbufferlength)
 
 
 /*
- * This method gets the device serial-number.
+ * This method returns the univerally-unique-identifier for this device.
  */
-void get_serial_number(char *messagebuffer, int maxbufferlength)
+void get_device_uuid(char *buffer, int maxbufferlength)
 {
 }
-
-

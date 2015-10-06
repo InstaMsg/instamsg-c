@@ -39,17 +39,6 @@ void get_latest_sms_containing_substring(Network *network, char *buffer, const c
 
 
 /*
- * This method returns the univerally-unique-identifier for this device.
- */
-void get_device_uuid(char *buffer)
-{
-#ifdef DEBUG_MODE
-    strcpy(buffer, "ajay-subscriber-unique-id");
-#endif
-}
-
-
-/*
  * This method tries to establish the network/socket to "network->host" on "network->port".
  *
  * If the connection is successful, then the following must be done by the device-implementation ::

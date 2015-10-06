@@ -186,7 +186,7 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
     strcat(messageBuffer, "]]></data>");
 
 
-    addXMLFieldsInPayload(messageBuffer, "serial_number", get_serial_number);
+    addXMLFieldsInPayload(messageBuffer, "serial_number", get_device_uuid);
     addXMLFieldsInPayload(messageBuffer, "time", getTimeInDesiredFormat);
     addXMLFieldsInPayload(messageBuffer, "offset", getTimezoneOffset);
 
@@ -227,5 +227,5 @@ int main(int argc, char** argv)
 #endif
     init_data_logger_persistent_storage();
 
-    start(onConnect, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, 600);
+    start(onConnect, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, 60);
 }
