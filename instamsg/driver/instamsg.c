@@ -27,6 +27,7 @@
 
 #define NO_CLIENT_ID "NONE"
 
+
 static void serverLoggingTopicMessageArrived(InstaMsg *c, MQTTMessage *msg)
 {
     /*
@@ -731,6 +732,33 @@ void initInstaMsg(InstaMsg* c,
 }
 
 
+static void sendClientData(void (*func)(char *messageBuffer, int maxBufferLength),
+                          const char *topicName)
+{
+    /*
+     * This method sends the data upon client's connect.
+     *
+     * If the message(s) are not sent from this method, that means that the connection is not (fully) completed.
+     * Thus, the InstaMsg-Driver code will try again for the connection, and then these messages will be sent (again).
+     *
+     * Bottom-line : We do not need to re-attempt the message(s) sent by this method.
+     */
+
+    memset(messageBuffer, 0, sizeof(messageBuffer));
+    func(messageBuffer, sizeof(messageBuffer));
+
+    MQTTPublish(&instaMsg,
+                topicName,
+                messageBuffer,
+                QOS1,
+                0,
+                NULL,
+                MQTT_RESULT_HANDLER_TIMEOUT,
+                0,
+                1);
+}
+
+
 static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc)
 {
     if(connack_rc == 0x00)  /* Connection Accepted */
@@ -740,6 +768,10 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc)
 
         if(c->onConnectCallback != NULL)
         {
+            sendClientData(get_client_session_data, TOPIC_SESSION_DATA);
+            sendClientData(get_client_metadata, TOPIC_METADATA);
+            sendClientData(get_network_data, TOPIC_NETWORK_DATA);
+
             c->onConnectCallback();
             c->onConnectCallback = NULL;
         }
@@ -749,7 +781,6 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc)
         info_log("Client-Connection failed with code [%d]", connack_rc);
     }
 }
-
 
 
 void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
@@ -1113,8 +1144,14 @@ int MQTTDisconnect(InstaMsg* c)
 void start(int (*onConnectOneTimeOperations)(),
            int (*onDisconnect)(),
            int (*oneToOneMessageHandler)(),
-           void (*coreLoopyBusinessLogicInitiatedBySelf)())
+           void (*coreLoopyBusinessLogicInitiatedBySelf)(),
+           int businessLogicInterval)
 {
+    unsigned char firstTimeBusinessLogicInitiated = 0;
+    int countdown = businessLogicInterval;
+    int nextNetworkTick = getCurrentTick() + NETWORK_INFO_INTERVAL;
+    int nextPingReqTick = getCurrentTick() + PING_REQ_INTERVAL;
+
     InstaMsg *c = &instaMsg;
 
     while(1)
@@ -1134,14 +1171,65 @@ void start(int (*onConnectOneTimeOperations)(),
             }
 
             removeExpiredResultHandlers(c);
-            coreLoopyBusinessLogicInitiatedBySelf(NULL);
+            if(firstTimeBusinessLogicInitiated == 0)
+            {
+                coreLoopyBusinessLogicInitiatedBySelf(NULL);
+                firstTimeBusinessLogicInitiated = 1;
+            }
+            else
+            {
+                /*
+                 * We ensure that the business-logic is initiated only after the interval, and do the intermediate
+                 * works as and when the time arrives.
+                 */
+                while(1)
+                {
+                    countdown--;
+                    startAndCountdownTimer(1, 0);
+
+                    {
+                        volatile unsigned int latestTick = getCurrentTick();
+
+                        /*
+                         * Send network-stats if time has arrived.
+                         */
+                        if(latestTick >= nextNetworkTick)
+                        {
+                            info_log("Time to send network-stats !!!");
+                            sendClientData(get_network_data, TOPIC_NETWORK_DATA);
+
+                            nextNetworkTick = getCurrentTick() + NETWORK_INFO_INTERVAL;
+                        }
+
+                        /*
+                         * Send PINGREQ, if time has arrived,
+                         */
+                        if(latestTick >= nextPingReqTick)
+                        {
+                            info_log("Time to play ping-pong with server !!!");
+                            sendPingReqToServer(c);
+
+                            nextPingReqTick = getCurrentTick() + PING_REQ_INTERVAL;
+                        }
+
+                    }
+
+                    if(countdown == 0)
+                    {
+                        /*
+                         * Time to run the business-logic !!
+                         */
+                        coreLoopyBusinessLogicInitiatedBySelf(NULL);
+
+                        countdown = businessLogicInterval;
+                        break;
+                    }
+                }
+            }
 
             /* This is 1 means physical-network is fine, AND connection to InstaMsg-Server is fine at protocol level. */
             if(c->connected == 1)
             {
-#if 0
-                sendPingReqToServer(c);
-#endif
             }
             else if((c->ipstack).socketCorrupted == 0)
             {

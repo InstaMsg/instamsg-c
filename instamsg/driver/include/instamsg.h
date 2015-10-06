@@ -173,7 +173,8 @@ void sendPingReqToServer(InstaMsg *c);
 void start(int (*onConnectOneTimeOperations)(),
            int (*onDisconnect)(),
            int (*oneToOneMessageHandler)(),
-           void (*coreLoopyBusinessLogicInitiatedBySelf)());
+           void (*coreLoopyBusinessLogicInitiatedBySelf)(),
+           int businessLogicInterval);
 
 #define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}
 #endif

@@ -2,9 +2,9 @@
 #include "../instamsg/driver/include/globals.h"
 #include "../instamsg/driver/include/sg_mem.h"
 #include "../instamsg/driver/include/watchdog.h"
+#include "../instamsg/driver/include/misc.h"
 
 #include "./include/globals.h"
-#include "./include/metadata.h"
 #include "./include/modbus.h"
 #include "./include/hex.h"
 #include "./include/time.h"
@@ -12,12 +12,8 @@
 
 #include "device_modbus.h"
 
-static char messageBuffer[2 * MAX_BUFFER_SIZE];
 static char smallBuffer[MAX_BUFFER_SIZE / 2];
 static char watchdogAssistant[50];
-
-static volatile unsigned int nextNetworkTick;
-static int countdown;
 
 Modbus singletonModbusInterface;
 
@@ -35,33 +31,9 @@ static int publishMessage(const char *topicName, char *message)
 }
 
 
-static void sendClientData(void (*func)(char *messageBuffer, int maxBufferLength),
-                          const char *topicName)
-{
-    /*
-     * This method sends the data upon client's connect.
-     *
-     * If the message(s) are not sent from this method, that means that the connection is not (fully) completed.
-     * Thus, the InstaMsg-Driver code will try again for the connection, and then these messages will be sent (again).
-     *
-     * Bottom-line : We do not need to re-attempt the message(s) sent by this method.
-     */
-
-    memset(messageBuffer, 0, sizeof(messageBuffer));
-    func(messageBuffer, sizeof(messageBuffer));
-
-    publishMessage(topicName, messageBuffer);
-}
-
-
 static int onConnect()
 {
     init_modbus(&singletonModbusInterface, NULL);
-
-    sendClientData(get_client_session_data, TOPIC_SESSION_DATA);
-    sendClientData(get_client_metadata, TOPIC_METADATA);
-    sendClientData(get_network_data, TOPIC_NETWORK_DATA);
-
 
     /*
      * Also, try sending the records stored in the persistent-storage (if any).
@@ -132,7 +104,6 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
     int rc;
     int i;
     unsigned char *responseByteBuffer;
-
 
     /*
      * Now, start forming the payload ....
@@ -244,28 +215,6 @@ exit:
     if(responseByteBuffer)
         sg_free(responseByteBuffer);
 
-    while(1)
-    {
-        countdown--;
-        startAndCountdownTimer(1, 0);
-
-        {
-            volatile unsigned int latestTick = getCurrentTick();
-            if(latestTick >= nextNetworkTick)
-            {
-                info_log("Time to send network-stats !!!");
-                sendClientData(get_network_data, TOPIC_NETWORK_DATA);
-
-                nextNetworkTick = getCurrentTick() + NETWORK_INFO_INTERVAL;
-            }
-        }
-
-        if(countdown == 0)
-        {
-            countdown = CORE_BUSINESS_LOGIC_INTERVAL;
-            break;
-        }
-    }
 }
 
 
@@ -278,8 +227,5 @@ int main(int argc, char** argv)
 #endif
     init_data_logger_persistent_storage();
 
-    countdown = CORE_BUSINESS_LOGIC_INTERVAL;
-    nextNetworkTick = getCurrentTick() + NETWORK_INFO_INTERVAL;
-
-    start(onConnect, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf);
+    start(onConnect, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, 600);
 }

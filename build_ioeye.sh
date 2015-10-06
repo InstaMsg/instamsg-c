@@ -40,8 +40,7 @@ SOURCES=`echo                                                                   
                                                                                                 \
         device/${VENDOR}/ioeye/device_modbus.c                                                  \
         device/${VENDOR}/ioeye/device_time.c                                                    \
-        device/${VENDOR}/ioeye/device_data_logger.c                                             \
-        device/${VENDOR}/ioeye/device_metadata.c                                                `
+        device/${VENDOR}/ioeye/device_data_logger.c                                             `
 
 
 mkdir -p build/${VENDOR}

@@ -91,4 +91,14 @@ unsigned char GLOBAL_BUFFER[MAX_BUFFER_SIZE];
 #define RESET_GLOBAL_BUFFER memset(GLOBAL_BUFFER, 0, MAX_BUFFER_SIZE);
 
 #define LOG_FILE_PATH "/home/ajay/subscriber"
+
+#define TOPIC_METADATA          "instamsg/client/metadata"
+#define TOPIC_SESSION_DATA      "instamsg/client/session"
+#define TOPIC_NETWORK_DATA      "instamsg/client/signalinfo"
+
+#define NETWORK_INFO_INTERVAL           300
+#define PING_REQ_INTERVAL               180
+
+char messageBuffer[2 * MAX_BUFFER_SIZE];
+
 #endif
