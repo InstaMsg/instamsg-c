@@ -16,7 +16,8 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
 
     MQTTPublish(&instaMsg,
                 "listener_topic",
-                buf, QOS2,
+                buf,
+                QOS2,
                 0,
                 publishAckReceived,
                 MQTT_RESULT_HANDLER_TIMEOUT,
