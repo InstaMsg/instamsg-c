@@ -90,7 +90,7 @@ void globalSystemInit(char *logFilePath);
 unsigned char GLOBAL_BUFFER[MAX_BUFFER_SIZE];
 #define RESET_GLOBAL_BUFFER memset(GLOBAL_BUFFER, 0, MAX_BUFFER_SIZE);
 
-#define LOG_FILE_PATH "/home/sensegrow/instamsg.log"
+#define LOG_FILE_PATH "/home/sensegrow/instamsg1.log"
 
 #define TOPIC_METADATA          "instamsg/client/metadata"
 #define TOPIC_SESSION_DATA      "instamsg/client/session"
