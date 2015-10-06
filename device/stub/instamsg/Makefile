@@ -49,4 +49,4 @@ COMPILE_COMMAND="gcc "
 #
 # For example, device_flashing_binary OUT_DIR/instamsg /dev/devID
 #
-declare -a FINAL_COMMANDS=("" "" "")
+declare -a FINAL_COMMANDS=("command-1" "command-2" "command-3" "and" "so" "on")
