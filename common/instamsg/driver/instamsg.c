@@ -1192,7 +1192,11 @@ void start(int (*onConnectOneTimeOperations)(),
             removeExpiredResultHandlers(c);
             if(firstTimeBusinessLogicInitiated == 0)
             {
-                coreLoopyBusinessLogicInitiatedBySelf(NULL);
+                if(coreLoopyBusinessLogicInitiatedBySelf != NULL)
+                {
+                    coreLoopyBusinessLogicInitiatedBySelf(NULL);
+                }
+
                 firstTimeBusinessLogicInitiated = 1;
             }
             else
@@ -1230,7 +1234,6 @@ void start(int (*onConnectOneTimeOperations)(),
 
                             nextPingReqTick = getCurrentTick() + PING_REQ_INTERVAL;
                         }
-
                     }
 
                     if(countdown == 0)
@@ -1238,7 +1241,10 @@ void start(int (*onConnectOneTimeOperations)(),
                         /*
                          * Time to run the business-logic !!
                          */
-                        coreLoopyBusinessLogicInitiatedBySelf(NULL);
+                        if(coreLoopyBusinessLogicInitiatedBySelf != NULL)
+                        {
+                            coreLoopyBusinessLogicInitiatedBySelf(NULL);
+                        }
 
                         countdown = businessLogicInterval;
                         break;

@@ -25,11 +25,7 @@ static int onConnectOneTimeOperations()
 }
 
 
-static void coreLoopyBusinessLogicInitiatedBySelf()
-{
-}
-
 int main(int argc, char** argv)
 {
-    start(onConnectOneTimeOperations, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, 1);
+    start(onConnectOneTimeOperations, NULL, NULL, NULL, 1);
 }
