@@ -1,4 +1,6 @@
-#include "../../../instamsg/driver/include/globals.h"
+#include "../../../common/instamsg/driver/include/globals.h"
+
+#include "./device_modbus.h"
 
 /*
  * This method initializes and connects to the Modbus-interface.

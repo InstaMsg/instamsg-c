@@ -1,5 +1,7 @@
 #include "../driver/include/globals.h"
 
+#include "./device_socket.h"
+
 #ifdef GSM_INTERFACE_ENABLED
 /*
  * This method returns the *****LATEST****** sms, which contains the desired substring.
@@ -97,7 +99,7 @@ int socket_read(Socket* socket, unsigned char* buffer, int len, unsigned char gu
  * An error occurred while writing.
  * In this case, FAILURE must be returned immediately (i.e. no socket-reinstantiation must be done in this method).
  */
-int socket_write(struct Socket* socket, unsigned char* buffer, int len)
+int socket_write(Socket* socket, unsigned char* buffer, int len)
 {
     return FAILURE;
 }

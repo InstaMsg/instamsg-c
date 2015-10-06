@@ -37,7 +37,7 @@ EXTRA_OBJECT_FILES=`echo   `
 
 # Compile-cum-Link command for the platform.
 #
-COMPILE_COMMAND=""
+COMPILE_COMMAND="gcc "
 
 
 # Any final commands that need to be run.
@@ -49,4 +49,4 @@ COMPILE_COMMAND=""
 #
 # For example, device_flashing_binary OUT_DIR/instamsg /dev/devID
 #
-declare -a FINAL_COMMANDS=("command-1" "command-2" "command-3")
+declare -a FINAL_COMMANDS=("" "" "")

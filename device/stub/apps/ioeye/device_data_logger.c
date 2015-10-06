@@ -1,4 +1,4 @@
-#include "../../../instamsg/driver/include/globals.h"
+#include "../../../common/instamsg/driver/include/globals.h"
 
 /*
  * This method initializes the data-logger-interface for the device.
