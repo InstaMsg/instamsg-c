@@ -1,13 +1,13 @@
-#ifndef INSTAMSG_NETWORK
-#define INSTAMSG_NETWORK
+#ifndef INSTAMSG_SOCKET
+#define INSTAMSG_SOCKET
 
 #include "../driver/include/globals.h"
 
 #include <string.h>
 
-typedef struct Network Network;
+typedef struct Socket Socket;
 
-struct Network
+struct Socket
 {
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
     char host[MAX_BUFFER_SIZE];
@@ -21,8 +21,8 @@ struct Network
     char gsmPass[MAX_GSM_PROVISION_PARAM_SIZE];
 #endif
 
-    int (*read) (Network *network, unsigned char* buffer, int len, unsigned char guaranteed);
-    int (*write)(Network *network, unsigned char* buffer, int len);
+    int (*read) (Socket *socket, unsigned char* buffer, int len, unsigned char guaranteed);
+    int (*write)(Socket *socket, unsigned char* buffer, int len);
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
 
 

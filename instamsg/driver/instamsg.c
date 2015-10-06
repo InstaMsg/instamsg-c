@@ -15,13 +15,13 @@
  *    Ajay Garg <ajay.garg@sensegrow.com>
  *******************************************************************************/
 
-#include "include/instamsg.h"
-#include "include/httpclient.h"
-#include "include/json.h"
-#include "include/sg_mem.h"
-#include "include/network.h"
-#include "include/watchdog.h"
-#include "include/misc.h"
+#include "./include/instamsg.h"
+#include "./include/httpclient.h"
+#include "./include/json.h"
+#include "./include/sg_mem.h"
+#include "./include/socket.h"
+#include "./include/watchdog.h"
+#include "./include/misc.h"
 
 #include <string.h>
 
@@ -147,7 +147,7 @@ static int sendPacket(InstaMsg *c, unsigned char *buf, int length)
 
     if((c->ipstack).socketCorrupted == 1)
     {
-        error_log("Network not available at physical layer .. so packet cannot be sent to server.");
+        error_log("Socket not available at physical layer .. so packet cannot be sent to server.");
 
         rc = FAILURE;
         goto exit;
@@ -174,14 +174,14 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     int rem_len = 0;
     unsigned char i;
     int multiplier = 1;
-    int numRetries = MAX_TRIES_ALLOWED_WHILE_READING_FROM_NETWORK_MEDIUM;
+    int numRetries = MAX_TRIES_ALLOWED_WHILE_READING_FROM_SOCKET_MEDIUM;
 
-    watchdog_reset_and_enable(10 * MAX_TRIES_ALLOWED_WHILE_READING_FROM_NETWORK_MEDIUM * NETWORK_READ_TIMEOUT_SECS,
+    watchdog_reset_and_enable(10 * MAX_TRIES_ALLOWED_WHILE_READING_FROM_SOCKET_MEDIUM * SOCKET_READ_TIMEOUT_SECS,
                               "readPacket");
 
     if((c->ipstack).socketCorrupted == 1)
     {
-        error_log("Network not available at physical layer .. so packet cannot be read from server.");
+        error_log("Socket not available at physical layer .. so packet cannot be read from server.");
         goto exit;
     }
 
@@ -615,7 +615,7 @@ void sendPingReqToServer(InstaMsg *c)
 
     if((c->ipstack).socketCorrupted == 1)
     {
-        error_log("Network not available at physical layer .. so server cannot be pinged for maintaining keep-alive.");
+        error_log("Socket not available at physical layer .. so server cannot be pinged for maintaining keep-alive.");
         return;
     }
 
@@ -628,7 +628,7 @@ void sendPingReqToServer(InstaMsg *c)
 
 void clearInstaMsg(InstaMsg *c)
 {
-    release_network(&(c->ipstack));
+    release_socket(&(c->ipstack));
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
     release_file_system(&(c->singletonUtilityFs));
@@ -683,7 +683,7 @@ void initInstaMsg(InstaMsg* c,
 
 
     (c->ipstack).socketCorrupted = 1;
-	init_network(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT);
+	init_socket(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT);
     if((c->ipstack).socketCorrupted ==1)
     {
         return;
@@ -1149,7 +1149,7 @@ void start(int (*onConnectOneTimeOperations)(),
 {
     unsigned char firstTimeBusinessLogicInitiated = 0;
     int countdown = businessLogicInterval;
-    int nextNetworkTick = getCurrentTick() + NETWORK_INFO_INTERVAL;
+    int nextSocketTick = getCurrentTick() + NETWORK_INFO_INTERVAL;
     int nextPingReqTick = getCurrentTick() + PING_REQ_INTERVAL;
 
     InstaMsg *c = &instaMsg;
@@ -1163,7 +1163,7 @@ void start(int (*onConnectOneTimeOperations)(),
 
             if((c->ipstack).socketCorrupted == 1)
             {
-                error_log("Network not available at physical layer .. so nothing can be read from network.");
+                error_log("Socket not available at physical layer .. so nothing can be read from socket.");
             }
             else
             {
@@ -1191,14 +1191,14 @@ void start(int (*onConnectOneTimeOperations)(),
                         volatile unsigned int latestTick = getCurrentTick();
 
                         /*
-                         * Send network-stats if time has arrived.
+                         * Send socket-stats if time has arrived.
                          */
-                        if(latestTick >= nextNetworkTick)
+                        if(latestTick >= nextSocketTick)
                         {
-                            info_log("Time to send network-stats !!!");
+                            info_log("Time to send socket-stats !!!");
                             sendClientData(get_network_data, TOPIC_NETWORK_DATA);
 
-                            nextNetworkTick = getCurrentTick() + NETWORK_INFO_INTERVAL;
+                            nextSocketTick = getCurrentTick() + NETWORK_INFO_INTERVAL;
                         }
 
                         /*
@@ -1227,7 +1227,7 @@ void start(int (*onConnectOneTimeOperations)(),
                 }
             }
 
-            /* This is 1 means physical-network is fine, AND connection to InstaMsg-Server is fine at protocol level. */
+            /* This is 1 means physical-socket is fine, AND connection to InstaMsg-Server is fine at protocol level. */
             if(c->connected == 1)
             {
             }
@@ -1236,11 +1236,11 @@ void start(int (*onConnectOneTimeOperations)(),
                 static int connectionAttempts = 0;
                 connectionAttempts++;
 
-                error_log("Network is fine at physical layer, but no connection established (yet) with InstaMsg-Server.");
+                error_log("Socket is fine at physical layer, but no connection established (yet) with InstaMsg-Server.");
                 if(connectionAttempts > MAX_CONN_ATTEMPTS_WITH_PHYSICAL_LAYER_FINE)
                 {
                     connectionAttempts = 0;
-                    error_log("Connection-Attempts exhausted ... so trying with re-initializing the network-physical layer.");
+                    error_log("Connection-Attempts exhausted ... so trying with re-initializing the socket-physical layer.");
 
                     (c->ipstack).socketCorrupted = 1;
                 }

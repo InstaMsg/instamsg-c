@@ -15,7 +15,7 @@ SOURCES=`echo                                                                   
         instamsg/driver/globals.c                                                               \
         instamsg/driver/sg_mem.c                                                                \
         instamsg/driver/sg_stdlib.c                                                             \
-        instamsg/driver/network.c                                                               \
+        instamsg/driver/socket.c                                                                \
                                                                                                 \
         instamsg/mqtt/src/MQTTFormat.c                                                          \
         instamsg/mqtt/src/MQTTPacket.c                                                          \
@@ -28,7 +28,7 @@ SOURCES=`echo                                                                   
         instamsg/mqtt/src/MQTTUnsubscribeServer.c                                               \
         instamsg/mqtt/src/MQTTUnsubscribeClient.c                                               \
                                                                                                 \
-        device/${VENDOR}/instamsg/device_network.c                                              \
+        device/${VENDOR}/instamsg/device_socket.c                                               \
         device/${VENDOR}/instamsg/device_serial_logger.c                                        \
         device/${VENDOR}/instamsg/device_time.c                                                 \
         device/${VENDOR}/instamsg/device_watchdog.c                                             \

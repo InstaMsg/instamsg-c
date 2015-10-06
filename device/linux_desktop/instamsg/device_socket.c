@@ -30,35 +30,35 @@
  * otherwise is a stronger check) is not being done.
  *
  * Please note that this method is called by Instamsg-application, *****BEFORE***** calling
- * "connect_underlying_network_medium_try_once".
+ * "connect_underlying_socket_medium_try_once".
  */
-void get_latest_sms_containing_substring(Network *network, char *buffer, const char *prefix)
+void get_latest_sms_containing_substring(Socket *socket, char *buffer, const char *prefix)
 {
 }
 #endif
 
 
 /*
- * This method tries to establish the network/socket to "network->host" on "network->port".
+ * This method tries to establish the socket/socket to "socket->host" on "socket->port".
  *
  * If the connection is successful, then the following must be done by the device-implementation ::
- *                          network->socketCorrupted = 0;
+ *                          socket->socketCorrupted = 0;
  *
  * Setting the above value will let InstaMsg know that the connection can be used fine for writing/reading.
  */
-void connect_underlying_network_medium_try_once(Network* network)
+void connect_underlying_socket_medium_try_once(Socket* socket)
 {
 	int type = SOCK_STREAM;
 	struct sockaddr_in address;
 
 	int rc = SUCCESS;
-    struct timeval interval = {NETWORK_READ_TIMEOUT_SECS, 0};
+    struct timeval interval = {SOCKET_READ_TIMEOUT_SECS, 0};
 
 	sa_family_t family = AF_INET;
 	struct addrinfo *result = NULL;
 	struct addrinfo hints = {0, AF_UNSPEC, SOCK_STREAM, IPPROTO_TCP, 0, NULL, NULL, NULL};
 
-	if ((rc = getaddrinfo(network->host, NULL, &hints, &result)) == 0)
+	if ((rc = getaddrinfo(socket->host, NULL, &hints, &result)) == 0)
 	{
 		struct addrinfo* res = result;
 
@@ -75,7 +75,7 @@ void connect_underlying_network_medium_try_once(Network* network)
 
 		if (result->ai_family == AF_INET)
 		{
-			address.sin_port = htons(network->port);
+			address.sin_port = htons(socket->port);
 			address.sin_family = family = AF_INET;
 			address.sin_addr = ((struct sockaddr_in*)(result->ai_addr))->sin_addr;
 		}
@@ -89,13 +89,13 @@ void connect_underlying_network_medium_try_once(Network* network)
 	{
         if(1)
         {
-		    network->socket = socket(family, type, 0);
-		    if (network->socket != -1)
+		    socket->socket = socket(family, type, 0);
+		    if (socket->socket != -1)
 		    {
 			    int opt = 1;
-                if(connect(network->socket, (struct sockaddr*)&address, sizeof(address)) != 0)
+                if(connect(socket->socket, (struct sockaddr*)&address, sizeof(address)) != 0)
                 {
-                    info_log(NETWORK_NOT_AVAILABLE);
+                    info_log(SOCKET_NOT_AVAILABLE);
                     startAndCountdownTimer(1, 0);
 
                     return;
@@ -105,7 +105,7 @@ void connect_underlying_network_medium_try_once(Network* network)
                     /*
                      * VERY IMPORTANT.. MUST BE DONE.
                      */
-                    network->socketCorrupted = 0;
+                    socket->socketCorrupted = 0;
                 }
 		    }
         }
@@ -113,15 +113,15 @@ void connect_underlying_network_medium_try_once(Network* network)
 
 
     /* Set timeout-limitation in the socket-receiving function */
-    setsockopt(network->socket, SOL_SOCKET, SO_RCVTIMEO, (char *)&interval, sizeof(struct timeval));
+    setsockopt(socket->socket, SOL_SOCKET, SO_RCVTIMEO, (char *)&interval, sizeof(struct timeval));
 
     info_log("TCP-SOCKET UNDERLYING_MEDIUM INITIATED FOR HOST = [%s], PORT = [%d].",
-             network->host, network->port);
+             socket->host, socket->port);
 }
 
 
 /*
- * This method reads "len" bytes from network into "buffer".
+ * This method reads "len" bytes from socket into "buffer".
  *
  * Exactly one of the cases must hold ::
  *
@@ -147,7 +147,7 @@ void connect_underlying_network_medium_try_once(Network* network)
  * "guaranteed" is 0.
  * So, this "read" must behave as a non-blocking read.
  *
- * Also, no bytes could be read in NETWORK_READ_TIMEOUT_SECS seconds (defined in "globals.h").
+ * Also, no bytes could be read in SOCKET_READ_TIMEOUT_SECS seconds (defined in "globals.h").
  * So, SOCKET_READ_TIMEOUT must be returned immediately.
  *
  *                      OR
@@ -168,7 +168,7 @@ void connect_underlying_network_medium_try_once(Network* network)
  * However, an error occurs while reading.
  * So, FAILURE must be returned immediately (i.e. no socket-reinstantiation must be done in this method).
  */
-int network_read(Network* network, unsigned char* buffer, int len, unsigned char guaranteed)
+int socket_read(Socket* socket, unsigned char* buffer, int len, unsigned char guaranteed)
 {
 	int bytes = 0;
     int rc = 0;
@@ -182,7 +182,7 @@ int network_read(Network* network, unsigned char* buffer, int len, unsigned char
 
 	while (bytes < len)
 	{
-		rc = recv(network->socket, &buffer[bytes], (size_t)(len - bytes), 0);
+		rc = recv(socket->socket, &buffer[bytes], (size_t)(len - bytes), 0);
         errBackup = errno;
 
         if(rc < 0)
@@ -254,7 +254,7 @@ int network_read(Network* network, unsigned char* buffer, int len, unsigned char
 
 
 /*
- * This method writes first "len" bytes from "buffer" onto the network.
+ * This method writes first "len" bytes from "buffer" onto the socket.
  *
  * This is a blocking function. So, either of the following must hold true ::
  *
@@ -267,7 +267,7 @@ int network_read(Network* network, unsigned char* buffer, int len, unsigned char
  * An error occurred while writing.
  * In this case, FAILURE must be returned immediately (i.e. no socket-reinstantiation must be done in this method).
  */
-int network_write(Network* network, unsigned char* buffer, int len)
+int socket_write(Socket* socket, unsigned char* buffer, int len)
 {
     int bytes = 0;
     int rc = 0;
@@ -275,7 +275,7 @@ int network_write(Network* network, unsigned char* buffer, int len)
     unsigned int errBackup;
     while(bytes < len)
     {
-	    rc = write(network->socket, &buffer[bytes], (size_t)(len - bytes));
+	    rc = write(socket->socket, &buffer[bytes], (size_t)(len - bytes));
         errBackup = errno;
 
         if(rc < 0)
@@ -320,12 +320,12 @@ int network_write(Network* network, unsigned char* buffer, int len)
 
 
 /*
- * This method does the cleaning up (for eg. closing a socket) when the network is cleaned up.
+ * This method does the cleaning up (for eg. closing a socket) when the socket is cleaned up.
  * But if it is ok to re-connect without releasing the underlying-system-resource, then this can be left empty.
  *
  * Note that this method MUST DO """ONLY""" per-socket level cleanup, NO GLOBAL-LEVEL CLEANING/REINIT MUST BE DONE.
  */
-void release_underlying_network_medium_guaranteed(Network* network)
+void release_underlying_socket_medium_guaranteed(Socket* socket)
 {
-    close(network->socket);
+    close(socket->socket);
 }

@@ -1,4 +1,4 @@
-#include "./include/network.h"
+#include "./include/socket.h"
 #include "./include/globals.h"
 #include "./include/log.h"
 #include "./include/json.h"
@@ -6,24 +6,24 @@
 
 static char sms[200];
 
-void init_network(Network *network, const char *hostName, unsigned int port)
+void init_socket(Socket *socket, const char *hostName, unsigned int port)
 {
     /* Register read-callback. */
-	network->read = network_read;
+	socket->read = socket_read;
 
     /* Register write-callback. */
-	network->write = network_write;
+	socket->write = socket_write;
 
     /* Keep a copy of connection-parameters, for easy book-keeping. */
-    memset(network->host, 0, sizeof(network->host));
-    sg_sprintf(network->host, "%s", hostName);
-    network->port = port;
+    memset(socket->host, 0, sizeof(socket->host));
+    sg_sprintf(socket->host, "%s", hostName);
+    socket->port = port;
 
 #ifdef GSM_INTERFACE_ENABLED
     /* Empty-initialize the GSM-params. */
-    memset(network->gsmApn, 0, sizeof(network->gsmApn));
-    memset(network->gsmUser, 0, sizeof(network->gsmUser));
-    memset(network->gsmPass, 0, sizeof(network->gsmPass));
+    memset(socket->gsmApn, 0, sizeof(socket->gsmApn));
+    memset(socket->gsmUser, 0, sizeof(socket->gsmUser));
+    memset(socket->gsmPass, 0, sizeof(socket->gsmPass));
 
     /* Fill-in the provisioning-parameters from the SMS obtained from InstaMsg-Server */
     memset(sms, 0, sizeof(sms));
@@ -32,7 +32,7 @@ void init_network(Network *network, const char *hostName, unsigned int port)
         info_log("\n\n\nProvisioning-SMS not available, retrying to fetch from storage area\n\n\n");
         startAndCountdownTimer(5, 1);
 
-        get_latest_sms_containing_substring(network, sms, "\"sg_apn\":\"");
+        get_latest_sms_containing_substring(socket, sms, "\"sg_apn\":\"");
     }
 
     /*
@@ -61,24 +61,24 @@ void init_network(Network *network, const char *hostName, unsigned int port)
 
     }
 
-    getJsonKeyValueIfPresent(sms, "sg_apn", network->gsmApn);
-    getJsonKeyValueIfPresent(sms, "sg_user", network->gsmUser);
-    getJsonKeyValueIfPresent(sms, "sg_pass", network->gsmPass);
+    getJsonKeyValueIfPresent(sms, "sg_apn", socket->gsmApn);
+    getJsonKeyValueIfPresent(sms, "sg_user", socket->gsmUser);
+    getJsonKeyValueIfPresent(sms, "sg_pass", socket->gsmPass);
 
     info_log("\n\nProvisioning-Params ::  sg_apn : [%s], sg_user : [%s], sg_pass : [%s]\n\n",
-             network->gsmApn, network->gsmUser, network->gsmPass);
+             socket->gsmApn, socket->gsmUser, socket->gsmPass);
     startAndCountdownTimer(3, 0);
 #endif
 
     /* Connect the medium (socket). */
-    connect_underlying_network_medium_try_once(network);
+    connect_underlying_socket_medium_try_once(socket);
 }
 
 
-void release_network(Network *network)
+void release_socket(Socket *socket)
 {
-    release_underlying_network_medium_guaranteed(network);
+    release_underlying_socket_medium_guaranteed(socket);
 
     info_log("COMPLETE [TCP-SOCKET] STRUCTURE, INCLUDING THE UNDERLYING MEDIUM CLEANED FOR HOST = [%s], PORT = [%d].",
-             network->host, network->port);
+             socket->host, socket->port);
 }

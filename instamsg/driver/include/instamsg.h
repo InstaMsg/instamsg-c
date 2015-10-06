@@ -22,8 +22,8 @@
 #include "./log.h"
 #include "../mqtt/src/MQTTPacket.h"
 
-#include "network.h"
-#include "time.h"
+#include "./socket.h"
+#include "./time.h"
 
 #define MAX_PACKET_ID 30000
 #define MAX_MESSAGE_HANDLERS 5
@@ -101,7 +101,7 @@ struct InstaMsg {
 
     unsigned char serverLoggingEnabled;
 
-    Network ipstack;
+    Socket ipstack;
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
     FileSystem singletonUtilityFs;
 #endif
