@@ -12,7 +12,7 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
 
     static int counter;
     counter++;
-    sprintf(buf, "Test %d", counter);
+    sg_sprintf(buf, "Test %d", counter);
 
     MQTTPublish(&instaMsg,
                 "listener_topic",
