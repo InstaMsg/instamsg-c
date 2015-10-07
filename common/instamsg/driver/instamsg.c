@@ -1169,6 +1169,10 @@ void start(int (*onConnectOneTimeOperations)(),
 
     InstaMsg *c = &instaMsg;
 
+    RESET_GLOBAL_BUFFER;
+    get_device_uuid((char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
+    info_log("Device-UUID :: [%s]", (char*)GLOBAL_BUFFER);
+
     while(1)
     {
         initInstaMsg(c, onConnectOneTimeOperations, onDisconnect, oneToOneMessageHandler);
