@@ -20,9 +20,9 @@ void bootstrapInit()
 
 
 /*
- * This method returns the client-session-data, in simple JSON form, of type ::
+ * This method returns the client-network-data, in simple JSON form, of type ::
  *
- * {key1 : value1, key2 : value2 .....}
+ * {'method' : 'value', 'ip_address' : 'value', 'antina_status' : 'value', 'signal_strength' : 'value'}
  */
 void get_client_session_data(char *messageBuffer, int maxBufferLength)
 {
@@ -30,9 +30,9 @@ void get_client_session_data(char *messageBuffer, int maxBufferLength)
 
 
 /*
- * This method returns the client-metadata, in simple JSON form, of type ::
+ * This method returns the client-network-data, in simple JSON form, of type ::
  *
- * {key1 : value1, key2 : value2 .....}
+ * {'imei' : 'value', 'serial_number' : 'value', 'model' : 'value', 'firmware_version' : 'value', 'manufacturer' : 'value', 'client_version' : 'value'}
  */
 void get_client_metadata(char *messageBuffer, int maxBufferLength)
 {
@@ -42,7 +42,7 @@ void get_client_metadata(char *messageBuffer, int maxBufferLength)
 /*
  * This method returns the client-network-data, in simple JSON form, of type ::
  *
- * {key1 : value1, key2 : value2 .....}
+ * {'antina_status' : 'value', 'signal_strength' : 'value'}
  */
 void get_network_data(char *messageBuffer, int maxBufferLength)
 {
