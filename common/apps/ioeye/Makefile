@@ -7,3 +7,5 @@ APP_SOURCES=`echo                                                               
         	device/VENDOR/apps/ioeye/device_time.c                                               	\
         	device/VENDOR/apps/ioeye/device_data_logger.c                                        	`
 
+APP_COMPILER_DIRECTIVES=`echo																		\
+						-DMODBUS_INTERFACE_ENABLED													`
