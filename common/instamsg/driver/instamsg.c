@@ -743,15 +743,22 @@ static void sendClientData(void (*func)(char *messageBuffer, int maxBufferLength
     memset(messageBuffer, 0, sizeof(messageBuffer));
     func(messageBuffer, sizeof(messageBuffer));
 
-    MQTTPublish(&instaMsg,
-                topicName,
-                messageBuffer,
-                QOS1,
-                0,
-                NULL,
-                MQTT_RESULT_HANDLER_TIMEOUT,
-                0,
-                1);
+    if(strlen(messageBuffer) > 0)
+    {
+        MQTTPublish(&instaMsg,
+                    topicName,
+                    messageBuffer,
+                    QOS1,
+                    0,
+                    NULL,
+                    MQTT_RESULT_HANDLER_TIMEOUT,
+                    0,
+                    1);
+    }
+    else
+    {
+        info_log("Not publishing empty-message to topic [%s]", topicName);
+    }
 }
 
 
