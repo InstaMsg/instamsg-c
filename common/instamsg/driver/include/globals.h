@@ -102,4 +102,9 @@ unsigned char GLOBAL_BUFFER[MAX_BUFFER_SIZE];
 
 char messageBuffer[2 * MAX_BUFFER_SIZE];
 
+#ifdef DEBUG_MODE
+char USER_LOG_FILE_PATH[MAX_BUFFER_SIZE];
+char USER_DEVICE_UUID[MAX_BUFFER_SIZE];
+#endif
+
 #endif

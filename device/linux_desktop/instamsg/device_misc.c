@@ -1,6 +1,11 @@
 #include <signal.h>
 #include <string.h>
 
+#ifdef DEBUG_MODE
+#include "../../../../common/instamsg/driver/include/globals.h"
+#endif
+
+
 /*
  * Utility-function that reboots the device.
  */
@@ -112,4 +117,12 @@ void get_device_uuid(char *buffer, int maxbufferlength)
      * Strip the last "-"
      */
     buffer[strlen(buffer) - 1] = 0;
+
+#ifdef DEBUG_MODE
+    if(strlen(USER_DEVICE_UUID) > 0)
+    {
+        memset(buffer, 0, maxbufferlength);
+        strcpy(buffer, USER_DEVICE_UUID);
+    }
+#endif
 }
