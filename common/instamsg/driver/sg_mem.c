@@ -5,7 +5,7 @@
 
 static unsigned long currentBytesUsed;
 
-void* sg_malloc(unsigned short numBytes)
+uintptr_t sg_malloc(unsigned short numBytes)
 {
     void *mem = NULL;
 
@@ -42,7 +42,7 @@ void* sg_malloc(unsigned short numBytes)
     debug_log(MEM_ALLOC "Current memory remaining in bytes = [%u]", MAX_HEAP_SIZE - currentBytesUsed);
 
 exit:
-    return mem;
+    return ((uintptr_t) mem);
 }
 
 
