@@ -31,7 +31,6 @@ int main(int argc, char** argv)
 {
     if(argc < 2)
     {
-        printf("\n\nUsage :: ./build/subscriber/<device>/instamsg <topic>\n\n");
         return 1;
     }
 
