@@ -108,7 +108,7 @@ struct InstaMsg {
     void (*defaultMessageHandler) (MessageData*);
     int (*onConnectCallback)();
     int (*onDisconnectCallback)();
-    int (*oneToOneMessageCallback)();
+    int (*oneToOneMessageReceivedCallback)();
 
     char filesTopic[100];
     char rebootTopic[100];
@@ -192,7 +192,7 @@ void removeExpiredResultHandlers(InstaMsg *c);
 void sendPingReqToServer(InstaMsg *c);
 void start(int (*onConnectOneTimeOperations)(),
            int (*onDisconnect)(),
-           int (*oneToOneMessageHandler)(),
+           int (*oneToOneMessageHandler)(OneToOneResult *),
            void (*coreLoopyBusinessLogicInitiatedBySelf)(),
            int businessLogicInterval);
 

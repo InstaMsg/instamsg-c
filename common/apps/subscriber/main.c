@@ -1,6 +1,26 @@
 #include "../../instamsg/driver/include/instamsg.h"
+#include "../../instamsg/driver/include/sg_mem.h"
 
 static char TOPIC[100];
+
+static int oneToOneResponseReceivedHandler(OneToOneResult* result)
+{
+    char *msg = (char*) sg_malloc(1000);
+
+    info_log("Received [%s] from peer [%s]", result->peerMsg, result->peer);
+    if(msg == NULL)
+    {
+        error_log("Could not allocate memory for message :(");
+        return FAILURE;
+
+    }
+
+    memset(msg, 0, 1000);
+    sg_sprintf(msg, "Got your response ==> %s :)", result->peerMsg);
+
+    result->reply(result, msg);
+    return SUCCESS;
+}
 
 static void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
@@ -65,5 +85,5 @@ int main(int argc, char** argv)
 #endif  /* FILE_SYSTEM_INTERFACE_ENABLED */
     }
 
-    start(onConnectOneTimeOperations, NULL, NULL, NULL, 1);
+    start(onConnectOneTimeOperations, NULL, oneToOneResponseReceivedHandler, NULL, 1);
 }

@@ -143,11 +143,14 @@ static void fireResultHandlerAndRemove(InstaMsg *c, MQTTFixedHeaderPlusMsgId *fi
 }
 
 
-static void attachOneToOneHandler(InstaMsg *c, int msgId, unsigned int timeout, void (*oneToOneResponseHandler)(OneToOneResult *))
+static void attachOneToOneResponseReceivedHandler(InstaMsg *c,
+                                                  int msgId,
+                                                  unsigned int timeout,
+                                                  void (*oneToOneResponseReceivedHandler)(OneToOneResult *))
 {
     int i;
 
-    if(oneToOneResponseHandler == NULL)
+    if(oneToOneResponseReceivedHandler == NULL)
     {
         return;
     }
@@ -159,7 +162,7 @@ static void attachOneToOneHandler(InstaMsg *c, int msgId, unsigned int timeout, 
         {
             c->oneToOneHandlers[i].msgId = msgId;
             c->oneToOneHandlers[i].timeout = timeout;
-            c->oneToOneHandlers[i].fp = oneToOneResponseHandler;
+            c->oneToOneHandlers[i].fp = oneToOneResponseReceivedHandler;
 
             break;
         }
@@ -205,7 +208,7 @@ static void MQTTReplyOneToOne(OneToOneResult *oneToOneResult, const char *replyM
     int id = getNextPacketId(c);
 
     memset(messageBuffer, 0, sizeof(messageBuffer));
-    sg_sprintf(messageBuffer, "{\"message_id\": \"%u\", \"response_id\": \"%s\", \"reply_to\": \"%s\", \"body\": \"%s\", \"status\": 1}",
+    sg_sprintf(messageBuffer, "{\"message_id\": \"%u\", \"response_id\": \"%u\", \"reply_to\": \"%s\", \"body\": \"%s\", \"status\": 1}",
                id,
                oneToOneResult->peerMsgId,
                c->clientIdComplete,
@@ -219,8 +222,10 @@ static void oneToOneMessageArrived(InstaMsg *c, MQTTMessage *msg)
 {
     char *peerMessage = NULL, *peer = NULL;
     char peerMsgId[6];
+    char responseMsgId[6];
 
     info_log("One to one payload == [%s]", msg->payload);
+
     peerMessage = (char*) sg_malloc(MAX_BUFFER_SIZE);
     if(peerMessage == NULL)
     {
@@ -240,12 +245,20 @@ static void oneToOneMessageArrived(InstaMsg *c, MQTTMessage *msg)
     memset(peerMsgId, 0, sizeof(peerMsgId));
     getJsonKeyValueIfPresent(msg->payload, "message_id", peerMsgId);
 
-    info_log("Peer-Message = [%s], Peer = [%s], Peer-Message-Id = [%s]", peerMessage, peer, peerMsgId);
+    memset(responseMsgId, 0, sizeof(responseMsgId));
+    getJsonKeyValueIfPresent(msg->payload, "response_id", responseMsgId);
+
     if(strlen(peerMsgId) == 0)
     {
         error_log(ONE_TO_ONE "Peer-Message-Id not received ... not proceeding further");
         goto exit;
     }
+    if(strlen(peer) == 0)
+    {
+        error_log(ONE_TO_ONE "Peer-value not received ... not proceeding further");
+        goto exit;
+    }
+
 
     {
         OneToOneResult oneToOneResult;
@@ -256,19 +269,30 @@ static void oneToOneMessageArrived(InstaMsg *c, MQTTMessage *msg)
         oneToOneResult.peerMsgId = sg_atoi(peerMsgId);
         oneToOneResult.reply = &MQTTReplyOneToOne;
 
-        if(fireOneToOneHandlerAndRemove(c, sg_atoi(peerMsgId), &oneToOneResult) == FAILURE)
+        debug_log("Peer-Message = [%s], Peer = [%s], Peer-Message-Id = [%u]",
+                   oneToOneResult.peerMsg,
+                   oneToOneResult.peer,
+                   oneToOneResult.peerMsgId);
+
+        if(strlen(responseMsgId) == 0)
         {
             /*
-             * There was no local-handler.. try the global handler..
+             * This is a fresh message, so use the global callback.
              */
-            info_log(ONE_TO_ONE "No local-handler found for one-to-one .. trying with the global-handler");
-            if(c->oneToOneMessageCallback == NULL)
+            if(c->oneToOneMessageReceivedCallback != NULL)
             {
-                error_log(ONE_TO_ONE "No global-handler found for one-to-one :(");
+                c->oneToOneMessageReceivedCallback(&oneToOneResult);
             }
-            else
+        }
+        else
+        {
+            /*
+             * This is for an already exisiting message, that was sent by the current-client to the peer.
+             * Call its handler (if at all it exists).
+             */
+            if(fireOneToOneHandlerAndRemove(c, sg_atoi(responseMsgId), &oneToOneResult) == FAILURE)
             {
-                c->oneToOneMessageCallback(oneToOneResult);
+                error_log(ONE_TO_ONE "No handler found for one-to-one for message-id [%s]", responseMsgId);
             }
         }
     }
@@ -814,7 +838,7 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
 void initInstaMsg(InstaMsg* c,
                   int (*connectHandler)(),
                   int (*disconnectHandler)(),
-                  int (*oneToOneMessageHandler)())
+                  int (*oneToOneMessageReceivedCallback)())
 {
     int i;
 
@@ -848,7 +872,7 @@ void initInstaMsg(InstaMsg* c,
     c->next_packetid = MAX_PACKET_ID;
     c->onConnectCallback = connectHandler;
     c->onDisconnectCallback = disconnectHandler;
-    c->oneToOneMessageCallback = oneToOneMessageHandler;
+    c->oneToOneMessageReceivedCallback = oneToOneMessageReceivedCallback;
 
     c->serverLoggingEnabled = 0;
 
@@ -1293,7 +1317,7 @@ exit:
 
 int MQTTSend(const char* peer,
               const char* payload,
-              void (*oneToOneResponseHandler)(OneToOneResult *),
+              void (*oneToOneResponseReceivedHandler)(OneToOneResult *),
               unsigned int timeout)
 {
     InstaMsg *c = &instaMsg;
@@ -1302,7 +1326,7 @@ int MQTTSend(const char* peer,
     memset(messageBuffer, 0, sizeof(messageBuffer));
     sg_sprintf(messageBuffer, "{\"message_id\": \"%u\", \"reply_to\": \"%s\", \"body\": \"%s\"}", id, c->clientIdComplete, payload);
 
-    attachOneToOneHandler(&instaMsg, id, timeout, oneToOneResponseHandler);
+    attachOneToOneResponseReceivedHandler(&instaMsg, id, timeout, oneToOneResponseReceivedHandler);
     return doMqttSendPublish(peer, messageBuffer);
 }
 
@@ -1330,7 +1354,7 @@ int MQTTDisconnect(InstaMsg* c)
 
 void start(int (*onConnectOneTimeOperations)(),
            int (*onDisconnect)(),
-           int (*oneToOneMessageHandler)(),
+           int (*oneToOneMessageHandler)(OneToOneResult *),
            void (*coreLoopyBusinessLogicInitiatedBySelf)(),
            int businessLogicInterval)
 {

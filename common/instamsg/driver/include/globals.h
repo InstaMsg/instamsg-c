@@ -43,7 +43,7 @@ struct KeyValuePairs
 
 
 /****************************************************************************************/
-#if 0
+#if 1
 #define INSTAMSG_HOST       "test.ioeye.com"
 
 #ifdef SSL_ENABLED

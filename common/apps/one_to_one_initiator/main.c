@@ -2,7 +2,7 @@
 
 static char TOPIC[100];
 
-static void oneToOneMessageReceived(OneToOneResult* result)
+static void oneToOneResponseReceivedCallback(OneToOneResult* result)
 {
     info_log("Received [%s] from peer [%s]", result->peerMsg, result->peer);
 }
@@ -22,7 +22,7 @@ static void onConnectOneTimeOperations()
     {
         MQTTSend(TOPIC,
                  "Hi... this is one-to-one initiator !!",
-                 oneToOneMessageReceived,
+                 oneToOneResponseReceivedCallback,
                  3600);
     }
     else
