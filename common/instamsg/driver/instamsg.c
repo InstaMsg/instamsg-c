@@ -1097,7 +1097,6 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                     deliverMessageToSelf(c, &topicMQTTString, &msg);
                 }
 
-                sg_free(topicName);
                 break;
             }
 

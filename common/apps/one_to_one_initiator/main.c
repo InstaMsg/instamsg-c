@@ -16,10 +16,11 @@ static void onConnectOneTimeOperations()
         return;
     }
 
-    onceDone = 1;
 
     if(instaMsg.connected == 1)
     {
+        onceDone = 1;
+
         MQTTSend(TOPIC,
                  "Hi... this is one-to-one initiator !!",
                  oneToOneResponseReceivedCallback,
