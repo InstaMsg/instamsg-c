@@ -188,7 +188,6 @@ struct JSONParseStuff
 #define FILE_DELETE     "[FILE-DELETE] "
 
 void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c);
-void removeExpiredResultHandlers(InstaMsg *c);
 void sendPingReqToServer(InstaMsg *c);
 void start(int (*onConnectOneTimeOperations)(),
            int (*onDisconnect)(),

@@ -761,17 +761,36 @@ exit:
 }
 
 
+static void checkAndRemoveExpiredHandler(int *msgId, unsigned int *timeout, const char *info)
+{
+    if(*timeout <= 0)
+    {
+        info_log("No %s received for msgid [%u], removing..", info, *msgId);
+        *msgId = 0;
+    }
+    else
+    {
+        *timeout = *timeout - 1;
 
-void removeExpiredResultHandlers(InstaMsg *c)
+    }
+}
+
+
+static void removeExpiredResultHandlers(InstaMsg *c)
 {
     int i;
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {
-        if (c->resultHandlers[i].msgId > 0)
-        {
-            info_log("No result obtained for msgId [%u] in the specified period", c->resultHandlers[i].msgId);
-            c->resultHandlers[i].msgId = 0;
-        }
+        checkAndRemoveExpiredHandler(&(c->resultHandlers[i].msgId), &(c->resultHandlers[i].timeout), "pub/sub response");
+    }
+}
+
+static void removeExpiredOneToOneResponseHandlers(InstaMsg *c)
+{
+    int i;
+    for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
+    {
+        checkAndRemoveExpiredHandler(&(c->oneToOneResponseHandlers[i].msgId), &(c->oneToOneResponseHandlers[i].timeout), "one-to-one response");
     }
 }
 
@@ -1384,7 +1403,7 @@ void start(int (*onConnectOneTimeOperations)(),
                 readAndProcessIncomingMQTTPacketsIfAny(c);
             }
 
-            removeExpiredResultHandlers(c);
+
             if(firstTimeBusinessLogicInitiated == 0)
             {
                 if(coreLoopyBusinessLogicInitiatedBySelf != NULL)
@@ -1402,6 +1421,9 @@ void start(int (*onConnectOneTimeOperations)(),
                  */
                 while(1)
                 {
+                    removeExpiredResultHandlers(c);
+                    removeExpiredOneToOneResponseHandlers(c);
+
                     countdown--;
                     startAndCountdownTimer(1, 0);
 
