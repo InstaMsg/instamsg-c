@@ -224,7 +224,7 @@ static void oneToOneMessageArrived(InstaMsg *c, MQTTMessage *msg)
     char peerMsgId[6];
     char responseMsgId[6];
 
-    info_log("One to one payload == [%s]", msg->payload);
+    info_log(ONE_TO_ONE " Payload == [%s]", msg->payload);
 
     peerMessage = (char*) sg_malloc(MAX_BUFFER_SIZE);
     if(peerMessage == NULL)
@@ -763,6 +763,11 @@ exit:
 
 static void checkAndRemoveExpiredHandler(int *msgId, unsigned int *timeout, const char *info)
 {
+    if(*msgId == 0)
+    {
+        return;
+    }
+
     if(*timeout <= 0)
     {
         info_log("No %s received for msgid [%u], removing..", info, *msgId);
@@ -771,7 +776,6 @@ static void checkAndRemoveExpiredHandler(int *msgId, unsigned int *timeout, cons
     else
     {
         *timeout = *timeout - 1;
-
     }
 }
 
