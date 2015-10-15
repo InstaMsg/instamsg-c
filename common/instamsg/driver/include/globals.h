@@ -36,14 +36,14 @@ struct KeyValuePairs
 
 #define SOCKET_READ     "[SOCKET-READ] "
 #define SOCKET_WRITE    "[SOCKET-WRITE] "
-#define ONE_TO_ONE      "[ONE-TO-ONE]"
+#define ONE_TO_ONE      "[ONE-TO-ONE] "
 
 #define SOCKET_NOT_AVAILABLE "Could not connect to the socket at physical-layer ... not retrying"
 #define MAX_CONN_ATTEMPTS_WITH_PHYSICAL_LAYER_FINE 5
 
 
 /****************************************************************************************/
-#if 1
+#if 0
 #define INSTAMSG_HOST       "test.ioeye.com"
 
 #ifdef SSL_ENABLED

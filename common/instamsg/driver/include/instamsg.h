@@ -147,6 +147,10 @@ int MQTTPublish(const char *topicName,
                 const char retain,
                 const char logging);
 
+int MQTTSend(const char* peer,
+             const char* payload,
+             void (*oneToOneResponseHandler)(OneToOneResult *),
+             unsigned int timeout);
 
 int MQTTSubscribe(const char *topicName,
                   const enum QoS qos,

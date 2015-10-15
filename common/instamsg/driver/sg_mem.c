@@ -5,9 +5,17 @@
 
 static unsigned long currentBytesUsed;
 
-uintptr_t sg_malloc(unsigned short numBytes)
+void* sg_malloc(unsigned short numBytes)
 {
+    static unsigned char oneCallDone = 0;
     void *mem = NULL;
+
+    if(oneCallDone == 0)
+    {
+        oneCallDone = 1;
+        currentBytesUsed = 0;
+    }
+
 
     if((currentBytesUsed + numBytes + HEADER_SIZE) > MAX_HEAP_SIZE)
     {
@@ -42,7 +50,7 @@ uintptr_t sg_malloc(unsigned short numBytes)
     debug_log(MEM_ALLOC "Current memory remaining in bytes = [%u]", MAX_HEAP_SIZE - currentBytesUsed);
 
 exit:
-    return ((uintptr_t) mem);
+    return mem;
 }
 
 

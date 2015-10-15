@@ -186,16 +186,16 @@ static int fireOneToOneHandlerAndRemove(InstaMsg *c, int msgId, OneToOneResult *
 }
 
 
-static void doMqttSendPublish(const char *topic, const char *message)
+static int doMqttSendPublish(const char *topic, const char *message)
 {
-    MQTTPublish(topic,
-                message,
-                QOS2,
-                0,
-                publishAckReceived,
-                MQTT_RESULT_HANDLER_TIMEOUT,
-                0,
-                1);
+    return MQTTPublish(topic,
+                       message,
+                       QOS2,
+                       0,
+                       publishAckReceived,
+                       MQTT_RESULT_HANDLER_TIMEOUT,
+                       0,
+                       1);
 }
 
 
@@ -205,7 +205,7 @@ static void MQTTReplyOneToOne(OneToOneResult *oneToOneResult, const char *replyM
     int id = getNextPacketId(c);
 
     memset(messageBuffer, 0, sizeof(messageBuffer));
-    sg_sprintf(messageBuffer, "\"message_id\": \"%u\", \"response_id\": \"%s\", \"reply_to\": \"%s\", \"body\": \"%s\", \"status\": 1",
+    sg_sprintf(messageBuffer, "{\"message_id\": \"%u\", \"response_id\": \"%s\", \"reply_to\": \"%s\", \"body\": \"%s\", \"status\": 1}",
                id,
                oneToOneResult->peerMsgId,
                c->clientIdComplete,
@@ -240,6 +240,7 @@ static void oneToOneMessageArrived(InstaMsg *c, MQTTMessage *msg)
     memset(peerMsgId, 0, sizeof(peerMsgId));
     getJsonKeyValueIfPresent(msg->payload, "message_id", peerMsgId);
 
+    info_log("Peer-Message = [%s], Peer = [%s], Peer-Message-Id = [%s]", peerMessage, peer, peerMsgId);
     if(strlen(peerMsgId) == 0)
     {
         error_log(ONE_TO_ONE "Peer-Message-Id not received ... not proceeding further");
@@ -1290,7 +1291,7 @@ exit:
 
 
 
-void MQTTSend(const char* peer,
+int MQTTSend(const char* peer,
               const char* payload,
               void (*oneToOneResponseHandler)(OneToOneResult *),
               unsigned int timeout)
@@ -1299,10 +1300,10 @@ void MQTTSend(const char* peer,
     int id = getNextPacketId(c);
 
     memset(messageBuffer, 0, sizeof(messageBuffer));
-    sg_sprintf(messageBuffer, "\"message_id\": \"%u\", \"reply_to\": \"%s\", \"body\": \"%s\"", id, c->clientIdComplete, payload);
+    sg_sprintf(messageBuffer, "{\"message_id\": \"%u\", \"reply_to\": \"%s\", \"body\": \"%s\"}", id, c->clientIdComplete, payload);
 
     attachOneToOneHandler(&instaMsg, id, timeout, oneToOneResponseHandler);
-    doMqttSendPublish(peer, messageBuffer);
+    return doMqttSendPublish(peer, messageBuffer);
 }
 
 
