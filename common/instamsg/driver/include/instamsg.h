@@ -103,12 +103,12 @@ struct InstaMsg {
         int msgId;
         unsigned int timeout;
         void (*fp) (OneToOneResult*);
-    } oneToOneHandlers[MAX_MESSAGE_HANDLERS];
+    } oneToOneResponseHandlers[MAX_MESSAGE_HANDLERS];
 
     void (*defaultMessageHandler) (MessageData*);
     int (*onConnectCallback)();
     int (*onDisconnectCallback)();
-    int (*oneToOneMessageReceivedCallback)();
+    int (*oneToOneMessageHandler)();
 
     char filesTopic[100];
     char rebootTopic[100];

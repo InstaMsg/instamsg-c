@@ -3,7 +3,7 @@
 
 static char TOPIC[100];
 
-static int oneToOneResponseReceivedHandler(OneToOneResult* result)
+static int oneToOneMessageHandler(OneToOneResult* result)
 {
     char *msg = (char*) sg_malloc(1000);
 
@@ -85,5 +85,5 @@ int main(int argc, char** argv)
 #endif  /* FILE_SYSTEM_INTERFACE_ENABLED */
     }
 
-    start(onConnectOneTimeOperations, NULL, oneToOneResponseReceivedHandler, NULL, 1);
+    start(onConnectOneTimeOperations, NULL, oneToOneMessageHandler, NULL, 1);
 }
