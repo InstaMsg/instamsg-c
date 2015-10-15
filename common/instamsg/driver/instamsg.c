@@ -75,6 +75,12 @@ exit:
 }
 
 
+static void oneToOneMessageArrived(InstaMsg *c, MQTTMessage *msg)
+{
+    info_log("One to one payload == [%s]", msg->payload);
+}
+
+
 static void publishQoS2CycleCompleted(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
     info_log("PUBCOMP received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
@@ -879,12 +885,12 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
 
             case PUBLISH:
             {
-                MQTTString topicPlusPayload;
+                MQTTString topicMQTTString;
                 MQTTMessage msg;
                 char *topicName;
 
                 if (MQTTDeserialize_publish(&(msg.fixedHeaderPlusMsgId),
-                                            &topicPlusPayload,
+                                            &topicMQTTString,
                                             (unsigned char**)&msg.payload,
                                             (int*)&msg.payloadlen,
                                             c->readbuf,
@@ -896,14 +902,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                 /*
                  * At this point, "msg.payload" contains the real-stuff that is passed from the peer ....
                  */
-                topicName = (char *)sg_malloc(MAX_BUFFER_SIZE);
-                if(topicName == NULL)
-                {
-                    error_log("Could not allocate memory for topic-name");
-                    goto exit;
-                }
-                memcpy(topicName, topicPlusPayload.lenstring.data, strlen(topicPlusPayload.lenstring.data) - strlen(msg.payload));
-
+                topicName = topicMQTTString.lenstring.data;
                 if(topicName != NULL)
                 {
                     if(strcmp(topicName, c->filesTopic) == 0)
@@ -918,14 +917,18 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                     {
                         rebootDevice();
                     }
+                    else if(strcmp(topicName, c->clientIdComplete) == 0)
+                    {
+                        oneToOneMessageArrived(c, &msg);
+                    }
                     else
                     {
-                        deliverMessageToSelf(c, &topicPlusPayload, &msg);
+                        deliverMessageToSelf(c, &topicMQTTString, &msg);
                     }
                 }
                 else
                 {
-                    deliverMessageToSelf(c, &topicPlusPayload, &msg);
+                    deliverMessageToSelf(c, &topicMQTTString, &msg);
                 }
 
                 sg_free(topicName);
