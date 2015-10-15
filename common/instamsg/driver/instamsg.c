@@ -19,6 +19,7 @@
 #include "./include/httpclient.h"
 #include "./include/json.h"
 #include "./include/sg_mem.h"
+#include "./include/sg_stdlib.h"
 #include "./include/socket.h"
 #include "./include/watchdog.h"
 #include "./include/misc.h"
@@ -26,6 +27,11 @@
 #include <string.h>
 
 #define NO_CLIENT_ID "NONE"
+
+static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
+{
+    info_log("[DEFAULT-PUBLISH-HANDLER] PUBACK received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
+}
 
 
 static void serverLoggingTopicMessageArrived(InstaMsg *c, MQTTMessage *msg)
@@ -75,10 +81,6 @@ exit:
 }
 
 
-static void oneToOneMessageArrived(InstaMsg *c, MQTTMessage *msg)
-{
-    info_log("One to one payload == [%s]", msg->payload);
-}
 
 
 static void publishQoS2CycleCompleted(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
@@ -138,6 +140,144 @@ static void fireResultHandlerAndRemove(InstaMsg *c, MQTTFixedHeaderPlusMsgId *fi
             break;
         }
     }
+}
+
+
+static void attachOneToOneHandler(InstaMsg *c, int msgId, unsigned int timeout, void (*oneToOneResponseHandler)(OneToOneResult *))
+{
+    int i;
+
+    if(oneToOneResponseHandler == NULL)
+    {
+        return;
+    }
+
+
+    for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
+    {
+        if (c->oneToOneHandlers[i].msgId == 0)
+        {
+            c->oneToOneHandlers[i].msgId = msgId;
+            c->oneToOneHandlers[i].timeout = timeout;
+            c->oneToOneHandlers[i].fp = oneToOneResponseHandler;
+
+            break;
+        }
+    }
+}
+
+
+static int fireOneToOneHandlerAndRemove(InstaMsg *c, int msgId, OneToOneResult *oneToOneResult)
+{
+    int i;
+
+    for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
+    {
+        if (c->oneToOneHandlers[i].msgId == msgId)
+        {
+            c->oneToOneHandlers[i].fp(oneToOneResult);
+            c->oneToOneHandlers[i].msgId = 0;
+
+            return SUCCESS;
+        }
+    }
+
+    return FAILURE;
+}
+
+
+static void doMqttSendPublish(const char *topic, const char *message)
+{
+    MQTTPublish(topic,
+                message,
+                QOS2,
+                0,
+                publishAckReceived,
+                MQTT_RESULT_HANDLER_TIMEOUT,
+                0,
+                1);
+}
+
+
+static void MQTTReplyOneToOne(OneToOneResult *oneToOneResult, const char *replyMessage)
+{
+    InstaMsg *c = &instaMsg;
+    int id = getNextPacketId(c);
+
+    memset(messageBuffer, 0, sizeof(messageBuffer));
+    sg_sprintf(messageBuffer, "\"message_id\": \"%u\", \"response_id\": \"%s\", \"reply_to\": \"%s\", \"body\": \"%s\", \"status\": 1",
+               id,
+               oneToOneResult->peerMsgId,
+               c->clientIdComplete,
+               replyMessage);
+
+    doMqttSendPublish(oneToOneResult->peer, messageBuffer);
+}
+
+
+static void oneToOneMessageArrived(InstaMsg *c, MQTTMessage *msg)
+{
+    char *peerMessage = NULL, *peer = NULL;
+    char peerMsgId[6];
+
+    info_log("One to one payload == [%s]", msg->payload);
+    peerMessage = (char*) sg_malloc(MAX_BUFFER_SIZE);
+    if(peerMessage == NULL)
+    {
+        error_log(ONE_TO_ONE "Could not allocate memory for message received from peer");
+        goto exit;
+    }
+    getJsonKeyValueIfPresent(msg->payload, "body", peerMessage);
+
+    peer = (char*) sg_malloc(50);
+    if(peer == NULL)
+    {
+        error_log(ONE_TO_ONE "Could not allocate memory for peer-value");
+        goto exit;
+    }
+    getJsonKeyValueIfPresent(msg->payload, "reply_to", peer);
+
+    memset(peerMsgId, 0, sizeof(peerMsgId));
+    getJsonKeyValueIfPresent(msg->payload, "message_id", peerMsgId);
+
+    if(strlen(peerMsgId) == 0)
+    {
+        error_log(ONE_TO_ONE "Peer-Message-Id not received ... not proceeding further");
+        goto exit;
+    }
+
+    {
+        OneToOneResult oneToOneResult;
+
+        oneToOneResult.succeeded = 1;
+        oneToOneResult.peerMsg = peerMessage;
+        oneToOneResult.peer = peer;
+        oneToOneResult.peerMsgId = sg_atoi(peerMsgId);
+        oneToOneResult.reply = &MQTTReplyOneToOne;
+
+        if(fireOneToOneHandlerAndRemove(c, sg_atoi(peerMsgId), &oneToOneResult) == FAILURE)
+        {
+            /*
+             * There was no local-handler.. try the global handler..
+             */
+            info_log(ONE_TO_ONE "No local-handler found for one-to-one .. trying with the global-handler");
+            if(c->oneToOneMessageCallback == NULL)
+            {
+                error_log(ONE_TO_ONE "No global-handler found for one-to-one :(");
+            }
+            else
+            {
+                c->oneToOneMessageCallback(oneToOneResult);
+            }
+        }
+    }
+
+exit:
+    if(peerMessage)
+        sg_free(peerMessage);
+
+    if(peer)
+        sg_free(peer);
 }
 
 
@@ -563,8 +703,7 @@ terminateFileUpload:
     /*
      * Send the acknowledgement, along with the ackStatus (success/failure).
      */
-    MQTTPublish(c,
-                replyTopic,
+    MQTTPublish(replyTopic,
                 ackMessage,
                 (msg->fixedHeaderPlusMsgId).fixedHeader.qos,
                 (msg->fixedHeaderPlusMsgId).fixedHeader.dup,
@@ -699,6 +838,9 @@ void initInstaMsg(InstaMsg* c,
 
         c->resultHandlers[i].msgId = 0;
         c->resultHandlers[i].timeout = 0;
+
+        c->oneToOneHandlers[i].msgId = 0;
+        c->oneToOneHandlers[i].timeout = 0;
     }
 
     c->defaultMessageHandler = NULL;
@@ -751,8 +893,7 @@ static void sendClientData(void (*func)(char *messageBuffer, int maxBufferLength
 
     if(strlen(messageBuffer) > 0)
     {
-        MQTTPublish(&instaMsg,
-                    topicName,
+        MQTTPublish(topicName,
                     messageBuffer,
                     QOS1,
                     0,
@@ -987,8 +1128,7 @@ void* MQTTConnect(void* arg)
 }
 
 
-int MQTTSubscribe(InstaMsg* c,
-                  const char* topicName,
+int MQTTSubscribe(const char* topicName,
                   const enum QoS qos,
                   messageHandler messageHandler,
                   void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
@@ -998,6 +1138,7 @@ int MQTTSubscribe(InstaMsg* c,
     int rc = FAILURE;
     int len = 0;
     int id;
+    InstaMsg *c = &instaMsg;
 
     MQTTString topic = MQTTString_initializer;
     topic.cstring = (char *)topicName;
@@ -1059,10 +1200,11 @@ exit:
 }
 
 
-int MQTTUnsubscribe(InstaMsg* c, const char* topicFilter)
+int MQTTUnsubscribe(const char* topicFilter)
 {
     int rc = FAILURE;
     int len = 0;
+    InstaMsg *c = &instaMsg;
 
     MQTTString topic = MQTTString_initializer;
     topic.cstring = (char *)topicFilter;
@@ -1079,8 +1221,7 @@ exit:
 }
 
 
-int MQTTPublish(InstaMsg* c,
-                const char* topicName,
+int MQTTPublish(const char* topicName,
                 const char* payload,
                 const enum QoS qos,
                 const char dup,
@@ -1092,6 +1233,7 @@ int MQTTPublish(InstaMsg* c,
     int rc = FAILURE;
     int len = 0;
     int id = -1;
+    InstaMsg *c = &instaMsg;
 
     MQTTString topic = MQTTString_initializer;
     topic.cstring = (char *)topicName;
@@ -1142,6 +1284,25 @@ exit:
     }
 
     return rc;
+}
+
+
+
+
+
+void MQTTSend(const char* peer,
+              const char* payload,
+              void (*oneToOneResponseHandler)(OneToOneResult *),
+              unsigned int timeout)
+{
+    InstaMsg *c = &instaMsg;
+    int id = getNextPacketId(c);
+
+    memset(messageBuffer, 0, sizeof(messageBuffer));
+    sg_sprintf(messageBuffer, "\"message_id\": \"%u\", \"reply_to\": \"%s\", \"body\": \"%s\"", id, c->clientIdComplete, payload);
+
+    attachOneToOneHandler(&instaMsg, id, timeout, oneToOneResponseHandler);
+    doMqttSendPublish(peer, messageBuffer);
 }
 
 

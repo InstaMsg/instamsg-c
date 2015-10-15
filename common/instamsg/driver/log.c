@@ -30,8 +30,7 @@ static char LOG_GLOBAL_BUFFER[MAX_BUFFER_SIZE];
                                                                                                         \
     if(instaMsg.serverLoggingEnabled == 1)                                                              \
     {                                                                                                   \
-        MQTTPublish(&instaMsg,                                                                          \
-                    instaMsg.serverLogsTopic,                                                           \
+        MQTTPublish(instaMsg.serverLogsTopic,                                                           \
                     LOG_GLOBAL_BUFFER,                                                                  \
                     QOS0,                                                                               \
                     0,                                                                                  \
@@ -61,8 +60,7 @@ static char LOG_GLOBAL_BUFFER[MAX_BUFFER_SIZE];
                                                                                                         \
     if(instaMsg.serverLoggingEnabled == 1)                                                              \
     {                                                                                                   \
-        MQTTPublish(&instaMsg,                                                                          \
-                    instaMsg.serverLogsTopic,                                                           \
+        MQTTPublish(instaMsg.serverLogsTopic,                                                           \
                     LOG_GLOBAL_BUFFER,                                                                  \
                     QOS0,                                                                               \
                     0,                                                                                  \

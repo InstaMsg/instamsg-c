@@ -16,8 +16,7 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
     counter++;
     sg_sprintf(buf, "Test %d", counter);
 
-    MQTTPublish(&instaMsg,
-                TOPIC,
+    MQTTPublish(TOPIC,
                 buf,
                 QOS2,
                 0,
@@ -39,8 +38,8 @@ int main(int argc, char** argv)
     strcpy(TOPIC, argv[1]);
 
     {
-        char *logFilePath = LOG_FILE_PATH;
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
+        char *logFilePath = LOG_FILE_PATH;
 
 #ifdef DEBUG_MODE
 

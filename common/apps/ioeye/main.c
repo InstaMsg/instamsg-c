@@ -19,8 +19,7 @@ Modbus singletonModbusInterface;
 
 static int publishMessage(const char *topicName, char *message)
 {
-    return MQTTPublish(&instaMsg,
-                       topicName,
+    return MQTTPublish(topicName,
                        message,
                        QOS1,
                        0,
