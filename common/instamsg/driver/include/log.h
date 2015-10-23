@@ -24,12 +24,30 @@ FileLogger fileLogger;
 #define INSTAMSG_LOG_LEVEL_DEBUG    3
 
 typedef int (*LOG_WRITE_FUNC)(void *logger_medium, unsigned char *buffer, int len);
+int currentLogLevel;
 
+
+/*
+ *********************************************************************************************************************
+ **************************************** PUBLIC APIs *****************************************************************
+ **********************************************************************************************************************
+ */
+
+/*
+ * Logging at INFO level.
+ */
 void info_log(char *fmt, ...);
+
+/*
+ * Logging at ERROR level.
+ */
 void error_log(char *fmt, ...);
+
+/*
+ * Logging at DEBUG level.
+ */
 void debug_log(char *fmt, ...);
 
-int currentLogLevel;
 
 
 #endif
