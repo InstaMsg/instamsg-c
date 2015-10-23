@@ -34,6 +34,7 @@
 
 typedef struct MQTTMessage MQTTMessage;
 typedef struct MessageData MessageData;
+typedef struct OneToOneResult OneToOneResult;
 typedef struct InstaMsg InstaMsg;
 
 
@@ -44,41 +45,6 @@ struct MQTTMessage
     size_t payloadlen;
 };
 
-
-struct MessageData
-{
-    InstaMsg *c;
-    MQTTMessage* message;
-    MQTTString* topicName;
-};
-
-
-typedef void (*messageHandler)(MessageData*);
-
-struct opts_struct
-{
-	int nodelimiter;
-	char* delimiter;
-	enum QoS qos;
-	char* host;
-	int port;
-	int showtopics;
-
-	int subscribe;
-	int publish;
-	char msg[100];
-    char *logFilePath;
-};
-
-typedef struct OneToOneResult OneToOneResult;
-struct OneToOneResult
-{
-    unsigned char succeeded;
-    char *peerMsg;
-    char *peer;
-    int peerMsgId;
-    void (*reply)(OneToOneResult *oneToOneResult, const char *replyMessage);
-};
 
 struct InstaMsg {
     unsigned int next_packetid;
@@ -135,49 +101,15 @@ struct InstaMsg {
 };
 
 InstaMsg instaMsg;
-
 void* MQTTConnect(void* arg);
 
-int MQTTPublish(const char *topicName,
-                const char *payload,
-                const enum QoS qos,
-                const char dup,
-                void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
-                unsigned int resultHandlerTimeout,
-                const char retain,
-                const char logging);
 
-int MQTTSend(const char* peer,
-             const char* payload,
-             void (*oneToOneResponseHandler)(OneToOneResult *),
-             unsigned int timeout);
-
-int MQTTSubscribe(const char *topicName,
-                  const enum QoS qos,
-                  messageHandler messageHandler,
-                  void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
-                  unsigned int resultHandlerTimeout,
-                  const char logging);
-
-int MQTTUnsubscribe (const char*);
-int MQTTDisconnect ();
-void setDefaultMessageHandler(InstaMsg*, messageHandler);
 
 void clearInstaMsg(InstaMsg *c);
 void initInstaMsg(InstaMsg* c,
                   int (*connectHandler)(),
                   int (*disconnectHandler)(),
                   int (*oneToOneMessageHandler)());
-
-
-typedef struct JSONParseStuff JSONParseStuff;
-struct JSONParseStuff
-{
-    const char *key;
-    void *value;
-    unsigned int mandatory;
-    unsigned char type;
-};
 
 
 #define SERVER_LOGGING  "[SERVER-LOGGING] "
@@ -195,5 +127,359 @@ void start(int (*onConnectOneTimeOperations)(),
            void (*coreLoopyBusinessLogicInitiatedBySelf)(),
            int businessLogicInterval);
 
-#define DefaultClient {0, 0, 0, 0, NULL, NULL, 0, 0, 0}
+int MQTTDisconnect ();
+
+
+
+
+
+
+
+/*
+ *********************************************************************************************************************
+ **************************************** PUBLIC APIs *****************************************************************
+ **********************************************************************************************************************
+ */
+
+
+/*
+ *
+ * topicName                            :
+ *
+ *      Topic on which the message should be published
+ *      FOR SUCCESSFUL PUBLISHING TO A TOPIC, THE TOPIC MUST BE IN THE "Pub Topics" LIST ON INSTAMSG-SERVER.
+ *
+ *
+ * payload                              :
+ *
+ *      Message-Content
+ *
+ *
+ * qos                                  :
+ *
+ *      One of QOS0, QOS1, QOS2.
+ *      Meanings of these levels as per the spec at http://public.dhe.ibm.com/software/dw/webservices/ws-mqtt/mqtt-v3r1.html
+ *
+ *
+ * dup                                  :
+ *
+ *      Either 0 or 1.
+ *      Meaning of this variable as per the spec at http://public.dhe.ibm.com/software/dw/webservices/ws-mqtt/mqtt-v3r1.html
+ *
+ *
+ * resultHandler                        :
+ *
+ *      Callback function-pointer.
+ *      Called when the message is published to the server, and the server responds with a PUBACK.
+ *
+ *      No effect for QOS0.
+ *
+ *
+ * resultHandlerTimeout                 :
+ *
+ *      Time for which "resultHandler" remains active.
+ *
+ *      If PUBACK is not received within this interval, "resultHandler" will be removed, and will never be called for the
+ *      message under consideration (even if PUBACK is received at some later stage > "resultHandlerTimeout" seconds).
+ *
+ *
+ * retain                               :
+ *
+ *      Either 0 or 1.
+ *      Meaning of this variable as per the spec at http://public.dhe.ibm.com/software/dw/webservices/ws-mqtt/mqtt-v3r1.html
+ *
+ *
+ * logging                              :
+ *
+ *      Either 0 or 1.
+ *      Specified whether logging should be done in the client-logger, about the progress of message bein published (or not !!!)
+ *
+ *      Highly recommended to have this value as 1, for easy tracking/debugging.
+ *
+ *
+ *
+ * Returns:
+ *
+ *      SUCCESS   :: If the publish-packet is successfully encoded AND sent over the wire to the InstaMsg-Server.
+ *      FAILURE   :: If any of the above steps fails.
+ *
+ *
+ *      Note that in case of FAILURE,
+ *
+ *      a)
+ *      The application MUST ""NOT"" do any socket-reinitialization (or anything related).
+ *      It will be handled autimatically by the InstaMsg-Driver code (as long as the device-implementor has implemented all
+ *      the InstaMsg-Kernel APIs in accordance with the requirements).
+ *
+ *      b)
+ *      It is the application's duty to re-send the message (if at all required), because there is no guarantee whether
+ *      the message reached the server or not.
+ *
+ *
+ * Kindly see
+ *
+ *                  common/apps/publisher/main.c
+ *
+ *      for simple (yet complete) example-usage.
+ *
+ */
+int MQTTPublish     (const char *topicName,
+                     const char *payload,
+                     const enum QoS qos,
+                     const char dup,
+                     void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
+                     unsigned int resultHandlerTimeout,
+                     const char retain,
+                     const char logging);
+
+
+
+
+
+
+/*
+ *
+ * peer                                 :
+ *
+ *      Peer-Id.
+ *
+ *      This value is equal to the client-id of the peer.
+ *      The client-id is generated by the InstaMsg-Server, and so the local-peer must have the exact client-id value of
+ *      the remote-peer.
+ *
+ *      FOR SUCCESSFUL SENDING TO THE PEER, THE PEER CLIENT-ID MUST BE LISTED AS ONE OF THE "Pub Topics" ON INSTAMSG-SERVER.
+ *
+ *
+ * payload                              :
+ *
+ *      Message-Content
+ *
+ *
+ * oneToOneResponseHandler              :
+ *
+ *      Callback function-pointer.
+ *      Called when the remote-peer has sent back a message to the local-peer.
+ *
+ *
+ * oneToOneResponseHandlerTimeout       :
+ *
+ *      Time for which "oneToOneResponseHandler" remains active.
+ *
+ *      If remote-peer does not respond within this interval, "oneToOneResponseHandler" will be removed, and will never be called
+ *      even if remote-peer sends something at some later stage > "oneToOneResponseHandlerTimeout" seconds).
+ *
+ *
+ *
+ * Returns:
+ *
+ *      SUCCESS   :: If the send-packet is successfully encoded AND sent over the wire to the InstaMsg-Server.
+ *      FAILURE   :: If any of the above steps fails.
+ *
+ *
+ *      Note that in case of FAILURE,
+ *
+ *      a)
+ *      The application MUST ""NOT"" do any socket-reinitialization (or anything related).
+ *      It will be handled autimatically by the InstaMsg-Driver code (as long as the device-implementor has implemented all
+ *      the InstaMsg-Kernel APIs in accordance with the requirements).
+ *
+ *      b)
+ *      It is the application's duty to re-send the message (if at all required), because there is no guarantee whether
+ *      the message reached the server or not.
+ *
+ *
+ * Kindly see
+ *
+ *                  common/apps/one_to_one_initiator/main.c
+ *                  common/apps/subscriber/main.c
+ *
+ *      for simple (yet complete) example-usage.
+ *
+ */
+int MQTTSend        (const char* peer,
+                     const char* payload,
+                     void (*oneToOneResponseHandler)(OneToOneResult *),
+                     unsigned int oneToOneResponseHandlerTimeout);
+
+
+
+
+
+
+/*
+ *
+ * topicName                            :
+ *
+ *      Topic on which client needs to subscribe.
+ *      FOR SUCCESSFUL SUBSCRIBING TO A TOPIC, THE TOPIC MUST BE IN THE "Sub Topics" LIST ON INSTAMSG-SERVER.
+ *
+ *
+ * qos                                  :
+ *
+ *      One of QOS0, QOS1, QOS2.
+ *      Meanings of these levels as per the spec at http://public.dhe.ibm.com/software/dw/webservices/ws-mqtt/mqtt-v3r1.html
+ *
+ *
+ * messageHandler                       :
+ *
+ *      Callback function-pointer.
+ *      Called whenever a message arrives on the subscribed-topic from InstaMsg-Server.
+ *
+ *
+ * resultHandler                        :
+ *
+ *      Callback function-pointer.
+ *      Called when the message is published to the server, and the server responds with a SUBACK.
+ *
+ *      No effect for QOS0.
+ *
+ *
+ * resultHandlerTimeout                 :
+ *
+ *      Time for which "resultHandler" remains active.
+ *
+ *      If SUBACK is not received within this interval, "resultHandler" will be removed, and will never be called for the
+ *      message under consideration (even if PUBACK is received at some later stage > "resultHandlerTimeout" seconds).
+ *
+ *
+ * logging                              :
+ *
+ *      Either 0 or 1.
+ *      Specified whether logging should be done in the client-logger, about the progress of message bein published (or not !!!)
+ *
+ *      Highly recommended to have this value as 1, for easy tracking/debugging.
+ *
+ *
+ *
+ * Returns:
+ *
+ *      SUCCESS   :: If the subscription-packet is successfully encoded AND sent over the wire to the InstaMsg-Server.
+ *      FAILURE   :: If any of the above steps fails.
+ *
+ *
+ *      Note that in case of FAILURE,
+ *
+ *      a)
+ *      The application MUST ""NOT"" do any socket-reinitialization (or anything related).
+ *      It will be handled autimatically by the InstaMsg-Driver code (as long as the device-implementor has implemented all
+ *      the InstaMsg-Kernel APIs in accordance with the requirements).
+ *
+ *      b)
+ *      It is the application's duty to re-send the message (if at all required), because there is no guarantee whether
+ *      the message reached the server or not.
+
+ *
+ *
+ * Kindly see
+ *
+ *                  common/apps/subscriber/main.c
+ *
+ *      for simple (yet complete) example-usage.
+ *
+ */
+int MQTTSubscribe   (const char *topicName,
+                     const enum QoS qos,
+                     void (*messageHandler)(MessageData *),
+                     void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
+                     unsigned int resultHandlerTimeout,
+                     const char logging);
+
+
+
+
+
+
+/*
+ * topicName                            :
+ *
+ *      The topic on which the client needs to unsubscribe.
+ *
+ *
+ * Returns:
+ *
+ *      SUCCESS   :: If the unsubscribe-packet is successfully encoded AND sent over the wire to the InstaMsg-Server.
+ *      FAILURE   :: If any of the above steps fails.
+ *
+ *
+ *      Note that in case of FAILURE,
+ *
+ *      a)
+ *      The application MUST ""NOT"" do any socket-reinitialization (or anything related).
+ *      It will be handled autimatically by the InstaMsg-Driver code (as long as the device-implementor has implemented all
+ *      the InstaMsg-Kernel APIs in accordance with the requirements).
+ *
+ *      b)
+ *      It is the application's duty to re-send the message (if at all required), because there is no guarantee whether
+ *      the message reached the server or not.
+
+ */
+int MQTTUnsubscribe (const char *topicName);
+
+
+
+
+
+
+/*
+ * Kindly see
+ *
+ *                  common/apps/subscriber/main.c
+ *
+ *      for simple (yet complete) example-usage.
+ *
+ */
+struct MessageData
+{
+    MQTTMessage* message;
+    MQTTString* topicName;
+};
+
+
+
+
+
+
+/*
+ */
+struct OneToOneResult
+{
+    /*
+     ************** NOT EXPECTED TO BE USED BY THE APPLICATION ******************************
+     */
+    char *peer;
+    int peerMsgId;
+
+
+    /*
+     ************** EXPECTED TO BE USED BY THE APPLICATION **********************************
+     */
+
+    /*
+     * Is one of 0, 1.
+     *
+     * 0 denotes that there was some error while fetching the response from peer.
+     * 1 denotes that the response was succesfully received.
+     */
+    unsigned char succeeded;
+
+    /*
+     * Peer-Message.
+     *
+     * Makes sense only if the value of "succeeded" is 1.
+     */
+    char *peerMsg;
+
+    /*
+     * Function-Pointer, to send a reply to the peer.
+     *
+     * Kindly see
+     *
+     *                  common/apps/one_to_one_initiator/main.c
+     *                  common/apps/subscriber/main.c
+     *
+     * for simple (yet complete) example-usage.
+     */
+    void (*reply)(OneToOneResult *oneToOneResult, const char *replyMessage);
+};
+
 #endif

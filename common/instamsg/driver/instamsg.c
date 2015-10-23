@@ -90,7 +90,6 @@ static void publishQoS2CycleCompleted(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusM
 
 
 static void NewMessageData(MessageData* md, InstaMsg *c, MQTTString* aTopicName, MQTTMessage* aMessgage) {
-    md->c = c;
     md->topicName = aTopicName;
     md->message = aMessgage;
 }
@@ -1177,7 +1176,7 @@ void* MQTTConnect(void* arg)
 
 int MQTTSubscribe(const char* topicName,
                   const enum QoS qos,
-                  messageHandler messageHandler,
+                  void (*messageHandler)(MessageData *),
                   void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
                   unsigned int resultHandlerTimeout,
                   const char logging)
