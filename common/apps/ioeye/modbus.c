@@ -1,4 +1,5 @@
 #include "./include/modbus.h"
+#include "./include/globals.h"
 #include "./include/hex.h"
 
 #include "../../instamsg/driver/include/log.h"
@@ -6,8 +7,6 @@
 
 #include <string.h>
 
-
-#define MODBUS_ERROR "[MODBUS_ERROR] "
 
 void init_modbus(Modbus *modbus, void *arg)
 {

@@ -98,7 +98,7 @@ static void addXMLFieldsInPayload(char *messageBuffer,
 }
 
 
-static void coreLoopyBusinessLogicInitiatedBySelf()
+static void processModbusCommand(char *commandHexString)
 {
     int rc;
     int i;
@@ -120,7 +120,6 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
 
     {
         int prefixStartIndex, prefixEndIndex;
-        char *commandHexString = "03030064000A85F0";
 
         unsigned long responseLength = getExpectedModbusResponseLength(commandHexString);
         if(responseLength == FAILURE)
@@ -138,6 +137,7 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
             goto exit;
         }
 
+        info_log("Processing modbus-command [%s]", commandHexString);
         RESET_GLOBAL_BUFFER;
         getByteStreamFromHexString(commandHexString, GLOBAL_BUFFER);
 
@@ -220,6 +220,33 @@ exit:
     if(responseByteBuffer)
         sg_free(responseByteBuffer);
 
+}
+
+
+static void coreLoopyBusinessLogicInitiatedBySelf()
+{
+    char *modbusCommandsFromAPI = "03030064000A85F0,03050064000A85F0,03020064000A85F0";
+    char *saveptr;
+    char *command;
+
+    char *modbusCommandStringMutable = (char*) sg_malloc(strlen(modbusCommandsFromAPI) + 1);
+    if(modbusCommandStringMutable == NULL)
+    {
+        error_log(MODBUS_ERROR "Could not allocate memory for modbus-commands-conversion to mutable stream");
+        goto exit;
+    }
+    strcpy(modbusCommandStringMutable, modbusCommandsFromAPI);
+
+    command = strtok_r(modbusCommandStringMutable, ",", &saveptr);
+    while(command != NULL)
+    {
+        processModbusCommand(command);
+        command = strtok_r(NULL, ",", &saveptr);
+    }
+
+exit:
+    if(modbusCommandStringMutable)
+        sg_free(modbusCommandStringMutable);
 }
 
 
