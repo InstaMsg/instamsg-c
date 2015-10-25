@@ -48,19 +48,20 @@ static int onConnectOneTimeOperations()
 
 int main(int argc, char** argv)
 {
-    if(argc < 2)
-    {
-        return 1;
-    }
-
     memset(TOPIC, 0, sizeof(TOPIC));
-    strcpy(TOPIC, argv[1]);
+    strcpy(TOPIC, "listener_topic");
 
     {
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
         char *logFilePath = LOG_FILE_PATH;
 
 #ifdef DEBUG_MODE
+
+        if(argc >= 2)
+        {
+            memset(TOPIC, 0, sizeof(TOPIC));
+            strcpy(TOPIC, argv[1]);
+        }
 
         if(argc >= 3)
         {
