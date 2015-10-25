@@ -102,7 +102,7 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
 {
     int rc;
     int i;
-    unsigned char *responseByteBuffer;
+    unsigned char *responseByteBuffer = NULL;
 
     /*
      * Now, start forming the payload ....
@@ -123,6 +123,12 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
         char *commandHexString = "03030064000A85F0";
 
         unsigned long responseLength = getExpectedModbusResponseLength(commandHexString);
+        if(responseLength == FAILURE)
+        {
+            error_log("Some problem occurred while processing modbus-command [%s]. Not continuing in this cycle", commandHexString);
+            goto exit;
+        }
+
         fillPrefixIndices(commandHexString, &prefixStartIndex, &prefixEndIndex);
 
         responseByteBuffer = (unsigned char*) sg_malloc(responseLength);
