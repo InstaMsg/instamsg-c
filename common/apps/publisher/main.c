@@ -12,7 +12,7 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
 {
     char buf[20] = {0};
 
-    static int counter;
+    static int counter = 0;
     counter++;
     sg_sprintf(buf, "Test %d", counter);
 
