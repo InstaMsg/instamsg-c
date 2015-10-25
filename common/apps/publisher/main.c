@@ -1,6 +1,7 @@
 #include "../../instamsg/driver/include/instamsg.h"
+#include "../utils/publisher_subscriber_init.h"
 
-static char TOPIC[100];
+char TOPIC[100];
 
 static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
@@ -29,43 +30,20 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
 
 int main(int argc, char** argv)
 {
-    memset(TOPIC, 0, sizeof(TOPIC));
-    strcpy(TOPIC, "listener_topic");
+    char *logFilePath = NULL;
 
-    {
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
-        char *logFilePath = LOG_FILE_PATH;
+    logFilePath = LOG_FILE_PATH;
+#else
+    logFilePath = NULL;
+#endif
 
-#ifdef DEBUG_MODE
+    /*
+     * This method is only for the test publisher/subscriber apps.
+     * For real-world apps, this method will not be needed.
+     */
+    init_publisher_subscriber_params(argc, argv, &logFilePath);
 
-        if(argc >= 2)
-        {
-            memset(TOPIC, 0, sizeof(TOPIC));
-            strcpy(TOPIC, argv[1]);
-        }
-
-        if(argc >= 3)
-        {
-            memset(USER_LOG_FILE_PATH, 0, sizeof(USER_LOG_FILE_PATH));
-            strcpy(USER_LOG_FILE_PATH, argv[2]);
-
-            logFilePath = USER_LOG_FILE_PATH;
-        }
-        if(argc >= 4)
-        {
-            memset(USER_DEVICE_UUID, 0, sizeof(USER_DEVICE_UUID));
-            strcpy(USER_DEVICE_UUID, argv[3]);
-        }
-#endif  /* DEBUG_MODE */
-
-        globalSystemInit(logFilePath);
-
-#else   /* FILE_SYSTEM_INTERFACE_ENABLED */
-
-        globalSystemInit(NULL);
-
-#endif  /* FILE_SYSTEM_INTERFACE_ENABLED */
-    }
-
+    globalSystemInit(logFilePath);
     start(NULL, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, 3);
 }
