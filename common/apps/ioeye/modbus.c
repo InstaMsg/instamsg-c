@@ -24,8 +24,26 @@ void release_modbus(Modbus *modbus)
 }
 
 
+/*
+ * Function-Codes being handled ::
+ *
+ *  FC 1:   11 01 0013 0025 0E84
+ *  FC 2:   11 02 00C4 0016 BAA9
+ *  FC 3:   11 02 00C4 0016 BAA9
+ *  FC 4:   11 04 0008 0001 B298
+ */
 static int validationCheck(char *commandNibbles)
 {
+    int i;
+    int rc = FAILURE;
+
+    unsigned char functionCodes[] = {
+                                        '1',
+                                        '2',
+                                        '3',
+                                        '4'
+                                    };
+
     int commandNibblesLength = strlen(commandNibbles);
     if(commandNibblesLength < 12)
     {
@@ -36,13 +54,27 @@ static int validationCheck(char *commandNibbles)
     /*
      * If the second byte (3rd and 4th nibbles) is not equal to 03 (reading-analog-registets), return -1
      */
-    if((commandNibbles[2] != '0') || (commandNibbles[3] != '3'))
+    if((commandNibbles[2] != '0'))
     {
-        error_log(MODBUS_ERROR "Modbus-Command Not for reading analog-registers [%c] [%c]", commandNibbles[2], commandNibbles[3]);
-        return FAILURE;
+        goto exit;
     }
 
-    return SUCCESS;
+    for(i = 0; i < sizeof(functionCodes); i++)
+    {
+        if(commandNibbles[3] == functionCodes[i])
+        {
+            rc = SUCCESS;
+            break;
+        }
+    }
+
+exit:
+    if(rc == FAILURE)
+    {
+        error_log(MODBUS_ERROR "Modbus-Command-Code not one of 01 02 03 04 [%c] [%c]", commandNibbles[2], commandNibbles[3]);
+    }
+
+    return rc;
 }
 
 
@@ -82,10 +114,6 @@ void fillPrefixIndices(char *commandNibbles, int *prefixStartIndex, int *prefixE
         *prefixStartIndex = *prefixEndIndex = -1;
     }
 
-    /*
-     * Sample command being handled so far ::
-     *  03 03 00 64 00 0A 85 F0
-     */
     *prefixStartIndex = 4;
     *prefixEndIndex = 7;
 }
