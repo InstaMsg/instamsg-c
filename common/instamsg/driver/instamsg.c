@@ -1388,11 +1388,6 @@ void start(int (*onConnectOneTimeOperations)(),
 
     while(1)
     {
-        if(c->connected == 1)
-        {
-            clearInstaMsg(c);
-        }
-
         initInstaMsg(c, onConnectOneTimeOperations, onDisconnect, oneToOneMessageReceivedHandler);
 
         RESET_GLOBAL_BUFFER;
