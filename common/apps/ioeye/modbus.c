@@ -71,7 +71,8 @@ static int validationCheck(char *commandNibbles)
 exit:
     if(rc == FAILURE)
     {
-        error_log(MODBUS_ERROR "Modbus-Command-Code not one of 01 02 03 04 [%c] [%c]", commandNibbles[2], commandNibbles[3]);
+        error_log(MODBUS_ERROR "Modbus-Command-Code [%c%c] not one of 01 02 03 04 in command [%s]",
+                               commandNibbles[2], commandNibbles[3], commandNibbles);
     }
 
     return rc;
