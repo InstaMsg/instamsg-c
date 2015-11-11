@@ -23,6 +23,7 @@
 #include "./include/socket.h"
 #include "./include/watchdog.h"
 #include "./include/misc.h"
+#include "./include/config.h"
 
 #include <string.h>
 
@@ -302,6 +303,13 @@ exit:
 
     if(peer)
         sg_free(peer);
+}
+
+
+static void handleConfigReceived(InstaMsg *c, MQTTMessage *msg)
+{
+    info_log(CONFIG "Received the config-payload [%s] from server", msg->payload);
+    process_config(msg->payload);
 }
 
 
@@ -847,13 +855,20 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
     memset(c->fileUploadUrl, 0, sizeof(c->fileUploadUrl));
     sg_sprintf(c->fileUploadUrl, "/api/beta/clients/%s/files", c->clientIdComplete);
 
+    memset(c->receiveConfigTopic, 0, sizeof(c->receiveConfigTopic));
+    sg_sprintf(c->receiveConfigTopic, "instamsg/clients/%s/config/serverToClient", c->clientIdComplete);
+
+
 
     info_log("\n\nThe special-topics value :: \n\n"
              "\r\nFILES_TOPIC = [%s],"
              "\r\nREBOOT_TOPIC = [%s],"
              "\r\nENABLE_SERVER_LOGGING_TOPIC = [%s],"
              "\r\nSERVER_LOGS_TOPIC = [%s],"
-             "\r\nFILE_UPLOAD_URL = [%s]\n", c->filesTopic, c->rebootTopic, c->enableServerLoggingTopic, c->serverLogsTopic, c->fileUploadUrl);
+             "\r\nFILE_UPLOAD_URL = [%s],"
+             "\r\nCONFIG_FROM_SERVER_TO_CLIENT = [%s]\n",
+             c->filesTopic, c->rebootTopic, c->enableServerLoggingTopic,
+             c->serverLogsTopic, c->fileUploadUrl, c->receiveConfigTopic);
 }
 
 
@@ -864,6 +879,8 @@ void initInstaMsg(InstaMsg* c,
 {
     int i;
 
+
+    init_config();
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
     init_file_system(&(c->singletonUtilityFs), "");
@@ -966,6 +983,18 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc)
         sendClientData(get_client_session_data, TOPIC_SESSION_DATA);
         sendClientData(get_client_metadata, TOPIC_METADATA);
         sendClientData(get_network_data, TOPIC_NETWORK_DATA);
+
+        add_editable_config(&pingRequestInterval,
+                            "PING_REQ_INTERVAL",
+                            CONFIG_INT,
+                            "180",
+                            "Keep-Alive Interval between Device and InstaMsg-Server");
+
+        add_editable_config(&compulsorySocketReadAfterMQTTPublishInterval,
+                            "COMPULSORY_SOCKET_READ_AFTER_MQTT_PUBLISH_INTERVAL",
+                            CONFIG_INT,
+                            "3",
+                            "This variable controls after how many MQTT-Publishes a compulsory socket-read is done. This prevents any socket-pverrun errors (particularly in hardcore embedded-devices");
 
         if(c->onConnectCallback != NULL)
         {
@@ -1076,6 +1105,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                 MQTTString topicMQTTString;
                 MQTTMessage msg;
                 char *topicName;
+                unsigned char memoryAllocatedSynamicaaly = 0;
 
                 if (MQTTDeserialize_publish(&(msg.fixedHeaderPlusMsgId),
                                             &topicMQTTString,
@@ -1091,6 +1121,26 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                  * At this point, "msg.payload" contains the real-stuff that is passed from the peer ....
                  */
                 topicName = topicMQTTString.lenstring.data;
+
+                /*
+                 * Sometimes, topic-name and payload are not separated by above algo.
+                 * So, do another check
+                 */
+                if(strstr(topicName, msg.payload) != NULL)
+                {
+                    topicName = (char*) sg_malloc(MAX_BUFFER_SIZE);
+                    if(topicName == NULL)
+                    {
+                        error_log("Could not allocate memory for topic");
+                        goto publish_exit;
+                    }
+                    else
+                    {
+                        memoryAllocatedSynamicaaly = 1;
+                        strncpy(topicName, topicMQTTString.lenstring.data, strlen(topicMQTTString.lenstring.data) - msg.payloadlen);
+                    }
+                }
+
                 if(topicName != NULL)
                 {
                     if(strcmp(topicName, c->filesTopic) == 0)
@@ -1109,6 +1159,10 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                     {
                         oneToOneMessageArrived(c, &msg);
                     }
+                    else if(strcmp(topicName, c->receiveConfigTopic) == 0)
+                    {
+                        handleConfigReceived(c, &msg);
+                    }
                     else
                     {
                         deliverMessageToSelf(c, &topicMQTTString, &msg);
@@ -1117,6 +1171,13 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                 else
                 {
                     deliverMessageToSelf(c, &topicMQTTString, &msg);
+                }
+
+publish_exit:
+                if(memoryAllocatedSynamicaaly == 1)
+                {
+                    if(topicName)
+                        sg_free(topicName);
                 }
 
                 break;
@@ -1276,6 +1337,7 @@ int MQTTPublish(const char* topicName,
                 const char retain,
                 const char logging)
 {
+    static unsigned int publishCount = 0;
     int rc = FAILURE;
     int len = 0;
     int id = -1;
@@ -1306,7 +1368,13 @@ int MQTTPublish(const char* topicName,
     if (len <= 0)
         goto exit;
     if ((rc = sendPacket(c, GLOBAL_BUFFER, len)) != SUCCESS) /* send the subscribe packet */
+    {
         goto exit; /* there was a problem */
+    }
+    else
+    {
+        publishCount++;
+    }
 
     if (qos == QOS1)
     {
@@ -1322,6 +1390,17 @@ exit:
         if(rc == SUCCESS)
         {
             info_log("Published successfully.\n");
+
+            if(compulsorySocketReadAfterMQTTPublishInterval != 0)
+            {
+                if((publishCount % compulsorySocketReadAfterMQTTPublishInterval) == 0)
+                {
+                    info_log("Doing out-of-order socket-read, as [%u] MQTT-Publishes have been done",
+                             compulsorySocketReadAfterMQTTPublishInterval);
+
+                    readAndProcessIncomingMQTTPacketsIfAny(c);
+                }
+            }
         }
         else
         {
@@ -1331,9 +1410,6 @@ exit:
 
     return rc;
 }
-
-
-
 
 
 int MQTTSend(const char* peer,
@@ -1379,12 +1455,16 @@ void start(int (*onConnectOneTimeOperations)(),
            void (*coreLoopyBusinessLogicInitiatedBySelf)(),
            int businessLogicInterval)
 {
-    unsigned char firstTimeBusinessLogicInitiated = 0;
-    int countdown = businessLogicInterval;
-    unsigned long nextSocketTick = getCurrentTick() + NETWORK_INFO_INTERVAL;
-    unsigned long nextPingReqTick = getCurrentTick() + PING_REQ_INTERVAL;
-
     InstaMsg *c = &instaMsg;
+
+    volatile unsigned long latestTick = getCurrentTick();
+    unsigned long nextSocketTick = latestTick + NETWORK_INFO_INTERVAL;
+    unsigned long nextPingReqTick = latestTick + pingRequestInterval;
+    unsigned long nextBusinessLogicTick = latestTick + businessLogicInterval;
+
+
+    pingRequestInterval = 0;
+    compulsorySocketReadAfterMQTTPublishInterval = 0;
 
     while(1)
     {
@@ -1406,17 +1486,7 @@ void start(int (*onConnectOneTimeOperations)(),
                 readAndProcessIncomingMQTTPacketsIfAny(c);
             }
 
-
-            if(firstTimeBusinessLogicInitiated == 0)
-            {
-                if(coreLoopyBusinessLogicInitiatedBySelf != NULL)
-                {
-                    coreLoopyBusinessLogicInitiatedBySelf(NULL);
-                }
-
-                firstTimeBusinessLogicInitiated = 1;
-            }
-            else
+            if(1)
             {
                 /*
                  * We ensure that the business-logic is initiated only after the interval, and do the intermediate
@@ -1427,11 +1497,11 @@ void start(int (*onConnectOneTimeOperations)(),
                     removeExpiredResultHandlers(c);
                     removeExpiredOneToOneResponseHandlers(c);
 
-                    countdown--;
                     startAndCountdownTimer(1, 0);
 
                     {
-                        volatile unsigned long latestTick = getCurrentTick();
+                        latestTick = getCurrentTick();
+
 
                         /*
                          * Send network-stats if time has arrived.
@@ -1441,7 +1511,7 @@ void start(int (*onConnectOneTimeOperations)(),
                             info_log("Time to send network-stats !!!");
                             sendClientData(get_network_data, TOPIC_NETWORK_DATA);
 
-                            nextSocketTick = getCurrentTick() + NETWORK_INFO_INTERVAL;
+                            nextSocketTick = latestTick + NETWORK_INFO_INTERVAL;
                         }
 
                         /*
@@ -1452,22 +1522,22 @@ void start(int (*onConnectOneTimeOperations)(),
                             info_log("Time to play ping-pong with server !!!\n");
                             sendPingReqToServer(c);
 
-                            nextPingReqTick = getCurrentTick() + PING_REQ_INTERVAL;
+                            nextPingReqTick = latestTick + pingRequestInterval;
                         }
-                    }
 
-                    if(countdown == 0)
-                    {
                         /*
                          * Time to run the business-logic !!
                          */
-                        if(coreLoopyBusinessLogicInitiatedBySelf != NULL)
+                        if(latestTick >= nextBusinessLogicTick)
                         {
-                            coreLoopyBusinessLogicInitiatedBySelf(NULL);
-                        }
+                            if(coreLoopyBusinessLogicInitiatedBySelf != NULL)
+                            {
+                                coreLoopyBusinessLogicInitiatedBySelf(NULL);
+                            }
 
-                        countdown = businessLogicInterval;
-                        break;
+                            nextBusinessLogicTick = latestTick + businessLogicInterval;
+                            break;
+                        }
                     }
                 }
             }

@@ -69,6 +69,7 @@ struct InstaMsg {
     char enableServerLoggingTopic[100];
     char serverLogsTopic[100];
     char fileUploadUrl[100];
+    char receiveConfigTopic[100];
 
     unsigned char serverLoggingEnabled;
 

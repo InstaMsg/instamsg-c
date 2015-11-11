@@ -22,6 +22,7 @@ SOURCES=`echo                                                                   
         common/instamsg/driver/sg_mem.c                                                         \
         common/instamsg/driver/sg_stdlib.c                                                      \
         common/instamsg/driver/socket.c                                                         \
+        common/instamsg/driver/config.c                                                         \
                                                                                                 \
         common/instamsg/mqtt/src/MQTTFormat.c                                                   \
         common/instamsg/mqtt/src/MQTTPacket.c                                                   \
@@ -38,6 +39,7 @@ SOURCES=`echo                                                                   
         device/${VENDOR}/instamsg/device_serial_logger.c                                        \
         device/${VENDOR}/instamsg/device_time.c                                                 \
         device/${VENDOR}/instamsg/device_watchdog.c                                             \
+        device/${VENDOR}/instamsg/device_config.c                                               \
         device/${VENDOR}/instamsg/device_misc.c                                                 `
 
 

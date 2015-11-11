@@ -32,12 +32,13 @@ FS_COMMUNICATION_IMPL="Y"
 
 # Device-specific extra source-files.
 #
-EXTRA_SOURCES=`echo   `
+EXTRA_SOURCES=`echo															\
+			  device/${VENDOR}/common/file_utils.c							`
 
 
 # Device-specific extra object-files that need to linked.
 #
-EXTRA_OBJECT_FILES=`echo   `
+EXTRA_OBJECT_FILES=`echo	`
 
 
 # Compile-cum-Link command for the platform.

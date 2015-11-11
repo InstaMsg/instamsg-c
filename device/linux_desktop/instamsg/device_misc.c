@@ -12,7 +12,6 @@
 void rebootDevice()
 {
     info_log("Rebooting the system.");
-    system("/sbin/reboot");
 }
 
 

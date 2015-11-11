@@ -97,9 +97,11 @@ unsigned char GLOBAL_BUFFER[MAX_BUFFER_SIZE];
 #define TOPIC_METADATA          "instamsg/client/metadata"
 #define TOPIC_SESSION_DATA      "instamsg/client/session"
 #define TOPIC_NETWORK_DATA      "instamsg/client/signalinfo"
+#define TOPIC_CONFIG_SEND       "instamsg/client/config/clientToServer"
 
 #define NETWORK_INFO_INTERVAL           300
-#define PING_REQ_INTERVAL               180
+int pingRequestInterval;
+int compulsorySocketReadAfterMQTTPublishInterval;
 
 char messageBuffer[2 * MAX_BUFFER_SIZE];
 

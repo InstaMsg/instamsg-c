@@ -257,7 +257,7 @@ int main(int argc, char** argv)
 #else
     globalSystemInit(NULL);
 #endif
-    init_data_logger_persistent_storage();
+    init_data_logger();
 
     start(onConnect, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, 60);
 }
