@@ -5,6 +5,8 @@
  *
  *******************************************************************************/
 
+#include "../../../common/instamsg/driver/include/globals.h"
+
 /*
  * This method initializes the Config-Interface for the device.
  */
@@ -23,6 +25,7 @@ void init_config()
  */
 int get_config_value_from_persistent_storage(const char *key, char *buffer, int maxBufferLength)
 {
+    return FAILURE;
 }
 
 
@@ -45,6 +48,7 @@ int get_config_value_from_persistent_storage(const char *key, char *buffer, int 
  */
 int save_config_value_on_persistent_storage(const char *key, const char *value)
 {
+    return FAILURE;
 }
 
 
@@ -58,4 +62,5 @@ int save_config_value_on_persistent_storage(const char *key, const char *value)
  */
 int delete_config_value_from_persistent_storage(const char *key)
 {
+    return FAILURE;
 }
