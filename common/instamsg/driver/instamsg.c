@@ -1049,13 +1049,13 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                                              c->readbuf,
                                              sizeof(c->readbuf)) == 1)
                 {
-                    handleConnOrProvAckGeneric(c, connack_rc);
                     if(connack_rc == 0x00)  /* Connection Accepted */
                     {
                         memcpy(c->clientIdComplete, msg.payload, msg.payloadlen);
                         info_log("Received client-id from server via PROVACK [%s]", c->clientIdComplete);
-
                         setValuesOfSpecialTopics(c);
+
+                        handleConnOrProvAckGeneric(c, connack_rc);
                     }
                 }
 
@@ -1390,7 +1390,6 @@ exit:
         if(rc == SUCCESS)
         {
             info_log("Published successfully.\n");
-
             if(compulsorySocketReadAfterMQTTPublishInterval != 0)
             {
                 if((publishCount % compulsorySocketReadAfterMQTTPublishInterval) == 0)
