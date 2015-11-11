@@ -984,17 +984,17 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc)
         sendClientData(get_client_metadata, TOPIC_METADATA);
         sendClientData(get_network_data, TOPIC_NETWORK_DATA);
 
-        add_editable_config(&pingRequestInterval,
-                            "PING_REQ_INTERVAL",
-                            CONFIG_INT,
-                            "180",
-                            "Keep-Alive Interval between Device and InstaMsg-Server");
+        registerEditableConfig(&pingRequestInterval,
+                               "PING_REQ_INTERVAL",
+                               CONFIG_INT,
+                               "180",
+                               "Keep-Alive Interval between Device and InstaMsg-Server");
 
-        add_editable_config(&compulsorySocketReadAfterMQTTPublishInterval,
-                            "COMPULSORY_SOCKET_READ_AFTER_MQTT_PUBLISH_INTERVAL",
-                            CONFIG_INT,
-                            "3",
-                            "This variable controls after how many MQTT-Publishes a compulsory socket-read is done. This prevents any socket-pverrun errors (particularly in hardcore embedded-devices");
+        registerEditableConfig(&compulsorySocketReadAfterMQTTPublishInterval,
+                               "COMPULSORY_SOCKET_READ_AFTER_MQTT_PUBLISH_INTERVAL",
+                               CONFIG_INT,
+                               "3",
+                               "This variable controls after how many MQTT-Publishes a compulsory socket-read is done. This prevents any socket-pverrun errors (particularly in hardcore embedded-devices");
 
         if(c->onConnectCallback != NULL)
         {

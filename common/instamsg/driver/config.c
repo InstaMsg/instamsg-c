@@ -50,11 +50,11 @@ exit:
 }
 
 
-void add_editable_config(void *var,
-                         const char *key,
-                         enum CONFIG_TYPE type,
-                         char *stringified_value,
-                         char *desc)
+void registerEditableConfig(void *var,
+                            const char *key,
+                            enum CONFIG_TYPE type,
+                            char *stringified_value,
+                            char *desc)
 {
     int rc = FAILURE;
 

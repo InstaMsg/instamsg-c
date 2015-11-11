@@ -25,11 +25,66 @@ int delete_config_value_from_persistent_storage(const char *key);
 void process_config(char *configJson);
 
 
-void add_editable_config(void *var,
-                         const char *key,
-                         enum CONFIG_TYPE type,
-                         char *stringified_value,
-                         char *desc);
+
+/*
+ *********************************************************************************************************************
+ **************************************** PUBLIC APIs *****************************************************************
+ **********************************************************************************************************************
+ */
+
+/*
+ * This method registers a configuration, which is then editable at the InstaMsg-Server.
+ * Once done, this configuration will be visible/editable in the "Configuration" tab on the Clients-page.
+ *
+ * The steps for editing and pushing the changed-configuration from server to device, are detailed in the
+ * "Configuration" tab.
+ *
+ *
+ * Register-Method-Explanation ::
+ * ===============================
+ *
+ *
+ * var                  :
+ *
+ *      Pointer to the variable, that will store the value.
+ *
+ *      Depending on whether the variable is of type INTEGER or STRING, the variable (to which the pointer is pointing)
+ *      must be of proper type.
+ *
+ *
+ * key                  :
+ *
+ *      String value, that will serve as the index to this config.
+ *
+ *
+ * type                 :
+ *
+ *      One of CONFIG_STRING or CONFIG_INT.
+ *
+ *
+ * stringified_value    :
+ *
+ *      For type of CONFIG_STRING, this will be a simple string.
+ *      For type of CONFIG_INT, this will be a stringified integer value.
+ *
+ *
+ * desc                 :
+ *
+ *      A bried description of what this configuration is for.
+ *
+ *
+ *
+ * Please see "static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc)" method in
+ *          common/instamsg/driver/instamsg.c
+ *
+ * for simple example on how to register an editable-configuration.
+ *
+ */
+void registerEditableConfig(void *var,
+                            const char *key,
+                            enum CONFIG_TYPE type,
+                            char *stringified_value,
+                            char *desc);
 
 
 #endif
