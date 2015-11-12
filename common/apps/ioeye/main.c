@@ -3,6 +3,7 @@
 #include "../../instamsg/driver/include/sg_mem.h"
 #include "../../instamsg/driver/include/watchdog.h"
 #include "../../instamsg/driver/include/misc.h"
+#include "../../instamsg/driver/include/config.h"
 
 #include "./include/globals.h"
 #include "./include/modbus.h"
@@ -14,6 +15,8 @@
 
 static char smallBuffer[MAX_BUFFER_SIZE / 2];
 static char watchdogAssistant[50];
+
+static char modbusCommands[MAX_BUFFER_SIZE];
 
 Modbus singletonModbusInterface;
 
@@ -32,7 +35,11 @@ static int publishMessage(const char *topicName, char *message)
 
 static int onConnect()
 {
-    init_modbus(&singletonModbusInterface, NULL);
+    registerEditableConfig(modbusCommands,
+                           "MODBUS_COMMANDS",
+                           CONFIG_STRING,
+                           "",
+                           "Comma-Separated List of Hexified-Modbus-Commands");
 
     /*
      * Also, try sending the records stored in the persistent-storage (if any).
@@ -225,28 +232,37 @@ exit:
 
 static void coreLoopyBusinessLogicInitiatedBySelf()
 {
-    char *modbusCommandsFromAPI = "03030064000A85F0,03050064000A85F0,03020064000A85F0";
     char *saveptr;
     char *command;
 
-    char *modbusCommandStringMutable = (char*) sg_malloc(strlen(modbusCommandsFromAPI) + 1);
-    if(modbusCommandStringMutable == NULL)
-    {
-        error_log(MODBUS_ERROR "Could not allocate memory for modbus-commands-conversion to mutable stream");
-        goto exit;
-    }
-    strcpy(modbusCommandStringMutable, modbusCommandsFromAPI);
+    char *temporaryCopy = NULL;
 
-    command = strtok_r(modbusCommandStringMutable, ",", &saveptr);
-    while(command != NULL)
+    if(strlen(modbusCommands) > 0)
     {
-        processModbusCommand(command);
-        command = strtok_r(NULL, ",", &saveptr);
+        temporaryCopy = (char*) sg_malloc(sizeof(modbusCommands) + 1);
+        if(temporaryCopy == NULL)
+        {
+            error_log(MODBUS_ERROR "Could not allocate temporary-memory for tokenizing modbus-commands");
+            goto exit;
+        }
+
+        strcpy(temporaryCopy, modbusCommands);
+
+        command = strtok_r(temporaryCopy, ",", &saveptr);
+        while(command != NULL)
+        {
+            processModbusCommand(command);
+            command = strtok_r(NULL, ",", &saveptr);
+        }
+    }
+    else
+    {
+        info_log(MODBUS_ERROR "No modbus-commands to execute !!!; please fill-in some commands on the InstaMsg-Server for this device");
     }
 
 exit:
-    if(modbusCommandStringMutable)
-        sg_free(modbusCommandStringMutable);
+    if(temporaryCopy)
+        sg_free(temporaryCopy);
 }
 
 
@@ -258,6 +274,9 @@ int main(int argc, char** argv)
     globalSystemInit(NULL);
 #endif
     init_data_logger();
+    init_modbus(&singletonModbusInterface, NULL);
+
+    memset(modbusCommands, 0, sizeof(modbusCommands));
 
     start(onConnect, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, 60);
 }
