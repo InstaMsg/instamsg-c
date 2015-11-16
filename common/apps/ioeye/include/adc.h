@@ -16,7 +16,7 @@ void release_adc(ADC *adc);
  *
  *      adc->read_value_sync
  */
-int adc_read_value_sync(ADC *adc, void *extra_args);
+int adc_read_value_sync(ADC *adc);
 
 
 /*
