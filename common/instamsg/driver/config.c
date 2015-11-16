@@ -101,8 +101,12 @@ void registerEditableConfig(void *var,
      */
     if(type == CONFIG_STRING)
     {
-        strcpy((char*)var, stringified_value);
-        info_log(CONFIG "Using value [%s] for key [%s] of type STRING", stringified_value, key);
+        char *destination_string = (char*) var;
+
+        strcpy(destination_string, stringified_value);
+        destination_string[strlen(stringified_value)] = 0;
+
+        info_log(CONFIG "Using value [%s] for key [%s] of type STRING", destination_string, key);
     }
     else
     {
