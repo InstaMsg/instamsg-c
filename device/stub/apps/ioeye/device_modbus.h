@@ -1,6 +1,8 @@
 #ifndef IOEYE_MODBUS
 #define IOEYE_MODBUS
 
+#include "../../../common/instamsg/driver/include/globals.h"
+
 typedef struct Modbus Modbus;
 
 struct Modbus
@@ -11,6 +13,8 @@ struct Modbus
                                                int commandBytesLength,
                                                unsigned char *responseByteBuffer,
                                                int responseBytesLength);
+
+    char modbusCommands[MAX_BUFFER_SIZE];
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
 
 
