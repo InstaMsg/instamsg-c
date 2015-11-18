@@ -1,10 +1,12 @@
 #include "../../instamsg/driver/include/instamsg.h"
 
 #include "./include/modbus.h"
+#include "./include/adc.h"
 #include "./include/data_logger.h"
 
 
 Modbus singletonModbusInterface;
+ADC singletonADCInterface;
 
 
 static int onConnect()
@@ -16,7 +18,16 @@ static int onConnect()
 
 static void coreLoopyBusinessLogicInitiatedBySelf()
 {
-    modbusProcedures(&singletonModbusInterface);
+    static int tick = 0;
+    tick++;
+
+    if((tick % 60) == 0)
+    {
+        tick = 0;
+        modbusProcedures(&singletonModbusInterface);
+    }
+
+    info_log("ADC value = [%u]", adc_read_value_sync(&singletonADCInterface));
 }
 
 
@@ -28,7 +39,12 @@ int main(int argc, char** argv)
     globalSystemInit(NULL);
 #endif
     init_data_logger();
+
     init_modbus(&singletonModbusInterface, NULL);
 
-    start(onConnect, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, 60);
+    singletonADCInterface.pins = GPIO_PIN_1;
+    singletonADCInterface.channel = ADC_CTL_CH2;
+    init_adc(&singletonADCInterface, NULL);
+
+    start(onConnect, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, 1);
 }

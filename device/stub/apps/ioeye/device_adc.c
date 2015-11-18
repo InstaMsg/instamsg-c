@@ -13,7 +13,7 @@ void connect_underlying_adc_medium_guaranteed(ADC *adc)
 /*
  * This method read the value from the ADC.
  */
-int adc_read_value_sync(ADC *adc)
+unsigned long adc_read_value_sync(ADC *adc)
 {
     return FAILURE;
 }
