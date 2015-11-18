@@ -1516,7 +1516,7 @@ void start(int (*onConnectOneTimeOperations)(),
                         /*
                          * Send PINGREQ, if time has arrived,
                          */
-                        if(latestTick >= nextPingReqTick)
+                        if((latestTick >= nextPingReqTick) && (pingRequestInterval != 0))
                         {
                             info_log("Time to play ping-pong with server !!!\n");
                             sendPingReqToServer(c);
