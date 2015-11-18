@@ -387,7 +387,7 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
         {
             numRetries--;
         }
-    } while((rc == SOCKET_READ_TIMEOUT) && (numRetries >= 0));
+    } while((rc == SOCKET_READ_TIMEOUT) && (numRetries > 0));
 
     /*
      * If at this point, we still had a socket-timeout, it means we really have nothing to read.
@@ -1461,6 +1461,7 @@ void start(int (*onConnectOneTimeOperations)(),
     unsigned long nextPingReqTick = latestTick + pingRequestInterval;
     unsigned long nextBusinessLogicTick = latestTick + businessLogicInterval;
 
+    unsigned char socketReadJustNow = 0;
 
     pingRequestInterval = 0;
     compulsorySocketReadAfterMQTTPublishInterval = 0;
@@ -1475,6 +1476,7 @@ void start(int (*onConnectOneTimeOperations)(),
 
         while(1)
         {
+            socketReadJustNow = 0;
 
             if((c->ipstack).socketCorrupted == 1)
             {
@@ -1483,6 +1485,7 @@ void start(int (*onConnectOneTimeOperations)(),
             else
             {
                 readAndProcessIncomingMQTTPacketsIfAny(c);
+                socketReadJustNow = 1;
             }
 
             if(1)
@@ -1496,7 +1499,14 @@ void start(int (*onConnectOneTimeOperations)(),
                     removeExpiredResultHandlers(c);
                     removeExpiredOneToOneResponseHandlers(c);
 
-                    startAndCountdownTimer(1, 0);
+                    if(socketReadJustNow == 0)
+                    {
+                        /*
+                         * Sleep only when the socket was not read in the current iteration.
+                         */
+                        startAndCountdownTimer(1, 0);
+                    }
+
 
                     {
                         latestTick = getCurrentTick();
@@ -1530,6 +1540,7 @@ void start(int (*onConnectOneTimeOperations)(),
                         if(latestTick >= nextBusinessLogicTick)
                         {
                             if(coreLoopyBusinessLogicInitiatedBySelf != NULL)
+
                             {
                                 coreLoopyBusinessLogicInitiatedBySelf(NULL);
                             }
