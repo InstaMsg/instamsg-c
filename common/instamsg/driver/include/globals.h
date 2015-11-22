@@ -111,11 +111,5 @@ char USER_LOG_FILE_PATH[MAX_BUFFER_SIZE];
 char USER_DEVICE_UUID[MAX_BUFFER_SIZE];
 #endif
 
-#ifdef sg_sprintf
-
-#else
-#define sg_sprintf DEFAULT_SPRINTF
-
-#endif
-
+#include "device_defines.h"
 #endif

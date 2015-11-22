@@ -232,7 +232,7 @@ static void oneToOneMessageArrived(InstaMsg *c, MQTTMessage *msg)
     char peerMsgId[6];
     char responseMsgId[6];
 
-    sg_sprintf(LOG_GLOBAL_BUFFER, ONE_TO_ONE " Payload == [%s]", msg->payload);
+    sg_sprintf(LOG_GLOBAL_BUFFER, ONE_TO_ONE " Payload == [%s]", (char*) (msg->payload));
     info_log(LOG_GLOBAL_BUFFER);
 
     peerMessage = (char*) sg_malloc(MAX_BUFFER_SIZE);
@@ -327,7 +327,7 @@ exit:
 
 static void handleConfigReceived(InstaMsg *c, MQTTMessage *msg)
 {
-    sg_sprintf(LOG_GLOBAL_BUFFER, CONFIG "Received the config-payload [%s] from server", msg->payload);
+    sg_sprintf(LOG_GLOBAL_BUFFER, CONFIG "Received the config-payload [%s] from server", (char*)(msg->payload));
     info_log(LOG_GLOBAL_BUFFER);
 
     process_config(msg->payload);
@@ -571,7 +571,8 @@ static int fireResultHandlerUsingMsgIdAsTheKey(InstaMsg *c)
 
 static void logJsonFailureMessageAndReturn(const char *key, MQTTMessage *msg)
 {
-    sg_sprintf(LOG_GLOBAL_BUFFER, FILE_TRANSFER "Could not find key [%s] in message-payload [%s] .. not proceeding further", key, msg->payload);
+    sg_sprintf(LOG_GLOBAL_BUFFER, FILE_TRANSFER "Could not find key [%s] in message-payload [%s] .. not proceeding further",
+               key, (char*) (msg->payload));
     error_log(LOG_GLOBAL_BUFFER);
 }
 

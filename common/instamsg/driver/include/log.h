@@ -5,7 +5,6 @@
 #include "./globals.h"
 
 #include "device_file_system.h"
-#include "device_defines.h"
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
 typedef struct FileLogger FileLogger;

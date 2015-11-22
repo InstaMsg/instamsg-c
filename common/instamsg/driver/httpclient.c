@@ -182,7 +182,7 @@ HTTPResponse downloadFile(const char *url,
     Socket socket;
     HTTPResponse response = {0};
 
-    unsigned long numBytes;
+    unsigned int numBytes;
 
 	init_socket(&socket, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
 
@@ -327,7 +327,7 @@ HTTPResponse uploadFile(const char *url,
 {
 
     int i = 0;
-    unsigned long numBytes = 0;
+    unsigned int numBytes = 0;
 
     Socket socket;
     HTTPResponse response = {0};
