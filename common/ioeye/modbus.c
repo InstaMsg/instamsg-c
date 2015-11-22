@@ -74,12 +74,16 @@ static void send_previously_unsent_modbus_data()
             /*
              * We got the record.
              */
-            info_log("Sending data that could not be sent sometime earlier");
+            sg_sprintf(LOG_GLOBAL_BUFFER, "Sending data that could not be sent sometime earlier");
+            info_log(LOG_GLOBAL_BUFFER);
 
             rc = publishMessage(TOPIC_WEBHOOK, messageBuffer);
             if(rc != SUCCESS)
             {
-                error_log("Since the data could not be sent to InstaMsg-Server, so not retrying sending data from persistent-storage");
+                sg_sprintf(LOG_GLOBAL_BUFFER,
+                          "Since the data could not be sent to InstaMsg-Server, so not retrying sending data from persistent-storage");
+                error_log(LOG_GLOBAL_BUFFER);
+
                 break;
             }
         }
@@ -88,7 +92,9 @@ static void send_previously_unsent_modbus_data()
             /*
              * We did not get any record.
              */
-            info_log("\n\nNo more pending-data to be sent from persistent-storage\n\n");
+            sg_sprintf(LOG_GLOBAL_BUFFER, "\n\nNo more pending-data to be sent from persistent-storage\n\n");
+            info_log(LOG_GLOBAL_BUFFER);
+
             break;
         }
     }
@@ -118,7 +124,9 @@ static int validationCheck(char *commandNibbles)
     int commandNibblesLength = strlen(commandNibbles);
     if(commandNibblesLength < 12)
     {
-        error_log(MODBUS_ERROR "Modbus-Command Length less than 12");
+        sg_sprintf(LOG_GLOBAL_BUFFER, MODBUS_ERROR "Modbus-Command Length less than 12");
+        error_log(LOG_GLOBAL_BUFFER);
+
         return FAILURE;
     }
 
@@ -142,8 +150,9 @@ static int validationCheck(char *commandNibbles)
 exit:
     if(rc == FAILURE)
     {
-        error_log(MODBUS_ERROR "Modbus-Command-Code [%c%c] not one of 01 02 03 04 in command [%s]",
+        sg_sprintf(LOG_GLOBAL_BUFFER, MODBUS_ERROR "Modbus-Command-Code [%c%c] not one of 01 02 03 04 in command [%s]",
                                commandNibbles[2], commandNibbles[3], commandNibbles);
+        error_log(LOG_GLOBAL_BUFFER);
     }
 
     return rc;
@@ -217,7 +226,10 @@ static void processModbusCommand(char *commandHexString, Modbus *modbus)
         unsigned long responseLength = getExpectedModbusResponseLength(commandHexString);
         if(responseLength == FAILURE)
         {
-            error_log("Some problem occurred while processing modbus-command [%s]. Not continuing in this cycle", commandHexString);
+            sg_sprintf(LOG_GLOBAL_BUFFER,
+                      "Some problem occurred while processing modbus-command [%s]. Not continuing in this cycle", commandHexString);
+            error_log(LOG_GLOBAL_BUFFER);
+
             goto exit;
         }
 
@@ -226,15 +238,20 @@ static void processModbusCommand(char *commandHexString, Modbus *modbus)
         responseByteBuffer = (unsigned char*) sg_malloc(responseLength);
         if(responseByteBuffer == NULL)
         {
-            error_log("Could not allocate memory for modbus-response-buffer :(");
+            sg_sprintf(LOG_GLOBAL_BUFFER, "Could not allocate memory for modbus-response-buffer :(");
+            error_log(LOG_GLOBAL_BUFFER);
+
             goto exit;
         }
 
-        info_log("Processing modbus-command [%s]", commandHexString);
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Processing modbus-command [%s]", commandHexString);
+        info_log(LOG_GLOBAL_BUFFER);
+
         RESET_GLOBAL_BUFFER;
         getByteStreamFromHexString(commandHexString, GLOBAL_BUFFER);
 
-        debug_log("Sending modbus-command [%s], and expecting response of [%u] bytes", commandHexString, responseLength);
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Sending modbus-command [%s], and expecting response of [%u] bytes", commandHexString, responseLength);
+        debug_log(LOG_GLOBAL_BUFFER);
 
         watchdog_reset_and_enable(10, "Getting-MODBUS-Response");
         rc = modbus->send_command_and_read_response_sync(modbus,
@@ -246,7 +263,9 @@ static void processModbusCommand(char *commandHexString, Modbus *modbus)
 
         if(rc != SUCCESS)
         {
-            error_log("Problem occured while fetching modbus-response... not proceeding further");
+            sg_sprintf(LOG_GLOBAL_BUFFER, "Problem occured while fetching modbus-response... not proceeding further");
+            error_log(LOG_GLOBAL_BUFFER);
+
             goto exit;
         }
 
@@ -277,7 +296,8 @@ static void processModbusCommand(char *commandHexString, Modbus *modbus)
             strcat((char*)GLOBAL_BUFFER, hex);
         }
 
-        debug_log("Modbus-Command [%s], Modbus-Response [%s]", commandHexString, (char*)GLOBAL_BUFFER);
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Modbus-Command [%s], Modbus-Response [%s]", commandHexString, (char*)GLOBAL_BUFFER);
+        debug_log(LOG_GLOBAL_BUFFER);
         strcat(messageBuffer, (char*) GLOBAL_BUFFER);
     }
 
@@ -290,7 +310,8 @@ static void processModbusCommand(char *commandHexString, Modbus *modbus)
 
     strcat(messageBuffer, "</rtu>");
 
-    debug_log("Sending device-data [%s]", messageBuffer);
+    sg_sprintf(LOG_GLOBAL_BUFFER, "Sending device-data [%s]", messageBuffer);
+    debug_log(LOG_GLOBAL_BUFFER);
 
     /*
      * The net-section can be used for testing the Flash-Memory Storage/Retrieval as and when required.
@@ -380,7 +401,9 @@ void modbusProcedures(Modbus *modbus)
         temporaryCopy = (char*) sg_malloc(sizeof(modbus->modbusCommands) + 1);
         if(temporaryCopy == NULL)
         {
-            error_log(MODBUS_ERROR "Could not allocate temporary-memory for tokenizing modbus-commands");
+            sg_sprintf(LOG_GLOBAL_BUFFER, MODBUS_ERROR "Could not allocate temporary-memory for tokenizing modbus-commands");
+            error_log(LOG_GLOBAL_BUFFER);
+
             goto exit;
         }
 
@@ -395,7 +418,9 @@ void modbusProcedures(Modbus *modbus)
     }
     else
     {
-        info_log(MODBUS_ERROR "No modbus-commands to execute !!!; please fill-in some commands on the InstaMsg-Server for this device");
+        sg_sprintf(LOG_GLOBAL_BUFFER,
+                   MODBUS_ERROR "No modbus-commands to execute !!!; please fill-in some commands on the InstaMsg-Server for this device");
+        info_log(LOG_GLOBAL_BUFFER);
     }
 
 exit:

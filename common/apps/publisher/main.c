@@ -5,7 +5,8 @@ char TOPIC[100];
 
 static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
-    info_log("PUBACK received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
+    sg_sprintf(LOG_GLOBAL_BUFFER, "PUBACK received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
+    info_log(LOG_GLOBAL_BUFFER);
 }
 
 

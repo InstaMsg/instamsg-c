@@ -29,7 +29,9 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port)
     memset(sms, 0, sizeof(sms));
     while(strlen(sms) == 0)
     {
-        info_log("\n\n\nProvisioning-SMS not available, retrying to fetch from storage area\n\n\n");
+        sg_sprintf(LOG_GLOBAL_BUFFER, "\n\n\nProvisioning-SMS not available, retrying to fetch from storage area\n\n\n");
+        info_log(LOG_GLOBAL_BUFFER);
+
         startAndCountdownTimer(5, 1);
 
         get_latest_sms_containing_substring(socket, sms, "\"sg_apn\":\"");
@@ -65,8 +67,10 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port)
     getJsonKeyValueIfPresent(sms, "sg_user", socket->gsmUser);
     getJsonKeyValueIfPresent(sms, "sg_pass", socket->gsmPass);
 
-    info_log("\n\nProvisioning-Params ::  sg_apn : [%s], sg_user : [%s], sg_pass : [%s]\n\n",
-             socket->gsmApn, socket->gsmUser, socket->gsmPass);
+    sg_sprintf(LOG_GLOBAL_BUFFER, "\n\nProvisioning-Params ::  sg_apn : [%s], sg_user : [%s], sg_pass : [%s]\n\n",
+               socket->gsmApn, socket->gsmUser, socket->gsmPass);
+    info_log(LOG_GLOBAL_BUFFER);
+
     startAndCountdownTimer(3, 0);
 #endif
 
@@ -79,6 +83,7 @@ void release_socket(Socket *socket)
 {
     release_underlying_socket_medium_guaranteed(socket);
 
-    info_log("COMPLETE [TCP-SOCKET] STRUCTURE, INCLUDING THE UNDERLYING MEDIUM CLEANED FOR HOST = [%s], PORT = [%d].",
+    sg_sprintf(LOG_GLOBAL_BUFFER, "COMPLETE [TCP-SOCKET] STRUCTURE, INCLUDING THE UNDERLYING MEDIUM CLEANED FOR HOST = [%s], PORT = [%d].",
              socket->host, socket->port);
+    info_log(LOG_GLOBAL_BUFFER);
 }

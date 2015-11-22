@@ -95,7 +95,9 @@ void connect_underlying_socket_medium_try_once(Socket* s)
 			    int opt = 1;
                 if(connect(s->socket, (struct sockaddr*)&address, sizeof(address)) != 0)
                 {
-                    info_log(SOCKET_NOT_AVAILABLE);
+                    sg_sprintf(LOG_GLOBAL_BUFFER, SOCKET_NOT_AVAILABLE);
+                    info_log(LOG_GLOBAL_BUFFER);
+
                     startAndCountdownTimer(1, 0);
 
                     return;
@@ -115,8 +117,9 @@ void connect_underlying_socket_medium_try_once(Socket* s)
     /* Set timeout-limitation in the socket-receiving function */
     setsockopt(s->socket, SOL_SOCKET, SO_RCVTIMEO, (char *)&interval, sizeof(struct timeval));
 
-    info_log("TCP-SOCKET UNDERLYING_MEDIUM INITIATED FOR HOST = [%s], PORT = [%d].",
+    sg_sprintf(LOG_GLOBAL_BUFFER, "TCP-SOCKET UNDERLYING_MEDIUM INITIATED FOR HOST = [%s], PORT = [%d].",
              s->host, s->port);
+    info_log(LOG_GLOBAL_BUFFER);
 }
 
 
@@ -195,7 +198,9 @@ int socket_read(Socket* socket, unsigned char* buffer, int len, unsigned char gu
                  */
                 if(guaranteed == 1)
                 {
-                    debug_log(SOCKET_READ "Timeout occurred while waiting for data.. retrying");
+                    sg_sprintf(LOG_GLOBAL_BUFFER, SOCKET_READ "Timeout occurred while waiting for data.. retrying");
+                    debug_log(LOG_GLOBAL_BUFFER);
+
                     continue;
                 }
                 else
@@ -204,7 +209,9 @@ int socket_read(Socket* socket, unsigned char* buffer, int len, unsigned char gu
                      * WE have genuinely timed-out.
                      * Return this info, and let the calling-function take appropriate action.
                      */
-                    debug_log(SOCKET_READ "Timeout occurred while waiting for data.. NOT retrying");
+                    sg_sprintf(LOG_GLOBAL_BUFFER, SOCKET_READ "Timeout occurred while waiting for data.. NOT retrying");
+                    debug_log(LOG_GLOBAL_BUFFER);
+
                     return SOCKET_READ_TIMEOUT; /* Case c) */
                 }
             }
@@ -213,7 +220,9 @@ int socket_read(Socket* socket, unsigned char* buffer, int len, unsigned char gu
                 /*
                  * There was some error on the socket.
                  */
-                error_log(SOCKET_READ "Errno [%d] occurred while reading from socket", errBackup);
+                sg_sprintf(LOG_GLOBAL_BUFFER, SOCKET_READ "Errno [%d] occurred while reading from socket", errBackup);
+                error_log(LOG_GLOBAL_BUFFER);
+
                 return FAILURE; /* Case b) and e) */
             }
         }
@@ -235,7 +244,9 @@ int socket_read(Socket* socket, unsigned char* buffer, int len, unsigned char gu
         {
             if(errBackup != 0)
             {
-                error_log(SOCKET_READ "Errno [%d] occurred while reading from socket", errBackup);
+                sg_sprintf(LOG_GLOBAL_BUFFER, SOCKET_READ "Errno [%d] occurred while reading from socket", errBackup);
+                error_log(LOG_GLOBAL_BUFFER);
+
                 return FAILURE; /* Another leg of case b) and e) */
             }
             else
@@ -280,7 +291,9 @@ int socket_write(Socket* socket, unsigned char* buffer, int len)
 
         if(rc < 0)
         {
-            error_log(SOCKET_WRITE "Errno [%d] occurred while writing to socket", errno);
+            sg_sprintf(LOG_GLOBAL_BUFFER, SOCKET_WRITE "Errno [%d] occurred while writing to socket", errno);
+            error_log(LOG_GLOBAL_BUFFER);
+
             return FAILURE;
         }
 
@@ -301,7 +314,9 @@ int socket_write(Socket* socket, unsigned char* buffer, int len)
         {
             if(errBackup != 0)
             {
-                error_log(SOCKET_READ "Errno [%d] occurred while sending to socket", errBackup);
+                sg_sprintf(LOG_GLOBAL_BUFFER, SOCKET_READ "Errno [%d] occurred while sending to socket", errBackup);
+                error_log(LOG_GLOBAL_BUFFER);
+
                 return FAILURE;
             }
             else

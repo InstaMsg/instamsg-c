@@ -14,24 +14,17 @@
 #include "./include/log.h"
 #include "./include/globals.h"
 
-static char LOG_GLOBAL_BUFFER[MAX_BUFFER_SIZE];
+
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
-#define LOG_COMMON_CODE(level)                                                                          \
+#define LOG_COMMON_CODE(log, level)                                                                     \
                                                                                                         \
-    va_list argptr;                                                                                     \
-    memset(LOG_GLOBAL_BUFFER, 0, MAX_BUFFER_SIZE);                                                      \
-                                                                                                        \
-    va_start(argptr, fmt);                                                                              \
-    sg_varargs(LOG_GLOBAL_BUFFER, fmt, argptr);                                                         \
-    va_end(argptr);                                                                                     \
-                                                                                                        \
-    strcat(LOG_GLOBAL_BUFFER, "\r\n");                                                                  \
+    strcat(log, "\r\n");                                                                                \
                                                                                                         \
     if(instaMsg.serverLoggingEnabled == 1)                                                              \
     {                                                                                                   \
         MQTTPublish(instaMsg.serverLogsTopic,                                                           \
-                    LOG_GLOBAL_BUFFER,                                                                  \
+                    log,                                                                                \
                     QOS0,                                                                               \
                     0,                                                                                  \
                     NULL,                                                                               \
@@ -41,27 +34,19 @@ static char LOG_GLOBAL_BUFFER[MAX_BUFFER_SIZE];
     }                                                                                                   \
     else if(level <= currentLogLevel)                                                                   \
     {                                                                                                   \
-        serial_logger_write((unsigned char *)LOG_GLOBAL_BUFFER, strlen(LOG_GLOBAL_BUFFER));             \
-        fileLogger.fs.write(                                                                            \
-                &(fileLogger.fs),                                                                       \
-                (unsigned char *)LOG_GLOBAL_BUFFER, strlen(LOG_GLOBAL_BUFFER));                         \
-    }
+        serial_logger_write((unsigned char *)log, strlen(log));                                         \
+        fileLogger.fs.write(&(fileLogger.fs), (unsigned char *)log, strlen(log));                       \
+    }                                                                                                   \
+    memset(LOG_GLOBAL_BUFFER, 0, sizeof(LOG_GLOBAL_BUFFER));
 #else
-#define LOG_COMMON_CODE(level)                                                                          \
+#define LOG_COMMON_CODE(log, level)                                                                     \
                                                                                                         \
-    va_list argptr;                                                                                     \
-    memset(LOG_GLOBAL_BUFFER, 0, MAX_BUFFER_SIZE);                                                      \
-                                                                                                        \
-    va_start(argptr, fmt);                                                                              \
-    sg_varargs(LOG_GLOBAL_BUFFER, fmt, argptr);                                                         \
-    va_end(argptr);                                                                                     \
-                                                                                                        \
-    strcat(LOG_GLOBAL_BUFFER, "\r\n");                                                                  \
+    strcat(log, "\r\n");                                                                                \
                                                                                                         \
     if(instaMsg.serverLoggingEnabled == 1)                                                              \
     {                                                                                                   \
         MQTTPublish(instaMsg.serverLogsTopic,                                                           \
-                    LOG_GLOBAL_BUFFER,                                                                  \
+                    log,                                                                                \
                     QOS0,                                                                               \
                     0,                                                                                  \
                     NULL,                                                                               \
@@ -71,8 +56,9 @@ static char LOG_GLOBAL_BUFFER[MAX_BUFFER_SIZE];
     }                                                                                                   \
     else if(level <= currentLogLevel)                                                                   \
     {                                                                                                   \
-        serial_logger_write((unsigned char *)LOG_GLOBAL_BUFFER, strlen(LOG_GLOBAL_BUFFER));             \
-    }
+        serial_logger_write((unsigned char *)log, strlen(log));                                         \
+    }                                                                                                   \
+    memset(LOG_GLOBAL_BUFFER, 0, sizeof(LOG_GLOBAL_BUFFER));
 #endif
 
 
@@ -86,26 +72,26 @@ void init_file_logger(FileLogger *fileLogger, void *arg)
 
 void release_file_logger(FileLogger *fileLogger)
 {
-    info_log("FREEING [LOG] RESOURCES (FILE-BASED).\n");
+    sg_sprintf(LOG_GLOBAL_BUFFER"FREEING [LOG] RESOURCES (FILE-BASED).\n");
 
     release_file_system(&(fileLogger->fs));
 }
 #endif
 
 
-void info_log(char *fmt, ...)
+void info_log(char *log)
 {
-    LOG_COMMON_CODE(INSTAMSG_LOG_LEVEL_INFO)
+    LOG_COMMON_CODE(log, INSTAMSG_LOG_LEVEL_INFO)
 }
 
 
-void error_log(char *fmt, ...)
+void error_log(char *log)
 {
-    LOG_COMMON_CODE(INSTAMSG_LOG_LEVEL_ERROR)
+    LOG_COMMON_CODE(log, INSTAMSG_LOG_LEVEL_ERROR)
 }
 
 
-void debug_log(char *fmt, ...)
+void debug_log(char *log)
 {
-    LOG_COMMON_CODE(INSTAMSG_LOG_LEVEL_DEBUG)
+    LOG_COMMON_CODE(log, INSTAMSG_LOG_LEVEL_DEBUG)
 }

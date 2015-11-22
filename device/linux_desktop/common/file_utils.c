@@ -63,7 +63,8 @@ int appendLine(const char *filePath, char *buffer)
     }
     else
     {
-        error_log("Could not open file %s in append-mode", filePath);
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Could not open file %s in append-mode", filePath);
+        error_log(LOG_GLOBAL_BUFFER);
     }
 
     return rc;

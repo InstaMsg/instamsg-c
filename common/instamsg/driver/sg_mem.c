@@ -19,7 +19,9 @@ void* sg_malloc(unsigned short numBytes)
 
     if((currentBytesUsed + numBytes + HEADER_SIZE) > MAX_HEAP_SIZE)
     {
-        error_log(MEM_ALLOC "Cannot allocate [%u] bytes of memory.", numBytes);
+        sg_sprintf(LOG_GLOBAL_BUFFER, MEM_ALLOC "Cannot allocate [%u] bytes of memory.", numBytes);
+        error_log(LOG_GLOBAL_BUFFER);
+
         goto exit;
     }
 
@@ -47,7 +49,9 @@ void* sg_malloc(unsigned short numBytes)
      * Set the global counter, to keep track of the area to be used for next memory-allocation.
      */
     currentBytesUsed = currentBytesUsed + numBytes;
-    debug_log(MEM_ALLOC "Current memory remaining in bytes = [%u]", MAX_HEAP_SIZE - currentBytesUsed);
+
+    sg_sprintf(LOG_GLOBAL_BUFFER, MEM_ALLOC "Current memory remaining in bytes = [%u]", MAX_HEAP_SIZE - currentBytesUsed);
+    debug_log(LOG_GLOBAL_BUFFER);
 
 exit:
     return mem;

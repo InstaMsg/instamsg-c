@@ -2,6 +2,7 @@
 #define INSTAMSG_LOGGER
 
 #include "./serial_logger.h"
+#include "./globals.h"
 #include "device_file_system.h"
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
@@ -26,6 +27,7 @@ FileLogger fileLogger;
 typedef int (*LOG_WRITE_FUNC)(void *logger_medium, unsigned char *buffer, int len);
 int currentLogLevel;
 
+char LOG_GLOBAL_BUFFER[MAX_BUFFER_SIZE];
 
 /*
  *********************************************************************************************************************
@@ -36,17 +38,17 @@ int currentLogLevel;
 /*
  * Logging at INFO level.
  */
-void info_log(char *fmt, ...);
+void info_log(char *log);
 
 /*
  * Logging at ERROR level.
  */
-void error_log(char *fmt, ...);
+void error_log(char *log);
 
 /*
  * Logging at DEBUG level.
  */
-void debug_log(char *fmt, ...);
+void debug_log(char *log);
 
 
 

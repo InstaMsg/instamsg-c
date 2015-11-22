@@ -8,12 +8,15 @@ static int oneToOneMessageHandler(OneToOneResult* result)
 {
     char *msg = (char*) sg_malloc(1000);
 
-    info_log("Received [%s] from peer [%s]", result->peerMsg, result->peer);
+    sg_sprintf(LOG_GLOBAL_BUFFER, "Received [%s] from peer [%s]", result->peerMsg, result->peer);
+    info_log(LOG_GLOBAL_BUFFER);
+
     if(msg == NULL)
     {
-        error_log("Could not allocate memory for message :(");
-        return FAILURE;
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Could not allocate memory for message :(");
+        error_log(LOG_GLOBAL_BUFFER);
 
+        return FAILURE;
     }
 
     memset(msg, 0, 1000);
@@ -25,14 +28,17 @@ static int oneToOneMessageHandler(OneToOneResult* result)
 
 static void subscribeAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
-    info_log("SUBACK received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
+    sg_sprintf(LOG_GLOBAL_BUFFER, "SUBACK received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
+    info_log(LOG_GLOBAL_BUFFER);
 }
 
 
 static void messageArrived(MessageData* md)
 {
 	MQTTMessage* message = md->message;
-    info_log("%s", (char*)message->payload);
+
+    sg_sprintf(LOG_GLOBAL_BUFFER, "%s", (char*)message->payload);
+    info_log(LOG_GLOBAL_BUFFER);
 }
 
 

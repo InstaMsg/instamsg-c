@@ -28,7 +28,9 @@ void process_config(char *configJson)
     config_key = (char*) sg_malloc(sizeof(GLOBAL_BUFFER));
     if(config_key == NULL)
     {
-        error_log(CONFIG_ERROR "Could not allocate memory for config-key.");
+        sg_sprintf(LOG_GLOBAL_BUFFER, CONFIG_ERROR "Could not allocate memory for config-key.");
+        error_log(LOG_GLOBAL_BUFFER);
+
         goto exit;
     }
     getJsonKeyValueIfPresent(configJson, CONFIG_KEY_KEY, config_key);
@@ -76,7 +78,9 @@ void registerEditableConfig(void *var,
         stored_value = (char*) sg_malloc(MAX_BUFFER_SIZE);
         if(stored_value == NULL)
         {
-            error_log(CONFIG_ERROR "Could not allocate memory for stored_value");
+            sg_sprintf(LOG_GLOBAL_BUFFER, CONFIG_ERROR "Could not allocate memory for stored_value");
+            error_log(LOG_GLOBAL_BUFFER);
+
             goto exit;
         }
         getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, stored_value);
@@ -85,14 +89,17 @@ void registerEditableConfig(void *var,
         stored_desc = (char*) sg_malloc(MAX_BUFFER_SIZE);
         if(stored_desc == NULL)
         {
-            error_log(CONFIG_ERROR "Could not allocate memory for stored_desc");
+            sg_sprintf(LOG_GLOBAL_BUFFER, CONFIG_ERROR "Could not allocate memory for stored_desc");
+            error_log(LOG_GLOBAL_BUFFER);
+
             goto exit;
         }
         getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_DESCRIPTION_KEY, stored_desc);
         desc = stored_desc;
 
-        info_log(CONFIG "Default-config-values overridden by stored-values. Key = [%s], Value = [%s], Description = [%s]",
+        sg_sprintf(LOG_GLOBAL_BUFFER, CONFIG "Default-config-values overridden by stored-values. Key = [%s], Value = [%s], Description = [%s]",
                  key, stringified_value, desc);
+        info_log(LOG_GLOBAL_BUFFER);
     }
 
 
@@ -106,12 +113,15 @@ void registerEditableConfig(void *var,
         strcpy(destination_string, stringified_value);
         destination_string[strlen(stringified_value)] = 0;
 
-        info_log(CONFIG "Using value [%s] for key [%s] of type STRING", destination_string, key);
+        sg_sprintf(LOG_GLOBAL_BUFFER, CONFIG "Using value [%s] for key [%s] of type STRING", destination_string, key);
+        info_log(LOG_GLOBAL_BUFFER);
     }
     else
     {
         *((int*)var) = sg_atoi(stringified_value);
-        info_log(CONFIG "Using value [%d] for key [%s] of type INTEGER", *((int*)var), key);
+
+        sg_sprintf(LOG_GLOBAL_BUFFER, CONFIG "Using value [%d] for key [%s] of type INTEGER", *((int*)var), key);
+        info_log(LOG_GLOBAL_BUFFER);
     }
 
 

@@ -4,7 +4,8 @@ static char TOPIC[100];
 
 static void oneToOneResponseReceivedCallback(OneToOneResult* result)
 {
-    info_log("Received [%s] from peer [%s]", result->peerMsg, result->peer);
+    sg_sprintf(LOG_GLOBAL_BUFFER, "Received [%s] from peer [%s]", result->peerMsg, result->peer);
+    info_log(LOG_GLOBAL_BUFFER);
 }
 
 

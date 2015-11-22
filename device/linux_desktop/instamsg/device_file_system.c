@@ -104,7 +104,9 @@ void getFileListing(FileSystem *fs, char *buf, int maxValueLenAllowed, const cha
     pDir = opendir(directoryPath);
     if(pDir == NULL)
     {
-        error_log("Cannot open directory '%s'\n", directoryPath);
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Cannot open directory '%s'\n", directoryPath);
+        error_log(LOG_GLOBAL_BUFFER);
+
         return;
     }
 

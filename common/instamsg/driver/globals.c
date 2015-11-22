@@ -432,7 +432,8 @@ void startAndCountdownTimer(int seconds, unsigned char showRunningStatus)
     {
         if(showRunningStatus == 1)
         {
-            info_log("[%u]", seconds - i);
+            sg_sprintf(LOG_GLOBAL_BUFFER, "[%u]", seconds - i);
+            info_log(LOG_GLOBAL_BUFFER);
         }
 
         for(j = 0; j < cycles; j++)

@@ -23,7 +23,9 @@ void getJsonKeyValueIfPresent(char *json, const char *key, char *buf)
     parsedValueToken = (char *)sg_malloc(MAX_BUFFER_SIZE);
     if((parsedKeyToken == NULL) || (parsedValueToken == NULL))
     {
-        error_log("Could not allocate memory in getJsonKeyValueIfPresent");
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Could not allocate memory in getJsonKeyValueIfPresent");
+        error_log(LOG_GLOBAL_BUFFER);
+
         goto exit;
     }
 
@@ -69,7 +71,9 @@ void getJsonKeyValueIfPresent(char *json, const char *key, char *buf)
                 {
                     strcat(buf, parsedValueToken);
 
-                    debug_log("Found key [%s] and value [%s] in json [%s]", parsedKeyToken, buf, jsonStartingPointer);
+                    sg_sprintf(LOG_GLOBAL_BUFFER, "Found key [%s] and value [%s] in json [%s]", parsedKeyToken, buf, jsonStartingPointer);
+                    debug_log(LOG_GLOBAL_BUFFER);
+
                     goto exit;
                 }
 
