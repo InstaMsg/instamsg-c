@@ -29,14 +29,7 @@ FileLogger fileLogger;
 typedef int (*LOG_WRITE_FUNC)(void *logger_medium, unsigned char *buffer, int len);
 int currentLogLevel;
 
-char LOG_GLOBAL_BUFFER[MAX_BUFFER_SIZE];
 
-#ifdef sg_sprintf
-
-#else
-#define sg_sprintf DEFAULT_SPRINTF
-
-#endif
 
 /*
  *********************************************************************************************************************

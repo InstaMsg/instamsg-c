@@ -77,6 +77,8 @@ struct KeyValuePairs
 
 static const char * const g_pcHex = "0123456789abcdef";
 
+char LOG_GLOBAL_BUFFER[MAX_BUFFER_SIZE];
+
 #include <stdarg.h>
 void DEFAULT_SPRINTF(char *out, const char *format, ...);
 
@@ -107,6 +109,13 @@ char messageBuffer[2 * MAX_BUFFER_SIZE];
 #ifdef DEBUG_MODE
 char USER_LOG_FILE_PATH[MAX_BUFFER_SIZE];
 char USER_DEVICE_UUID[MAX_BUFFER_SIZE];
+#endif
+
+#ifdef sg_sprintf
+
+#else
+#define sg_sprintf DEFAULT_SPRINTF
+
 #endif
 
 #endif

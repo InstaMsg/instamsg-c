@@ -10,6 +10,7 @@
 
 #include "../../../common/instamsg/driver/include/config.h"
 #include "../../../common/instamsg/driver/include/globals.h"
+#include "../../../common/instamsg/driver/include/log.h"
 
 #define CONFIG_FILE_NAME "/home/sensegrow/config.txt"
 #define TEMP_FILE_NAME   "/home/sensegrow/temp"

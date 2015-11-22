@@ -1,9 +1,7 @@
 #include <signal.h>
 #include <string.h>
 
-#ifdef DEBUG_MODE
 #include "../../../../common/instamsg/driver/include/globals.h"
-#endif
 
 
 /*
