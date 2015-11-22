@@ -9,7 +9,7 @@
 #include <stdarg.h>
 
 
-void sg_varargs(char *out, const char *pcString, va_list vaArgP)
+static void sg_varargs(char *out, const char *pcString, va_list vaArgP)
 {
     unsigned long ulIdx, ulValue, ulPos, ulCount, ulBase, ulNeg, temp;
     char *pcStr, pcBuf[16], cFill;
@@ -410,7 +410,7 @@ convert:
 }
 
 
-void sg_sprintf(char *out, const char *format, ...)
+void DEFAULT_SPRINTF(char *out, const char *format, ...)
 {
     va_list argptr;
     va_start(argptr, format);

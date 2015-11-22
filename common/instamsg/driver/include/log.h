@@ -3,7 +3,9 @@
 
 #include "./serial_logger.h"
 #include "./globals.h"
+
 #include "device_file_system.h"
+#include "device_defines.h"
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
 typedef struct FileLogger FileLogger;
@@ -28,6 +30,13 @@ typedef int (*LOG_WRITE_FUNC)(void *logger_medium, unsigned char *buffer, int le
 int currentLogLevel;
 
 char LOG_GLOBAL_BUFFER[MAX_BUFFER_SIZE];
+
+#ifdef sg_sprintf
+
+#else
+#define sg_sprintf DEFAULT_SPRINTF
+
+#endif
 
 /*
  *********************************************************************************************************************

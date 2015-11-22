@@ -78,8 +78,7 @@ struct KeyValuePairs
 static const char * const g_pcHex = "0123456789abcdef";
 
 #include <stdarg.h>
-void sg_varargs(char *out, const char *pcString, va_list vaArgP);
-void sg_sprintf(char *out, const char *format, ...);
+void DEFAULT_SPRINTF(char *out, const char *format, ...);
 
 #define NO_TIMEOUT 0
 
