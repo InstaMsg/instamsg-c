@@ -84,7 +84,7 @@ struct InstaMsg {
     char clientIdMachine[MAX_CLIENT_ID_SIZE];
     char username[MAX_CLIENT_ID_SIZE];
 
-    char password[MAX_BUFFER_SIZE];
+    char password[MAX_CLIENT_ID_SIZE];
 
     unsigned char connected;
 };
