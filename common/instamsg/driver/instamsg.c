@@ -1201,6 +1201,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                     }
                     else if(strcmp(topicName, c->rebootTopic) == 0)
                     {
+                        info_log("Received REBOOT request from server.. rebooting !!!");
                         rebootDevice();
                     }
                     else if(strcmp(topicName, c->clientIdComplete) == 0)
