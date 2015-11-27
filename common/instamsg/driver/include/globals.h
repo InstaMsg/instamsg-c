@@ -3,7 +3,7 @@
 
 #define INSTAMSG_VERSION "1.0.0"
 
-#define MAX_BUFFER_SIZE 1000
+#include "device_defines.h"
 
 enum returnCode
 {
@@ -87,7 +87,6 @@ void DEFAULT_SPRINTF(char *out, const char *format, ...);
 void startAndCountdownTimer(int seconds, unsigned char showRunningStatus);
 void globalSystemInit(char *logFilePath);
 
-#define MAX_HEAP_SIZE (10 * 1024)
 #define MEM_ALLOC     "[MEM-ALLOC] "
 
 unsigned char GLOBAL_BUFFER[MAX_BUFFER_SIZE];
@@ -111,5 +110,4 @@ char USER_LOG_FILE_PATH[MAX_BUFFER_SIZE];
 char USER_DEVICE_UUID[MAX_BUFFER_SIZE];
 #endif
 
-#include "device_defines.h"
 #endif
