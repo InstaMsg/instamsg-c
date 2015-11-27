@@ -57,7 +57,7 @@ struct InstaMsg {
         int msgId;
         unsigned int timeout;
         void (*fp) (OneToOneResult*);
-    } oneToOneResponseHandlers[MAX_MESSAGE_HANDLERS];
+    } oneToOneHandlers[MAX_MESSAGE_HANDLERS];
 
     void (*defaultMessageHandler) (MessageData*);
     int (*onConnectCallback)();
@@ -98,7 +98,7 @@ void clearInstaMsg(InstaMsg *c);
 void initInstaMsg(InstaMsg* c,
                   int (*connectHandler)(),
                   int (*disconnectHandler)(),
-                  int (*oneToOneMessageHandler)());
+                  int (*oneToOneHandler)());
 
 
 #define SERVER_LOGGING  "[SERVER-LOGGING] "
@@ -112,7 +112,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c);
 void sendPingReqToServer(InstaMsg *c);
 void start(int (*onConnectOneTimeOperations)(),
            int (*onDisconnect)(),
-           int (*oneToOneMessageHandler)(OneToOneResult *),
+           int (*oneToOneHandler)(OneToOneResult *),
            void (*coreLoopyBusinessLogicInitiatedBySelf)(),
            int businessLogicInterval);
 
