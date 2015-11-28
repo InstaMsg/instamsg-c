@@ -355,6 +355,11 @@ exit:
 
 void init_modbus(Modbus *modbus, void *arg)
 {
+    static int interfaceNumber = 0;
+    interfaceNumber++;
+
+    modbus->interfaceNumber = interfaceNumber;
+
     /* Register the callback */
 	modbus->send_command_and_read_response_sync = modbus_send_command_and_read_response_sync;
 
@@ -373,11 +378,8 @@ void release_modbus(Modbus *modbus)
 
 void modbusOnConnectProcedures(Modbus *modbus)
 {
-    static unsigned int interfaceNumber = 0;
-    interfaceNumber++;
-
     memset(smallBuffer, 0, sizeof(smallBuffer));
-    sg_sprintf(smallBuffer, "MODBUS_COMMANDS_INTERFACE_%u", interfaceNumber);
+    sg_sprintf(smallBuffer, "MODBUS_COMMANDS_INTERFACE_%u", modbus->interfaceNumber);
 
     registerEditableConfig(modbus->modbusCommands,
                            smallBuffer,
