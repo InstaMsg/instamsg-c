@@ -244,18 +244,18 @@ int MQTTPublish     (const char *topicName,
  *      Message-Content
  *
  *
- * oneToOneResponseHandler              :
+ * oneToOneHandler                      :
  *
  *      Callback function-pointer.
  *      Called when the remote-peer has sent back a message to the local-peer.
  *
  *
- * oneToOneResponseHandlerTimeout       :
+ * oneToOneHandlerTimeout               :
  *
- *      Time for which "oneToOneResponseHandler" remains active.
+ *      Time for which "oneToOneHandler" remains active.
  *
- *      If remote-peer does not respond within this interval, "oneToOneResponseHandler" will be removed, and will never be called
- *      even if remote-peer sends something at some later stage > "oneToOneResponseHandlerTimeout" seconds).
+ *      If remote-peer does not respond within this interval, "oneToOneHandler" will be removed, and will never be called
+ *      even if remote-peer sends something at some later stage > "oneToOneHandlerTimeout" seconds).
  *
  *
  *
@@ -287,8 +287,8 @@ int MQTTPublish     (const char *topicName,
  */
 int MQTTSend        (const char* peer,
                      const char* payload,
-                     void (*oneToOneResponseHandler)(OneToOneResult *),
-                     unsigned int oneToOneResponseHandlerTimeout);
+                     void (*oneToOneHandler)(OneToOneResult *),
+                     unsigned int oneToOneHandlerTimeout);
 
 
 
