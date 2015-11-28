@@ -110,11 +110,6 @@ void initInstaMsg(InstaMsg* c,
 
 void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c);
 void sendPingReqToServer(InstaMsg *c);
-void start(int (*onConnectOneTimeOperations)(),
-           int (*onDisconnect)(),
-           int (*oneToOneHandler)(OneToOneResult *),
-           void (*coreLoopyBusinessLogicInitiatedBySelf)(),
-           int businessLogicInterval);
 
 int MQTTDisconnect ();
 
@@ -470,5 +465,19 @@ struct OneToOneResult
      */
     void (*reply)(OneToOneResult *oneToOneResult, const char *replyMessage);
 };
+
+
+
+
+
+
+/*
+ * Starting-Method For Application
+ */
+void start(int (*onConnectOneTimeOperations)(),
+           int (*onDisconnect)(),
+           int (*oneToOneHandler)(OneToOneResult *),
+           void (*coreLoopyBusinessLogicInitiatedBySelf)(),
+           int businessLogicInterval);
 
 #endif
