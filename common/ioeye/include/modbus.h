@@ -8,8 +8,8 @@
  */
 void init_modbus(Modbus *modbus, void *arg);
 void release_modbus(Modbus *modbus);
-void modbusOnConnectProcedures();
-void modbusProcedures();
+void modbusOnConnectProcedures(Modbus *modbus);
+void modbusProcedures(Modbus *modbus);
 
 
 /*
