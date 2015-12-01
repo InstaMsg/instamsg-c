@@ -1,7 +1,5 @@
 #include <string.h>
 
-#include "device_modbus.h"
-
 int getIntValueOfHexChar(char c)
 {
     if((c == 'a') || (c == 'A'))
