@@ -200,28 +200,13 @@ static void fillPrefixIndices(char *commandNibbles, int *prefixStartIndex, int *
 }
 
 
-static void processModbusCommand(char *commandHexString, Modbus *modbus)
+static void fillModbusCommandResponseIntoMessageBuffer(char *messageBuffer, char *commandHexString, Modbus *modbus)
 {
     int rc;
-    int i;
     unsigned char *responseByteBuffer = NULL;
 
-    /*
-     * Now, start forming the payload ....
-     */
-    memset(messageBuffer, 0, sizeof(messageBuffer));
-    strcat(messageBuffer, "<rtu>");
-
-    addXMLFieldsInPayload(messageBuffer, "manufacturer", get_manufacturer);
-
-
-    /*
-     * Modbus-Response
-     */
-    strcat(messageBuffer, "<data><![CDATA[");
-
     {
-        int prefixStartIndex, prefixEndIndex;
+        int prefixStartIndex, prefixEndIndex, i;
 
         unsigned long responseLength = getExpectedModbusResponseLength(commandHexString);
         if(responseLength == FAILURE)
@@ -271,6 +256,12 @@ static void processModbusCommand(char *commandHexString, Modbus *modbus)
 
 
         /*
+         * Now, start filling the final modbus-response.
+         */
+        RESET_GLOBAL_BUFFER;
+
+
+        /*
          * Fill in the prefix;
          */
         for(i = prefixStartIndex; i <= prefixEndIndex; i++)
@@ -301,6 +292,30 @@ static void processModbusCommand(char *commandHexString, Modbus *modbus)
         strcat(messageBuffer, (char*) GLOBAL_BUFFER);
     }
 
+exit:
+    if(responseByteBuffer)
+        sg_free(responseByteBuffer);
+}
+
+
+static void processModbusCommand(char *commandHexString, Modbus *modbus)
+{
+    int rc;
+
+    /*
+     * Now, start forming the payload ....
+     */
+    memset(messageBuffer, 0, sizeof(messageBuffer));
+    strcat(messageBuffer, "<rtu>");
+
+    addXMLFieldsInPayload(messageBuffer, "manufacturer", get_manufacturer);
+
+
+    /*
+     * Modbus-Response
+     */
+    strcat(messageBuffer, "<data><![CDATA[");
+    fillModbusCommandResponseIntoMessageBuffer(messageBuffer, commandHexString, modbus);
     strcat(messageBuffer, "]]></data>");
 
 
@@ -328,12 +343,6 @@ static void processModbusCommand(char *commandHexString, Modbus *modbus)
          */
         save_record_to_persistent_storage(messageBuffer);
     }
-
-
-exit:
-    if(responseByteBuffer)
-        sg_free(responseByteBuffer);
-
 }
 
 
