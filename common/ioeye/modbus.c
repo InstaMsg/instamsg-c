@@ -124,9 +124,7 @@ static int validationCheck(char *commandNibbles)
     int commandNibblesLength = strlen(commandNibbles);
     if(commandNibblesLength < 12)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, MODBUS_ERROR "Modbus-Command Length less than 12");
-        error_log(LOG_GLOBAL_BUFFER);
-
+        error_log(MODBUS_ERROR "Modbus-Command Length less than 12");
         return FAILURE;
     }
 
@@ -197,6 +195,80 @@ static void fillPrefixIndices(char *commandNibbles, int *prefixStartIndex, int *
 
     *prefixStartIndex = 4;
     *prefixEndIndex = 7;
+}
+
+
+static void appendModbusCRC16(char *hexifiedModbusResponse, int maxLength)
+{
+    int i, pos;
+    int len = strlen(hexifiedModbusResponse);
+    unsigned int crc = 0xFFFF;
+
+
+    if((len + 5) >= maxLength)
+    {
+        error_log(MODBUS_ERROR "Not enough space to fill-in CRC .. returning back");
+        return;
+    }
+
+    sg_sprintf(LOG_GLOBAL_BUFFER, MODBUS "Hexified-Modbus-Response before adding CRC = %s", hexifiedModbusResponse);
+    debug_log(LOG_GLOBAL_BUFFER);
+
+    /*
+     * First calculate the integer-CRC-value.
+     */
+    for (pos = 0; pos < len; pos = pos + 2)
+    {
+        unsigned int byteValue = 0;
+        byteValue = byteValue + (16 * getIntValueOfHexChar(hexifiedModbusResponse[pos]));
+        byteValue = byteValue + (1  * getIntValueOfHexChar(hexifiedModbusResponse[pos + 1]));
+
+        crc ^= (unsigned int) byteValue;
+
+        for (i = 8; i != 0; i--)
+        {
+            if ((crc & 0x0001) != 0)
+            {
+                crc >>= 1;
+                crc ^= 0xA001;
+            }
+            else
+            {
+                crc >>= 1;
+            }
+        }
+    }
+
+    {
+        int i, j;
+        char hexCRC[4] = {0};
+        sg_sprintf(hexCRC, "%x", crc);
+
+        /*
+         * Add any padding if required.
+         */
+        for(i = 3, j = strlen(hexCRC) - 1; j >= 0; i--, j--)
+        {
+            hexCRC[i] = hexCRC[j];
+        }
+
+        for(; i >= 0; i--)
+        {
+            hexCRC[i] = '0';
+        }
+
+
+        /*
+         * Finally, add the CRC in modbus-response (lower-byte first).
+         */
+        hexifiedModbusResponse[len]     = hexCRC[2];
+        hexifiedModbusResponse[len + 1] = hexCRC[3];
+        hexifiedModbusResponse[len + 2] = hexCRC[0];
+        hexifiedModbusResponse[len + 3] = hexCRC[1];
+    }
+
+    sg_sprintf(LOG_GLOBAL_BUFFER, MODBUS "Hexified-Modbus-Response after  adding CRC = %s", hexifiedModbusResponse);
+    debug_log(LOG_GLOBAL_BUFFER);
 }
 
 

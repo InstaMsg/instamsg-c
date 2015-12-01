@@ -3,6 +3,7 @@
 
 #define TOPIC_WEBHOOK           "instamsg/webhook"
 
+#define MODBUS                  "[MODBUS] "
 #define MODBUS_ERROR            "[MODBUS_ERROR] "
 
 #endif
