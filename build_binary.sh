@@ -8,7 +8,7 @@ VENDOR=$2
 TOTAL_INCLUDES=`echo                                                                            \
         ${SYSTEM_INCLUDES}                                                                      \
         -Idevice/${VENDOR}/instamsg/                                                            \
-        -Idevice/${VENDOR}/apps/ioeye/                                                          \
+        -Idevice/${VENDOR}/ioeye/                                                               \
         -Icommon/instamsg/mqtt/                                                                 `
 
 

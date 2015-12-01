@@ -1,7 +1,7 @@
 #include <signal.h>
 #include <string.h>
 
-#include "../../../../common/instamsg/driver/include/globals.h"
+#include "../../../common/instamsg/driver/include/globals.h"
 
 
 /*

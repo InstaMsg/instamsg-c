@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../../../../common/instamsg/driver/include/globals.h"
+#include "../../../common/instamsg/driver/include/globals.h"
 
 void readLine(FILE *fp, char *buffer, int maxBufferLength)
 {
