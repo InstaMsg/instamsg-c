@@ -434,12 +434,10 @@ static void processModbusCommand(char *commandHexString, Modbus *modbus)
 
 
 
-void init_modbus(Modbus *modbus, void *arg)
+void init_modbus(Modbus *modbus, MODBUS_DEVICE_TYPE deviceType, const char *identifier)
 {
-    static int interfaceNumber = 0;
-    interfaceNumber++;
-
-    modbus->interfaceNumber = interfaceNumber;
+    modbus->deviceType = deviceType;
+    modbus->identifier = identifier;
 
     /* Register the callback */
 	modbus->send_command_and_read_response_sync = modbus_send_command_and_read_response_sync;
@@ -460,13 +458,19 @@ void release_modbus(Modbus *modbus)
 void modbusOnConnectProcedures(Modbus *modbus)
 {
     memset(smallBuffer, 0, sizeof(smallBuffer));
-    sg_sprintf(smallBuffer, "MODBUS_COMMANDS_INTERFACE_%u", modbus->interfaceNumber);
+    sg_sprintf(smallBuffer, "MODBUS_INTERFACE_%s", modbus->identifier);
 
-    registerEditableConfig(modbus->modbusCommands,
-                           smallBuffer,
-                           CONFIG_STRING,
-                           "",
-                           "Comma-Separated List of Hexified-Modbus-Commands");
+    if(modbus->deviceType == CLASSICAL)
+    {
+        registerEditableConfig(modbus->modbusCommands,
+                               smallBuffer,
+                               CONFIG_STRING,
+                               "",
+                               "Comma-Separated List of Hexified-Modbus-Commands");
+    }
+    else if(modbus->deviceType == SIMULATED)
+    {
+    }
 
     send_previously_unsent_modbus_data();
 }
@@ -474,36 +478,42 @@ void modbusOnConnectProcedures(Modbus *modbus)
 
 void modbusProcedures(Modbus *modbus)
 {
-    char *saveptr;
-    char *command;
-
     char *temporaryCopy = NULL;
 
-    if(strlen(modbus->modbusCommands) > 0)
+    if(modbus->deviceType == CLASSICAL)
     {
-        temporaryCopy = (char*) sg_malloc(sizeof(modbus->modbusCommands) + 1);
-        if(temporaryCopy == NULL)
-        {
-            sg_sprintf(LOG_GLOBAL_BUFFER, MODBUS_ERROR "Could not allocate temporary-memory for tokenizing modbus-commands");
-            error_log(LOG_GLOBAL_BUFFER);
+        char *saveptr;
+        char *command;
 
-            goto exit;
+        if(strlen(modbus->modbusCommands) > 0)
+        {
+            temporaryCopy = (char*) sg_malloc(sizeof(modbus->modbusCommands) + 1);
+            if(temporaryCopy == NULL)
+            {
+                sg_sprintf(LOG_GLOBAL_BUFFER, MODBUS_ERROR "Could not allocate temporary-memory for tokenizing modbus-commands");
+                error_log(LOG_GLOBAL_BUFFER);
+
+                goto exit;
+            }
+
+            strcpy(temporaryCopy, modbus->modbusCommands);
+
+            command = strtok_r(temporaryCopy, ",", &saveptr);
+            while(command != NULL)
+            {
+                processModbusCommand(command, modbus);
+                command = strtok_r(NULL, ",", &saveptr);
+            }
         }
-
-        strcpy(temporaryCopy, modbus->modbusCommands);
-
-        command = strtok_r(temporaryCopy, ",", &saveptr);
-        while(command != NULL)
+        else
         {
-            processModbusCommand(command, modbus);
-            command = strtok_r(NULL, ",", &saveptr);
+            sg_sprintf(LOG_GLOBAL_BUFFER,
+                       MODBUS_ERROR "No modbus-commands to execute !!!; please fill-in some commands on the InstaMsg-Server for this device");
+            info_log(LOG_GLOBAL_BUFFER);
         }
     }
-    else
+    else if(modbus->deviceType == SIMULATED)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER,
-                   MODBUS_ERROR "No modbus-commands to execute !!!; please fill-in some commands on the InstaMsg-Server for this device");
-        info_log(LOG_GLOBAL_BUFFER);
     }
 
 exit:

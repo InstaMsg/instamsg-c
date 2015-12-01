@@ -1,12 +1,14 @@
 #ifndef IOEYE_MODBUS_COMMON
 #define IOEYE_MODBUS_COMMON
 
+#include "./globals.h"
 #include "device_modbus.h"
+
 
 /*
  * Global-functions callable.
  */
-void init_modbus(Modbus *modbus, void *arg);
+void init_modbus(Modbus *modbus, MODBUS_DEVICE_TYPE deviceType, const char *identifier);
 void release_modbus(Modbus *modbus);
 void modbusOnConnectProcedures(Modbus *modbus);
 void modbusProcedures(Modbus *modbus);
