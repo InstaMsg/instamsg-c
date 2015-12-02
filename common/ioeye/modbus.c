@@ -17,6 +17,9 @@
 static char watchdogAssistant[50];
 static char smallBuffer[MAX_BUFFER_SIZE / 2];
 
+#define COMMAND_HEX_STRING_DONT_CARE    NULL
+#define PAYLOAD_DONT_CARE               -1
+
 
 static int publishMessage(const char *topicName, char *message)
 {
@@ -406,7 +409,7 @@ static void fillModbusCommandResponseIntoMessageBufferForSimulatedDevice(char *m
 }
 
 
-static void processModbusCommand(char *commandHexString, Modbus *modbus)
+static void processModbusCommand(char *commandHexString, short payloadValue, Modbus *modbus)
 {
     int rc;
 
@@ -423,7 +426,14 @@ static void processModbusCommand(char *commandHexString, Modbus *modbus)
      * Modbus-Response
      */
     strcat(messageBuffer, "<data><![CDATA[");
-    fillModbusCommandResponseIntoMessageBufferForClassicalDevice(messageBuffer, commandHexString, modbus);
+    if(modbus->deviceType == CLASSICAL)
+    {
+        fillModbusCommandResponseIntoMessageBufferForClassicalDevice(messageBuffer, commandHexString, modbus);
+    }
+    else if(modbus->deviceType == SIMULATED)
+    {
+        fillModbusCommandResponseIntoMessageBufferForSimulatedDevice(messageBuffer, payloadValue, modbus);
+    }
     strcat(messageBuffer, "]]></data>");
 
 
@@ -542,7 +552,7 @@ void modbusProcedures(Modbus *modbus)
             command = strtok_r(temporaryCopy, ",", &saveptr);
             while(command != NULL)
             {
-                processModbusCommand(command, modbus);
+                processModbusCommand(command, PAYLOAD_DONT_CARE, modbus);
                 command = strtok_r(NULL, ",", &saveptr);
             }
         }
