@@ -57,11 +57,11 @@ void getByteStreamFromHexString(const char *hexString, unsigned char *buffer)
 }
 
 
-void addPaddingIfRequired(char *buf, int len)
+void addPaddingIfRequired(char *buf, int size)
 {
     int i, j;
 
-    for(i = len - 1, j = strlen(buf) - 1; j >= 0; i--, j--)
+    for(i = size - 1, j = strlen(buf) - 1; j >= 0; i--, j--)
     {
         buf[i] = buf[j];
     }

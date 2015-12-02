@@ -240,9 +240,9 @@ static void appendModbusCRC16(char *hexifiedModbusResponse, int maxLength)
     }
 
     {
-        char hexCRC[4] = {0};
+        char hexCRC[5] = {0};
         sg_sprintf(hexCRC, "%x", crc);
-        addPaddingIfRequired(hexCRC, sizeof(hexCRC));
+        addPaddingIfRequired(hexCRC, sizeof(hexCRC) - 1);
 
 
         /*
@@ -259,7 +259,7 @@ static void appendModbusCRC16(char *hexifiedModbusResponse, int maxLength)
 }
 
 
-static void fillModbusCommandResponseIntoMessageBuffer(char *messageBuffer, char *commandHexString, Modbus *modbus)
+static void fillModbusCommandResponseIntoMessageBufferForClassicalDevice(char *messageBuffer, char *commandHexString, Modbus *modbus)
 {
     int rc;
     unsigned char *responseByteBuffer = NULL;
@@ -361,6 +361,51 @@ exit:
 }
 
 
+static void fillModbusCommandResponseIntoMessageBufferForSimulatedDevice(char *messageBuffer, short payloadValue, Modbus *modbus)
+{
+    {
+        /*
+         * Calculation of simulated-modbus response.
+         *
+         * ss   04  01  dddd  cccc
+         *
+         * (2) ss       :   slave-id
+         * (2) 04       :   (hardcoded) register-type
+         * (2) 01       :   (hardcoded) number of (simulated-)registers to be read
+         * (4) dddd     :   two-bytes for the (simulated-)register value.
+         * (4) cccc     :   two-byte checksum
+         */
+        RESET_GLOBAL_BUFFER;
+
+        strcat((char*)GLOBAL_BUFFER, modbus->simulatedSlaveId);
+        strcat((char*)GLOBAL_BUFFER, "04");
+        strcat((char*)GLOBAL_BUFFER, "01");
+
+        {
+            char payload[5] = {0};
+            sg_sprintf(payload, "%x", payloadValue);
+            addPaddingIfRequired(payload, sizeof(payload) - 1);
+
+            strcat((char*)GLOBAL_BUFFER, payload);
+        }
+
+        appendModbusCRC16((char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
+
+
+
+        /*
+         * Fill the prefix, containing the initial register-value.
+         */
+        strcat(messageBuffer, "0001");
+
+        /*
+         * Fill the simulated-modbus-response.
+         */
+        strcat(messageBuffer, (char*)GLOBAL_BUFFER);
+    }
+}
+
+
 static void processModbusCommand(char *commandHexString, Modbus *modbus)
 {
     int rc;
@@ -378,7 +423,7 @@ static void processModbusCommand(char *commandHexString, Modbus *modbus)
      * Modbus-Response
      */
     strcat(messageBuffer, "<data><![CDATA[");
-    fillModbusCommandResponseIntoMessageBuffer(messageBuffer, commandHexString, modbus);
+    fillModbusCommandResponseIntoMessageBufferForClassicalDevice(messageBuffer, commandHexString, modbus);
     strcat(messageBuffer, "]]></data>");
 
 
