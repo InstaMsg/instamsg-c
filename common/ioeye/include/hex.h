@@ -3,5 +3,6 @@
 
 int getIntValueOfHexChar(char c);
 void getByteStreamFromHexString(const char *hexString, unsigned char *buffer);
+void addPaddingIfRequired(char *buf, int len);
 
 #endif

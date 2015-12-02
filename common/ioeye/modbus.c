@@ -240,22 +240,9 @@ static void appendModbusCRC16(char *hexifiedModbusResponse, int maxLength)
     }
 
     {
-        int i, j;
         char hexCRC[4] = {0};
         sg_sprintf(hexCRC, "%x", crc);
-
-        /*
-         * Add any padding if required.
-         */
-        for(i = 3, j = strlen(hexCRC) - 1; j >= 0; i--, j--)
-        {
-            hexCRC[i] = hexCRC[j];
-        }
-
-        for(; i >= 0; i--)
-        {
-            hexCRC[i] = '0';
-        }
+        addPaddingIfRequired(hexCRC, sizeof(hexCRC));
 
 
         /*
@@ -361,6 +348,10 @@ static void fillModbusCommandResponseIntoMessageBuffer(char *messageBuffer, char
 
         sg_sprintf(LOG_GLOBAL_BUFFER, "Modbus-Command [%s], Modbus-Response [%s]", commandHexString, (char*)GLOBAL_BUFFER);
         debug_log(LOG_GLOBAL_BUFFER);
+
+        /*
+         * Finally, add the modbus-response field in the total-XMLized-response to be sent to the server.
+         */
         strcat(messageBuffer, (char*) GLOBAL_BUFFER);
     }
 
