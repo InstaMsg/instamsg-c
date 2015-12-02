@@ -2,6 +2,7 @@
 #include "./include/globals.h"
 #include "./include/log.h"
 #include "./include/json.h"
+#include "./include/watchdog.h"
 
 
 static char sms[200];
