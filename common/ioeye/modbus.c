@@ -442,7 +442,7 @@ void init_modbus(Modbus *modbus, MODBUS_DEVICE_TYPE deviceType, const char *iden
 	modbus->send_command_and_read_response_sync = modbus_send_command_and_read_response_sync;
 
     memset(modbus->modbusCommands, 0, sizeof(modbus->modbusCommands));
-    modbus->simulatedSlaveId = -1;
+    memset(modbus->simulatedSlaveId, 0, sizeof(modbus->simulatedSlaveId));
 
     connect_underlying_modbus_medium_guaranteed(modbus);
 }
@@ -470,10 +470,10 @@ void modbusOnConnectProcedures(Modbus *modbus)
     else if(modbus->deviceType == SIMULATED)
     {
         sg_sprintf(smallBuffer, "MODBUS_SIMULATED_INTERFACE_%s_SLAVE_ID", modbus->identifier);
-        registerEditableConfig(&(modbus->simulatedSlaveId),
+        registerEditableConfig(modbus->simulatedSlaveId,
                                smallBuffer,
-                               CONFIG_INT,
-                               "-1",
+                               CONFIG_STRING,
+                               "",
                                "Slave-Id. This id will be used while sending the modbus-response for this (simulated-modbus) device");
     }
 
@@ -520,7 +520,7 @@ void modbusProcedures(Modbus *modbus)
     }
     else if(modbus->deviceType == SIMULATED)
     {
-        if(modbus->simulatedSlaveId != -1)
+        if(strlen(modbus->simulatedSlaveId) > 0)
         {
         }
         else
