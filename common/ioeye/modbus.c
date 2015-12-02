@@ -366,6 +366,10 @@ exit:
 
 static void fillModbusCommandResponseIntoMessageBufferForSimulatedDevice(char *messageBuffer, short payloadValue, Modbus *modbus)
 {
+    sg_sprintf(LOG_GLOBAL_BUFFER, "Processing simulated-modbus-device [%s]", modbus->identifier);
+    info_log(LOG_GLOBAL_BUFFER);
+
+
     {
         /*
          * Calculation of simulated-modbus response.
