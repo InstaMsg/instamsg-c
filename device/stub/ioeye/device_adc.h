@@ -6,7 +6,7 @@ typedef struct ADC ADC;
 struct ADC
 {
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
-    int (*read_value_sync)(ADC *adc);
+    long (*read_value_sync)(ADC *adc);
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
 
 
