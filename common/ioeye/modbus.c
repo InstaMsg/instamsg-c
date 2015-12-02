@@ -439,11 +439,10 @@ void init_modbus(Modbus *modbus, MODBUS_DEVICE_TYPE deviceType, const char *iden
     modbus->deviceType = deviceType;
     modbus->identifier = identifier;
 
-    /* Register the callback */
 	modbus->send_command_and_read_response_sync = modbus_send_command_and_read_response_sync;
 
-    /* Zero-initialize the buffer */
     memset(modbus->modbusCommands, 0, sizeof(modbus->modbusCommands));
+    modbus->simulatedSlaveId = -1;
 
     connect_underlying_modbus_medium_guaranteed(modbus);
 }
@@ -458,10 +457,10 @@ void release_modbus(Modbus *modbus)
 void modbusOnConnectProcedures(Modbus *modbus)
 {
     memset(smallBuffer, 0, sizeof(smallBuffer));
-    sg_sprintf(smallBuffer, "MODBUS_INTERFACE_%s", modbus->identifier);
 
     if(modbus->deviceType == CLASSICAL)
     {
+        sg_sprintf(smallBuffer, "MODBUS_CLASSICAL_INTERFACE_%s_COMMANDS", modbus->identifier);
         registerEditableConfig(modbus->modbusCommands,
                                smallBuffer,
                                CONFIG_STRING,
@@ -470,6 +469,12 @@ void modbusOnConnectProcedures(Modbus *modbus)
     }
     else if(modbus->deviceType == SIMULATED)
     {
+        sg_sprintf(smallBuffer, "MODBUS_SIMULATED_INTERFACE_%s_SLAVE_ID", modbus->identifier);
+        registerEditableConfig(&(modbus->simulatedSlaveId),
+                               smallBuffer,
+                               CONFIG_INT,
+                               "-1",
+                               "Slave-Id. This id will be used while sending the modbus-response for this (simulated-modbus) device");
     }
 
     send_previously_unsent_modbus_data();
@@ -508,12 +513,23 @@ void modbusProcedures(Modbus *modbus)
         else
         {
             sg_sprintf(LOG_GLOBAL_BUFFER,
-                       MODBUS_ERROR "No modbus-commands to execute !!!; please fill-in some commands on the InstaMsg-Server for this device");
+                       MODBUS_ERROR "No modbus-commands to execute for classical-modbus-device [%s] !!!; "
+                       "please fill-in some commands on the InstaMsg-Server for this device", modbus->identifier);
             info_log(LOG_GLOBAL_BUFFER);
         }
     }
     else if(modbus->deviceType == SIMULATED)
     {
+        if(modbus->simulatedSlaveId != -1)
+        {
+        }
+        else
+        {
+            sg_sprintf(LOG_GLOBAL_BUFFER,
+                       MODBUS_ERROR "Slave-Id not specified for simulated-modbus device [%s] !!!; "
+                       "please fill-in the slave-id on the InstaMsg-Server for this device", modbus->identifier);
+            info_log(LOG_GLOBAL_BUFFER);
+        }
     }
 
 exit:

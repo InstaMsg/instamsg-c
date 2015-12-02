@@ -18,6 +18,7 @@ struct Modbus
                                                int responseBytesLength);
 
     char modbusCommands[MAX_BUFFER_SIZE];
+    int simulatedSlaveId;
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
 
 
