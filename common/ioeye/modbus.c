@@ -480,10 +480,13 @@ static void processModbusCommand(char *commandHexString, short payloadValue, Mod
 
 
 
-void init_modbus(Modbus *modbus, MODBUS_DEVICE_TYPE deviceType, const char *identifier)
+void init_modbus(Modbus *modbus, MODBUS_DEVICE_TYPE deviceType, const char *identifier,
+                 short (*shortPayloadValueGetter)(void *arg), void *shortPayloadValueGetterArg)
 {
     modbus->deviceType = deviceType;
     modbus->identifier = identifier;
+    modbus->shortPayloadValueGetter = shortPayloadValueGetter;
+    modbus->shortPayloadValueGetterArg = shortPayloadValueGetterArg;
 
 	modbus->send_command_and_read_response_sync = modbus_send_command_and_read_response_sync;
 
@@ -568,6 +571,8 @@ void modbusProcedures(Modbus *modbus)
     {
         if(strlen(modbus->simulatedSlaveId) > 0)
         {
+            short payload = modbus->shortPayloadValueGetter(modbus->shortPayloadValueGetterArg);
+            processModbusCommand(COMMAND_HEX_STRING_DONT_CARE, payload, modbus);
         }
         else
         {

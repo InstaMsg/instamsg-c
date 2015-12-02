@@ -12,4 +12,6 @@
 #define MAX_BUFFER_SIZE 1000
 #define MAX_HEAP_SIZE (10 * 1024)
 
+#define MODBUS_COMMAND_BUFFER_SIZE  150
+
 #endif

@@ -17,8 +17,11 @@ struct Modbus
                                                unsigned char *responseByteBuffer,
                                                int responseBytesLength);
 
-    char modbusCommands[MAX_BUFFER_SIZE];
+    char modbusCommands[MODBUS_COMMAND_BUFFER_SIZE];
+
     char simulatedSlaveId[3];
+    short (*shortPayloadValueGetter)(void *arg);
+    void *shortPayloadValueGetterArg;
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
 
 

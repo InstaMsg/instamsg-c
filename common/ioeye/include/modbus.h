@@ -8,7 +8,8 @@
 /*
  * Global-functions callable.
  */
-void init_modbus(Modbus *modbus, MODBUS_DEVICE_TYPE deviceType, const char *identifier);
+void init_modbus(Modbus *modbus, MODBUS_DEVICE_TYPE deviceType, const char *identifier,
+                 short (*shortPayloadValueGetter)(void *arg), void *shortPayloadValueGetterArg);
 void release_modbus(Modbus *modbus);
 void modbusOnConnectProcedures(Modbus *modbus);
 void modbusProcedures(Modbus *modbus);
