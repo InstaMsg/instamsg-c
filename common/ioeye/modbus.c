@@ -378,7 +378,7 @@ static void fillModbusCommandResponseIntoMessageBufferForSimulatedDevice(char *m
     /*
      * Fill the prefix, containing the initial register-value.
      */
-    strcat(messageBuffer, "0001");
+    strcat(messageBuffer, "0000");
 
     /*
      * Fill the simulated-modbus-response.
