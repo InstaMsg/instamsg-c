@@ -390,11 +390,14 @@ static void fillModbusCommandResponseIntoMessageBufferForSimulatedDevice(char *m
 static void processModbusCommand(char *commandHexString, char *payloadValues, Modbus *modbus)
 {
     int rc;
+    char *lengthBuffer = NULL;
+    const char *initialZeroLengthData = "00000000";
 
     /*
      * Now, start forming the payload ....
      */
     memset(messageBuffer, 0, sizeof(messageBuffer));
+    strcat(messageBuffer, initialZeroLengthData);
     strcat(messageBuffer, "<rtu>");
 
     addXMLFieldsInPayload(messageBuffer, "manufacturer", get_manufacturer);
@@ -421,6 +424,25 @@ static void processModbusCommand(char *commandHexString, char *payloadValues, Mo
 
     strcat(messageBuffer, "</rtu>");
 
+    /*
+     * Now, put the actual length in the beginning.
+     */
+    {
+        int bufferLength = strlen(initialZeroLengthData);
+
+        lengthBuffer = (char*) sg_malloc(bufferLength + 1);
+        if(lengthBuffer == NULL)
+        {
+            error_log(MODBUS_ERROR "Could not allocate memory for length-buffer.. not continuing");
+            goto exit;
+        }
+
+        sg_sprintf(lengthBuffer, "%u", strlen(messageBuffer) - bufferLength);
+        addPaddingIfRequired(lengthBuffer, bufferLength);
+
+        memcpy(messageBuffer, lengthBuffer, strlen(initialZeroLengthData));
+    }
+
     sg_sprintf(LOG_GLOBAL_BUFFER, "Sending device-data [%s]", messageBuffer);
     debug_log(LOG_GLOBAL_BUFFER);
 
@@ -438,6 +460,12 @@ static void processModbusCommand(char *commandHexString, char *payloadValues, Mo
          * If the data could not be sent, we need to log it, so that it can be re-attempted (later).
          */
         save_record_to_persistent_storage(messageBuffer);
+    }
+
+exit:
+    if(lengthBuffer)
+    {
+        sg_free(lengthBuffer);
     }
 }
 
