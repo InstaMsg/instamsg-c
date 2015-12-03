@@ -487,7 +487,7 @@ exit:
 
 
 void init_modbus(Modbus *modbus, MODBUS_DEVICE_TYPE deviceType, const char *identifier,
-                 short (*shortPayloadValueGetter)(void *arg), void *shortPayloadValueGetterArg)
+                 SHORT_VALUE_GETTER shortPayloadValueGetter, void *shortPayloadValueGetterArg)
 {
     modbus->deviceType = deviceType;
     modbus->identifier = identifier;

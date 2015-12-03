@@ -5,11 +5,13 @@
 #include "device_modbus.h"
 
 
+typedef short (*SHORT_VALUE_GETTER)(void *);
+
 /*
  * Global-functions callable.
  */
 void init_modbus(Modbus *modbus, MODBUS_DEVICE_TYPE deviceType, const char *identifier,
-                 short (*shortPayloadValueGetter)(void *arg), void *shortPayloadValueGetterArg);
+                 SHORT_VALUE_GETTER shortPayloadValueGetter, void *shortPayloadValueGetterArg);
 void release_modbus(Modbus *modbus);
 void modbusOnConnectProcedures(Modbus *modbus);
 void modbusProcedures(Modbus *modbus);
