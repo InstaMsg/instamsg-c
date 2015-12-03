@@ -406,7 +406,7 @@ static void processModbusCommand(char *commandHexString, char *payloadValues, Mo
     /*
      * Modbus-Response
      */
-    strcat(messageBuffer, "<data><![CDATA[");
+    strcat(messageBuffer, "<data><");
     if(modbus == NULL)
     {
         fillModbusCommandResponseIntoMessageBufferForSimulatedDevice(messageBuffer, payloadValues);
@@ -415,7 +415,7 @@ static void processModbusCommand(char *commandHexString, char *payloadValues, Mo
     {
         fillModbusCommandResponseIntoMessageBufferForClassicalDevice(messageBuffer, commandHexString, modbus);
     }
-    strcat(messageBuffer, "]]></data>");
+    strcat(messageBuffer, "></data>");
 
 
     addXMLFieldsInPayload(messageBuffer, "serial_number", get_device_uuid);
