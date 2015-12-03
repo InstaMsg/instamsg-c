@@ -398,7 +398,7 @@ static void processModbusCommand(char *commandHexString, char *payloadValues, Mo
      */
     memset(messageBuffer, 0, sizeof(messageBuffer));
     strcat(messageBuffer, initialZeroLengthData);
-    strcat(messageBuffer, "<rtu>");
+    strcat(messageBuffer, "<?xml version=\"1.0\"?><datas><data_node>");
 
     addXMLFieldsInPayload(messageBuffer, "manufacturer", get_manufacturer);
 
@@ -418,11 +418,11 @@ static void processModbusCommand(char *commandHexString, char *payloadValues, Mo
     strcat(messageBuffer, "></data>");
 
 
-    addXMLFieldsInPayload(messageBuffer, "serial_number", get_device_uuid);
+    addXMLFieldsInPayload(messageBuffer, "id", get_device_uuid);
     addXMLFieldsInPayload(messageBuffer, "time", getTimeInDesiredFormat);
     addXMLFieldsInPayload(messageBuffer, "offset", getTimezoneOffset);
 
-    strcat(messageBuffer, "</rtu>");
+    strcat(messageBuffer, "</data_node></datas>");
 
     /*
      * Now, put the actual length in the beginning.
