@@ -13,6 +13,8 @@ void init_modbus(Modbus *modbus, MODBUS_DEVICE_TYPE deviceType, const char *iden
 void release_modbus(Modbus *modbus);
 void modbusOnConnectProcedures(Modbus *modbus);
 void modbusProcedures(Modbus *modbus);
+void resetSimulatedModbusEnvironment(int numberOfSimulatedInterfaces);
+void flushSimulatedModbusEnvironment();
 
 
 /*
@@ -34,5 +36,7 @@ int modbus_send_command_and_read_response_sync(Modbus *modbus,
  */
 void connect_underlying_modbus_medium_guaranteed(Modbus *modbus);
 void release_underlying_modbus_medium_guaranteed(Modbus *modbus);
+
+char *simulatedModbusValuesCumulated;
 
 #endif

@@ -19,7 +19,6 @@ struct Modbus
 
     char modbusCommands[MODBUS_COMMAND_BUFFER_SIZE];
 
-    char simulatedSlaveId[3];
     short (*shortPayloadValueGetter)(void *arg);
     void *shortPayloadValueGetterArg;
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */

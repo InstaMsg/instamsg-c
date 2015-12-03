@@ -18,7 +18,7 @@ static char watchdogAssistant[50];
 static char smallBuffer[MAX_BUFFER_SIZE / 2];
 
 #define COMMAND_HEX_STRING_DONT_CARE    NULL
-#define PAYLOAD_DONT_CARE               -1
+#define PAYLOAD_DONT_CARE               NULL
 
 
 static int publishMessage(const char *topicName, char *message)
@@ -364,56 +364,30 @@ exit:
 }
 
 
-static void fillModbusCommandResponseIntoMessageBufferForSimulatedDevice(char *messageBuffer, short payloadValue, Modbus *modbus)
+static void fillModbusCommandResponseIntoMessageBufferForSimulatedDevice(char *messageBuffer, char *payloadValues)
 {
-    sg_sprintf(LOG_GLOBAL_BUFFER, "Processing simulated-modbus-device [%s]", modbus->identifier);
-    info_log(LOG_GLOBAL_BUFFER);
+    RESET_GLOBAL_BUFFER;
 
+    strcat((char*)GLOBAL_BUFFER, "010410");
+    strcat((char*)GLOBAL_BUFFER, payloadValues);
 
-    {
-        /*
-         * Calculation of simulated-modbus response.
-         *
-         * ss   04  01  dddd  cccc
-         *
-         * (2) ss       :   slave-id
-         * (2) 04       :   (hardcoded) register-type
-         * (2) 01       :   (hardcoded) number of (simulated-)registers to be read
-         * (4) dddd     :   two-bytes for the (simulated-)register value.
-         * (4) cccc     :   two-byte checksum
-         */
-        RESET_GLOBAL_BUFFER;
-
-        strcat((char*)GLOBAL_BUFFER, modbus->simulatedSlaveId);
-        strcat((char*)GLOBAL_BUFFER, "04");
-        strcat((char*)GLOBAL_BUFFER, "01");
-
-        {
-            char payload[5] = {0};
-            sg_sprintf(payload, "%x", payloadValue);
-            addPaddingIfRequired(payload, sizeof(payload) - 1);
-
-            strcat((char*)GLOBAL_BUFFER, payload);
-        }
-
-        appendModbusCRC16((char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
+    appendModbusCRC16((char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
 
 
 
-        /*
-         * Fill the prefix, containing the initial register-value.
-         */
-        strcat(messageBuffer, "0001");
+    /*
+     * Fill the prefix, containing the initial register-value.
+     */
+    strcat(messageBuffer, "0001");
 
-        /*
-         * Fill the simulated-modbus-response.
-         */
-        strcat(messageBuffer, (char*)GLOBAL_BUFFER);
-    }
+    /*
+     * Fill the simulated-modbus-response.
+     */
+    strcat(messageBuffer, (char*)GLOBAL_BUFFER);
 }
 
 
-static void processModbusCommand(char *commandHexString, short payloadValue, Modbus *modbus)
+static void processModbusCommand(char *commandHexString, char *payloadValues, Modbus *modbus)
 {
     int rc;
 
@@ -430,13 +404,13 @@ static void processModbusCommand(char *commandHexString, short payloadValue, Mod
      * Modbus-Response
      */
     strcat(messageBuffer, "<data><![CDATA[");
-    if(modbus->deviceType == CLASSICAL)
+    if(modbus == NULL)
+    {
+        fillModbusCommandResponseIntoMessageBufferForSimulatedDevice(messageBuffer, payloadValues);
+    }
+    else if(modbus->deviceType == CLASSICAL)
     {
         fillModbusCommandResponseIntoMessageBufferForClassicalDevice(messageBuffer, commandHexString, modbus);
-    }
-    else if(modbus->deviceType == SIMULATED)
-    {
-        fillModbusCommandResponseIntoMessageBufferForSimulatedDevice(messageBuffer, payloadValue, modbus);
     }
     strcat(messageBuffer, "]]></data>");
 
@@ -495,7 +469,6 @@ void init_modbus(Modbus *modbus, MODBUS_DEVICE_TYPE deviceType, const char *iden
 	modbus->send_command_and_read_response_sync = modbus_send_command_and_read_response_sync;
 
     memset(modbus->modbusCommands, 0, sizeof(modbus->modbusCommands));
-    memset(modbus->simulatedSlaveId, 0, sizeof(modbus->simulatedSlaveId));
 
     connect_underlying_modbus_medium_guaranteed(modbus);
 }
@@ -522,12 +495,6 @@ void modbusOnConnectProcedures(Modbus *modbus)
     }
     else if(modbus->deviceType == SIMULATED)
     {
-        sg_sprintf(smallBuffer, "MODBUS_SIMULATED_INTERFACE_%s_SLAVE_ID", modbus->identifier);
-        registerEditableConfig(modbus->simulatedSlaveId,
-                               smallBuffer,
-                               CONFIG_STRING,
-                               "",
-                               "Slave-Id. This id will be used while sending the modbus-response for this (simulated-modbus) device");
     }
 
     send_previously_unsent_modbus_data();
@@ -573,21 +540,50 @@ void modbusProcedures(Modbus *modbus)
     }
     else if(modbus->deviceType == SIMULATED)
     {
-        if(strlen(modbus->simulatedSlaveId) > 0)
+        if(1)
         {
-            short payload = modbus->shortPayloadValueGetter(modbus->shortPayloadValueGetterArg);
-            processModbusCommand(COMMAND_HEX_STRING_DONT_CARE, payload, modbus);
-        }
-        else
-        {
-            sg_sprintf(LOG_GLOBAL_BUFFER,
-                       MODBUS_ERROR "Slave-Id not specified for simulated-modbus device [%s] !!!; "
-                       "please fill-in the slave-id on the InstaMsg-Server for this device", modbus->identifier);
+            short payload;
+            char payloadString[5] = {0};
+
+            sg_sprintf(LOG_GLOBAL_BUFFER, "Processing simulated-modbus-device [%s]", modbus->identifier);
             info_log(LOG_GLOBAL_BUFFER);
+
+            payload = modbus->shortPayloadValueGetter(modbus->shortPayloadValueGetterArg);
+            sg_sprintf(payloadString, "%x", payload);
+            addPaddingIfRequired(payloadString, sizeof(payloadString) - 1);
+
+            strcat(simulatedModbusValuesCumulated, payloadString);
         }
     }
 
 exit:
     if(temporaryCopy)
         sg_free(temporaryCopy);
+}
+
+
+void resetSimulatedModbusEnvironment(int numberOfSimulatedInterfaces)
+{
+    /*
+     * We allocate 4 character-bytes per device, plus for holding null-terminator.
+     */
+    simulatedModbusValuesCumulated = (char*) sg_malloc((numberOfSimulatedInterfaces * 4) + 1);
+    if(simulatedModbusValuesCumulated == NULL)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Could not allocate [%u] bytes for simulated modbus-devices.. rebooting device");
+        error_log(LOG_GLOBAL_BUFFER);
+
+        rebootDevice();
+    }
+}
+
+
+void flushSimulatedModbusEnvironment(int numberOfSimulatedInterfaces)
+{
+    processModbusCommand(COMMAND_HEX_STRING_DONT_CARE, simulatedModbusValuesCumulated, NULL);
+
+    if(simulatedModbusValuesCumulated)
+    {
+        sg_free(simulatedModbusValuesCumulated);
+    }
 }
