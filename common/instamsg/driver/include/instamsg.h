@@ -128,13 +128,13 @@ int MQTTDisconnect ();
 
 /*
  *
- * topicName                            :
+ * topic                                :
  *
  *      Topic on which the message should be published
  *      FOR SUCCESSFUL PUBLISHING TO A TOPIC, THE TOPIC MUST BE IN THE "Pub Topics" LIST ON INSTAMSG-SERVER.
  *
  *
- * payload                              :
+ * msg                                  :
  *
  *      Message-Content
  *
@@ -207,8 +207,8 @@ int MQTTDisconnect ();
  *      for simple (yet complete) example-usage.
  *
  */
-int MQTTPublish     (const char *topicName,
-                     const char *payload,
+int MQTTPublish     (const char *topic,
+                     const char *msg,
                      const enum QoS qos,
                      const char dup,
                      void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
@@ -223,7 +223,7 @@ int MQTTPublish     (const char *topicName,
 
 /*
  *
- * peer                                 :
+ * peerClientId                         :
  *
  *      Peer-Id.
  *
@@ -234,18 +234,18 @@ int MQTTPublish     (const char *topicName,
  *      FOR SUCCESSFUL SENDING TO THE PEER, THE PEER CLIENT-ID MUST BE LISTED AS ONE OF THE "Pub Topics" ON INSTAMSG-SERVER.
  *
  *
- * payload                              :
+ * msg                                  :
  *
  *      Message-Content
  *
  *
- * oneToOneHandler                      :
+ * replyHandler                         :
  *
  *      Callback function-pointer.
  *      Called when the remote-peer has sent back a message to the local-peer.
  *
  *
- * oneToOneHandlerTimeout               :
+ * replyHandlerTimeout                  :
  *
  *      Time for which "oneToOneHandler" remains active.
  *
@@ -280,10 +280,10 @@ int MQTTPublish     (const char *topicName,
  *      for simple (yet complete) example-usage.
  *
  */
-int MQTTSend        (const char* peer,
-                     const char* payload,
-                     int (*oneToOneHandler)(OneToOneResult *),
-                     unsigned int oneToOneHandlerTimeout);
+int MQTTSend        (const char* peerClientId,
+                     const char* msg,
+                     int (*replyHandler)(OneToOneResult *),
+                     unsigned int replyHandlerTimeout);
 
 
 
@@ -292,7 +292,7 @@ int MQTTSend        (const char* peer,
 
 /*
  *
- * topicName                            :
+ * topic                                :
  *
  *      Topic on which client needs to subscribe.
  *      FOR SUCCESSFUL SUBSCRIBING TO A TOPIC, THE TOPIC MUST BE IN THE "Sub Topics" LIST ON INSTAMSG-SERVER.
@@ -361,7 +361,7 @@ int MQTTSend        (const char* peer,
  *      for simple (yet complete) example-usage.
  *
  */
-int MQTTSubscribe   (const char *topicName,
+int MQTTSubscribe   (const char *topic,
                      const enum QoS qos,
                      void (*messageHandler)(MessageData *),
                      void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
@@ -374,7 +374,7 @@ int MQTTSubscribe   (const char *topicName,
 
 
 /*
- * topicName                            :
+ * topic                                :
  *
  *      The topic on which the client needs to unsubscribe.
  *
@@ -397,7 +397,7 @@ int MQTTSubscribe   (const char *topicName,
  *      the message reached the server or not.
 
  */
-int MQTTUnsubscribe (const char *topicName);
+int MQTTUnsubscribe (const char *topic);
 
 
 
@@ -464,9 +464,9 @@ struct OneToOneResult
      * for simple (yet complete) example-usage.
      */
     void (*reply)(OneToOneResult *oneToOneResult,
-                  const char *replyMessage,
-                  int (*oneToOneHandler)(OneToOneResult *),
-                  unsigned int oneToOneHandlerTimeout);
+                  const char *msg,
+                  int (*replyHandler)(OneToOneResult *),
+                  unsigned int replyHandlerTimeout);
 };
 
 
