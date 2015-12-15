@@ -56,7 +56,7 @@ struct InstaMsg {
     {
         int msgId;
         unsigned int timeout;
-        void (*fp) (OneToOneResult*);
+        int (*fp) (OneToOneResult*);
     } oneToOneHandlers[MAX_MESSAGE_HANDLERS];
 
     void (*defaultMessageHandler) (MessageData*);
@@ -282,7 +282,7 @@ int MQTTPublish     (const char *topicName,
  */
 int MQTTSend        (const char* peer,
                      const char* payload,
-                     void (*oneToOneHandler)(OneToOneResult *),
+                     int (*oneToOneHandler)(OneToOneResult *),
                      unsigned int oneToOneHandlerTimeout);
 
 
@@ -463,7 +463,10 @@ struct OneToOneResult
      *
      * for simple (yet complete) example-usage.
      */
-    void (*reply)(OneToOneResult *oneToOneResult, const char *replyMessage);
+    void (*reply)(OneToOneResult *oneToOneResult,
+                  const char *replyMessage,
+                  int (*oneToOneHandler)(OneToOneResult *),
+                  unsigned int oneToOneHandlerTimeout);
 };
 
 
