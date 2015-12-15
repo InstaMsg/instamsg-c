@@ -209,7 +209,7 @@ int MQTTDisconnect ();
  */
 int MQTTPublish     (const char *topic,
                      const char *msg,
-                     const enum QoS qos,
+                     const int qos,
                      const char dup,
                      void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
                      unsigned int resultHandlerTimeout,
@@ -362,7 +362,7 @@ int MQTTSend        (const char* peerClientId,
  *
  */
 int MQTTSubscribe   (const char *topic,
-                     const enum QoS qos,
+                     const int qos,
                      void (*messageHandler)(MessageData *),
                      void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
                      unsigned int resultHandlerTimeout,

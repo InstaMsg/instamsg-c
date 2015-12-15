@@ -1294,7 +1294,7 @@ void* MQTTConnect(void* arg)
 
 
 int MQTTSubscribe(const char* topicName,
-                  const enum QoS qos,
+                  const int qos,
                   void (*messageHandler)(MessageData *),
                   void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
                   unsigned int resultHandlerTimeout,
@@ -1391,7 +1391,7 @@ exit:
 
 int MQTTPublish(const char* topicName,
                 const char* payload,
-                const enum QoS qos,
+                const int qos,
                 const char dup,
                 void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
                 unsigned int resultHandlerTimeout,
