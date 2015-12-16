@@ -229,7 +229,7 @@ static void MQTTReplyOneToOne(OneToOneResult *oneToOneResult,
                c->clientIdComplete,
                replyMessage);
 
-    doMqttSendPublish(id, oneToOneHandler, oneToOneHandlerTimeout, oneToOneResult->peer, messageBuffer);
+    doMqttSendPublish(id, oneToOneHandler, oneToOneHandlerTimeout, oneToOneResult->peerClientId, messageBuffer);
 }
 
 
@@ -289,13 +289,13 @@ static void oneToOneMessageArrived(InstaMsg *c, MQTTMessage *msg)
 
         oneToOneResult.succeeded = 1;
         oneToOneResult.peerMsg = peerMessage;
-        oneToOneResult.peer = peer;
+        oneToOneResult.peerClientId = peer;
         oneToOneResult.peerMsgId = sg_atoi(peerMsgId);
         oneToOneResult.reply = &MQTTReplyOneToOne;
 
         sg_sprintf(LOG_GLOBAL_BUFFER, "Peer-Message = [%s], Peer = [%s], Peer-Message-Id = [%u]",
                    oneToOneResult.peerMsg,
-                   oneToOneResult.peer,
+                   oneToOneResult.peerClientId,
                    oneToOneResult.peerMsgId);
         debug_log(LOG_GLOBAL_BUFFER);
 

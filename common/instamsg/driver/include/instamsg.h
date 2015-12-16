@@ -430,7 +430,7 @@ struct OneToOneResult
     /*
      ************** NOT EXPECTED TO BE USED BY THE APPLICATION ******************************
      */
-    char *peer;
+    char *peerClientId;
     int peerMsgId;
 
 
