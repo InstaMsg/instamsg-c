@@ -5,6 +5,9 @@
 
 static unsigned int currentBytesUsed;
 
+static int count;
+static int maxAllocationsCount;
+
 void* sg_malloc(unsigned short numBytes)
 {
     static unsigned char oneCallDone = 0;
@@ -50,6 +53,15 @@ void* sg_malloc(unsigned short numBytes)
      */
     currentBytesUsed = currentBytesUsed + numBytes;
 
+    count++;
+    if(count > maxAllocationsCount)
+    {
+        maxAllocationsCount = count;
+
+        sg_sprintf(LOG_GLOBAL_BUFFER, " ******************************** MAX ALLOCATIONS SO FAR [%u]", maxAllocationsCount);
+        info_log(LOG_GLOBAL_BUFFER);
+    }
+
     sg_sprintf(LOG_GLOBAL_BUFFER, MEM_ALLOC "Current memory remaining in bytes = [%u]", MAX_HEAP_SIZE - currentBytesUsed);
     debug_log(LOG_GLOBAL_BUFFER);
 
@@ -74,6 +86,8 @@ void sg_free(void *ptr)
         */
         currentBytesUsed = currentBytesUsed - numBytes - HEADER_SIZE;
     }
+
+    count--;
 }
 
 
