@@ -347,6 +347,9 @@ HTTPResponse uploadFile(const char *url,
 
         goto exit;
     }
+    memset(request, 0, MAX_BUFFER_SIZE);
+    memset(secondLevel, 0, MAX_BUFFER_SIZE);
+    memset(fourthLevel, 0, MAX_BUFFER_SIZE);
 
 	init_socket(&socket, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
 

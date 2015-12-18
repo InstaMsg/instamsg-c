@@ -45,6 +45,7 @@ static int get_config_value_from_persistent_storage_and_delete_if_asked(const ch
 
         goto exit;
     }
+    memset(jsonKey, 0, MAX_BUFFER_SIZE);
 
     while(1)
     {

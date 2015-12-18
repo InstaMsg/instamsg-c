@@ -56,6 +56,8 @@ static void serverLoggingTopicMessageArrived(InstaMsg *c, MQTTMessage *msg)
 
         goto exit;
     }
+    memset(clientId, 0, MAX_BUFFER_SIZE);
+    memset(logging, 0, MAX_BUFFER_SIZE);
 
     getJsonKeyValueIfPresent(msg->payload, CLIENT_ID, clientId);
     getJsonKeyValueIfPresent(msg->payload, LOGGING, logging);
@@ -250,6 +252,7 @@ static void oneToOneMessageArrived(InstaMsg *c, MQTTMessage *msg)
 
         goto exit;
     }
+    memset(peerMessage, 0, MAX_BUFFER_SIZE);
     getJsonKeyValueIfPresent(msg->payload, "body", peerMessage);
 
     peer = (char*) sg_malloc(50);
@@ -260,6 +263,7 @@ static void oneToOneMessageArrived(InstaMsg *c, MQTTMessage *msg)
 
         goto exit;
     }
+    memset(peer, 0, 50);
     getJsonKeyValueIfPresent(msg->payload, "reply_to", peer);
 
     memset(peerMsgId, 0, sizeof(peerMsgId));
@@ -592,11 +596,22 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     char *replyTopic, *messageId, *method, *url, *filename, *ackMessage;
 
     replyTopic = (char *)sg_malloc(MAX_BUFFER_SIZE);
+    memset(replyTopic, 0, MAX_BUFFER_SIZE);
+
     messageId = (char *)sg_malloc(50);
+    memset(messageId, 0, 50);
+
     method = (char *)sg_malloc(20);
+    memset(method, 0, 20);
+
     url = (char *)sg_malloc(MAX_BUFFER_SIZE);
+    memset(url, 0, MAX_BUFFER_SIZE);
+
     filename = (char *)sg_malloc(MAX_BUFFER_SIZE);
+    memset(filename, 0, MAX_BUFFER_SIZE);
+
     ackMessage = (char *)sg_malloc(MAX_BUFFER_SIZE);
+    memset(ackMessage, 0, MAX_BUFFER_SIZE);
 
     getJsonKeyValueIfPresent(msg->payload, REPLY_TOPIC, replyTopic);
     getJsonKeyValueIfPresent(msg->payload, MESSAGE_ID, messageId);
@@ -741,6 +756,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
 
             goto terminateFileUpload;
         }
+        memset(clientIdBuf, 0, MAX_BUFFER_SIZE);
 
         sg_sprintf(clientIdBuf, "%s-%s", c->connectOptions.clientID.cstring, c->connectOptions.username.cstring);
         headers[1].value = clientIdBuf;
@@ -1191,6 +1207,8 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                     }
                     else
                     {
+                        memset(topicName, 0, MAX_BUFFER_SIZE);
+
                         memoryAllocatedSynamicaaly = 1;
                         strncpy(topicName, topicMQTTString.lenstring.data, strlen(topicMQTTString.lenstring.data) - msg.payloadlen);
                     }

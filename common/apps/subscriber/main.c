@@ -16,6 +16,7 @@ static int oneToOneResponseReceivedCallback(OneToOneResult* result)
 static int oneToOneMessageHandler(OneToOneResult* result)
 {
     char *msg = (char*) sg_malloc(1000);
+    memset(msg, 0, 1000);
 
     sg_sprintf(LOG_GLOBAL_BUFFER, "Received [%s] from peer [%s]", result->peerMsg, result->peerClientId);
     info_log(LOG_GLOBAL_BUFFER);

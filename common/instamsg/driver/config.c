@@ -33,6 +33,7 @@ void process_config(char *configJson)
 
         goto exit;
     }
+    memset(config_key, 0, sizeof(GLOBAL_BUFFER));
     getJsonKeyValueIfPresent(configJson, CONFIG_KEY_KEY, config_key);
 
     /*
@@ -83,6 +84,7 @@ void registerEditableConfig(void *var,
 
             goto exit;
         }
+        memset(stored_value, 0, MAX_BUFFER_SIZE);
         getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, stored_value);
         stringified_value = stored_value;
 
@@ -94,6 +96,7 @@ void registerEditableConfig(void *var,
 
             goto exit;
         }
+        memset(stored_desc, 0, MAX_BUFFER_SIZE);
         getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_DESCRIPTION_KEY, stored_desc);
         desc = stored_desc;
 

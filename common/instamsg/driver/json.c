@@ -28,7 +28,6 @@ void getJsonKeyValueIfPresent(char *json, const char *key, char *buf)
 
         goto exit;
     }
-
     memset(parsedKeyToken, 0, MAX_BUFFER_SIZE);
     memset(parsedValueToken, 0, MAX_BUFFER_SIZE);
 

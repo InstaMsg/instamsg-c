@@ -290,6 +290,7 @@ static void fillModbusCommandResponseIntoMessageBufferForClassicalDevice(char *m
 
             goto exit;
         }
+        memset(responseByteBuffer, 0, responseLength);
 
         sg_sprintf(LOG_GLOBAL_BUFFER, "Processing modbus-command [%s]", commandHexString);
         info_log(LOG_GLOBAL_BUFFER);
@@ -436,6 +437,7 @@ static void processModbusCommand(char *commandHexString, char *payloadValues, Mo
             error_log(MODBUS_ERROR "Could not allocate memory for length-buffer.. not continuing");
             goto exit;
         }
+        memset(lengthBuffer, 0, bufferLength + 1);
 
         sg_sprintf(lengthBuffer, "%u", strlen(messageBuffer) - bufferLength);
         addPaddingIfRequired(lengthBuffer, bufferLength);
@@ -548,6 +550,7 @@ void modbusProcedures(Modbus *modbus)
 
                 goto exit;
             }
+            memset(temporaryCopy, 0, sizeof(modbus->modbusCommands) + 1);
 
             strcpy(temporaryCopy, modbus->modbusCommands);
 
@@ -603,6 +606,7 @@ void resetSimulatedModbusEnvironment(int numberOfSimulatedInterfaces)
 
         rebootDevice();
     }
+    memset(simulatedModbusValuesCumulated, 0, (numberOfSimulatedInterfaces * 4) + 1);
 }
 
 
