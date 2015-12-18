@@ -3,12 +3,15 @@
 #include "include/log.h"
 #include "include/sg_mem.h"
 
+#if USE_DEFAULT_MALLOC == 1
+
+static char sg_heap[MAX_HEAP_SIZE];
 static unsigned int currentBytesUsed;
 
 static int count;
 static int maxAllocationsCount;
 
-void* sg_malloc(unsigned short numBytes)
+void* DEFAULT_MALLOC(unsigned short numBytes)
 {
     static unsigned char oneCallDone = 0;
     void *mem = NULL;
@@ -70,7 +73,7 @@ exit:
 }
 
 
-void sg_free(void *ptr)
+void DEFAULT_FREE(void *ptr)
 {
     /*
      * Extract the number of bytes allocated to this block.
@@ -89,7 +92,7 @@ void sg_free(void *ptr)
 
     count--;
 }
-
+#endif
 
 char *sg_mem_strstr(char *string, const char *substring, int len)
 {

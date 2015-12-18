@@ -9,8 +9,12 @@
  */
 #define sg_sprintf DEFAULT_SPRINTF
 
+#define USE_DEFAULT_MALLOC      1
+#define sg_malloc               DEFAULT_MALLOC
+#define sg_free                 DEFAULT_FREE
+
 #define MAX_BUFFER_SIZE 1000
-#define MAX_HEAP_SIZE (6 * (MAX_BUFFER_SIZE + HEADER_SIZE))
+#define MAX_HEAP_SIZE (10 * (MAX_BUFFER_SIZE + HEADER_SIZE))
 
 #define MODBUS_COMMAND_BUFFER_SIZE  150
 

@@ -6,10 +6,8 @@
 
 #define HEADER_SIZE 2
 
-char sg_heap[MAX_HEAP_SIZE];
-
-void* sg_malloc(unsigned short numBytes);
-void sg_free(void *ptr);
+void* DEFAULT_MALLOC(unsigned short numBytes);
+void DEFAULT_FREE(void *ptr);
 char* sg_mem_strstr(char *string, const char *substring, int len);
 
 #endif
