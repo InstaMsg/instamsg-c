@@ -18,14 +18,13 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
     counter++;
     sg_sprintf(buf, "Test %d", counter);
 
-    MQTTPublish(TOPIC,
-                buf,
-                QOS2,
-                0,
-                publishAckReceived,
-                MQTT_RESULT_HANDLER_TIMEOUT,
-                0,
-                1);
+    publish(TOPIC,
+            buf,
+            QOS2,
+            0,
+            publishAckReceived,
+            MQTT_RESULT_HANDLER_TIMEOUT,
+            1);
 }
 
 

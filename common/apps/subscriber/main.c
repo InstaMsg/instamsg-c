@@ -57,11 +57,11 @@ static void messageArrived(MessageData* md)
 
 static int onConnectOneTimeOperations()
 {
-    return MQTTSubscribe(TOPIC,
-                         QOS2,
-                         messageArrived,
-                         subscribeAckReceived,
-                         MQTT_RESULT_HANDLER_TIMEOUT,
+    return subscribe(TOPIC,
+                     QOS2,
+                     messageArrived,
+                     subscribeAckReceived,
+                     MQTT_RESULT_HANDLER_TIMEOUT,
                          1);
 }
 

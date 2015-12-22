@@ -23,14 +23,13 @@
                                                                                                         \
     if(instaMsg.serverLoggingEnabled == 1)                                                              \
     {                                                                                                   \
-        MQTTPublish(instaMsg.serverLogsTopic,                                                           \
-                    log,                                                                                \
-                    QOS0,                                                                               \
-                    0,                                                                                  \
-                    NULL,                                                                               \
-                    MQTT_RESULT_HANDLER_TIMEOUT,                                                        \
-                    0,                                                                                  \
-                    0);                                                                                 \
+        publish(instaMsg.serverLogsTopic,                                                               \
+                log,                                                                                    \
+                QOS0,                                                                                   \
+                0,                                                                                      \
+                NULL,                                                                                   \
+                MQTT_RESULT_HANDLER_TIMEOUT,                                                            \
+                0);                                                                                     \
     }                                                                                                   \
     else if(level <= currentLogLevel)                                                                   \
     {                                                                                                   \
@@ -45,14 +44,13 @@
                                                                                                         \
     if(instaMsg.serverLoggingEnabled == 1)                                                              \
     {                                                                                                   \
-        MQTTPublish(instaMsg.serverLogsTopic,                                                           \
-                    log,                                                                                \
-                    QOS0,                                                                               \
-                    0,                                                                                  \
-                    NULL,                                                                               \
-                    MQTT_RESULT_HANDLER_TIMEOUT,                                                        \
-                    0,                                                                                  \
-                    0);                                                                                 \
+        publish(instaMsg.serverLogsTopic,                                                               \
+                log,                                                                                    \
+                QOS0,                                                                                   \
+                0,                                                                                      \
+                NULL,                                                                                   \
+                MQTT_RESULT_HANDLER_TIMEOUT,                                                            \
+                0);                                                                                     \
     }                                                                                                   \
     else if(level <= currentLogLevel)                                                                   \
     {                                                                                                   \

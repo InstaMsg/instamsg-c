@@ -20,7 +20,7 @@
 #include <string.h>
 
 #include "../driver/include/globals.h"
-#include "../driver/include/instamsg.h"
+#include "../driver/include/socket.h"
 
 #ifdef GSM_INTERFACE_ENABLED
 /*

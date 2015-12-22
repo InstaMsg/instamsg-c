@@ -205,14 +205,13 @@ static int doMqttSendPublish(int msgId,
                              const char *topic, const char *message)
 {
     attachOneToOneHandler(&instaMsg, msgId, timeout, oneToOneHandler);
-    return MQTTPublish(topic,
-                       message,
-                       QOS2,
-                       0,
-                       publishAckReceived,
-                       MQTT_RESULT_HANDLER_TIMEOUT,
-                       0,
-                       1);
+    return publish(topic,
+                   message,
+                   QOS2,
+                   0,
+                   publishAckReceived,
+                   MQTT_RESULT_HANDLER_TIMEOUT,
+                   1);
 }
 
 
@@ -792,14 +791,13 @@ terminateFileUpload:
     /*
      * Send the acknowledgement, along with the ackStatus (success/failure).
      */
-    MQTTPublish(replyTopic,
-                ackMessage,
-                (msg->fixedHeaderPlusMsgId).fixedHeader.qos,
-                (msg->fixedHeaderPlusMsgId).fixedHeader.dup,
-                NULL,
-                MQTT_RESULT_HANDLER_TIMEOUT,
-                0,
-                0);
+    publish(replyTopic,
+            ackMessage,
+            (msg->fixedHeaderPlusMsgId).fixedHeader.qos,
+            (msg->fixedHeaderPlusMsgId).fixedHeader.dup,
+            NULL,
+            MQTT_RESULT_HANDLER_TIMEOUT,
+            0);
 
 exit:
     if(replyTopic)
@@ -1019,14 +1017,13 @@ static void sendClientData(void (*func)(char *messageBuffer, int maxBufferLength
 
     if(strlen(messageBuffer) > 0)
     {
-        MQTTPublish(topicName,
-                    messageBuffer,
-                    QOS1,
-                    0,
-                    NULL,
-                    MQTT_RESULT_HANDLER_TIMEOUT,
-                    0,
-                    1);
+        publish(topicName,
+                messageBuffer,
+                QOS1,
+                0,
+                NULL,
+                MQTT_RESULT_HANDLER_TIMEOUT,
+                1);
     }
     else
     {
@@ -1311,12 +1308,12 @@ void* MQTTConnect(void* arg)
 }
 
 
-int MQTTSubscribe(const char* topicName,
-                  const int qos,
-                  void (*messageHandler)(MessageData *),
-                  void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
-                  unsigned int resultHandlerTimeout,
-                  const char logging)
+int subscribe(const char* topicName,
+              const int qos,
+              void (*messageHandler)(MessageData *),
+              void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
+              unsigned int resultHandlerTimeout,
+              const char logging)
 {
     int rc = FAILURE;
     int len = 0;
@@ -1407,14 +1404,13 @@ exit:
 }
 
 
-int MQTTPublish(const char* topicName,
-                const char* payload,
-                const int qos,
-                const char dup,
-                void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
-                unsigned int resultHandlerTimeout,
-                const char retain,
-                const char logging)
+int publish(const char* topicName,
+            const char* payload,
+            const int qos,
+            const char dup,
+            void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
+            unsigned int resultHandlerTimeout,
+            const char logging)
 {
     static unsigned int publishCount = 0;
     int rc = FAILURE;
@@ -1444,7 +1440,7 @@ int MQTTPublish(const char* topicName,
         info_log(LOG_GLOBAL_BUFFER);
     }
 
-    len = MQTTSerialize_publish(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), 0, qos, retain, id, topic, (unsigned char*)payload, strlen((char*)payload) + 1);
+    len = MQTTSerialize_publish(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), 0, qos, 0, id, topic, (unsigned char*)payload, strlen((char*)payload) + 1);
     if (len <= 0)
         goto exit;
     if ((rc = sendPacket(c, GLOBAL_BUFFER, len)) != SUCCESS) /* send the subscribe packet */
@@ -1495,10 +1491,10 @@ exit:
 }
 
 
-int MQTTSend(const char* peer,
-              const char* payload,
-              int (*oneToOneHandler)(OneToOneResult *),
-              unsigned int timeout)
+int send(const char* peer,
+         const char* payload,
+         int (*oneToOneHandler)(OneToOneResult *),
+         unsigned int timeout)
 {
     InstaMsg *c = &instaMsg;
     int id = getNextPacketId(c);

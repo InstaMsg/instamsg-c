@@ -23,14 +23,13 @@ static char smallBuffer[MAX_BUFFER_SIZE / 2];
 
 static int publishMessage(const char *topicName, char *message)
 {
-    return MQTTPublish(topicName,
-                       message,
-                       QOS1,
-                       0,
-                       NULL,
-                       MQTT_RESULT_HANDLER_TIMEOUT,
-                       0,
-                       1);
+    return publish(topicName,
+                   message,
+                   QOS1,
+                   0,
+                   NULL,
+                   MQTT_RESULT_HANDLER_TIMEOUT,
+                   1);
 }
 
 

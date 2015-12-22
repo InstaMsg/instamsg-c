@@ -111,7 +111,7 @@ void initInstaMsg(InstaMsg* c,
 void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c);
 void sendPingReqToServer(InstaMsg *c);
 
-int MQTTDisconnect ();
+int disconnect ();
 
 
 
@@ -167,12 +167,6 @@ int MQTTDisconnect ();
  *      message under consideration (even if PUBACK is received at some later stage > "resultHandlerTimeout" seconds).
  *
  *
- * retain                               :
- *
- *      Either 0 or 1.
- *      Meaning of this variable as per the spec at http://public.dhe.ibm.com/software/dw/webservices/ws-mqtt/mqtt-v3r1.html
- *
- *
  * logging                              :
  *
  *      Either 0 or 1.
@@ -207,13 +201,12 @@ int MQTTDisconnect ();
  *      for simple (yet complete) example-usage.
  *
  */
-int MQTTPublish     (const char *topic,
+int publish         (const char *topic,
                      const char *msg,
                      const int qos,
                      const char dup,
                      void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
                      unsigned int resultHandlerTimeout,
-                     const char retain,
                      const char logging);
 
 
@@ -280,7 +273,7 @@ int MQTTPublish     (const char *topic,
  *      for simple (yet complete) example-usage.
  *
  */
-int MQTTSend        (const char* peerClientId,
+int send            (const char* peerClientId,
                      const char* msg,
                      int (*replyHandler)(OneToOneResult *),
                      unsigned int replyHandlerTimeout);
@@ -361,7 +354,7 @@ int MQTTSend        (const char* peerClientId,
  *      for simple (yet complete) example-usage.
  *
  */
-int MQTTSubscribe   (const char *topic,
+int subscribe       (const char *topic,
                      const int qos,
                      void (*messageHandler)(MessageData *),
                      void (*resultHandler)(MQTTFixedHeaderPlusMsgId *),
@@ -397,7 +390,7 @@ int MQTTSubscribe   (const char *topic,
  *      the message reached the server or not.
 
  */
-int MQTTUnsubscribe (const char *topic);
+int unsubscribe (const char *topic);
 
 
 

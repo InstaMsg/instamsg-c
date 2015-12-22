@@ -25,10 +25,10 @@ static void onConnectOneTimeOperations()
     {
         onceDone = 1;
 
-        MQTTSend(TOPIC,
-                 "Hi... this is one-to-one initiator !!",
-                 oneToOneResponseReceivedCallback,
-                 3600);
+        send(TOPIC,
+             "Hi... this is one-to-one initiator !!",
+             oneToOneResponseReceivedCallback,
+             3600);
     }
     else
     {
