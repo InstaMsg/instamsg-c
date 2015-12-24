@@ -78,7 +78,9 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port)
 #endif
 
     /* Connect the medium (socket). */
+    watchdog_reset_and_enable(300, "TRYING-SOCKET-CONNECTION-SOLITARY-ATTEMPT");
     connect_underlying_socket_medium_try_once(socket);
+    watchdog_disable();
 }
 
 
