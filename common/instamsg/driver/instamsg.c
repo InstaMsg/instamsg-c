@@ -1596,6 +1596,8 @@ void start(int (*onConnectOneTimeOperations)(),
                     removeExpiredOneToOneResponseHandlers(c);
 
                     {
+                        static unsigned char businessLogicRunOnceAtStart = 0;
+
                         latestTick = getCurrentTick();
 
 
@@ -1628,13 +1630,15 @@ void start(int (*onConnectOneTimeOperations)(),
                         /*
                          * Time to run the business-logic !!
                          */
-                        if((latestTick >= nextBusinessLogicTick) || (runBusinessLogicImmediately == 1))
+                        if((latestTick >= nextBusinessLogicTick) || (runBusinessLogicImmediately == 1) ||
+                           (businessLogicRunOnceAtStart == 0))
                         {
                             if(coreLoopyBusinessLogicInitiatedBySelf != NULL)
 
                             {
                                 coreLoopyBusinessLogicInitiatedBySelf(NULL);
                                 runBusinessLogicImmediately = 0;
+                                businessLogicRunOnceAtStart = 1;
                             }
 
                             nextBusinessLogicTick = latestTick + editableBusinessLogicInterval;
