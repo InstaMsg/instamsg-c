@@ -29,6 +29,8 @@
 
 #define NO_CLIENT_ID "NONE"
 
+static int editableBusinessLogicInterval;
+
 static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
     sg_sprintf(LOG_GLOBAL_BUFFER, "[DEFAULT-PUBLISH-HANDLER] PUBACK received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
@@ -1058,6 +1060,19 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc)
                                "3",
                                "This variable controls after how many MQTT-Publishes a compulsory socket-read is done. This prevents any socket-pverrun errors (particularly in hardcore embedded-devices");
 
+        {
+            char interval[6];
+            memset(interval, 0, sizeof(interval));
+
+            sg_sprintf(interval, "%d", editableBusinessLogicInterval);
+            registerEditableConfig(&editableBusinessLogicInterval,
+                                   "BUSINESS_LOGIC_INTERVAL",
+                                   CONFIG_INT,
+                                   interval,
+                                   "Business-Logic Interval (in seconds)");
+        }
+
+
         if(c->onConnectCallback != NULL)
         {
             c->onConnectCallback();
@@ -1538,7 +1553,9 @@ void start(int (*onConnectOneTimeOperations)(),
     volatile unsigned long latestTick = getCurrentTick();
     unsigned long nextSocketTick = latestTick + NETWORK_INFO_INTERVAL;
     unsigned long nextPingReqTick = latestTick + pingRequestInterval;
-    unsigned long nextBusinessLogicTick = latestTick + businessLogicInterval;
+
+    editableBusinessLogicInterval = businessLogicInterval;
+    unsigned long nextBusinessLogicTick = latestTick + editableBusinessLogicInterval;
 
     unsigned char socketReadJustNow = 0;
 
@@ -1634,7 +1651,7 @@ void start(int (*onConnectOneTimeOperations)(),
                                 runBusinessLogicImmediately = 0;
                             }
 
-                            nextBusinessLogicTick = latestTick + businessLogicInterval;
+                            nextBusinessLogicTick = latestTick + editableBusinessLogicInterval;
                             break;
                         }
                     }
