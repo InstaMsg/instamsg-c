@@ -1554,8 +1554,6 @@ void start(int (*onConnectOneTimeOperations)(),
     unsigned long nextSocketTick = latestTick + NETWORK_INFO_INTERVAL;
     unsigned long nextPingReqTick = latestTick + pingRequestInterval;
 
-    unsigned char socketReadJustNow = 0;
-
     unsigned long nextBusinessLogicTick;
     editableBusinessLogicInterval = businessLogicInterval;
     nextBusinessLogicTick = latestTick + editableBusinessLogicInterval;
@@ -1576,7 +1574,7 @@ void start(int (*onConnectOneTimeOperations)(),
 
         while(1)
         {
-            socketReadJustNow = 0;
+            startAndCountdownTimer(1, 0);
 
             if((c->ipstack).socketCorrupted == 1)
             {
@@ -1588,28 +1586,14 @@ void start(int (*onConnectOneTimeOperations)(),
             else
             {
                 readAndProcessIncomingMQTTPacketsIfAny(c);
-                socketReadJustNow = 1;
             }
 
             if(1)
             {
-                /*
-                 * We ensure that the business-logic is initiated only after the interval, and do the intermediate
-                 * works as and when the time arrives.
-                 */
-                while(1)
+                if(1)
                 {
                     removeExpiredResultHandlers(c);
                     removeExpiredOneToOneResponseHandlers(c);
-
-                    if(socketReadJustNow == 0)
-                    {
-                        /*
-                         * Sleep only when the socket was not read in the current iteration.
-                         */
-                        startAndCountdownTimer(1, 0);
-                    }
-
 
                     {
                         latestTick = getCurrentTick();
@@ -1654,7 +1638,6 @@ void start(int (*onConnectOneTimeOperations)(),
                             }
 
                             nextBusinessLogicTick = latestTick + editableBusinessLogicInterval;
-                            break;
                         }
                     }
                 }
