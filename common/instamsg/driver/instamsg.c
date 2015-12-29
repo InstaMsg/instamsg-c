@@ -1554,10 +1554,12 @@ void start(int (*onConnectOneTimeOperations)(),
     unsigned long nextSocketTick = latestTick + NETWORK_INFO_INTERVAL;
     unsigned long nextPingReqTick = latestTick + pingRequestInterval;
 
-    editableBusinessLogicInterval = businessLogicInterval;
-    unsigned long nextBusinessLogicTick = latestTick + editableBusinessLogicInterval;
-
     unsigned char socketReadJustNow = 0;
+
+    unsigned long nextBusinessLogicTick;
+    editableBusinessLogicInterval = businessLogicInterval;
+    nextBusinessLogicTick = latestTick + editableBusinessLogicInterval;
+
 
     pingRequestInterval = 0;
     compulsorySocketReadAfterMQTTPublishInterval = 0;
