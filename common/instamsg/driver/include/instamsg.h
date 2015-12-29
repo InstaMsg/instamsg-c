@@ -90,6 +90,7 @@ struct InstaMsg {
 };
 
 InstaMsg instaMsg;
+volatile unsigned char runBusinessLogicImmediately;
 void* MQTTConnect(void* arg);
 
 

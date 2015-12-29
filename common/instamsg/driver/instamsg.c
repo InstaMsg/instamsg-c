@@ -939,7 +939,7 @@ void initInstaMsg(InstaMsg* c,
 {
     int i;
 
-
+    runBusinessLogicImmediately = 0;
     init_config();
 
 #ifdef FILE_SYSTEM_INTERFACE_ENABLED
@@ -1625,12 +1625,13 @@ void start(int (*onConnectOneTimeOperations)(),
                         /*
                          * Time to run the business-logic !!
                          */
-                        if(latestTick >= nextBusinessLogicTick)
+                        if((latestTick >= nextBusinessLogicTick) || (runBusinessLogicImmediately == 1))
                         {
                             if(coreLoopyBusinessLogicInitiatedBySelf != NULL)
 
                             {
                                 coreLoopyBusinessLogicInitiatedBySelf(NULL);
+                                runBusinessLogicImmediately = 0;
                             }
 
                             nextBusinessLogicTick = latestTick + businessLogicInterval;
