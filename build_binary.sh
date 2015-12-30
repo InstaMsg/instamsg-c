@@ -4,6 +4,8 @@ APP=${1}
 VENDOR=$2
 . device/${VENDOR}/instamsg/Makefile
 
+TOTAL_BINARY_VERSION=$3
+
 
 TOTAL_INCLUDES=`echo                                                                            \
         ${SYSTEM_INCLUDES}                                                                      \
@@ -72,18 +74,25 @@ fi
 
 COMPILE_COMMAND="${COMPILE_COMMAND} ${APP_COMPILER_DIRECTIVES} "
 
-TOTAL_COMPILE_COMMAND="${COMPILE_COMMAND} ${TOTAL_INCLUDES} ${SOURCES} -o ${OUT_DIR}/instamsg"
+VERSION=`grep INSTAMSG_VERSION common/instamsg/driver/include/globals.h | cut -d\  -f 3 | cut -d\" -f 2`
+COMPILED_FILE_NAME="${APP}_${VENDOR}_${VERSION}_${TOTAL_BINARY_VERSION}"
+
+TOTAL_COMPILE_COMMAND="${COMPILE_COMMAND} ${TOTAL_INCLUDES} ${SOURCES} -o ${OUT_DIR}/${COMPILED_FILE_NAME}"
 
 for obj in ${EXTRA_OBJECT_FILES}
 do
-    TOTAL_COMPILE_COMMAND="${COMPILE_COMMAND} ${TOTAL_INCLUDES} ${SOURCES} ${OUT_DIR}/* -o ${OUT_DIR}/instamsg"
+    TOTAL_COMPILE_COMMAND="${COMPILE_COMMAND} ${TOTAL_INCLUDES} ${SOURCES} ${OUT_DIR}/* -o ${OUT_DIR}/${COMPILED_FILE_NAME}"
     cp ${obj} ${OUT_DIR}
 done
 
 ${TOTAL_COMPILE_COMMAND}
 
+FINAL_FILE_NAME="${COMPILED_FILE_NAME}_to-flash"
 for cmd in "${FINAL_COMMANDS[@]}"
 do
     cmd=`echo ${cmd} | sed -e 's|OUT_DIR|'"${OUT_DIR}"'|g'`
+    cmd=`echo ${cmd} | sed -e 's|COMPILED_FILE_NAME|'"${COMPILED_FILE_NAME}"'|g'`
+    cmd=`echo ${cmd} | sed -e 's|FINAL_FILE_NAME|'"${FINAL_FILE_NAME}"'|g'`
+
     $cmd
 done
