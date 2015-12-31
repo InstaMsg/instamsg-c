@@ -714,7 +714,7 @@ static void handleMediaStopMessage(InstaMsg *c)
     info_log(MEDIA "Stopping .....");
 
     RESET_GLOBAL_BUFFER;
-    sg_sprintf((char*)GLOBAL_BUFFER, "{'to':%s,'from':%s,'type':3,'stream_id': %s}", c->clientIdComplete, c->clientIdComplete, streamId);
+    sg_sprintf((char*)GLOBAL_BUFFER, "{'to':'%s','from':'%s','type':3,'stream_id': '%s'}", c->clientIdComplete, c->clientIdComplete, streamId);
 
     publish(c->mediaTopic,
             (char*)GLOBAL_BUFFER,
