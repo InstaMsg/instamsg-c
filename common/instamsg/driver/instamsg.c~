@@ -730,48 +730,6 @@ static void handleMediaPauseMessage(InstaMsg *c)
 {
     info_log(MEDIA "Pausing .....");
 }
-
-
-static void publishMediaMessage(InstaMsg *c)
-{
-    /*TODO: Calculate the ip-address */
-    char *ipAddress = "";
-
-    RESET_GLOBAL_BUFFER;
-    sg_sprintf((char*) GLOBAL_BUFFER,
-               "{"
-                    "'to': '%s', "
-                    "'sdp_offer' : 'v=0\r\ni"
-                                   "o=- 0 0 IN IP4 %s\r\n"
-                                   "s=\r\n"
-                                   "c=IN IP4 %s\r\n"
-                                   "t=0 0\r\n"
-                                   "a=charset:UTF-8\n"
-                                   "a=recvonly\r\n"
-                                   "m=video 50004 RTP/AVP 96\r\n"
-                                   "a=rtpmap:96 H264/90000\r\n"
-                                    "', "
-	    			"'from': '%s', "
-                    "'protocol' : 'rtp', "
-                    "'type':'7', "
-                    "'stream_id':'%s', "
-	    			"'record': True"
-	    		"}",
-                c->clientIdComplete,
-                                    ipAddress,
-                                    ipAddress,
-                c->clientIdComplete,
-                streamId);
-
-
-		publish(c->mediaTopic,
-				(char*)GLOBAL_BUFFER,
-				QOS1,
-				0,
-				NULL,
-				MQTT_RESULT_HANDLER_TIMEOUT,
-				1);
-}
 #endif
 
 
