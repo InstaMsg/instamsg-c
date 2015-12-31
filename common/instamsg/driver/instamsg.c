@@ -707,6 +707,21 @@ exit:
             sg_free(method);
     }
 }
+
+
+static void handleMediaStopMessage(InstaMsg *c, MQTTMessage *msg)
+{
+    RESET_GLOBAL_BUFFER;
+    sg_sprintf((char*)GLOBAL_BUFFER, "{'to':%s,'from':%s,'type':3,'stream_id': %s}", c->clientIdComplete, c->clientIdComplete, streamId);
+
+    publish(c->mediaTopic,
+            (char*)GLOBAL_BUFFER,
+            QOS1,
+            0,
+            NULL,
+            MQTT_RESULT_HANDLER_TIMEOUT,
+            1);
+}
 #endif
 
 
@@ -1405,6 +1420,10 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                     else if(strcmp(topicName, c->mediaStreamsTopic) == 0)
                     {
                         handleMediaStreamsMessage(c, &msg);
+                    }
+                    else if(strcmp(topicName, c->mediaStopTopic) == 0)
+                    {
+                        handleMediaStopMessage(c, &msg);
                     }
 #endif
                     else
