@@ -29,6 +29,13 @@
 
 #define NO_CLIENT_ID "NONE"
 
+#if MEDIA_STREAMING_ENABLED == 1
+
+static char streamId[MAX_BUFFER_SIZE];
+#define MEDIA "[MEDIA] "
+
+#endif
+
 static int editableBusinessLogicInterval;
 
 static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
@@ -587,6 +594,120 @@ static void logJsonFailureMessageAndReturn(const char *key, MQTTMessage *msg)
                key, (char*) (msg->payload));
     error_log(LOG_GLOBAL_BUFFER);
 }
+
+
+#if MEDIA_STREAMING_ENABLED == 1
+static void broadcastMedia(const char *sdpAnswer)
+{
+}
+
+
+static void handleMediaReplyMessage(InstaMsg *c, MQTTMessage *msg)
+{
+    sg_sprintf(LOG_GLOBAL_BUFFER, MEDIA "Received media-reply-message [%s]", (char*)msg->payload);
+    info_log(LOG_GLOBAL_BUFFER);
+
+    {
+        const char *STREAM_ID = "stream_id";
+        const char *SDP_ANSWER = "sdp_answer";
+
+        char *sdpAnswer;
+
+        memset(streamId, 0, sizeof(streamId));
+        getJsonKeyValueIfPresent(msg->payload, STREAM_ID, streamId);
+
+        sdpAnswer = (char *)sg_malloc(MAX_BUFFER_SIZE);
+        if(sdpAnswer == NULL)
+        {
+            error_log(MEDIA "Could not allocate memory for sdp-answer");
+            goto exit;
+        }
+        memset(sdpAnswer, 0, MAX_BUFFER_SIZE);
+        getJsonKeyValueIfPresent(msg->payload, SDP_ANSWER, sdpAnswer);
+
+        if(strlen(sdpAnswer) > 0)
+        {
+            broadcastMedia(sdpAnswer);
+        }
+
+exit:
+        if(sdpAnswer)
+        {
+            sg_free(sdpAnswer);
+        }
+    }
+}
+
+
+static void handleMediaStreamsMessage(InstaMsg *c, MQTTMessage *msg)
+{
+    sg_sprintf(LOG_GLOBAL_BUFFER, MEDIA "Received media-streams-message [%s]", (char*) msg->payload);
+    info_log(LOG_GLOBAL_BUFFER);
+
+    {
+        const char *REPLY_TO = "reply_to";
+        const char *MESSAGE_ID = "message_id";
+        const char *METHOD = "method";
+
+        char *replyTopic, *messageId, *method;
+        replyTopic = (char*) sg_malloc(100);
+        messageId = (char*) sg_malloc(MAX_BUFFER_SIZE);
+        method = (char*) sg_malloc(10);
+
+        if((replyTopic == NULL) || (messageId == NULL) || (method == NULL))
+        {
+            error_log(MEDIA "Could not allocate memory for replyTopic/messageId/method");
+            goto exit;
+        }
+
+        getJsonKeyValueIfPresent(msg->payload, REPLY_TO, replyTopic);
+        getJsonKeyValueIfPresent(msg->payload, MESSAGE_ID, messageId);
+        getJsonKeyValueIfPresent(msg->payload, METHOD, method);
+
+        if(strlen(replyTopic) == 0)
+        {
+            logJsonFailureMessageAndReturn(REPLY_TO, msg);
+            goto exit;
+        }
+
+        if(strlen(messageId) == 0)
+        {
+            logJsonFailureMessageAndReturn(MESSAGE_ID, msg);
+            goto exit;
+        }
+
+        if(strlen(method) == 0)
+        {
+            logJsonFailureMessageAndReturn(METHOD, msg);
+            goto exit;
+        }
+
+        if(strcmp(method, "GET") == 0)
+        {
+            RESET_GLOBAL_BUFFER;
+            sg_sprintf((char*) GLOBAL_BUFFER, "{\"response_id\": \"%s\", \"status\": 1, \"streams\": \"[%s]\"}", messageId, streamId);
+
+            publish(replyTopic,
+                    (char*)GLOBAL_BUFFER,
+                    1,
+                    0,
+                    NULL,
+                    MQTT_RESULT_HANDLER_TIMEOUT,
+                    1);
+        }
+
+exit:
+        if(replyTopic)
+            sg_free(replyTopic);
+
+        if(messageId)
+            sg_free(messageId);
+
+        if(method)
+            sg_free(method);
+    }
+}
+#endif
 
 
 static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
@@ -1276,6 +1397,16 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                     {
                         handleConfigReceived(c, &msg);
                     }
+#if MEDIA_STREAMING_ENABLED == 1
+                    else if(strcmp(topicName, c->mediaReplyTopic) == 0)
+                    {
+                        handleMediaReplyMessage(c, &msg);
+                    }
+                    else if(strcmp(topicName, c->mediaStreamsTopic) == 0)
+                    {
+                        handleMediaStreamsMessage(c, &msg);
+                    }
+#endif
                     else
                     {
                         deliverMessageToSelf(c, &topicMQTTString, &msg);
