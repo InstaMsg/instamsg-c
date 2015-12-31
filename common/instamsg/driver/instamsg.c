@@ -919,7 +919,22 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
     memset(c->receiveConfigTopic, 0, sizeof(c->receiveConfigTopic));
     sg_sprintf(c->receiveConfigTopic, "instamsg/clients/%s/config/serverToClient", c->clientIdComplete);
 
+#if MEDIA_STREAMING_ENABLED == 1
+    memset(c->mediaTopic, 0, sizeof(c->mediaTopic));
+    sg_sprintf(c->mediaTopic, "instamsg/clients/%s/media", c->clientIdComplete);
 
+    memset(c->mediaReplyTopic, 0, sizeof(c->mediaReplyTopic));
+    sg_sprintf(c->mediaReplyTopic, "instamsg/clients/%s/mediareply", c->clientIdComplete);
+
+    memset(c->mediaStopTopic, 0, sizeof(c->mediaStopTopic));
+    sg_sprintf(c->mediaStopTopic, "instamsg/clients/%s/mediastop", c->clientIdComplete);
+
+    memset(c->mediaPauseTopic, 0, sizeof(c->mediaPauseTopic));
+    sg_sprintf(c->mediaPauseTopic, "instamsg/clients/%s/mediapause", c->clientIdComplete);
+
+    memset(c->mediaStreamsTopic, 0, sizeof(c->mediaStreamsTopic));
+    sg_sprintf(c->mediaStreamsTopic, "instamsg/clients/%s/mediastreams", c->clientIdComplete);
+#endif
 
     sg_sprintf(LOG_GLOBAL_BUFFER, "\n\nThe special-topics value :: \n\n"
              "\r\nFILES_TOPIC = [%s],"
@@ -927,9 +942,21 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
              "\r\nENABLE_SERVER_LOGGING_TOPIC = [%s],"
              "\r\nSERVER_LOGS_TOPIC = [%s],"
              "\r\nFILE_UPLOAD_URL = [%s],"
-             "\r\nCONFIG_FROM_SERVER_TO_CLIENT = [%s]\n",
+             "\r\nCONFIG_FROM_SERVER_TO_CLIENT = [%s],"
+#if MEDIA_STREAMING_ENABLED == 1
+             "\r\nMEDIA_TOPIC = [%s],"
+             "\r\nMEDIA_REPLY_TOPIC = [%s],"
+             "\r\nMEDIA_STOP_TOPIC = [%s],"
+             "\r\nMEDIA_PAUSE_TOPIC = [%s],"
+             "\r\nMEDIA_STREAMS_TOPIC = [%s],"
+#endif
+             "\n",
              c->filesTopic, c->rebootTopic, c->enableServerLoggingTopic,
-             c->serverLogsTopic, c->fileUploadUrl, c->receiveConfigTopic);
+             c->serverLogsTopic, c->fileUploadUrl, c->receiveConfigTopic
+#if MEDIA_STREAMING_ENABLED == 1
+             , c->mediaTopic, c->mediaReplyTopic, c->mediaStopTopic, c->mediaPauseTopic, c->mediaStreamsTopic
+#endif
+             );
     info_log(LOG_GLOBAL_BUFFER);
 }
 

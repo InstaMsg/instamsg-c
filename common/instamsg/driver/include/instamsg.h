@@ -70,6 +70,13 @@ struct InstaMsg {
     char serverLogsTopic[100];
     char fileUploadUrl[100];
     char receiveConfigTopic[100];
+#if MEDIA_STREAMING_ENABLED == 1
+    char mediaTopic[100];
+    char mediaReplyTopic[100];
+    char mediaStopTopic[100];
+    char mediaPauseTopic[100];
+    char mediaStreamsTopic[100];
+#endif
 
     unsigned char serverLoggingEnabled;
 
