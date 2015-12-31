@@ -588,10 +588,10 @@ static int fireResultHandlerUsingMsgIdAsTheKey(InstaMsg *c)
 }
 
 
-static void logJsonFailureMessageAndReturn(const char *key, MQTTMessage *msg)
+static void logJsonFailureMessageAndReturn(const char *module, const char *key, MQTTMessage *msg)
 {
-    sg_sprintf(LOG_GLOBAL_BUFFER, FILE_TRANSFER "Could not find key [%s] in message-payload [%s] .. not proceeding further",
-               key, (char*) (msg->payload));
+    sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not find key [%s] in message-payload [%s] .. not proceeding further",
+               module, key, (char*) (msg->payload));
     error_log(LOG_GLOBAL_BUFFER);
 }
 
@@ -666,19 +666,19 @@ static void handleMediaStreamsMessage(InstaMsg *c, MQTTMessage *msg)
 
         if(strlen(replyTopic) == 0)
         {
-            logJsonFailureMessageAndReturn(REPLY_TO, msg);
+            logJsonFailureMessageAndReturn(MEDIA, REPLY_TO, msg);
             goto exit;
         }
 
         if(strlen(messageId) == 0)
         {
-            logJsonFailureMessageAndReturn(MESSAGE_ID, msg);
+            logJsonFailureMessageAndReturn(MEDIA, MESSAGE_ID, msg);
             goto exit;
         }
 
         if(strlen(method) == 0)
         {
-            logJsonFailureMessageAndReturn(METHOD, msg);
+            logJsonFailureMessageAndReturn(MEDIA, METHOD, msg);
             goto exit;
         }
 
@@ -689,7 +689,7 @@ static void handleMediaStreamsMessage(InstaMsg *c, MQTTMessage *msg)
 
             publish(replyTopic,
                     (char*)GLOBAL_BUFFER,
-                    1,
+                    QOS1,
                     0,
                     NULL,
                     MQTT_RESULT_HANDLER_TIMEOUT,
@@ -743,17 +743,17 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
 
     if(strlen(replyTopic) == 0)
     {
-        logJsonFailureMessageAndReturn(REPLY_TOPIC, msg);
+        logJsonFailureMessageAndReturn(FILE_TRANSFER, REPLY_TOPIC, msg);
         goto exit;
     }
     if(strlen(messageId) == 0)
     {
-        logJsonFailureMessageAndReturn(MESSAGE_ID, msg);
+        logJsonFailureMessageAndReturn(FILE_TRANSFER, MESSAGE_ID, msg);
         goto exit;
     }
     if(strlen(method) == 0)
     {
-        logJsonFailureMessageAndReturn(METHOD, msg);
+        logJsonFailureMessageAndReturn(FILE_TRANSFER, METHOD, msg);
         goto exit;
     }
 
