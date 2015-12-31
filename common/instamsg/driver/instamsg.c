@@ -711,6 +711,9 @@ exit:
 
 static void handleMediaStopMessage(InstaMsg *c, MQTTMessage *msg)
 {
+    sg_sprintf(LOG_GLOBAL_BUFFER, MEDIA "Received media-stop-message [%s]", (char*) msg->payload);
+    info_log(LOG_GLOBAL_BUFFER);
+
     RESET_GLOBAL_BUFFER;
     sg_sprintf((char*)GLOBAL_BUFFER, "{'to':%s,'from':%s,'type':3,'stream_id': %s}", c->clientIdComplete, c->clientIdComplete, streamId);
 
