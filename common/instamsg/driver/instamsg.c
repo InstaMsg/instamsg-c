@@ -709,10 +709,9 @@ exit:
 }
 
 
-static void handleMediaStopMessage(InstaMsg *c, MQTTMessage *msg)
+static void handleMediaStopMessage(InstaMsg *c)
 {
-    sg_sprintf(LOG_GLOBAL_BUFFER, MEDIA "Received media-stop-message [%s]", (char*) msg->payload);
-    info_log(LOG_GLOBAL_BUFFER);
+    info_log(MEDIA "Stopping .....");
 
     RESET_GLOBAL_BUFFER;
     sg_sprintf((char*)GLOBAL_BUFFER, "{'to':%s,'from':%s,'type':3,'stream_id': %s}", c->clientIdComplete, c->clientIdComplete, streamId);
@@ -724,6 +723,12 @@ static void handleMediaStopMessage(InstaMsg *c, MQTTMessage *msg)
             NULL,
             MQTT_RESULT_HANDLER_TIMEOUT,
             1);
+}
+
+
+static void handleMediaPauseMessage(InstaMsg *c)
+{
+    info_log(MEDIA "Pausing .....");
 }
 #endif
 
@@ -1426,7 +1431,11 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                     }
                     else if(strcmp(topicName, c->mediaStopTopic) == 0)
                     {
-                        handleMediaStopMessage(c, &msg);
+                        handleMediaStopMessage(c);
+                    }
+                    else if(strcmp(topicName, c->mediaPauseTopic) == 0)
+                    {
+                        handleMediaPauseMessage(c);
                     }
 #endif
                     else
