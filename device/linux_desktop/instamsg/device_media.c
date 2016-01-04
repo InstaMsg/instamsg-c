@@ -10,7 +10,7 @@ void create_and_start_streaming_pipeline(const char *mediaServerIpAddress, const
 
 
 /*
- * This method stops the streaming.
+ * This method pauses the streaming.
  */
 void pause_streaming()
 {
