@@ -597,8 +597,58 @@ static void logJsonFailureMessageAndReturn(const char *module, const char *key, 
 
 
 #if MEDIA_STREAMING_ENABLED == 1
-static void broadcastMedia(const char *sdpAnswer)
+static void broadcastMedia(InstaMsg * c, char *sdpAnswer)
 {
+    {
+        /*
+         * We hard-code the media-server-ip-address.
+         */
+        memset(c->mediaServerIpAddress, 0, sizeof(c->mediaServerIpAddress));
+        strcpy(c->mediaServerIpAddress, "23.253.42.123");
+    }
+
+    {
+        /*
+         * We need to extract port from the string of type
+         *
+         *              m=video 12345 RTP/AVP 96
+         */
+        char *token = strtok(sdpAnswer, "\n");
+        while(token != NULL)
+        {
+            if(strstr(token, "m=video") == token)
+            {
+                /*
+                 * We found the line containing the server-token.
+                 */
+                break;
+            }
+            else
+            {
+                token = strtok(NULL, "\n");
+            }
+        }
+
+        if(token != NULL)
+        {
+            /*
+             * Find the server-port.
+             */
+            memset(c->mediaServerPort, 0, sizeof(c->mediaServerPort));
+
+            strtok(token, " ");
+            strcpy(c->mediaServerPort, strtok(NULL, ""));
+
+            sg_sprintf(LOG_GLOBAL_BUFFER, MEDIA "Media-Server-Port being used for streaming [%s]", c->mediaServerPort);
+            info_log(LOG_GLOBAL_BUFFER);
+
+        }
+        else
+        {
+            error_log(MEDIA "Could not find server-port for streaming.. not doing anything else !!!");
+            return;
+        }
+    }
 }
 
 
@@ -627,7 +677,7 @@ static void handleMediaReplyMessage(InstaMsg *c, MQTTMessage *msg)
 
         if(strlen(sdpAnswer) > 0)
         {
-            broadcastMedia(sdpAnswer);
+            broadcastMedia(c, sdpAnswer);
         }
 
 exit:
@@ -734,14 +784,14 @@ static void handleMediaPauseMessage(InstaMsg *c)
 
 static void publishMediaMessage(InstaMsg *c)
 {
-    memset(c->ipAddress, 0, sizeof(c->ipAddress));
-    get_device_ip_address(c->ipAddress, sizeof(c->ipAddress));
+    memset(c->selfIpAddress, 0, sizeof(c->selfIpAddress));
+    get_device_ip_address(c->selfIpAddress);
 
     RESET_GLOBAL_BUFFER;
     sg_sprintf((char*) GLOBAL_BUFFER,
                "{"
                     "'to': '%s', "
-                    "'sdp_offer' : 'v=0\r\ni"
+                    "'sdp_offer' : 'v=0\r\n"
                                    "o=- 0 0 IN IP4 %s\r\n"
                                    "s=\r\n"
                                    "c=IN IP4 %s\r\n"
@@ -758,8 +808,8 @@ static void publishMediaMessage(InstaMsg *c)
 	    			"'record': True"
 	    		"}",
                 c->clientIdComplete,
-                                    c->ipAddress,
-                                    c->ipAddress,
+                                    c->selfIpAddress,
+                                    c->selfIpAddress,
                 c->clientIdComplete,
                 streamId);
 

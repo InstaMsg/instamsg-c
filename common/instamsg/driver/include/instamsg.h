@@ -77,7 +77,9 @@ struct InstaMsg {
     char mediaPauseTopic[100];
     char mediaStreamsTopic[100];
 
-    char ipAddress[20];
+    char selfIpAddress[20];
+    char mediaServerIpAddress[20];
+    char mediaServerPort[10];
 #endif
 
     unsigned char serverLoggingEnabled;
