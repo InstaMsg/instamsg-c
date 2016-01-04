@@ -63,3 +63,11 @@ void get_manufacturer(char *messagebuffer, int maxbufferlength)
 void get_device_uuid(char *buffer, int maxbufferlength)
 {
 }
+
+
+/*
+ * This method returns the ip-address of this device.
+ */
+void get_device_ip_address(char *buffer, int maxbufferlength)
+{
+}

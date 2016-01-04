@@ -124,3 +124,11 @@ void get_device_uuid(char *buffer, int maxbufferlength)
     }
 #endif
 }
+
+
+/*
+ * This method returns the ip-address of this device.
+ */
+void get_device_ip_address(char *buffer, int maxbufferlength)
+{
+}

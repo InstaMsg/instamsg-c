@@ -734,8 +734,8 @@ static void handleMediaPauseMessage(InstaMsg *c)
 
 static void publishMediaMessage(InstaMsg *c)
 {
-    /*TODO: Calculate the ip-address */
-    char *ipAddress = "";
+    memset(c->ipAddress, 0, sizeof(c->ipAddress));
+    get_device_ip_address(c->ipAddress, sizeof(c->ipAddress));
 
     RESET_GLOBAL_BUFFER;
     sg_sprintf((char*) GLOBAL_BUFFER,
@@ -758,8 +758,8 @@ static void publishMediaMessage(InstaMsg *c)
 	    			"'record': True"
 	    		"}",
                 c->clientIdComplete,
-                                    ipAddress,
-                                    ipAddress,
+                                    c->ipAddress,
+                                    c->ipAddress,
                 c->clientIdComplete,
                 streamId);
 
