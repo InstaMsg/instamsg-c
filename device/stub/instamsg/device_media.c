@@ -3,6 +3,7 @@
 
 /*
  * This method starts streaming, to the desired media-server.
+ * THIS MUST BE DONE IN A DEDICATED THREAD.
  */
 void create_and_start_streaming_pipeline(const char *mediaServerIpAddress, const char *mediaServerPort)
 {
