@@ -600,6 +600,7 @@ static void logJsonFailureMessageAndReturn(const char *module, const char *key, 
 static void handleMediaStopMessage(InstaMsg *c)
 {
     info_log(MEDIA "Stopping .....");
+    stop_streaming();
 
     RESET_GLOBAL_BUFFER;
     sg_sprintf((char*)GLOBAL_BUFFER, "{'to':'%s','from':'%s','type':3,'stream_id': '%s'}", c->clientIdComplete, c->clientIdComplete, streamId);
@@ -617,11 +618,7 @@ static void handleMediaStopMessage(InstaMsg *c)
 static void handleMediaPauseMessage(InstaMsg *c)
 {
     info_log(MEDIA "Pausing .....");
-}
-
-
-static void createStreamingPipeline(const char *uri, const char *mediaServerIpAddress, const char *mediaServerPort)
-{
+    pause_streaming();
 }
 
 
@@ -670,8 +667,7 @@ static void broadcastMedia(InstaMsg * c, char *sdpAnswer)
             sg_sprintf(LOG_GLOBAL_BUFFER, MEDIA "Media-Server-Port being used for streaming [%s]", c->mediaServerPort);
             info_log(LOG_GLOBAL_BUFFER);
 
-
-            createStreamingPipeline(NULL, c->mediaServerIpAddress, c->mediaServerPort);
+            create_and_start_streaming_pipeline(c->mediaServerIpAddress, c->mediaServerPort);
         }
         else
         {

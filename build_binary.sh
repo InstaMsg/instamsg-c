@@ -42,6 +42,7 @@ SOURCES=`echo                                                                   
         device/${VENDOR}/instamsg/device_time.c                                                 \
         device/${VENDOR}/instamsg/device_watchdog.c                                             \
         device/${VENDOR}/instamsg/device_config.c                                               \
+        device/${VENDOR}/instamsg/device_media.c                                                \
         device/${VENDOR}/instamsg/device_misc.c                                                 `
 
 
