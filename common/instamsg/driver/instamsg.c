@@ -30,6 +30,7 @@
 #define NO_CLIENT_ID "NONE"
 
 #if MEDIA_STREAMING_ENABLED == 1
+#include "./include/media.h"
 
 static char streamId[MAX_BUFFER_SIZE];
 #define MEDIA "[MEDIA] "
@@ -788,7 +789,7 @@ exit:
 static void publishMediaMessage(InstaMsg *c)
 {
     memset(c->selfIpAddress, 0, sizeof(c->selfIpAddress));
-    get_device_ip_address(c->selfIpAddress);
+    get_device_ip_address(c->selfIpAddress, sizeof(c->selfIpAddress));
 
     RESET_GLOBAL_BUFFER;
     sg_sprintf((char*) GLOBAL_BUFFER,
@@ -1181,22 +1182,20 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
              "\r\nENABLE_SERVER_LOGGING_TOPIC = [%s],"
              "\r\nSERVER_LOGS_TOPIC = [%s],"
              "\r\nFILE_UPLOAD_URL = [%s],"
-             "\r\nCONFIG_FROM_SERVER_TO_CLIENT = [%s],"
+             "\r\nCONFIG_FROM_SERVER_TO_CLIENT = [%s]",
+              c->filesTopic, c->rebootTopic, c->enableServerLoggingTopic,
+              c->serverLogsTopic, c->fileUploadUrl, c->receiveConfigTopic);
+    info_log(LOG_GLOBAL_BUFFER);
+
 #if MEDIA_STREAMING_ENABLED == 1
-             "\r\nMEDIA_TOPIC = [%s],"
+    sg_sprintf(LOG_GLOBAL_BUFFER, "\r\nMEDIA_TOPIC = [%s],"
              "\r\nMEDIA_REPLY_TOPIC = [%s],"
              "\r\nMEDIA_STOP_TOPIC = [%s],"
              "\r\nMEDIA_PAUSE_TOPIC = [%s],"
-             "\r\nMEDIA_STREAMS_TOPIC = [%s],"
-#endif
-             "\n",
-             c->filesTopic, c->rebootTopic, c->enableServerLoggingTopic,
-             c->serverLogsTopic, c->fileUploadUrl, c->receiveConfigTopic
-#if MEDIA_STREAMING_ENABLED == 1
-             , c->mediaTopic, c->mediaReplyTopic, c->mediaStopTopic, c->mediaPauseTopic, c->mediaStreamsTopic
-#endif
-             );
+             "\r\nMEDIA_STREAMS_TOPIC = [%s]",
+             c->mediaTopic, c->mediaReplyTopic, c->mediaStopTopic, c->mediaPauseTopic, c->mediaStreamsTopic);
     info_log(LOG_GLOBAL_BUFFER);
+#endif
 }
 
 
