@@ -1851,8 +1851,12 @@ void start(int (*onConnectOneTimeOperations)(),
 
         RESET_GLOBAL_BUFFER;
         get_device_uuid((char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
-
         sg_sprintf(LOG_GLOBAL_BUFFER, "Device-UUID :: [%s]", (char*)GLOBAL_BUFFER);
+        info_log(LOG_GLOBAL_BUFFER);
+
+        RESET_GLOBAL_BUFFER;
+        get_device_ip_address((char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
+        sg_sprintf(LOG_GLOBAL_BUFFER, "IP-Address :: [%s]", (char*)GLOBAL_BUFFER);
         info_log(LOG_GLOBAL_BUFFER);
 
         while(1)

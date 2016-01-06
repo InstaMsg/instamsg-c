@@ -74,6 +74,9 @@ void get_manufacturer(char *messagebuffer, int maxbufferlength)
 #include <sys/ioctl.h>
 #include <net/if.h>
 #include <unistd.h>
+
+const char *IFACE = "wlan0";
+
 void get_device_uuid(char *buffer, int maxbufferlength)
 {
     /*
@@ -84,14 +87,13 @@ void get_device_uuid(char *buffer, int maxbufferlength)
      */
     int fd;
 	struct ifreq ifr;
-	char *iface = "wlan0";
 	unsigned char *mac;
     int i;
 
 	fd = socket(AF_INET, SOCK_DGRAM, 0);
 
 	ifr.ifr_addr.sa_family = AF_INET;
-	strncpy(ifr.ifr_name , iface , IFNAMSIZ-1);
+	strncpy(ifr.ifr_name, IFACE, IFNAMSIZ - 1);
 
 	ioctl(fd, SIOCGIFHWADDR, &ifr);
 
@@ -129,6 +131,38 @@ void get_device_uuid(char *buffer, int maxbufferlength)
 /*
  * This method returns the ip-address of this device.
  */
+#include <ifaddrs.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 void get_device_ip_address(char *buffer, int maxbufferlength)
 {
+    struct ifaddrs *ifAddrStruct = NULL;
+    struct ifaddrs * ifa = NULL;
+    void *tmpAddrPtr = NULL;
+
+    getifaddrs(&ifAddrStruct);
+
+    for(ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next)
+    {
+        if (!ifa->ifa_addr)
+        {
+            continue;
+        }
+        if (ifa->ifa_addr->sa_family == AF_INET)
+        {
+            if(strcmp(ifa->ifa_name, IFACE) == 0)
+            {
+                tmpAddrPtr = &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
+                inet_ntop(AF_INET, tmpAddrPtr, buffer, INET_ADDRSTRLEN);
+            }
+            else
+            {
+                continue;
+            }
+        }
+    }
+
+    if(ifAddrStruct != NULL)
+        freeifaddrs(ifAddrStruct);
 }
