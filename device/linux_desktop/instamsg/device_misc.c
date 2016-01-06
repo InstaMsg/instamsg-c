@@ -77,14 +77,14 @@ void get_manufacturer(char *messagebuffer, int maxbufferlength)
 void get_device_uuid(char *buffer, int maxbufferlength)
 {
     /*
-     * We assume that """EVERY""" Linux-Desktop device-type has an interface called "eth0",
+     * We assume that """EVERY""" Linux-Desktop device-type has an interface called "wlan0",
      * with a unique MAC-address.
      *
-     * We use that, in combination with LINUX-DESKTOP:ETH0:MAC as the prefix.
+     * We use that, in combination with LINUX-DESKTOP:WLAN0:MAC as the prefix.
      */
     int fd;
 	struct ifreq ifr;
-	char *iface = "eth0";
+	char *iface = "wlan0";
 	unsigned char *mac;
     int i;
 
@@ -98,7 +98,7 @@ void get_device_uuid(char *buffer, int maxbufferlength)
 	close(fd);
 	mac = (unsigned char *)ifr.ifr_hwaddr.sa_data;
 
-    strcat(buffer, "LINUX-DESKTOP:ETH0:MAC:");
+    strcat(buffer, "LINUX-DESKTOP:WLAN0:MAC:");
     for(i = 0; i < 6; i++)
     {
         char hex[3] = {0};
