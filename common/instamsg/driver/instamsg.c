@@ -1842,6 +1842,9 @@ void start(int (*onConnectOneTimeOperations)(),
 
     pingRequestInterval = 0;
     compulsorySocketReadAfterMQTTPublishInterval = 0;
+#if MEDIA_STREAMING_ENABLED == 1
+    mediaStreamingErrorOccurred = 0;
+#endif
 
     while(1)
     {
@@ -1928,6 +1931,16 @@ void start(int (*onConnectOneTimeOperations)(),
 
                             nextBusinessLogicTick = latestTick + editableBusinessLogicInterval;
                         }
+
+#if MEDIA_STREAMING_ENABLED == 1
+                        if(mediaStreamingErrorOccurred == 1)
+                        {
+                            sg_sprintf(LOG_GLOBAL_BUFFER, MEDIA "Error occurred in media-streaming ... rebooting device to reset everything");
+                            error_log(LOG_GLOBAL_BUFFER);
+
+                            rebootDevice();
+                        }
+#endif
                     }
                 }
             }

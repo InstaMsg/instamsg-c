@@ -105,6 +105,11 @@ int compulsorySocketReadAfterMQTTPublishInterval;
 
 char messageBuffer[2 * MAX_BUFFER_SIZE];
 
+
+#if MEDIA_STREAMING_ENABLED == 1
+unsigned char mediaStreamingErrorOccurred;
+#endif
+
 #ifdef DEBUG_MODE
 char USER_LOG_FILE_PATH[MAX_BUFFER_SIZE];
 char USER_DEVICE_UUID[MAX_BUFFER_SIZE];
