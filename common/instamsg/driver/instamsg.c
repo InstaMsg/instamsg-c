@@ -782,7 +782,7 @@ exit:
 }
 
 
-void initiateStreaming()
+static void initiateStreaming()
 {
     InstaMsg *c = &instaMsg;
 
@@ -1334,6 +1334,18 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc)
                                    interval,
                                    "Business-Logic Interval (in seconds)");
         }
+
+#if MEDIA_STREAMING_ENABLED == 1
+        registerEditableConfig(&mediaStreamingEnabledRuntime,
+                               "MEDIA_STREAMING_ENABLED",
+                               CONFIG_INT,
+                               "0",
+                               "0 - Disabled; 1 - Enabled");
+        if(mediaStreamingEnabledRuntime == 1)
+        {
+            initiateStreaming();
+        }
+#endif
 
 
         if(c->onConnectCallback != NULL)

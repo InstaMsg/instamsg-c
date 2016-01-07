@@ -102,6 +102,9 @@ unsigned char GLOBAL_BUFFER[MAX_BUFFER_SIZE];
 #define NETWORK_INFO_INTERVAL           300
 int pingRequestInterval;
 int compulsorySocketReadAfterMQTTPublishInterval;
+#if MEDIA_STREAMING_ENABLED == 1
+int mediaStreamingEnabledRuntime;
+#endif
 
 char messageBuffer[2 * MAX_BUFFER_SIZE];
 

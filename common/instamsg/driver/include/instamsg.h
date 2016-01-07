@@ -410,26 +410,6 @@ int unsubscribe (const char *topic);
 
 
 /*
- * This method initiates-media-streaming.
- *
- * Kindly see
- *                  common/apps/media_streamer/main.c
- * for example-usage.
- *
- *
- * Also, for this to be successful, the corresponding-methods in
- *                  device/<device>/instamsg/device_media.c
- * must be implemented.
- *
- */
-void initiateStreaming();
-
-
-
-
-
-
-/*
  * Kindly see
  *
  *                  common/apps/subscriber/main.c

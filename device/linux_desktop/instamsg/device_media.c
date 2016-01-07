@@ -8,6 +8,9 @@
 #include <gst/gst.h>
 
 
+char mediaIp[20];
+char mediaPort[20];
+
 static void *startPipeline(void *arg)
 {
     GstElement *pipeline;
@@ -16,7 +19,7 @@ static void *startPipeline(void *arg)
 
     gst_init (NULL, NULL);
     RESET_GLOBAL_BUFFER;
-    sg_sprintf((char*) GLOBAL_BUFFER, "v4l2src device=/dev/video0 ! udpsink host=%s port=%s", mediaServerIpAddress, mediaServerPort);
+    sg_sprintf((char*) GLOBAL_BUFFER, "v4l2src device=/dev/video0 ! udpsink host=%s port=%s", mediaIp, mediaPort);
 
     pipeline = gst_parse_launch ((char*) GLOBAL_BUFFER, NULL);
     gst_element_set_state (pipeline, GST_STATE_PLAYING);
@@ -58,6 +61,13 @@ static void *startPipeline(void *arg)
 void create_and_start_streaming_pipeline(const char *mediaServerIpAddress, const char *mediaServerPort)
 {
     pthread_t tid;
+
+    memset(mediaIp, 0, sizeof(mediaIp));
+    strcpy(mediaIp, mediaServerIpAddress);
+
+    memset(mediaPort, 0, sizeof(mediaPort));
+    strcpy(mediaPort, mediaServerPort);
+
     pthread_create(&tid, NULL, startPipeline, NULL);
 }
 
