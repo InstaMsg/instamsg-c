@@ -639,43 +639,32 @@ static void broadcastMedia(InstaMsg * c, char *sdpAnswer)
          *
          *              m=video 12345 RTP/AVP 96
          */
-        char *token = strtok(sdpAnswer, "\n");
-        while(token != NULL)
+        const char *stringToSearch = "m=video ";
+
+        char *pos = strstr(sdpAnswer, stringToSearch);
+        if(pos != NULL)
         {
-            if(strstr(token, "m=video") == token)
+            char *token = strtok(pos, " ");
+
+            if(token != NULL)
             {
                 /*
-                 * We found the line containing the server-token.
-                 */
-                break;
+                * Find the server-port.
+                */
+                memset(c->mediaServerPort, 0, sizeof(c->mediaServerPort));
+                strcpy(c->mediaServerPort, strtok(NULL, " "));
+
+                sg_sprintf(LOG_GLOBAL_BUFFER, MEDIA "Media-Server IP-Address and Port being used for streaming [%s], [%s]",
+                                              c->mediaServerIpAddress,  c->mediaServerPort);
+                info_log(LOG_GLOBAL_BUFFER);
+
+                create_and_start_streaming_pipeline(c->mediaServerIpAddress, c->mediaServerPort);
+                return;
             }
-            else
-            {
-                token = strtok(NULL, "\n");
-            }
-        }
-
-        if(token != NULL)
-        {
-            /*
-             * Find the server-port.
-             */
-            memset(c->mediaServerPort, 0, sizeof(c->mediaServerPort));
-
-            strtok(token, " ");
-            strcpy(c->mediaServerPort, strtok(NULL, ""));
-
-            sg_sprintf(LOG_GLOBAL_BUFFER, MEDIA "Media-Server-Port being used for streaming [%s]", c->mediaServerPort);
-            info_log(LOG_GLOBAL_BUFFER);
-
-            create_and_start_streaming_pipeline(c->mediaServerIpAddress, c->mediaServerPort);
-        }
-        else
-        {
-            error_log(MEDIA "Could not find server-port for streaming.. not doing anything else !!!");
-            return;
         }
     }
+
+    error_log(MEDIA "Could not find server-port for streaming.. not doing anything else !!!");
 }
 
 
@@ -705,6 +694,13 @@ static void handleMediaReplyMessage(InstaMsg *c, MQTTMessage *msg)
         if(strlen(sdpAnswer) > 0)
         {
             broadcastMedia(c, sdpAnswer);
+        }
+        else
+        {
+            sg_sprintf(LOG_GLOBAL_BUFFER, MEDIA "Could not process sdp-answer ... media will not start streaming !!!");
+            error_log(LOG_GLOBAL_BUFFER);
+
+            goto exit;
         }
 
 exit:
@@ -786,13 +782,15 @@ exit:
 }
 
 
-static void publishMediaMessage(InstaMsg *c)
+void initiate_streaming()
 {
+    InstaMsg *c = &instaMsg;
+
     memset(c->selfIpAddress, 0, sizeof(c->selfIpAddress));
     get_device_ip_address(c->selfIpAddress, sizeof(c->selfIpAddress));
 
-    RESET_GLOBAL_BUFFER;
-    sg_sprintf((char*) GLOBAL_BUFFER,
+    memset(messageBuffer, 0, sizeof(messageBuffer));
+    sg_sprintf(messageBuffer,
                "{"
                     "'to': '%s', "
                     "'sdp_offer' : 'v=0\r\n"
@@ -815,16 +813,16 @@ static void publishMediaMessage(InstaMsg *c)
                                     c->selfIpAddress,
                                     c->selfIpAddress,
                 c->clientIdComplete,
-                streamId);
+                c->clientIdComplete);
 
 
-		publish(c->mediaTopic,
-				(char*)GLOBAL_BUFFER,
-				QOS1,
-				0,
-				NULL,
-				MQTT_RESULT_HANDLER_TIMEOUT,
-				1);
+    publish(c->mediaTopic,
+	    	messageBuffer,
+			QOS1,
+			0,
+			NULL,
+			MQTT_RESULT_HANDLER_TIMEOUT,
+			1);
 }
 #endif
 

@@ -400,9 +400,19 @@ int subscribe       (const char *topic,
  *      b)
  *      It is the application's duty to re-send the message (if at all required), because there is no guarantee whether
  *      the message reached the server or not.
-
+ *
  */
 int unsubscribe (const char *topic);
+
+
+
+
+
+
+/*
+ * This method initiates-video-streaming.
+ */
+void initiate_streaming();
 
 
 

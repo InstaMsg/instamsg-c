@@ -14,10 +14,20 @@
  * The key/value can be without double-quotes or single-quotes, but we will return them as a string nevertheless
  * (the calling-function will do the necessary conversions as necessary).
  */
-void getJsonKeyValueIfPresent(char *json, const char *key, char *buf)
+void getJsonKeyValueIfPresent(char *json_original, const char *key, char *buf)
 {
     unsigned char NOT_FOUND, keyWrapper;
-    char *jsonStartingPointer, *parsedKeyToken, *parsedValueToken, *token;
+    char *parsedKeyToken, *parsedValueToken, *token;
+    char *json;
+
+    json = (char*) sg_malloc(MAX_BUFFER_SIZE);
+    if(json == NULL)
+    {
+        error_log("Could not allocate mmeory for JSON");
+        goto exit;
+    }
+    memset(json, 0, MAX_BUFFER_SIZE);
+    strcpy(json, json_original);
 
     parsedKeyToken = (char *)sg_malloc(MAX_BUFFER_SIZE);
     parsedValueToken = (char *)sg_malloc(MAX_BUFFER_SIZE);
@@ -33,8 +43,21 @@ void getJsonKeyValueIfPresent(char *json, const char *key, char *buf)
 
     NOT_FOUND = ' ';
     keyWrapper = NOT_FOUND;
-    jsonStartingPointer = json;
     token = parsedKeyToken;
+
+    /*
+     * Replace all \r and \n with NOT_FOUND.
+     */
+    {
+        int i;
+        for(i = 0; i < strlen(json); i++)
+        {
+            if((json[i] == '\r') || (json[i] == '\n'))
+            {
+                json[i] = NOT_FOUND;
+            }
+        }
+    }
 
     while(*json)
     {
@@ -49,11 +72,22 @@ void getJsonKeyValueIfPresent(char *json, const char *key, char *buf)
             /* This means we need to start parsing the key now. */
             keyWrapper = *json;
         }
-        else if((*json == ':') && (keyWrapper == NOT_FOUND))
+        else if((keyWrapper == NOT_FOUND) && (*json == ':'))
         {
         }
-        else if(    (*json == keyWrapper) ||
-                    ((*json == '}') && (keyWrapper == NOT_FOUND)))
+        else if((keyWrapper == NOT_FOUND) && (*json != '}'))
+        {
+            keyWrapper = ',';
+
+            {
+                /* Simply add to the running token. */
+                char ch[2] = {0};
+                ch[0] = *json;
+                strcat(token, ch);
+            }
+        }
+        else if(    (keyWrapper == *json) ||
+                    ((keyWrapper == NOT_FOUND) && (*json == '}')))
         {
             /* We need to stop parsing the key now. */
             keyWrapper = NOT_FOUND;
@@ -70,7 +104,7 @@ void getJsonKeyValueIfPresent(char *json, const char *key, char *buf)
                 {
                     strcat(buf, parsedValueToken);
 
-                    sg_sprintf(LOG_GLOBAL_BUFFER, "Found key [%s] and value [%s] in json [%s]", parsedKeyToken, buf, jsonStartingPointer);
+                    sg_sprintf(LOG_GLOBAL_BUFFER, "Found key [%s] and value [%s] in json [%s]", parsedKeyToken, buf, json_original);
                     debug_log(LOG_GLOBAL_BUFFER);
 
                     goto exit;
