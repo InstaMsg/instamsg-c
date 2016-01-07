@@ -5,7 +5,10 @@ SYSTEM_INCLUDES=`echo                                               		\
         -isystem/usr/local/include                                        	\
         -isystem/usr/lib/gcc/i686-linux-gnu/4.8/include-fixed             	\
         -isystem/usr/include/i386-linux-gnu                               	\
-        -isystem/usr/include  												`
+        -isystem/usr/include  												\
+		-isystem/usr/include/gstreamer-1.0                                  \
+		-isystem/usr/include/glib-2.0                                       \
+	   	-isystem/usr/lib/i386-linux-gnu/glib-2.0/include					`
 
 
 # Uncomment the following, if device provides File-System-Implementation.
@@ -43,7 +46,12 @@ EXTRA_OBJECT_FILES=`echo	`
 
 # Compile-cum-Link command for the platform.
 #
-COMPILE_COMMAND="gcc -g -nostdinc -pedantic "
+COMPILE_COMMAND="gcc -g -nostdinc -pedantic -pthread "
+
+
+# Any final libraries that need to be linked.
+#
+POST_LINKED_LIBS=" -lgstreamer-1.0 -lgobject-2.0 -lglib-2.0 "
 
 
 # Any final commands that need to be run.

@@ -43,6 +43,11 @@ EXTRA_OBJECT_FILES=`echo   `
 COMPILE_COMMAND="gcc "
 
 
+# Any final libraries that need to be linked.
+#
+POST_LINKED_LIBS=""
+
+
 # Any final commands that need to be run.
 #
 # Most-likely, these commands would (prepare to) flash the
