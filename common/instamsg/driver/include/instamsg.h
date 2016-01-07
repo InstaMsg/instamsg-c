@@ -410,7 +410,7 @@ int unsubscribe (const char *topic);
 
 
 /*
- * This method initiates-video-streaming.
+ * This method initiates-media-streaming.
  */
 void initiateStreaming();
 

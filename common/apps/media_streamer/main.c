@@ -1,14 +1,9 @@
 #include "../../instamsg/driver/include/instamsg.h"
 
-static void coreLoopyBusinessLogicInitiatedBySelf()
+static int onConnectCallback()
 {
-    static unsigned char streamingStarted = 0;
-
-    if(streamingStarted == 0)
-    {
-        initiateStreaming();
-        streamingStarted = 1;
-    }
+    initiateStreaming();
+    return SUCCESS;
 }
 
 
@@ -23,5 +18,5 @@ int main(int argc, char** argv)
 #endif
 
     globalSystemInit(logFilePath);
-    start(NULL, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, 3);
+    start(onConnectCallback, NULL, NULL, NULL, 3);
 }
