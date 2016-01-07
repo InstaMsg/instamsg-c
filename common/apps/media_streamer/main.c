@@ -6,7 +6,7 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
 
     if(streamingStarted == 0)
     {
-        initiate_streaming();
+        initiateStreaming();
         streamingStarted = 1;
     }
 }

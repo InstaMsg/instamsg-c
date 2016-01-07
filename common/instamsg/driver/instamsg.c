@@ -782,7 +782,7 @@ exit:
 }
 
 
-void initiate_streaming()
+void initiateStreaming()
 {
     InstaMsg *c = &instaMsg;
 
