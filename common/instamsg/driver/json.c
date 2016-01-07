@@ -17,8 +17,8 @@
 void getJsonKeyValueIfPresent(char *json_original, const char *key, char *buf)
 {
     unsigned char NOT_FOUND, keyWrapper;
-    char *parsedKeyToken, *parsedValueToken, *token;
-    char *json, *newJsonBeginnerPointer;
+    char *parsedKeyToken = NULL, *parsedValueToken = NULL, *token = NULL;
+    char *json = NULL, *newJsonBeginnerPointer = NULL;
 
     json = (char*) sg_malloc(MAX_BUFFER_SIZE);
     if(json == NULL)
