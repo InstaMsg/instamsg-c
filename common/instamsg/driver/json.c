@@ -18,7 +18,7 @@ void getJsonKeyValueIfPresent(char *json_original, const char *key, char *buf)
 {
     unsigned char NOT_FOUND, keyWrapper;
     char *parsedKeyToken, *parsedValueToken, *token;
-    char *json;
+    char *json, *newJsonBeginnerPointer;
 
     json = (char*) sg_malloc(MAX_BUFFER_SIZE);
     if(json == NULL)
@@ -28,6 +28,7 @@ void getJsonKeyValueIfPresent(char *json_original, const char *key, char *buf)
     }
     memset(json, 0, MAX_BUFFER_SIZE);
     strcpy(json, json_original);
+    newJsonBeginnerPointer = json;
 
     parsedKeyToken = (char *)sg_malloc(MAX_BUFFER_SIZE);
     parsedValueToken = (char *)sg_malloc(MAX_BUFFER_SIZE);
@@ -130,6 +131,8 @@ void getJsonKeyValueIfPresent(char *json_original, const char *key, char *buf)
     }
 
 exit:
+    if(newJsonBeginnerPointer)
+        sg_free(newJsonBeginnerPointer);
 
     if(parsedKeyToken)
         sg_free(parsedKeyToken);
