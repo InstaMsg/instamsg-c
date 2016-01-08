@@ -1953,36 +1953,37 @@ void start(int (*onConnectOneTimeOperations)(),
 #endif
                     }
                 }
-            }
 
-            /* This is 1 means physical-socket is fine, AND connection to InstaMsg-Server is fine at protocol level. */
-            if(c->connected == 1)
-            {
-            }
-            else if((c->ipstack).socketCorrupted == 0)
-            {
-                static int connectionAttempts = 0;
-                connectionAttempts++;
-
-                sg_sprintf(LOG_GLOBAL_BUFFER, "Socket is fine at physical layer, but no connection established (yet) with InstaMsg-Server.");
-                error_log(LOG_GLOBAL_BUFFER);
-
-                if(connectionAttempts > MAX_CONN_ATTEMPTS_WITH_PHYSICAL_LAYER_FINE)
+                /* This is 1 means physical-socket is fine, AND connection to InstaMsg-Server is fine at protocol level. */
+                if(c->connected == 1)
                 {
-                    connectionAttempts = 0;
+                }
+                else if((c->ipstack).socketCorrupted == 0)
+                {
+                    static int connectionAttempts = 0;
+                    connectionAttempts++;
 
                     sg_sprintf(LOG_GLOBAL_BUFFER,
-                              "Connection-Attempts exhausted ... so trying with re-initializing the socket-physical layer.");
+                              "Socket is fine at physical layer, but no connection established (yet) with InstaMsg-Server.");
                     error_log(LOG_GLOBAL_BUFFER);
 
-                    (c->ipstack).socketCorrupted = 1;
-                }
-            }
+                    if(connectionAttempts > MAX_CONN_ATTEMPTS_WITH_PHYSICAL_LAYER_FINE)
+                    {
+                        connectionAttempts = 0;
 
-            if((c->ipstack).socketCorrupted == 1)
-            {
-                clearInstaMsg(&instaMsg);
-                break;
+                        sg_sprintf(LOG_GLOBAL_BUFFER,
+                                  "Connection-Attempts exhausted ... so trying with re-initializing the socket-physical layer.");
+                        error_log(LOG_GLOBAL_BUFFER);
+
+                        (c->ipstack).socketCorrupted = 1;
+                    }
+                }
+
+                if((c->ipstack).socketCorrupted == 1)
+                {
+                    clearInstaMsg(&instaMsg);
+                    break;
+                }
             }
         }
     }
