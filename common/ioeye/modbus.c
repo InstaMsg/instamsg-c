@@ -265,6 +265,7 @@ static void fillModbusCommandResponseIntoMessageBufferForClassicalDevice(char *m
 {
     int rc;
     unsigned char *responseByteBuffer = NULL;
+    int offset;
 
     {
         int prefixStartIndex, prefixEndIndex, i;
@@ -351,6 +352,49 @@ static void fillModbusCommandResponseIntoMessageBufferForClassicalDevice(char *m
 
         sg_sprintf(LOG_GLOBAL_BUFFER, "Modbus-Command [%s], Modbus-Response [%s]", commandHexString, (char*)GLOBAL_BUFFER);
         debug_log(LOG_GLOBAL_BUFFER);
+
+        /*
+         * Do validation-checks in the response.
+         *
+         * a)
+         * Check if the first two-bytes/four-nibbles are in accordance.
+         * That is, check if the slave-id and function-code are there in place, as expected by the modbus-command.
+         */
+        offset = prefixEndIndex - prefixStartIndex + 1;
+
+        {
+            if(strncmp((char*)GLOBAL_BUFFER + offset, commandHexString, 4) != 0)
+            {
+                sg_sprintf(LOG_GLOBAL_BUFFER, "Slave-Id/Function-Code not proper in the response [%s] for command [%s] .. rebooting device",
+                                              ((char*)GLOBAL_BUFFER) + offset, commandHexString);
+                rebootDevice();
+            }
+        }
+
+        /*
+         * b)
+         * Check the CRC.
+         */
+        {
+            char crcBackup[5] = {0};
+            int totalLength = strlen((char*) GLOBAL_BUFFER);
+
+            for(i = 0; i < 4; i++)
+            {
+                char *crcPointer = ((char*)GLOBAL_BUFFER) + totalLength - 4 + i;
+
+                crcBackup[i] = *crcPointer; /* Take the backup of this CRC character */
+                *crcPointer = 0;            /* Mark this as null-terminator. */
+            }
+
+            appendModbusCRC16((char*)GLOBAL_BUFFER + offset, sizeof(GLOBAL_BUFFER) - offset);
+            if(strncmp((char*)GLOBAL_BUFFER + totalLength - 4, crcBackup, 4) != 0)
+            {
+                sg_sprintf(LOG_GLOBAL_BUFFER, "CRC not proper in the response [%s] for command [%s] .. rebooting device",
+                                              ((char*)GLOBAL_BUFFER) + offset, commandHexString);
+                rebootDevice();
+            }
+        }
 
         /*
          * Finally, add the modbus-response field in the total-XMLized-response to be sent to the server.
