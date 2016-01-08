@@ -1880,8 +1880,6 @@ void start(int (*onConnectOneTimeOperations)(),
             {
                 sg_sprintf(LOG_GLOBAL_BUFFER, "Socket not available at physical layer .. so nothing can be read from socket.");
                 error_log(LOG_GLOBAL_BUFFER);
-
-                break;
             }
             else
             {
