@@ -21,6 +21,9 @@ static void *startPipeline(void *arg)
     RESET_GLOBAL_BUFFER;
     sg_sprintf((char*) GLOBAL_BUFFER, "v4l2src device=/dev/video0 ! udpsink host=%s port=%s", mediaIp, mediaPort);
 
+    sg_sprintf(LOG_GLOBAL_BUFFER, "%s", (char*) GLOBAL_BUFFER);
+    info_log(LOG_GLOBAL_BUFFER);
+
     pipeline = gst_parse_launch ((char*) GLOBAL_BUFFER, NULL);
     gst_element_set_state (pipeline, GST_STATE_PLAYING);
 
