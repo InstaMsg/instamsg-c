@@ -38,6 +38,7 @@ static char streamId[MAX_BUFFER_SIZE];
 #endif
 
 static int editableBusinessLogicInterval;
+static unsigned char mqttConnectFlag;
 
 static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
@@ -372,6 +373,19 @@ static int sendPacket(InstaMsg *c, unsigned char *buf, int length)
         rc = FAILURE;
         goto exit;
     }
+
+    if(mqttConnectFlag != 1)
+    {
+        if(c->connected == 0)
+        {
+            sg_sprintf(LOG_GLOBAL_BUFFER, "No CONNACK received from server .. so packet cannot be sent to server.");
+            error_log(LOG_GLOBAL_BUFFER);
+
+            rc = FAILURE;
+            goto exit;
+        }
+    }
+    mqttConnectFlag = 0;
 
     if((c->ipstack).write(&(c->ipstack), buf, length) == FAILURE)
     {
@@ -1610,6 +1624,7 @@ void* MQTTConnect(void* arg)
         return NULL;
     }
 
+    mqttConnectFlag = 1;
     sendPacket(c, GLOBAL_BUFFER, len);
 
     return NULL;
@@ -1852,6 +1867,7 @@ void start(int (*onConnectOneTimeOperations)(),
     nextBusinessLogicTick = latestTick + editableBusinessLogicInterval;
 
 
+    mqttConnectFlag = 0;
     pingRequestInterval = 0;
     compulsorySocketReadAfterMQTTPublishInterval = 0;
 #if MEDIA_STREAMING_ENABLED == 1
