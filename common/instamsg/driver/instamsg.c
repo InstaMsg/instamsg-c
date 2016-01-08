@@ -630,7 +630,7 @@ static void broadcastMedia(InstaMsg * c, char *sdpAnswer)
          * We hard-code the media-server-ip-address.
          */
         memset(c->mediaServerIpAddress, 0, sizeof(c->mediaServerIpAddress));
-        strcpy(c->mediaServerIpAddress, "23.253.42.123");
+        strcpy(c->mediaServerIpAddress, "162.242.174.56");
     }
 
     {

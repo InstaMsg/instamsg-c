@@ -19,7 +19,7 @@ static void *startPipeline(void *arg)
 
     gst_init (NULL, NULL);
     RESET_GLOBAL_BUFFER;
-    sg_sprintf((char*) GLOBAL_BUFFER, "v4l2src device=/dev/video0 ! udpsink host=%s port=%s", mediaIp, mediaPort);
+    sg_sprintf((char*) GLOBAL_BUFFER, "v4l2src device=/dev/video0 ! x264enc ! rtph264pay ! udpsink host=%s port=%s", mediaIp, mediaPort);
 
     sg_sprintf(LOG_GLOBAL_BUFFER, "%s", (char*) GLOBAL_BUFFER);
     info_log(LOG_GLOBAL_BUFFER);
