@@ -1,7 +1,8 @@
-#ifdef FILE_SYSTEM_INTERFACE_ENABLED
+#include "device_file_system.h"
+
+#if FILE_SYSTEM_ENABLED == 1
 
 #include "./include/file_system.h"
-#include "device_file_system.h"
 
 void init_file_system(FileSystem *fs, void *arg)
 {

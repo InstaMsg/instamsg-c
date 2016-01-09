@@ -1,11 +1,10 @@
-#ifdef FILE_SYSTEM_INTERFACE_ENABLED
-
 #include "./include/globals.h"
 #include "./include/instamsg.h"
 #include "./include/httpclient.h"
 
 #include "device_file_system.h"
 
+#if FILE_SYSTEM_ENABLED == 1
 #include <string.h>
 
 #define HTTP_RESPONSE_STATUS_PREFIX "HTTP/1.0"

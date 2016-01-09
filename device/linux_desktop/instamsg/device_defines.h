@@ -23,5 +23,6 @@
 #define MAX_HEAP_SIZE (10 * (MAX_BUFFER_SIZE + HEADER_SIZE))
 
 #define MEDIA_STREAMING_ENABLED     1
+#define FILE_SYSTEM_ENABLED         1
 
 #endif

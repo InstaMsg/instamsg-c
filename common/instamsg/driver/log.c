@@ -16,7 +16,7 @@
 
 
 
-#ifdef FILE_SYSTEM_INTERFACE_ENABLED
+#if FILE_SYSTEM_ENABLED == 1
 #define LOG_COMMON_CODE(log, level)                                                                     \
                                                                                                         \
     strcat(log, "\r\n");                                                                                \
@@ -60,7 +60,7 @@
 #endif
 
 
-#ifdef FILE_SYSTEM_INTERFACE_ENABLED
+#if FILE_SYSTEM_ENABLED == 1
 void init_file_logger(FileLogger *fileLogger, void *arg)
 {
     /* Here, physical medium is a file-system. */

@@ -19,5 +19,6 @@
 #define MODBUS_COMMAND_BUFFER_SIZE  150
 
 #define MEDIA_STREAMING_ENABLED     0
+#define FILE_SYSTEM_ENABLED         0
 
 #endif

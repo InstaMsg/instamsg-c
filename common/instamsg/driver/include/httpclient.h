@@ -11,7 +11,7 @@ struct HTTPResponse
 };
 
 
-#ifdef FILE_SYSTEM_INTERFACE_ENABLED
+#if FILE_SYSTEM_ENABLED == 1
 HTTPResponse downloadFile(const char *url,
                           const char *downloadedFileName,
                           KeyValuePairs *params,

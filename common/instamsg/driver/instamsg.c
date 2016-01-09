@@ -937,7 +937,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
          */
         HTTPResponse response = {0};
 
-#ifdef FILE_SYSTEM_INTERFACE_ENABLED
+#if FILE_SYSTEM_ENABLED == 1
         response = downloadFile(url, filename, NULL, NULL, 10);
 #endif
         if(response.status == HTTP_FILE_DOWNLOAD_SUCCESS)
@@ -954,7 +954,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         RESET_GLOBAL_BUFFER;
         fileListing = (char*)GLOBAL_BUFFER;
 
-#ifdef FILE_SYSTEM_INTERFACE_ENABLED
+#if FILE_SYSTEM_ENABLED == 1
         (c->singletonUtilityFs).getFileListing(&(c->singletonUtilityFs), fileListing, MAX_BUFFER_SIZE, ".");
 #else
         strcat(fileListing, "{}");
@@ -969,7 +969,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     {
         int status = FAILURE;
 
-#ifdef FILE_SYSTEM_INTERFACE_ENABLED
+#if FILE_SYSTEM_ENABLED == 1
         status = (c->singletonUtilityFs).deleteFile(&(c->singletonUtilityFs), filename);
 #endif
 
@@ -992,7 +992,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     {
         HTTPResponse response = {0};
 
-#ifdef FILE_SYSTEM_INTERFACE_ENABLED
+#if FILE_SYSTEM_ENABLED == 1
         char *clientIdBuf;
         KeyValuePairs headers[5];
 
@@ -1143,7 +1143,7 @@ void clearInstaMsg(InstaMsg *c)
 {
     release_socket(&(c->ipstack));
 
-#ifdef FILE_SYSTEM_INTERFACE_ENABLED
+#if FILE_SYSTEM_ENABLED == 1
     release_file_system(&(c->singletonUtilityFs));
 #endif
 
@@ -1221,7 +1221,7 @@ void initInstaMsg(InstaMsg* c,
     runBusinessLogicImmediately = 0;
     init_config();
 
-#ifdef FILE_SYSTEM_INTERFACE_ENABLED
+#if FILE_SYSTEM_ENABLED == 1
     init_file_system(&(c->singletonUtilityFs), "");
 #endif
 

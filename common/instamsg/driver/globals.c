@@ -454,7 +454,7 @@ void globalSystemInit(char *logFilePath)
     init_global_timer();
     watchdog_init();
 
-#ifdef FILE_SYSTEM_INTERFACE_ENABLED
+#if FILE_SYSTEM_ENABLED == 1
     init_file_logger(&fileLogger, logFilePath);
 #endif
 }

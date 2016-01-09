@@ -85,7 +85,7 @@ struct InstaMsg {
     unsigned char serverLoggingEnabled;
 
     Socket ipstack;
-#ifdef FILE_SYSTEM_INTERFACE_ENABLED
+#if FILE_SYSTEM_ENABLED == 1
     FileSystem singletonUtilityFs;
 #endif
 

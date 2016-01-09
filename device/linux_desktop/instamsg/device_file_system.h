@@ -1,7 +1,9 @@
-#ifdef FILE_SYSTEM_INTERFACE_ENABLED
-
 #ifndef INSTAMSG_FILE_SYSTEM
 #define INSTAMSG_FILE_SYSTEM
+
+#include "../../../common/instamsg/driver/include/globals.h"
+
+#if FILE_SYSTEM_ENABLED == 1
 
 #include <stdio.h>
 

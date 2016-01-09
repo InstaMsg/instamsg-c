@@ -25,6 +25,8 @@ SOURCES=`echo                                                                   
         common/instamsg/driver/sg_stdlib.c                                                      \
         common/instamsg/driver/socket.c                                                         \
         common/instamsg/driver/config.c                                                         \
+        common/instamsg/driver/file_system.c                                                    \
+        common/instamsg/driver/httpclient.c                                                     \
                                                                                                 \
         common/instamsg/mqtt/src/MQTTFormat.c                                                   \
         common/instamsg/mqtt/src/MQTTPacket.c                                                   \
@@ -43,6 +45,7 @@ SOURCES=`echo                                                                   
         device/${VENDOR}/instamsg/device_watchdog.c                                             \
         device/${VENDOR}/instamsg/device_config.c                                               \
         device/${VENDOR}/instamsg/device_media.c                                                \
+        device/${VENDOR}/instamsg/device_file_system.c                                          \
         device/${VENDOR}/instamsg/device_misc.c                                                 `
 
 
@@ -64,14 +67,6 @@ then
     COMPILE_COMMAND="${COMPILE_COMMAND} -DSSL_ENABLED"
 fi
 
-
-
-# Compile the File-System-Module only if applicable.
-if [ ! -z ${FS_COMMUNICATION_IMPL} ];
-then
-    SOURCES="${SOURCES} common/instamsg/driver/file_system.c device/${VENDOR}/instamsg/device_file_system.c common/instamsg/driver/httpclient.c  "
-    COMPILE_COMMAND="${COMPILE_COMMAND} -DFILE_SYSTEM_INTERFACE_ENABLED"
-fi
 
 COMPILE_COMMAND="${COMPILE_COMMAND} ${APP_COMPILER_DIRECTIVES} "
 

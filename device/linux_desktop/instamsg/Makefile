@@ -11,11 +11,6 @@ SYSTEM_INCLUDES=`echo                                               		\
 	   	-isystem/usr/lib/i386-linux-gnu/glib-2.0/include					`
 
 
-# Uncomment the following, if device provides File-System-Implementation.
-#
-FS_COMMUNICATION_IMPL="Y"
-
-
 # Uncomment the following, if device is a GSM-device.
 # Uncommenting this, causes the device to wait for a SMS from the InstaMsg-server, containing the following params ::
 #

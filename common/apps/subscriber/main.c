@@ -70,7 +70,7 @@ int main(int argc, char** argv)
 {
     char *logFilePath = NULL;
 
-#ifdef FILE_SYSTEM_INTERFACE_ENABLED
+#if FILE_SYSTEM_ENABLED == 1
     logFilePath = LOG_FILE_PATH;
 #else
     logFilePath = NULL;

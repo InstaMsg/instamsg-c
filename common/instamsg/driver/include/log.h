@@ -6,7 +6,7 @@
 
 #include "device_file_system.h"
 
-#ifdef FILE_SYSTEM_INTERFACE_ENABLED
+#if FILE_SYSTEM_ENABLED == 1
 typedef struct FileLogger FileLogger;
 struct FileLogger
 {

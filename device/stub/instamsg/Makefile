@@ -3,11 +3,6 @@
 SYSTEM_INCLUDES=`echo  	`
 
 
-# Uncomment the following, if device provides File-System-Implementation.
-#
-#FS_COMMUNICATION_IMPL="Y"
-
-
 # Uncomment the following, if device is a GSM-device.
 # Uncommenting this, causes the device to wait for a SMS from the InstaMsg-server, containing the following params ::
 #

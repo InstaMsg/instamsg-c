@@ -1,8 +1,8 @@
-#ifdef FILE_SYSTEM_INTERFACE_ENABLED
-
 #include "./device_file_system.h"
-#include "../driver/include/globals.h"
+#include "../../../common/instamsg/driver/include/globals.h"
 
+
+#if FILE_SYSTEM_ENABLED == 1
 
 /*
  * This method MUST connect the underlying medium (even if it means to retry continuously).

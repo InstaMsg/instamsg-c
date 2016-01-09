@@ -1,10 +1,9 @@
-#ifdef FILE_SYSTEM_INTERFACE_ENABLED
-
 #ifndef INSTAMSG_FILE_SYSTEM_COMMON
 #define INSTAMSG_FILE_SYSTEM_COMMON
 
 #include "device_file_system.h"
 
+#if FILE_SYSTEM_ENABLED == 1
 /*
  * Global-functions callable.
  */
