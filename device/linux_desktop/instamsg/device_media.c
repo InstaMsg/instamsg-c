@@ -3,6 +3,7 @@
 
 #include "../../../common/instamsg/driver/include/globals.h"
 
+#if MEDIA_STREAMING_ENABLED == 1
 #include <string.h>
 
 #include <gst/gst.h>
@@ -89,4 +90,6 @@ void pause_streaming()
 void stop_streaming()
 {
 }
+#endif
+
 #endif

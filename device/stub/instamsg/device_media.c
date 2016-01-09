@@ -3,6 +3,7 @@
 
 #include "../../../common/instamsg/driver/include/globals.h"
 
+#if MEDIA_STREAMING_ENABLED == 1
 /*
  * This method starts streaming, to the desired media-server.
  * THIS MUST BE DONE IN A DEDICATED THREAD.
@@ -32,4 +33,6 @@ void pause_streaming()
 void stop_streaming()
 {
 }
+#endif
+
 #endif
