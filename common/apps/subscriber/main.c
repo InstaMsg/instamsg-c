@@ -62,7 +62,7 @@ static int onConnectOneTimeOperations()
                      messageArrived,
                      subscribeAckReceived,
                      MQTT_RESULT_HANDLER_TIMEOUT,
-                         1);
+                     1);
 }
 
 
