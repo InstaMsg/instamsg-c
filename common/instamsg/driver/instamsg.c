@@ -1784,30 +1784,30 @@ int publish(const char* topicName,
 
 exit:
 
-    if(logging == 1)
+    if(rc == SUCCESS)
     {
-        if(rc == SUCCESS)
+        if(logging == 1)
         {
             sg_sprintf(LOG_GLOBAL_BUFFER, "Published successfully.\n");
             info_log(LOG_GLOBAL_BUFFER);
+        }
 
-            if(compulsorySocketReadAfterMQTTPublishInterval != 0)
+        if(compulsorySocketReadAfterMQTTPublishInterval != 0)
+        {
+            if((publishCount % compulsorySocketReadAfterMQTTPublishInterval) == 0)
             {
-                if((publishCount % compulsorySocketReadAfterMQTTPublishInterval) == 0)
-                {
-                    sg_sprintf(LOG_GLOBAL_BUFFER, "Doing out-of-order socket-read, as [%u] MQTT-Publishes have been done",
-                               compulsorySocketReadAfterMQTTPublishInterval);
-                    info_log(LOG_GLOBAL_BUFFER);
+                sg_sprintf(LOG_GLOBAL_BUFFER, "Doing out-of-order socket-read, as [%u] MQTT-Publishes have been done",
+                           compulsorySocketReadAfterMQTTPublishInterval);
+                info_log(LOG_GLOBAL_BUFFER);
 
-                    readAndProcessIncomingMQTTPacketsIfAny(c);
-                }
+                readAndProcessIncomingMQTTPacketsIfAny(c);
             }
         }
-        else
-        {
-            sg_sprintf(LOG_GLOBAL_BUFFER, "Publishing failed, error-code = [%d]\n", rc);
-            info_log(LOG_GLOBAL_BUFFER);
-        }
+    }
+    else
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Publishing failed, error-code = [%d]\n", rc);
+        info_log(LOG_GLOBAL_BUFFER);
     }
 
     return rc;
