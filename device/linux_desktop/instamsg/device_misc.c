@@ -100,7 +100,7 @@ void get_device_uuid(char *buffer, int maxbufferlength)
 	close(fd);
 	mac = (unsigned char *)ifr.ifr_hwaddr.sa_data;
 
-    strcat(buffer, "LINUX-DESKTOP:WLAN0:MAC:");
+    strcat(buffer, "");
     for(i = 0; i < 6; i++)
     {
         char hex[3] = {0};
@@ -111,7 +111,7 @@ void get_device_uuid(char *buffer, int maxbufferlength)
             strcat(buffer, "0");
         }
         strcat(buffer, hex);
-        strcat(buffer, "-");
+        strcat(buffer, ":");
     }
     /*
      * Strip the last "-"
