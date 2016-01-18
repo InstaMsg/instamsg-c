@@ -20,6 +20,8 @@ static char smallBuffer[MAX_BUFFER_SIZE / 2];
 #define COMMAND_HEX_STRING_DONT_CARE    NULL
 #define PAYLOAD_DONT_CARE               NULL
 
+#define USE_XML_FOR_PAYLOAD             0
+
 
 static int publishMessage(const char *topicName, char *message)
 {
@@ -33,17 +35,23 @@ static int publishMessage(const char *topicName, char *message)
 }
 
 
-static void addXMLFieldsInPayload(char *messageBuffer,
-                                  char *tag,
-                                  void (*func)(char *messageBuffer, int maxBufferLength))
+static void addPayloadField(char *messageBuffer,
+                            char *tag,
+                            void (*func)(char *messageBuffer, int maxBufferLength))
 {
     memset(watchdogAssistant, 0, sizeof(watchdogAssistant));
     strcat(watchdogAssistant, "Calculating-For-Payload ");
     strcat(watchdogAssistant, tag);
 
+#if USE_XML_FOR_PAYLOAD == 1
     strcat(messageBuffer, "<");
     strcat(messageBuffer, tag);
     strcat(messageBuffer, ">");
+#else
+    strcat(messageBuffer, "\"");
+    strcat(messageBuffer, tag);
+    strcat(messageBuffer, "\" : \"");
+#endif
 
     memset(smallBuffer, 0, sizeof(smallBuffer));
 
@@ -53,9 +61,13 @@ static void addXMLFieldsInPayload(char *messageBuffer,
 
     strcat(messageBuffer, smallBuffer);
 
+#if USE_XML_FOR_PAYLOAD == 1
     strcat(messageBuffer, "</");
     strcat(messageBuffer, tag);
     strcat(messageBuffer, ">");
+#else
+    strcat(messageBuffer, "\", ");
+#endif
 }
 
 
@@ -442,15 +454,24 @@ static void processModbusCommand(char *commandHexString, char *payloadValues, Mo
      */
     memset(messageBuffer, 0, sizeof(messageBuffer));
     strcat(messageBuffer, initialZeroLengthData);
-    strcat(messageBuffer, "<?xml version=\"1.0\"?><datas><data_node>");
 
-    addXMLFieldsInPayload(messageBuffer, "manufacturer", get_manufacturer);
+#if USE_XML_FOR_PAYLOAD == 1
+    strcat(messageBuffer, "<?xml version=\"1.0\"?><datas><data_node>");
+#else
+    strcat(messageBuffer, "{");
+#endif
+
+    addPayloadField(messageBuffer, "manufacturer", get_manufacturer);
 
 
     /*
      * Modbus-Response
      */
+#if USE_XML_FOR_PAYLOAD == 1
     strcat(messageBuffer, "<data><");
+#else
+    strcat(messageBuffer, "\"data\" : \"");
+#endif
     if(modbus == NULL)
     {
         fillModbusCommandResponseIntoMessageBufferForSimulatedDevice(messageBuffer, payloadValues);
@@ -459,14 +480,22 @@ static void processModbusCommand(char *commandHexString, char *payloadValues, Mo
     {
         fillModbusCommandResponseIntoMessageBufferForClassicalDevice(messageBuffer, commandHexString, modbus);
     }
+#if USE_XML_FOR_PAYLOAD == 1
     strcat(messageBuffer, "></data>");
+#else
+    strcat(messageBuffer, "\", ");
+#endif
 
 
-    addXMLFieldsInPayload(messageBuffer, "id", get_device_uuid);
-    addXMLFieldsInPayload(messageBuffer, "time", getTimeInDesiredFormat);
-    addXMLFieldsInPayload(messageBuffer, "offset", getTimezoneOffset);
+    addPayloadField(messageBuffer, "id", get_device_uuid);
+    addPayloadField(messageBuffer, "time", getTimeInDesiredFormat);
+    addPayloadField(messageBuffer, "offset", getTimezoneOffset);
 
+#if USE_XML_FOR_PAYLOAD == 1
     strcat(messageBuffer, "</data_node></datas>");
+#else
+    strcat(messageBuffer, "}");
+#endif
 
     /*
      * Now, put the actual length in the beginning.
