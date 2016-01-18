@@ -412,7 +412,7 @@ static void fillModbusCommandResponseIntoMessageBufferForSimulatedDevice(char *m
 {
     RESET_GLOBAL_BUFFER;
 
-    strcat((char*)GLOBAL_BUFFER, "010410");
+    strcat((char*)GLOBAL_BUFFER, "FF0410");
     strcat((char*)GLOBAL_BUFFER, payloadValues);
 
     appendModbusCRC16((char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
