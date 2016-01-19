@@ -1763,7 +1763,7 @@ int publish(const char* topicName,
         info_log(LOG_GLOBAL_BUFFER);
     }
 
-    len = MQTTSerialize_publish(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), 0, qos, 0, id, topic, (unsigned char*)payload, strlen((char*)payload) + 1);
+    len = MQTTSerialize_publish(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), 0, qos, 0, id, topic, (unsigned char*)payload, strlen((char*)payload));
     if (len <= 0)
         goto exit;
     if ((rc = sendPacket(c, GLOBAL_BUFFER, len)) != SUCCESS) /* send the subscribe packet */
