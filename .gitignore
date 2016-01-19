@@ -63,3 +63,4 @@ device/ar501
 device/test_device
 
 common/apps/atoll-gms
+common/ioeye
