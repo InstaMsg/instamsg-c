@@ -1796,9 +1796,12 @@ exit:
         {
             if((publishCount % compulsorySocketReadAfterMQTTPublishInterval) == 0)
             {
-                sg_sprintf(LOG_GLOBAL_BUFFER, "Doing out-of-order socket-read, as [%u] MQTT-Publishes have been done",
-                           compulsorySocketReadAfterMQTTPublishInterval);
-                info_log(LOG_GLOBAL_BUFFER);
+                if(logging == 1)
+                {
+                    sg_sprintf(LOG_GLOBAL_BUFFER, "Doing out-of-order socket-read, as [%u] MQTT-Publishes have been done",
+                               compulsorySocketReadAfterMQTTPublishInterval);
+                    info_log(LOG_GLOBAL_BUFFER);
+                }
 
                 readAndProcessIncomingMQTTPacketsIfAny(c);
             }
@@ -1806,8 +1809,11 @@ exit:
     }
     else
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Publishing failed, error-code = [%d]\n", rc);
-        info_log(LOG_GLOBAL_BUFFER);
+        if(logging == 1)
+        {
+            sg_sprintf(LOG_GLOBAL_BUFFER, "Publishing failed, error-code = [%d]\n", rc);
+            info_log(LOG_GLOBAL_BUFFER);
+        }
     }
 
     return rc;
