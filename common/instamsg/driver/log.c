@@ -13,7 +13,10 @@
 #include "./include/instamsg.h"
 #include "./include/log.h"
 #include "./include/globals.h"
+#include "./include/sg_stdlib.h"
 
+
+#define EXPIRY_SECONDS "600"
 
 
 #if FILE_SYSTEM_ENABLED == 1
@@ -77,19 +80,57 @@ void release_file_logger(FileLogger *fileLogger)
 #endif
 
 
+static void processServerLoggingMetadata()
+{
+    InstaMsg * c = &instaMsg;
+
+    if(c->serverLoggingEnabled == 1)
+    {
+        if(c->serverLogsStartTime == c->FRESH_SERVER_LOGS_TIME)
+        {
+            c->serverLogsStartTime = getCurrentTick();
+        }
+
+        /*
+		 * We allow the server-logs only for 10-minutes.
+		 */
+        if(c->serverLogsStartTime != c->FRESH_SERVER_LOGS_TIME)
+        {
+            long currentTick = getCurrentTick();
+            if(currentTick > ( (c->serverLogsStartTime) + sg_atoi(EXPIRY_SECONDS) ))
+            {
+                c->serverLogsStartTime = c->FRESH_SERVER_LOGS_TIME;
+                c->serverLoggingEnabled = 0;
+
+                publish(c->serverLogsTopic,
+			            "****** DISABLING SERVER LOGS, as " EXPIRY_SECONDS " have passed ******",
+                        QOS0,
+                        0,
+                        NULL,
+                        MQTT_RESULT_HANDLER_TIMEOUT,
+                        0);                                                                                     \
+			}
+        }
+    }
+}
+
+
 void info_log(char *log)
 {
+    processServerLoggingMetadata();
     LOG_COMMON_CODE(log, INSTAMSG_LOG_LEVEL_INFO)
 }
 
 
 void error_log(char *log)
 {
+    processServerLoggingMetadata();
     LOG_COMMON_CODE(log, INSTAMSG_LOG_LEVEL_ERROR)
 }
 
 
 void debug_log(char *log)
 {
+    processServerLoggingMetadata();
     LOG_COMMON_CODE(log, INSTAMSG_LOG_LEVEL_DEBUG)
 }

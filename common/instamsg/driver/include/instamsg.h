@@ -98,6 +98,9 @@ struct InstaMsg {
     char password[MAX_CLIENT_ID_SIZE];
 
     unsigned char connected;
+
+    long FRESH_SERVER_LOGS_TIME;
+    long serverLogsStartTime;
 };
 
 InstaMsg instaMsg;

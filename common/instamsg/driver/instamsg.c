@@ -78,6 +78,7 @@ static void serverLoggingTopicMessageArrived(InstaMsg *c, MQTTMessage *msg)
         if(strcmp(logging, "1") == 0)
         {
             c->serverLoggingEnabled = 1;
+            c->serverLogsStartTime = c->FRESH_SERVER_LOGS_TIME;
 
             sg_sprintf(LOG_GLOBAL_BUFFER, SERVER_LOGGING "Enabled.");
             info_log(LOG_GLOBAL_BUFFER);
@@ -1220,6 +1221,8 @@ void initInstaMsg(InstaMsg* c,
 
     runBusinessLogicImmediately = 0;
     init_config();
+
+    c->FRESH_SERVER_LOGS_TIME = -1;
 
 #if FILE_SYSTEM_ENABLED == 1
     init_file_system(&(c->singletonUtilityFs), "");
