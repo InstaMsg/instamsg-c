@@ -103,7 +103,7 @@ static void processServerLoggingMetadata()
                 c->serverLoggingEnabled = 0;
 
                 publish(c->serverLogsTopic,
-			            "****** DISABLING SERVER LOGS, as " EXPIRY_SECONDS " have passed ******",
+			            "****** DISABLING SERVER LOGS, as " EXPIRY_SECONDS " seconds have passed ******",
                         QOS0,
                         0,
                         NULL,
