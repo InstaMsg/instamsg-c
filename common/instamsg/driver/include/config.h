@@ -22,6 +22,7 @@ int get_config_value_from_persistent_storage(const char *key, char *buffer, int 
 int save_config_value_on_persistent_storage(const char *key, const char *value);
 int delete_config_value_from_persistent_storage(const char *key);
 
+void generate_config_json(char *messageBuffer, const char *key, enum CONFIG_TYPE type, const char *stringified_value, const char *desc);
 void process_config(char *configJson);
 
 
