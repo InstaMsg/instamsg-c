@@ -29,6 +29,9 @@
 
 #define NO_CLIENT_ID "NONE"
 
+#define SECRET "SECRET"
+#define NOTIFICATION_TOPIC "instamsg/client/notifications"
+
 #if MEDIA_STREAMING_ENABLED == 1
 #include "./include/media.h"
 
@@ -1265,18 +1268,6 @@ void initInstaMsg(InstaMsg* c,
     memset(c->clientIdComplete, 0, sizeof(c->clientIdComplete));
     strcpy(c->clientIdComplete, "");
 
-    memset(c->clientIdMachine, 0, sizeof(c->clientIdMachine));
-    strcpy(c->clientIdMachine, NO_CLIENT_ID);
-    c->connectOptions.clientID.cstring = c->clientIdMachine;
-
-    memset(c->username, 0, sizeof(c->username));
-    strcpy(c->username, "");
-    c->connectOptions.username.cstring = c->username;
-
-    memset(c->password, 0, sizeof(c->password));
-    get_device_uuid(c->password, sizeof(c->password));
-    c->connectOptions.password.cstring = c->password;
-
     c->connected = 0;
     MQTTConnect(c);
 }
@@ -1423,6 +1414,36 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                     {
                         memcpy(c->clientIdComplete, msg.payload, msg.payloadlen);
 
+                        {
+                            int remainingPayloadLength = msg.payloadlen - 36;
+                            if(remainingPayloadLength > 1)
+                            {
+                                memset(c->password, 0, sizeof(c->password));
+                                memcpy(c->password, (char*)msg.payload + 37, remainingPayloadLength - 1);
+
+                                sg_sprintf(LOG_GLOBAL_BUFFER, "Received client-secret from server via PROVACK [%s]", c->password);
+                                info_log(LOG_GLOBAL_BUFFER);
+
+                                memset(messageBuffer, 0, sizeof(messageBuffer));
+                                generate_config_json(messageBuffer, SECRET, CONFIG_STRING, c->clientIdComplete, "");
+                                save_config_value_on_persistent_storage(SECRET, messageBuffer);
+
+                                /*
+                                 * Send notification to the server, that the secret-password has been saved.
+                                 */
+                                mqttConnectFlag = 1;
+                                publish(NOTIFICATION_TOPIC,
+                                        "SECRET RECEIVED",
+                                        QOS2,
+                                        0,
+                                        NULL,
+                                        MQTT_RESULT_HANDLER_TIMEOUT,
+                                        1);
+                            }
+                        }
+
+                        memset(c->clientIdComplete, 0, sizeof(c->clientIdComplete));
+                        memcpy(c->clientIdComplete, msg.payload, 36);
                         sg_sprintf(LOG_GLOBAL_BUFFER, "Received client-id from server via PROVACK [%s]", c->clientIdComplete);
                         info_log(LOG_GLOBAL_BUFFER);
 
@@ -1619,16 +1640,68 @@ exit:
 void* MQTTConnect(void* arg)
 {
     int len = 0;
+    int rc;
+    char *secret = NULL;
     InstaMsg *c = (InstaMsg *)arg;
+
+    memset(c->clientIdMachine, 0, sizeof(c->clientIdMachine));
+    memset(c->username, 0, sizeof(c->username));
+    memset(c->password, 0, sizeof(c->password));
+
+    RESET_GLOBAL_BUFFER;
+
+    rc = get_config_value_from_persistent_storage(SECRET, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
+    if(rc == SUCCESS)
+    {
+        /*
+         * We will receive CONNACK for this leg.
+         */
+        secret = (char*) sg_malloc(MAX_BUFFER_SIZE);
+        if(secret == NULL)
+        {
+            error_log(CONFIG "Could not allocate memory for secret .. not proceeding further");
+            goto exit;
+        }
+
+        memset(secret, 0, MAX_BUFFER_SIZE);
+        getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, secret);
+
+        memset(c->clientIdComplete, 0, sizeof(c->clientIdComplete));
+        memcpy(c->clientIdComplete, secret, 36);
+        setValuesOfSpecialTopics(c);
+
+        memcpy(c->clientIdMachine, secret, 23);
+        memcpy(c->username, secret + 24, 12);
+        memcpy(c->password, secret + 37, strlen(secret) - 37);
+    }
+    else
+    {
+        /*
+         * We will receive PROVACK for this leg.
+         */
+        strcpy(c->clientIdMachine, NO_CLIENT_ID);
+        strcpy(c->username, "");
+        get_device_uuid(c->password, sizeof(c->password));
+    }
+
+    c->connectOptions.clientID.cstring = c->clientIdMachine;
+    c->connectOptions.username.cstring = c->username;
+    c->connectOptions.password.cstring = c->password;
 
     RESET_GLOBAL_BUFFER;
     if ((len = MQTTSerialize_connect(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), &(c->connectOptions))) <= 0)
     {
-        return NULL;
+        goto exit;
     }
 
     mqttConnectFlag = 1;
     sendPacket(c, GLOBAL_BUFFER, len);
+
+exit:
+    if(secret)
+    {
+        sg_free(secret);
+    }
 
     return NULL;
 }

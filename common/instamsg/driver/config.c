@@ -20,6 +20,16 @@ static int publishConfig(const char *topicName, const char *message)
 }
 
 
+void generate_config_json(char *messageBuffer, const char *key, enum CONFIG_TYPE type, const char *stringified_value, const char *desc)
+{
+    sg_sprintf(messageBuffer, "{'%s' : '%s', '%s' : '%d', '%s' : '%s', '%s' : '%s'}",
+               CONFIG_KEY_KEY, key,
+               CONFIG_TYPE_KEY, type,
+               CONFIG_VALUE_KEY, stringified_value,
+               CONFIG_DESCRIPTION_KEY, desc);
+}
+
+
 void process_config(char *configJson)
 {
     char *config_key = NULL;
@@ -131,11 +141,7 @@ void registerEditableConfig(void *var,
      * Form a Config-JSON, and do the additional-processing required.
      */
     memset(messageBuffer, 0, sizeof(messageBuffer));
-    sg_sprintf(messageBuffer, "{'%s' : '%s', '%s' : '%d', '%s' : '%s', '%s' : '%s'}",
-               CONFIG_KEY_KEY, key,
-               CONFIG_TYPE_KEY, type,
-               CONFIG_VALUE_KEY, stringified_value,
-               CONFIG_DESCRIPTION_KEY, desc);
+    generate_config_json(messageBuffer, key, type, stringified_value, desc);
 
     process_config(messageBuffer);
 
