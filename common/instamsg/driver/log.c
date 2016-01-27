@@ -24,7 +24,7 @@
                                                                                                         \
     strcat(log, "\r\n");                                                                                \
                                                                                                         \
-    if(instaMsg.serverLoggingEnabled == 1)                                                              \
+    if((instaMsg.serverLoggingEnabled == 1) && (level <= currentLogLevel))                              \
     {                                                                                                   \
         publish(instaMsg.serverLogsTopic,                                                               \
                 log,                                                                                    \
@@ -45,7 +45,7 @@
                                                                                                         \
     strcat(log, "\r\n");                                                                                \
                                                                                                         \
-    if(instaMsg.serverLoggingEnabled == 1)                                                              \
+    if((instaMsg.serverLoggingEnabled == 1) && (level <= currentLogLevel))                              \
     {                                                                                                   \
         publish(instaMsg.serverLogsTopic,                                                               \
                 log,                                                                                    \
