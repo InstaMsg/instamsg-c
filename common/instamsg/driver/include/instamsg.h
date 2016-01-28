@@ -288,7 +288,7 @@ int publish         (const char *topic,
  *      for simple (yet complete) example-usage.
  *
  */
-int send            (const char* peerClientId,
+int sendOneToOne     (const char* peerClientId,
                      const char* msg,
                      int (*replyHandler)(OneToOneResult *),
                      unsigned int replyHandlerTimeout);

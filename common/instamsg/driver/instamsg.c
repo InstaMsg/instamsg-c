@@ -618,7 +618,9 @@ static void logJsonFailureMessageAndReturn(const char *module, const char *key, 
 #if MEDIA_STREAMING_ENABLED == 1
 static void handleMediaStopMessage(InstaMsg *c)
 {
-    info_log(MEDIA "Stopping .....");
+    sg_sprintf(LOG_GLOBAL_BUFFER, "%sStopping .....", MEDIA);
+    info_log(LOG_GLOBAL_BUFFER);
+
     stop_streaming();
 
     RESET_GLOBAL_BUFFER;
@@ -636,7 +638,9 @@ static void handleMediaStopMessage(InstaMsg *c)
 
 static void handleMediaPauseMessage(InstaMsg *c)
 {
-    info_log(MEDIA "Pausing .....");
+    sg_sprintf(LOG_GLOBAL_BUFFER, "%sPausing .....", MEDIA);
+    info_log(LOG_GLOBAL_BUFFER);
+
     pause_streaming();
 }
 
@@ -1898,10 +1902,10 @@ exit:
 }
 
 
-int send(const char* peer,
-         const char* payload,
-         int (*oneToOneHandler)(OneToOneResult *),
-         unsigned int timeout)
+int sendOneToOne(const char* peer,
+                 const char* payload,
+                 int (*oneToOneHandler)(OneToOneResult *),
+                 unsigned int timeout)
 {
     InstaMsg *c = &instaMsg;
     int id = getNextPacketId(c);
