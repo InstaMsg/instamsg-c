@@ -2,7 +2,7 @@
 
 #include "./device_socket.h"
 
-#ifdef GSM_INTERFACE_ENABLED
+#if GSM_INTERFACE_ENABLED == 1
 /*
  * This method returns the *****LATEST****** sms, which contains the desired substring.
  *

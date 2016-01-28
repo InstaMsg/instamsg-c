@@ -20,5 +20,7 @@
 
 #define MEDIA_STREAMING_ENABLED     0
 #define FILE_SYSTEM_ENABLED         0
+#define GSM_INTERFACE_ENABLED       0
+#define SSL_ENABLED                 0
 
 #endif

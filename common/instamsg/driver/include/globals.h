@@ -46,7 +46,7 @@ struct KeyValuePairs
 #if 1
 #define INSTAMSG_HOST       "device.instamsg.io"
 
-#ifdef SSL_ENABLED
+#if  SSL_ENABLED == 1
 #define INSTAMSG_PORT       8883
 #else
 #define INSTAMSG_PORT       1883

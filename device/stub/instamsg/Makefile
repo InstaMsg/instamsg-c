@@ -3,23 +3,6 @@
 SYSTEM_INCLUDES=`echo  	`
 
 
-# Uncomment the following, if device is a GSM-device.
-# Uncommenting this, causes the device to wait for a SMS from the InstaMsg-server, containing the following params ::
-#
-# 		APN
-# 		APN-Username
-# 		APN-Password
-#
-# Above parameters are required to make a connection to the Mobile-APN.
-#
-#IS_GSM_DEVICE="Y"
-
-
-# Uncomment the following, if the socket-implementation provided by the device is secured.
-#
-#IS_SSL="Y"
-
-
 # Device-specific extra source-files.
 #
 EXTRA_SOURCES=`echo   `

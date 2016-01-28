@@ -20,7 +20,7 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port)
     sg_sprintf(socket->host, "%s", hostName);
     socket->port = port;
 
-#ifdef GSM_INTERFACE_ENABLED
+#if GSM_INTERFACE_ENABLED == 1
     /* Empty-initialize the GSM-params. */
     memset(socket->gsmApn, 0, sizeof(socket->gsmApn));
     memset(socket->gsmUser, 0, sizeof(socket->gsmUser));

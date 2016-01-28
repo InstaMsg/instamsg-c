@@ -56,18 +56,6 @@ mkdir -p ${OUT_DIR}
 rm -f ${OUT_DIR}/*
 
 
-if [ ! -z ${IS_GSM_DEVICE} ];
-then
-    COMPILE_COMMAND="${COMPILE_COMMAND} -DGSM_INTERFACE_ENABLED"
-fi
-
-
-if [ ! -z ${IS_SSL} ];
-then
-    COMPILE_COMMAND="${COMPILE_COMMAND} -DSSL_ENABLED"
-fi
-
-
 COMPILE_COMMAND="${COMPILE_COMMAND} ${APP_COMPILER_DIRECTIVES} "
 
 VERSION=`grep INSTAMSG_VERSION common/instamsg/driver/include/globals.h | cut -d\  -f 3 | cut -d\" -f 2`
