@@ -193,7 +193,7 @@ HTTPResponse downloadFile(const char *url,
 
         generateRequest("GET", url, params, headers, urlComplete, MAX_BUFFER_SIZE, 1);
 
-        sg_sprintf(LOG_GLOBAL_BUFFER, FILE_DOWNLOAD "Complete URL that will be hit : [%s]", urlComplete);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_DOWNLOAD "Complete URL that will be hit : [%s]"), urlComplete);
         info_log(LOG_GLOBAL_BUFFER);
 
         /*
@@ -251,7 +251,7 @@ HTTPResponse downloadFile(const char *url,
             init_file_system(&fs, (void *)tempFileName);
 
             /* Now, we need to start reading the bytes */
-            sg_sprintf(LOG_GLOBAL_BUFFER, FILE_DOWNLOAD "Beginning downloading of [%s] worth [%u] bytes", tempFileName, numBytes);
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_DOWNLOAD "Beginning downloading of [%s] worth [%u] bytes"), tempFileName, numBytes);
             info_log(LOG_GLOBAL_BUFFER);
 
             for(i = 0; i < numBytes; i++)
@@ -275,14 +275,14 @@ HTTPResponse downloadFile(const char *url,
              */
             instaMsg.singletonUtilityFs.renameFile(&(instaMsg.singletonUtilityFs), tempFileName, filename);
 
-            sg_sprintf(LOG_GLOBAL_BUFFER, FILE_DOWNLOAD "File [%s] successfully moved to [%s] worth [%u] bytes",
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_DOWNLOAD "File [%s] successfully moved to [%s] worth [%u] bytes"),
                        tempFileName, filename, numBytes);
             info_log(LOG_GLOBAL_BUFFER);
 
 exit:
             release_socket(&socket);
 
-            sg_sprintf(LOG_GLOBAL_BUFFER, FILE_DOWNLOAD "HTTP-Response Status = [%d]", response.status);
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_DOWNLOAD "HTTP-Response Status = [%d]"), response.status);
             info_log(LOG_GLOBAL_BUFFER);
 
             return response;

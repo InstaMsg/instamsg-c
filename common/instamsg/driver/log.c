@@ -73,7 +73,7 @@ void init_file_logger(FileLogger *fileLogger, void *arg)
 
 void release_file_logger(FileLogger *fileLogger)
 {
-    sg_sprintf(LOG_GLOBAL_BUFFER, "FREEING [LOG] RESOURCES (FILE-BASED).\n");
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("FREEING [LOG] RESOURCES (FILE-BASED).\n"));
 
     release_file_system(&(fileLogger->fs));
 }
