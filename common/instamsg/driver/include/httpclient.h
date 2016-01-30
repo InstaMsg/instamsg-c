@@ -3,6 +3,7 @@
 
 #include "./globals.h"
 
+#if FILE_SYSTEM_ENABLED == 1
 typedef struct HTTPResponse HTTPResponse;
 struct HTTPResponse
 {
@@ -11,7 +12,6 @@ struct HTTPResponse
 };
 
 
-#if FILE_SYSTEM_ENABLED == 1
 HTTPResponse downloadFile(const char *url,
                           const char *downloadedFileName,
                           KeyValuePairs *params,

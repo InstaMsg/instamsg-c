@@ -652,7 +652,7 @@ static void broadcastMedia(InstaMsg * c, char *sdpAnswer)
          * We hard-code the media-server-ip-address.
          */
         memset(c->mediaServerIpAddress, 0, sizeof(c->mediaServerIpAddress));
-        strcpy(c->mediaServerIpAddress, "162.242.174.56");
+        strcpy(c->mediaServerIpAddress, "23.253.42.123");
     }
 
     {
@@ -943,16 +943,17 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
          * IT MEANS THE FILE-TRANSFER COMPLETED, AND THAT TOO PERFECTLY SUCCESSFULLY.
          *
          */
-        HTTPResponse response = {0};
 
 #if FILE_SYSTEM_ENABLED == 1
-        response = downloadFile(url, filename, NULL, NULL, 10);
-#endif
+        HTTPResponse response = downloadFile(url, filename, NULL, NULL, 10);
         if(response.status == HTTP_FILE_DOWNLOAD_SUCCESS)
         {
             ackStatus = 1;
         }
         sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": %d}", messageId, ackStatus);
+#else
+        sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": %d}", messageId, ackStatus);
+#endif
 
     }
     else if( (strcmp(method, "GET") == 0) && (strlen(filename) == 0))
@@ -998,9 +999,9 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     }
     else if( (strcmp(method, "GET") == 0) && (strlen(filename) > 0))
     {
+#if FILE_SYSTEM_ENABLED == 1
         HTTPResponse response = {0};
 
-#if FILE_SYSTEM_ENABLED == 1
         char *clientIdBuf;
         KeyValuePairs headers[5];
 
@@ -1038,7 +1039,6 @@ terminateFileUpload:
 
         if(clientIdBuf)
             sg_free(clientIdBuf);
-#endif
         if(response.status == HTTP_FILE_UPLOAD_SUCCESS)
         {
             sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"url\": \"%s\"}", messageId, response.body);
@@ -1047,6 +1047,9 @@ terminateFileUpload:
         {
             sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 0}", messageId);
         }
+#else
+        sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 0}", messageId);
+#endif
     }
 
 
