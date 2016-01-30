@@ -116,12 +116,12 @@ void initInstaMsg(InstaMsg* c,
                   int (*oneToOneHandler)());
 
 
-#define SERVER_LOGGING  "[SERVER-LOGGING] "
-#define FILE_TRANSFER   "[FILE-TRANSFER] "
-#define FILE_DOWNLOAD   "[FILE-DOWNLOAD] "
-#define FILE_UPLOAD     "[FILE-UPLOAD] "
-#define FILE_LISTING    "[FILE-LISTING] "
-#define FILE_DELETE     "[FILE-DELETE] "
+#define SERVER_LOGGING  PROSTR("[SERVER-LOGGING] ")
+#define FILE_TRANSFER   PROSTR("[FILE-TRANSFER] ")
+#define FILE_DOWNLOAD   PROSTR("[FILE-DOWNLOAD] ")
+#define FILE_UPLOAD     PROSTR("[FILE-UPLOAD] ")
+#define FILE_LISTING    PROSTR("[FILE-LISTING] ")
+#define FILE_DELETE     PROSTR("[FILE-DELETE] ")
 
 void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c);
 void sendPingReqToServer(InstaMsg *c);

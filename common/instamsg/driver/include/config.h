@@ -8,8 +8,8 @@ enum CONFIG_TYPE
     CONFIG_INT
 };
 
-#define CONFIG                      "[CONFIG] "
-#define CONFIG_ERROR                "[CONFIG_ERROR] "
+#define CONFIG                      PROSTR("[CONFIG] ")
+#define CONFIG_ERROR                PROSTR("[CONFIG_ERROR] ")
 
 #define CONFIG_KEY_KEY              "key"
 #define CONFIG_TYPE_KEY             "type"

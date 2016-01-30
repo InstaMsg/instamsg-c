@@ -30,7 +30,7 @@ static int get_config_value_from_persistent_storage_and_delete_if_asked(const ch
 
     if(fp == NULL)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, CONFIG_ERROR "Could not open config-file [%s] for reading", CONFIG_FILE_NAME);
+        sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not open config-file [%s] for reading", CONFIG_ERROR, CONFIG_FILE_NAME);
         error_log(LOG_GLOBAL_BUFFER);
 
         goto exit;
@@ -40,7 +40,7 @@ static int get_config_value_from_persistent_storage_and_delete_if_asked(const ch
     jsonKey = (char*) sg_malloc(MAX_BUFFER_SIZE);
     if(jsonKey == NULL)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, CONFIG_ERROR "Could not allocate memory in config.. not proceeding");
+        sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not allocate memory in config.. not proceeding", CONFIG_ERROR);
         error_log(LOG_GLOBAL_BUFFER);
 
         goto exit;
@@ -120,7 +120,7 @@ exit:
     {
         if((rc = renameFile(NULL, TEMP_FILE_NAME, CONFIG_FILE_NAME)) != 0)
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, CONFIG_ERROR "Could not move file from [%s] to [%s]", TEMP_FILE_NAME, CONFIG_FILE_NAME);
+            sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not move file from [%s] to [%s]", CONFIG_ERROR, TEMP_FILE_NAME, CONFIG_FILE_NAME);
             error_log(LOG_GLOBAL_BUFFER);
         }
     }

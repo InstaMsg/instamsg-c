@@ -25,7 +25,7 @@ void* DEFAULT_MALLOC(unsigned short numBytes)
 
     if((currentBytesUsed + numBytes + HEADER_SIZE) > MAX_HEAP_SIZE)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(MEM_ALLOC "Cannot allocate [%u] bytes of memory."), numBytes);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCannot allocate [%u] bytes of memory."), MEM_ALLOC, numBytes);
         error_log(LOG_GLOBAL_BUFFER);
 
         goto exit;
@@ -65,7 +65,7 @@ void* DEFAULT_MALLOC(unsigned short numBytes)
         info_log(LOG_GLOBAL_BUFFER);
     }
 
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(MEM_ALLOC "Current memory remaining in bytes = [%u]"), MAX_HEAP_SIZE - currentBytesUsed);
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCurrent memory remaining in bytes = [%u]"), MEM_ALLOC, MAX_HEAP_SIZE - currentBytesUsed);
     debug_log(LOG_GLOBAL_BUFFER);
 
 exit:

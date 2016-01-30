@@ -27,16 +27,16 @@
 
 #include <string.h>
 
-#define NO_CLIENT_ID "NONE"
+#define NO_CLIENT_ID PROSTR("NONE")
 
-#define SECRET "SECRET"
-#define NOTIFICATION_TOPIC "instamsg/client/notifications"
+#define SECRET PROSTR("SECRET")
+#define NOTIFICATION_TOPIC PROSTR("instamsg/client/notifications")
 
 #if MEDIA_STREAMING_ENABLED == 1
 #include "./include/media.h"
 
 static char streamId[MAX_BUFFER_SIZE];
-#define MEDIA "[MEDIA] "
+#define MEDIA PROSTR("[MEDIA] ")
 
 #endif
 
@@ -57,8 +57,8 @@ static void serverLoggingTopicMessageArrived(InstaMsg *c, MQTTMessage *msg)
      *              {'client_id':'cc366750-e286-11e4-ace1-bc764e102b63','logging':1}
      */
 
-    const char *CLIENT_ID = "client_id";
-    const char *LOGGING = "logging";
+    const char *CLIENT_ID = PROSTR("client_id");
+    const char *LOGGING = PROSTR("logging");
     char *clientId, *logging;
 
     clientId = (char *)sg_malloc(MAX_BUFFER_SIZE);
@@ -83,14 +83,14 @@ static void serverLoggingTopicMessageArrived(InstaMsg *c, MQTTMessage *msg)
             c->serverLoggingEnabled = 1;
             c->serverLogsStartTime = c->FRESH_SERVER_LOGS_TIME;
 
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(SERVER_LOGGING "Enabled."));
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sEnabled."), SERVER_LOGGING);
             info_log(LOG_GLOBAL_BUFFER);
         }
         else
         {
             c->serverLoggingEnabled = 0;
 
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(SERVER_LOGGING "Disabled."));
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sDisabled."), SERVER_LOGGING);
             info_log(LOG_GLOBAL_BUFFER);
         }
     }
@@ -256,13 +256,13 @@ static void oneToOneMessageArrived(InstaMsg *c, MQTTMessage *msg)
     char peerMsgId[6];
     char responseMsgId[6];
 
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(ONE_TO_ONE " Payload == [%s]"), (char*) (msg->payload));
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s Payload == [%s]"), ONE_TO_ONE, (char*) (msg->payload));
     info_log(LOG_GLOBAL_BUFFER);
 
     peerMessage = (char*) sg_malloc(MAX_BUFFER_SIZE);
     if(peerMessage == NULL)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(ONE_TO_ONE "Could not allocate memory for message received from peer"));
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCould not allocate memory for message received from peer"), ONE_TO_ONE);
         error_log(LOG_GLOBAL_BUFFER);
 
         goto exit;
@@ -273,7 +273,7 @@ static void oneToOneMessageArrived(InstaMsg *c, MQTTMessage *msg)
     peer = (char*) sg_malloc(50);
     if(peer == NULL)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(ONE_TO_ONE "Could not allocate memory for peer-value"));
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCould not allocate memory for peer-value"), ONE_TO_ONE);
         error_log(LOG_GLOBAL_BUFFER);
 
         goto exit;
@@ -289,14 +289,14 @@ static void oneToOneMessageArrived(InstaMsg *c, MQTTMessage *msg)
 
     if(strlen(peerMsgId) == 0)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(ONE_TO_ONE "Peer-Message-Id not received ... not proceeding further"));
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sPeer-Message-Id not received ... not proceeding further"), ONE_TO_ONE);
         error_log(LOG_GLOBAL_BUFFER);
 
         goto exit;
     }
     if(strlen(peer) == 0)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(ONE_TO_ONE "Peer-value not received ... not proceeding further"));
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sPeer-value not received ... not proceeding further"), ONE_TO_ONE);
         error_log(LOG_GLOBAL_BUFFER);
 
         goto exit;
@@ -336,7 +336,7 @@ static void oneToOneMessageArrived(InstaMsg *c, MQTTMessage *msg)
              */
             if(fireOneToOneHandlerUsingMsgIdAsTheKey(c, sg_atoi(responseMsgId), &oneToOneResult) == FAILURE)
             {
-                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(ONE_TO_ONE "No handler found for one-to-one for message-id [%s]"), responseMsgId);
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sNo handler found for one-to-one for message-id [%s]"), ONE_TO_ONE, responseMsgId);
                 error_log(LOG_GLOBAL_BUFFER);
             }
         }
@@ -353,7 +353,7 @@ exit:
 
 static void handleConfigReceived(InstaMsg *c, MQTTMessage *msg)
 {
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(CONFIG "Received the config-payload [%s] from server"), (char*)(msg->payload));
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sReceived the config-payload [%s] from server"), CONFIG, (char*)(msg->payload));
     info_log(LOG_GLOBAL_BUFFER);
 
     process_config(msg->payload);
@@ -698,8 +698,8 @@ static void handleMediaReplyMessage(InstaMsg *c, MQTTMessage *msg)
     info_log(LOG_GLOBAL_BUFFER);
 
     {
-        const char *STREAM_ID = "stream_id";
-        const char *SDP_ANSWER = "sdp_answer";
+        const char *STREAM_ID = PROSTR("stream_id");
+        const char *SDP_ANSWER = PROSTR("sdp_answer");
 
         char *sdpAnswer;
 
@@ -742,9 +742,9 @@ static void handleMediaStreamsMessage(InstaMsg *c, MQTTMessage *msg)
     info_log(LOG_GLOBAL_BUFFER);
 
     {
-        const char *REPLY_TO = "reply_to";
-        const char *MESSAGE_ID = "message_id";
-        const char *METHOD = "method";
+        const char *REPLY_TO = PROSTR("reply_to");
+        const char *MESSAGE_ID = PROSTR("message_id");
+        const char *METHOD = PROSTR("method";)
 
         char *replyTopic, *messageId, *method;
         replyTopic = (char*) sg_malloc(100);
@@ -853,9 +853,9 @@ static void initiateStreaming()
 
 static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
 {
-    const char *REPLY_TOPIC = "reply_to";
-    const char *MESSAGE_ID = "message_id";
-    const char *METHOD = "method";
+    const char *REPLY_TOPIC = PROSTR("reply_to");
+    const char *MESSAGE_ID = PROSTR("message_id");
+    const char *METHOD = PROSTR("method");
     char *replyTopic, *messageId, *method, *url, *filename, *ackMessage;
 
     replyTopic = (char *)sg_malloc(MAX_BUFFER_SIZE);
@@ -971,7 +971,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         strcat(fileListing, "{}");
 #endif
 
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_LISTING ": [%s]"), fileListing);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s: [%s]"), FILE_LISTING, fileListing);
         info_log(LOG_GLOBAL_BUFFER);
 
         sg_sprintf(ackMessage, PROSTR("{\"response_id\": \"%s\", \"status\": 1, \"files\": %s}"), messageId, fileListing);
@@ -986,14 +986,14 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
 
         if(status == SUCCESS)
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_DELETE "[%s] deleted successfully."), filename);
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[%s] deleted successfully."), FILE_DELETE, filename);
             info_log(LOG_GLOBAL_BUFFER);
 
             sg_sprintf(ackMessage, PROSTR("{\"response_id\": \"%s\", \"status\": 1}"), messageId);
         }
         else
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_DELETE "[%s] could not be deleted :("), filename);
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[%s] could not be deleted :("), FILE_DELETE, filename);
             error_log(LOG_GLOBAL_BUFFER);
 
             sg_sprintf(ackMessage, PROSTR("{\"response_id\": \"%s\", \"status\": 0, \"error_msg\":\"%s\"}"),
@@ -1016,7 +1016,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         clientIdBuf = (char*) sg_malloc(MAX_BUFFER_SIZE);
         if(clientIdBuf == NULL)
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_UPLOAD "Failed to allocate memory"));
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to allocate memory"), FILE_UPLOAD);
             error_log(LOG_GLOBAL_BUFFER);
 
             goto terminateFileUpload;
@@ -1672,7 +1672,9 @@ void* MQTTConnect(void* arg)
         secret = (char*) sg_malloc(MAX_BUFFER_SIZE);
         if(secret == NULL)
         {
-            error_log(CONFIG "Could not allocate memory for secret .. not proceeding further");
+            sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not allocate memory for secret .. not proceeding further", CONFIG);
+            error_log(LOG_GLOBAL_BUFFER);
+
             goto exit;
         }
 

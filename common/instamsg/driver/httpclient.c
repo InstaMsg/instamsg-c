@@ -193,7 +193,7 @@ HTTPResponse downloadFile(const char *url,
 
         generateRequest("GET", url, params, headers, urlComplete, MAX_BUFFER_SIZE, 1);
 
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_DOWNLOAD "Complete URL that will be hit : [%s]"), urlComplete);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sComplete URL that will be hit : [%s]"), FILE_DOWNLOAD, urlComplete);
         info_log(LOG_GLOBAL_BUFFER);
 
         /*
@@ -251,7 +251,8 @@ HTTPResponse downloadFile(const char *url,
             init_file_system(&fs, (void *)tempFileName);
 
             /* Now, we need to start reading the bytes */
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_DOWNLOAD "Beginning downloading of [%s] worth [%u] bytes"), tempFileName, numBytes);
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sBeginning downloading of [%s] worth [%u] bytes"),
+                       FILE_DOWNLOAD, tempFileName, numBytes);
             info_log(LOG_GLOBAL_BUFFER);
 
             for(i = 0; i < numBytes; i++)
@@ -275,14 +276,14 @@ HTTPResponse downloadFile(const char *url,
              */
             instaMsg.singletonUtilityFs.renameFile(&(instaMsg.singletonUtilityFs), tempFileName, filename);
 
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_DOWNLOAD "File [%s] successfully moved to [%s] worth [%u] bytes"),
-                       tempFileName, filename, numBytes);
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFile [%s] successfully moved to [%s] worth [%u] bytes"),
+                       FILE_DOWNLOAD, tempFileName, filename, numBytes);
             info_log(LOG_GLOBAL_BUFFER);
 
 exit:
             release_socket(&socket);
 
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_DOWNLOAD "HTTP-Response Status = [%d]"), response.status);
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sHTTP-Response Status = [%d]"), FILE_DOWNLOAD, response.status);
             info_log(LOG_GLOBAL_BUFFER);
 
             return response;
@@ -341,7 +342,7 @@ HTTPResponse uploadFile(const char *url,
 
     if((request == NULL) || (secondLevel == NULL) || (fourthLevel == NULL))
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_UPLOAD "Failure in memory allocation for uploadFile"));
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailure in memory allocation for uploadFile"), FILE_UPLOAD);
         error_log(LOG_GLOBAL_BUFFER);
 
         goto exit;
@@ -394,13 +395,13 @@ HTTPResponse uploadFile(const char *url,
 
         generateRequest("POST", url, params, headers, request, MAX_BUFFER_SIZE, 0);
 
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_UPLOAD "First-stage URL that will be hit : [%s]"), request);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFirst-stage URL that will be hit : [%s]"), FILE_UPLOAD, request);
         info_log(LOG_GLOBAL_BUFFER);
     }
 
     if(socket.write(&socket, (unsigned char*)request, strlen(request)) == FAILURE)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_UPLOAD "Error occurred while uploading POST data (FIRST LEVEL) for [%s]"), filename);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sError occurred while uploading POST data (FIRST LEVEL) for [%s]"), FILE_UPLOAD, filename);
         error_log(LOG_GLOBAL_BUFFER);
 
         goto exit;
@@ -408,7 +409,7 @@ HTTPResponse uploadFile(const char *url,
 
     if(socket.write(&socket, (unsigned char*)secondLevel, strlen(secondLevel)) == FAILURE)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_UPLOAD "Error occurred while uploading POST data (SECOND LEVEL) for [%s]"), filename);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sError occurred while uploading POST data (SECOND LEVEL) for [%s]"), FILE_UPLOAD, filename);
         error_log(LOG_GLOBAL_BUFFER);
 
         goto exit;
@@ -426,7 +427,7 @@ HTTPResponse uploadFile(const char *url,
         fs.read(&fs, (unsigned char*)ch, 1, 1);
         if(socket.write(&socket, (unsigned char*)ch, 1) == FAILURE)
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_UPLOAD "Error occurred while uploading POST data (THIRD LEVEL) for [%s]"), filename);
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sError occurred while uploading POST data (THIRD LEVEL) for [%s]"), FILE_UPLOAD, filename);
             error_log(LOG_GLOBAL_BUFFER);
 
             release_file_system(&fs);
@@ -434,13 +435,13 @@ HTTPResponse uploadFile(const char *url,
         }
     }
 
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_UPLOAD "File [%s] successfully uploaded worth [%u] bytes"), filename, numBytes);
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFile [%s] successfully uploaded worth [%u] bytes"), FILE_UPLOAD, filename, numBytes);
     info_log(LOG_GLOBAL_BUFFER);
 
     release_file_system(&fs);
     if(socket.write(&socket, (unsigned char*)fourthLevel, strlen(fourthLevel)) == FAILURE)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_UPLOAD "Error occurred while uploading POST data (FOURTH LEVEL) for [%s]"), filename);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sError occurred while uploading POST data (FOURTH LEVEL) for [%s]"), FILE_UPLOAD, filename);
         error_log(LOG_GLOBAL_BUFFER);
 
         goto exit;
@@ -478,7 +479,7 @@ HTTPResponse uploadFile(const char *url,
         {
             if(socket.read(&socket, (unsigned char*)response.body, numBytes, 1) == FAILURE) /* Pseudo-Blocking Call */
             {
-                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_UPLOAD "Socket error while reading URL-payload for uploaded file [%s]"), filename);
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sSocket error while reading URL-payload for uploaded file [%s]"), FILE_UPLOAD, filename);
                 error_log(LOG_GLOBAL_BUFFER);
 
                 goto exit;
@@ -486,7 +487,7 @@ HTTPResponse uploadFile(const char *url,
             else
             {
                 sg_sprintf(LOG_GLOBAL_BUFFER,
-                           PROSTR(FILE_UPLOAD "URL being provided to peer for uploaded file [%s] is [%s]"), filename, response.body);
+                           PROSTR("%sURL being provided to peer for uploaded file [%s] is [%s]"), FILE_UPLOAD, filename, response.body);
                 info_log(LOG_GLOBAL_BUFFER);
 
                 break;
@@ -507,7 +508,7 @@ exit:
 
     release_socket(&socket);
 
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_UPLOAD "HTTP-Response Status = [%d]"), response.status);
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sHTTP-Response Status = [%d]"), FILE_UPLOAD, response.status);
     info_log(LOG_GLOBAL_BUFFER);
 
     return response;

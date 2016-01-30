@@ -198,7 +198,7 @@ int socket_read(Socket* socket, unsigned char* buffer, int len, unsigned char gu
                  */
                 if(guaranteed == 1)
                 {
-                    sg_sprintf(LOG_GLOBAL_BUFFER, SOCKET_READ "Timeout occurred while waiting for data.. retrying");
+                    sg_sprintf(LOG_GLOBAL_BUFFER, "%sTimeout occurred while waiting for data.. retrying", SOCKET_READ);
                     debug_log(LOG_GLOBAL_BUFFER);
 
                     continue;
@@ -209,7 +209,7 @@ int socket_read(Socket* socket, unsigned char* buffer, int len, unsigned char gu
                      * WE have genuinely timed-out.
                      * Return this info, and let the calling-function take appropriate action.
                      */
-                    sg_sprintf(LOG_GLOBAL_BUFFER, SOCKET_READ "Timeout occurred while waiting for data.. NOT retrying");
+                    sg_sprintf(LOG_GLOBAL_BUFFER, "%sTimeout occurred while waiting for data.. NOT retrying", SOCKET_READ);
                     debug_log(LOG_GLOBAL_BUFFER);
 
                     return SOCKET_READ_TIMEOUT; /* Case c) */
@@ -220,7 +220,7 @@ int socket_read(Socket* socket, unsigned char* buffer, int len, unsigned char gu
                 /*
                  * There was some error on the socket.
                  */
-                sg_sprintf(LOG_GLOBAL_BUFFER, SOCKET_READ "Errno [%d] occurred while reading from socket", errBackup);
+                sg_sprintf(LOG_GLOBAL_BUFFER, "%sErrno [%d] occurred while reading from socket", SOCKET_READ, errBackup);
                 error_log(LOG_GLOBAL_BUFFER);
 
                 return FAILURE; /* Case b) and e) */
@@ -244,7 +244,7 @@ int socket_read(Socket* socket, unsigned char* buffer, int len, unsigned char gu
         {
             if(errBackup != 0)
             {
-                sg_sprintf(LOG_GLOBAL_BUFFER, SOCKET_READ "Errno [%d] occurred while reading from socket", errBackup);
+                sg_sprintf(LOG_GLOBAL_BUFFER, "%sErrno [%d] occurred while reading from socket", SOCKET_READ, errBackup);
                 error_log(LOG_GLOBAL_BUFFER);
 
                 return FAILURE; /* Another leg of case b) and e) */
@@ -291,7 +291,7 @@ int socket_write(Socket* socket, unsigned char* buffer, int len)
 
         if(rc < 0)
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, SOCKET_WRITE "Errno [%d] occurred while writing to socket", errno);
+            sg_sprintf(LOG_GLOBAL_BUFFER, "%sErrno [%d] occurred while writing to socket", SOCKET_WRITE, errno);
             error_log(LOG_GLOBAL_BUFFER);
 
             return FAILURE;
@@ -314,7 +314,7 @@ int socket_write(Socket* socket, unsigned char* buffer, int len)
         {
             if(errBackup != 0)
             {
-                sg_sprintf(LOG_GLOBAL_BUFFER, SOCKET_READ "Errno [%d] occurred while sending to socket", errBackup);
+                sg_sprintf(LOG_GLOBAL_BUFFER, "%sErrno [%d] occurred while sending to socket", SOCKET_WRITE, errBackup);
                 error_log(LOG_GLOBAL_BUFFER);
 
                 return FAILURE;

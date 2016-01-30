@@ -31,20 +31,20 @@ struct KeyValuePairs
 #define HTTP_FILE_DOWNLOAD_SUCCESS 200
 #define HTTP_FILE_UPLOAD_SUCCESS 200
 
-#define CONTENT_LENGTH "Content-Length"
+#define CONTENT_LENGTH PROSTR("Content-Length")
 #define POST_BOUNDARY "-----------ThIs_Is_tHe_bouNdaRY_78564$!@"
 
-#define SOCKET_READ     "[SOCKET-READ] "
-#define SOCKET_WRITE    "[SOCKET-WRITE] "
-#define ONE_TO_ONE      "[ONE-TO-ONE] "
+#define SOCKET_READ     PROSTR("[SOCKET-READ] ")
+#define SOCKET_WRITE    PROSTR("[SOCKET-WRITE] ")
+#define ONE_TO_ONE      PROSTR("[ONE-TO-ONE] ")
 
-#define SOCKET_NOT_AVAILABLE "Could not connect to the socket at physical-layer ... not retrying"
+#define SOCKET_NOT_AVAILABLE PROSTR("Could not connect to the socket at physical-layer ... not retrying")
 #define MAX_CONN_ATTEMPTS_WITH_PHYSICAL_LAYER_FINE 5
 
 
 /****************************************************************************************/
 #if 1
-#define INSTAMSG_HOST       "device.instamsg.io"
+#define INSTAMSG_HOST       PROSTR("device.instamsg.io")
 
 #if  SSL_ENABLED == 1
 #define INSTAMSG_PORT       8883
@@ -52,7 +52,7 @@ struct KeyValuePairs
 #define INSTAMSG_PORT       1883
 #endif
 
-#define INSTAMSG_HTTP_HOST  "platform.instamsg.io"
+#define INSTAMSG_HTTP_HOST  PROSTR("platform.instamsg.io")
 #define INSTAMSG_HTTP_PORT  80
 #define LOG_LEVEL           2
 
@@ -75,7 +75,7 @@ struct KeyValuePairs
 #define MAX_GSM_PROVISION_PARAM_SIZE 50
 /***************************************************************************************/
 
-static const char * const g_pcHex = "0123456789abcdef";
+static const char * const g_pcHex = PROSTR("0123456789abcdef");
 
 char LOG_GLOBAL_BUFFER[MAX_BUFFER_SIZE];
 
@@ -87,17 +87,17 @@ void DEFAULT_SPRINTF(char *out, const char *format, ...);
 void startAndCountdownTimer(int seconds, unsigned char showRunningStatus);
 void globalSystemInit(char *logFilePath);
 
-#define MEM_ALLOC     "[MEM-ALLOC] "
+#define MEM_ALLOC     PROSTR("[MEM-ALLOC] ")
 
 unsigned char GLOBAL_BUFFER[MAX_BUFFER_SIZE];
 #define RESET_GLOBAL_BUFFER memset(GLOBAL_BUFFER, 0, MAX_BUFFER_SIZE);
 
-#define LOG_FILE_PATH "/home/sensegrow/instamsg.log"
+#define LOG_FILE_PATH           PROSTR("/home/sensegrow/instamsg.log")
 
-#define TOPIC_METADATA          "instamsg/client/metadata"
-#define TOPIC_SESSION_DATA      "instamsg/client/session"
-#define TOPIC_NETWORK_DATA      "instamsg/client/signalinfo"
-#define TOPIC_CONFIG_SEND       "instamsg/client/config/clientToServer"
+#define TOPIC_METADATA          PROSTR("instamsg/client/metadata")
+#define TOPIC_SESSION_DATA      PROSTR("instamsg/client/session")
+#define TOPIC_NETWORK_DATA      PROSTR("instamsg/client/signalinfo")
+#define TOPIC_CONFIG_SEND       PROSTR("instamsg/client/config/clientToServer")
 
 #define NETWORK_INFO_INTERVAL           300
 int pingRequestInterval;
