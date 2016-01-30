@@ -1203,23 +1203,23 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
     sg_sprintf(c->mediaStreamsTopic, PROSTR("instamsg/clients/%s/mediastreams"), c->clientIdComplete);
 #endif
 
-    sg_sprintf(LOG_GLOBAL_BUFFER, "\n\nThe special-topics value :: \n\n"
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("\n\nThe special-topics value :: \n\n"
              "\r\nFILES_TOPIC = [%s],"
              "\r\nREBOOT_TOPIC = [%s],"
              "\r\nENABLE_SERVER_LOGGING_TOPIC = [%s],"
              "\r\nSERVER_LOGS_TOPIC = [%s],"
              "\r\nFILE_UPLOAD_URL = [%s],"
-             "\r\nCONFIG_FROM_SERVER_TO_CLIENT = [%s]",
+             "\r\nCONFIG_FROM_SERVER_TO_CLIENT = [%s]"),
               c->filesTopic, c->rebootTopic, c->enableServerLoggingTopic,
               c->serverLogsTopic, c->fileUploadUrl, c->receiveConfigTopic);
     info_log(LOG_GLOBAL_BUFFER);
 
 #if MEDIA_STREAMING_ENABLED == 1
-    sg_sprintf(LOG_GLOBAL_BUFFER, "\r\nMEDIA_TOPIC = [%s],"
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("\r\nMEDIA_TOPIC = [%s],"
              "\r\nMEDIA_REPLY_TOPIC = [%s],"
              "\r\nMEDIA_STOP_TOPIC = [%s],"
              "\r\nMEDIA_PAUSE_TOPIC = [%s],"
-             "\r\nMEDIA_STREAMS_TOPIC = [%s]",
+             "\r\nMEDIA_STREAMS_TOPIC = [%s]"),
              c->mediaTopic, c->mediaReplyTopic, c->mediaStopTopic, c->mediaPauseTopic, c->mediaStreamsTopic);
     info_log(LOG_GLOBAL_BUFFER);
 #endif
