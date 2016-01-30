@@ -19,6 +19,8 @@
 #define sg_malloc               malloc
 #define sg_free                 free
 
+#define PROSTR
+
 #define MAX_BUFFER_SIZE 1000
 #define MAX_HEAP_SIZE (10 * (MAX_BUFFER_SIZE + HEADER_SIZE))
 

@@ -22,7 +22,7 @@ static int publishConfig(const char *topicName, const char *message)
 
 void generate_config_json(char *messageBuffer, const char *key, enum CONFIG_TYPE type, const char *stringified_value, const char *desc)
 {
-    sg_sprintf(messageBuffer, "{'%s' : '%s', '%s' : '%d', '%s' : '%s', '%s' : '%s'}",
+    sg_sprintf(messageBuffer, PROSTR("{'%s' : '%s', '%s' : '%d', '%s' : '%s', '%s' : '%s'}"),
                CONFIG_KEY_KEY, key,
                CONFIG_TYPE_KEY, type,
                CONFIG_VALUE_KEY, stringified_value,
@@ -37,7 +37,7 @@ void process_config(char *configJson)
     config_key = (char*) sg_malloc(sizeof(GLOBAL_BUFFER));
     if(config_key == NULL)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, CONFIG_ERROR "Could not allocate memory for config-key.");
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(CONFIG_ERROR "Could not allocate memory for config-key."));
         error_log(LOG_GLOBAL_BUFFER);
 
         goto exit;
@@ -88,7 +88,7 @@ void registerEditableConfig(void *var,
         stored_value = (char*) sg_malloc(MAX_BUFFER_SIZE);
         if(stored_value == NULL)
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, CONFIG_ERROR "Could not allocate memory for stored_value");
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(CONFIG_ERROR "Could not allocate memory for stored_value"));
             error_log(LOG_GLOBAL_BUFFER);
 
             goto exit;
@@ -100,7 +100,7 @@ void registerEditableConfig(void *var,
         stored_desc = (char*) sg_malloc(MAX_BUFFER_SIZE);
         if(stored_desc == NULL)
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, CONFIG_ERROR "Could not allocate memory for stored_desc");
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(CONFIG_ERROR "Could not allocate memory for stored_desc"));
             error_log(LOG_GLOBAL_BUFFER);
 
             goto exit;
@@ -109,8 +109,9 @@ void registerEditableConfig(void *var,
         getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_DESCRIPTION_KEY, stored_desc);
         desc = stored_desc;
 
-        sg_sprintf(LOG_GLOBAL_BUFFER, CONFIG "Default-config-values overridden by stored-values. Key = [%s], Value = [%s], Description = [%s]",
-                 key, stringified_value, desc);
+        sg_sprintf(LOG_GLOBAL_BUFFER,
+                   PROSTR(CONFIG "Default-config-values overridden by stored-values. Key = [%s], Value = [%s], Description = [%s]"),
+                   key, stringified_value, desc);
         info_log(LOG_GLOBAL_BUFFER);
     }
 
@@ -125,14 +126,14 @@ void registerEditableConfig(void *var,
         strcpy(destination_string, stringified_value);
         destination_string[strlen(stringified_value)] = 0;
 
-        sg_sprintf(LOG_GLOBAL_BUFFER, CONFIG "Using value [%s] for key [%s] of type STRING", destination_string, key);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(CONFIG "Using value [%s] for key [%s] of type STRING"), destination_string, key);
         info_log(LOG_GLOBAL_BUFFER);
     }
     else
     {
         *((int*)var) = sg_atoi(stringified_value);
 
-        sg_sprintf(LOG_GLOBAL_BUFFER, CONFIG "Using value [%d] for key [%s] of type INTEGER", *((int*)var), key);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(CONFIG "Using value [%d] for key [%s] of type INTEGER"), *((int*)var), key);
         info_log(LOG_GLOBAL_BUFFER);
     }
 

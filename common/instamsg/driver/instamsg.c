@@ -45,7 +45,7 @@ static unsigned char mqttConnectFlag;
 
 static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
-    sg_sprintf(LOG_GLOBAL_BUFFER, "[DEFAULT-PUBLISH-HANDLER] PUBACK received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("[DEFAULT-PUBLISH-HANDLER] PUBACK received for msg-id [%u]"), fixedHeaderPlusMsgId->msgId);
     info_log(LOG_GLOBAL_BUFFER);
 }
 
@@ -65,7 +65,7 @@ static void serverLoggingTopicMessageArrived(InstaMsg *c, MQTTMessage *msg)
     logging = (char *)sg_malloc(MAX_BUFFER_SIZE);
     if((clientId == NULL) || (logging == NULL))
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Could not allocate memory in serverLoggingTopicMessageArrived");
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Could not allocate memory in serverLoggingTopicMessageArrived"));
         error_log(LOG_GLOBAL_BUFFER);
 
         goto exit;
@@ -83,14 +83,14 @@ static void serverLoggingTopicMessageArrived(InstaMsg *c, MQTTMessage *msg)
             c->serverLoggingEnabled = 1;
             c->serverLogsStartTime = c->FRESH_SERVER_LOGS_TIME;
 
-            sg_sprintf(LOG_GLOBAL_BUFFER, SERVER_LOGGING "Enabled.");
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(SERVER_LOGGING "Enabled."));
             info_log(LOG_GLOBAL_BUFFER);
         }
         else
         {
             c->serverLoggingEnabled = 0;
 
-            sg_sprintf(LOG_GLOBAL_BUFFER, SERVER_LOGGING "Disabled.");
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(SERVER_LOGGING "Disabled."));
             info_log(LOG_GLOBAL_BUFFER);
         }
     }
@@ -110,7 +110,7 @@ exit:
 
 static void publishQoS2CycleCompleted(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
-    sg_sprintf(LOG_GLOBAL_BUFFER, "PUBCOMP received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("PUBCOMP received for msg-id [%u]"), fixedHeaderPlusMsgId->msgId);
     info_log(LOG_GLOBAL_BUFFER);
 }
 
@@ -239,7 +239,8 @@ static void MQTTReplyOneToOne(OneToOneResult *oneToOneResult,
     int id = getNextPacketId(c);
 
     memset(messageBuffer, 0, sizeof(messageBuffer));
-    sg_sprintf(messageBuffer, "{\"message_id\": \"%u\", \"response_id\": \"%u\", \"reply_to\": \"%s\", \"body\": \"%s\", \"status\": 1}",
+    sg_sprintf(messageBuffer,
+               PROSTR("{\"message_id\": \"%u\", \"response_id\": \"%u\", \"reply_to\": \"%s\", \"body\": \"%s\", \"status\": 1}"),
                id,
                oneToOneResult->peerMsgId,
                c->clientIdComplete,
@@ -255,13 +256,13 @@ static void oneToOneMessageArrived(InstaMsg *c, MQTTMessage *msg)
     char peerMsgId[6];
     char responseMsgId[6];
 
-    sg_sprintf(LOG_GLOBAL_BUFFER, ONE_TO_ONE " Payload == [%s]", (char*) (msg->payload));
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(ONE_TO_ONE " Payload == [%s]"), (char*) (msg->payload));
     info_log(LOG_GLOBAL_BUFFER);
 
     peerMessage = (char*) sg_malloc(MAX_BUFFER_SIZE);
     if(peerMessage == NULL)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, ONE_TO_ONE "Could not allocate memory for message received from peer");
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(ONE_TO_ONE "Could not allocate memory for message received from peer"));
         error_log(LOG_GLOBAL_BUFFER);
 
         goto exit;
@@ -272,7 +273,7 @@ static void oneToOneMessageArrived(InstaMsg *c, MQTTMessage *msg)
     peer = (char*) sg_malloc(50);
     if(peer == NULL)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, ONE_TO_ONE "Could not allocate memory for peer-value");
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(ONE_TO_ONE "Could not allocate memory for peer-value"));
         error_log(LOG_GLOBAL_BUFFER);
 
         goto exit;
@@ -288,14 +289,14 @@ static void oneToOneMessageArrived(InstaMsg *c, MQTTMessage *msg)
 
     if(strlen(peerMsgId) == 0)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, ONE_TO_ONE "Peer-Message-Id not received ... not proceeding further");
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(ONE_TO_ONE "Peer-Message-Id not received ... not proceeding further"));
         error_log(LOG_GLOBAL_BUFFER);
 
         goto exit;
     }
     if(strlen(peer) == 0)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, ONE_TO_ONE "Peer-value not received ... not proceeding further");
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(ONE_TO_ONE "Peer-value not received ... not proceeding further"));
         error_log(LOG_GLOBAL_BUFFER);
 
         goto exit;
@@ -311,7 +312,7 @@ static void oneToOneMessageArrived(InstaMsg *c, MQTTMessage *msg)
         oneToOneResult.peerMsgId = sg_atoi(peerMsgId);
         oneToOneResult.reply = &MQTTReplyOneToOne;
 
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Peer-Message = [%s], Peer = [%s], Peer-Message-Id = [%u]",
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Peer-Message = [%s], Peer = [%s], Peer-Message-Id = [%u]"),
                    oneToOneResult.peerMsg,
                    oneToOneResult.peerClientId,
                    oneToOneResult.peerMsgId);
@@ -335,7 +336,7 @@ static void oneToOneMessageArrived(InstaMsg *c, MQTTMessage *msg)
              */
             if(fireOneToOneHandlerUsingMsgIdAsTheKey(c, sg_atoi(responseMsgId), &oneToOneResult) == FAILURE)
             {
-                sg_sprintf(LOG_GLOBAL_BUFFER, ONE_TO_ONE "No handler found for one-to-one for message-id [%s]", responseMsgId);
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(ONE_TO_ONE "No handler found for one-to-one for message-id [%s]"), responseMsgId);
                 error_log(LOG_GLOBAL_BUFFER);
             }
         }
@@ -352,7 +353,7 @@ exit:
 
 static void handleConfigReceived(InstaMsg *c, MQTTMessage *msg)
 {
-    sg_sprintf(LOG_GLOBAL_BUFFER, CONFIG "Received the config-payload [%s] from server", (char*)(msg->payload));
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(CONFIG "Received the config-payload [%s] from server"), (char*)(msg->payload));
     info_log(LOG_GLOBAL_BUFFER);
 
     process_config(msg->payload);
@@ -371,7 +372,7 @@ static int sendPacket(InstaMsg *c, unsigned char *buf, int length)
 
     if((c->ipstack).socketCorrupted == 1)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Socket not available at physical layer .. so packet cannot be sent to server.");
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Socket not available at physical layer .. so packet cannot be sent to server."));
         error_log(LOG_GLOBAL_BUFFER);
 
         rc = FAILURE;
@@ -382,7 +383,7 @@ static int sendPacket(InstaMsg *c, unsigned char *buf, int length)
     {
         if(c->connected == 0)
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, "No CONNACK received from server .. so packet cannot be sent to server.");
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("No CONNACK received from server .. so packet cannot be sent to server."));
             error_log(LOG_GLOBAL_BUFFER);
 
             rc = FAILURE;
@@ -419,7 +420,7 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
 
     if((c->ipstack).socketCorrupted == 1)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Socket not available at physical layer .. so packet cannot be read from server.");
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Socket not available at physical layer .. so packet cannot be read from server."));
         error_log(LOG_GLOBAL_BUFFER);
 
         goto exit;
@@ -609,7 +610,7 @@ static int fireResultHandlerUsingMsgIdAsTheKey(InstaMsg *c)
 
 static void logJsonFailureMessageAndReturn(const char *module, const char *key, MQTTMessage *msg)
 {
-    sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not find key [%s] in message-payload [%s] .. not proceeding further",
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCould not find key [%s] in message-payload [%s] .. not proceeding further"),
                module, key, (char*) (msg->payload));
     error_log(LOG_GLOBAL_BUFFER);
 }
@@ -618,13 +619,14 @@ static void logJsonFailureMessageAndReturn(const char *module, const char *key, 
 #if MEDIA_STREAMING_ENABLED == 1
 static void handleMediaStopMessage(InstaMsg *c)
 {
-    sg_sprintf(LOG_GLOBAL_BUFFER, "%sStopping .....", MEDIA);
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sStopping ....."), MEDIA);
     info_log(LOG_GLOBAL_BUFFER);
 
     stop_streaming();
 
     RESET_GLOBAL_BUFFER;
-    sg_sprintf((char*)GLOBAL_BUFFER, "{'to':'%s','from':'%s','type':3,'stream_id': '%s'}", c->clientIdComplete, c->clientIdComplete, streamId);
+    sg_sprintf((char*)GLOBAL_BUFFER, PROSTR("{'to':'%s','from':'%s','type':3,'stream_id': '%s'}"),
+               c->clientIdComplete, c->clientIdComplete, streamId);
 
     publish(c->mediaTopic,
             (char*)GLOBAL_BUFFER,
@@ -638,7 +640,7 @@ static void handleMediaStopMessage(InstaMsg *c)
 
 static void handleMediaPauseMessage(InstaMsg *c)
 {
-    sg_sprintf(LOG_GLOBAL_BUFFER, "%sPausing .....", MEDIA);
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sPausing ....."), MEDIA);
     info_log(LOG_GLOBAL_BUFFER);
 
     pause_streaming();
@@ -676,7 +678,7 @@ static void broadcastMedia(InstaMsg * c, char *sdpAnswer)
                 memset(c->mediaServerPort, 0, sizeof(c->mediaServerPort));
                 strcpy(c->mediaServerPort, strtok(NULL, " "));
 
-                sg_sprintf(LOG_GLOBAL_BUFFER, MEDIA "Media-Server IP-Address and Port being used for streaming [%s], [%s]",
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(MEDIA "Media-Server IP-Address and Port being used for streaming [%s], [%s]"),
                                               c->mediaServerIpAddress,  c->mediaServerPort);
                 info_log(LOG_GLOBAL_BUFFER);
 
@@ -692,7 +694,7 @@ static void broadcastMedia(InstaMsg * c, char *sdpAnswer)
 
 static void handleMediaReplyMessage(InstaMsg *c, MQTTMessage *msg)
 {
-    sg_sprintf(LOG_GLOBAL_BUFFER, MEDIA "Received media-reply-message [%s]", (char*)msg->payload);
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(MEDIA "Received media-reply-message [%s]"), (char*)msg->payload);
     info_log(LOG_GLOBAL_BUFFER);
 
     {
@@ -719,7 +721,7 @@ static void handleMediaReplyMessage(InstaMsg *c, MQTTMessage *msg)
         }
         else
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, MEDIA "Could not process sdp-answer ... media will not start streaming !!!");
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(MEDIA "Could not process sdp-answer ... media will not start streaming !!!"));
             error_log(LOG_GLOBAL_BUFFER);
 
             goto exit;
@@ -736,7 +738,7 @@ exit:
 
 static void handleMediaStreamsMessage(InstaMsg *c, MQTTMessage *msg)
 {
-    sg_sprintf(LOG_GLOBAL_BUFFER, MEDIA "Received media-streams-message [%s]", (char*) msg->payload);
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(MEDIA "Received media-streams-message [%s]"), (char*) msg->payload);
     info_log(LOG_GLOBAL_BUFFER);
 
     {
@@ -780,7 +782,7 @@ static void handleMediaStreamsMessage(InstaMsg *c, MQTTMessage *msg)
         if(strcmp(method, "GET") == 0)
         {
             RESET_GLOBAL_BUFFER;
-            sg_sprintf((char*) GLOBAL_BUFFER, "{\"response_id\": \"%s\", \"status\": 1, \"streams\": \"[%s]\"}", messageId, streamId);
+            sg_sprintf((char*) GLOBAL_BUFFER, PROSTR("{\"response_id\": \"%s\", \"status\": 1, \"streams\": \"[%s]\"}"), messageId, streamId);
 
             publish(replyTopic,
                     (char*)GLOBAL_BUFFER,
@@ -950,9 +952,9 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         {
             ackStatus = 1;
         }
-        sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": %d}", messageId, ackStatus);
+        sg_sprintf(ackMessage, PROSTR("{\"response_id\": \"%s\", \"status\": %d}"), messageId, ackStatus);
 #else
-        sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": %d}", messageId, ackStatus);
+        sg_sprintf(ackMessage, PROSTR("{\"response_id\": \"%s\", \"status\": %d}"), messageId, ackStatus);
 #endif
 
     }
@@ -969,10 +971,10 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         strcat(fileListing, "{}");
 #endif
 
-        sg_sprintf(LOG_GLOBAL_BUFFER, FILE_LISTING ": [%s]", fileListing);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_LISTING ": [%s]"), fileListing);
         info_log(LOG_GLOBAL_BUFFER);
 
-        sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"files\": %s}", messageId, fileListing);
+        sg_sprintf(ackMessage, PROSTR("{\"response_id\": \"%s\", \"status\": 1, \"files\": %s}"), messageId, fileListing);
     }
     else if( (strcmp(method, "DELETE") == 0) && (strlen(filename) > 0))
     {
@@ -984,17 +986,18 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
 
         if(status == SUCCESS)
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, FILE_DELETE "[%s] deleted successfully.", filename);
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_DELETE "[%s] deleted successfully."), filename);
             info_log(LOG_GLOBAL_BUFFER);
 
-            sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1}", messageId);
+            sg_sprintf(ackMessage, PROSTR("{\"response_id\": \"%s\", \"status\": 1}"), messageId);
         }
         else
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, FILE_DELETE "[%s] could not be deleted :(", filename);
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_DELETE "[%s] could not be deleted :("), filename);
             error_log(LOG_GLOBAL_BUFFER);
 
-            sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 0, \"error_msg\":\"%s\"}", messageId, "File-Removal Failed :(");
+            sg_sprintf(ackMessage, PROSTR("{\"response_id\": \"%s\", \"status\": 0, \"error_msg\":\"%s\"}"),
+                       messageId, PROSTR("File-Removal Failed :("));
         }
     }
     else if( (strcmp(method, "GET") == 0) && (strlen(filename) > 0))
@@ -1013,7 +1016,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         clientIdBuf = (char*) sg_malloc(MAX_BUFFER_SIZE);
         if(clientIdBuf == NULL)
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, FILE_UPLOAD "Failed to allocate memory");
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(FILE_UPLOAD "Failed to allocate memory"));
             error_log(LOG_GLOBAL_BUFFER);
 
             goto terminateFileUpload;
@@ -1041,14 +1044,14 @@ terminateFileUpload:
             sg_free(clientIdBuf);
         if(response.status == HTTP_FILE_UPLOAD_SUCCESS)
         {
-            sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 1, \"url\": \"%s\"}", messageId, response.body);
+            sg_sprintf(ackMessage, PROSTR("{\"response_id\": \"%s\", \"status\": 1, \"url\": \"%s\"}"), messageId, response.body);
         }
         else
         {
-            sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 0}", messageId);
+            sg_sprintf(ackMessage, PROSTR("{\"response_id\": \"%s\", \"status\": 0}"), messageId);
         }
 #else
-        sg_sprintf(ackMessage, "{\"response_id\": \"%s\", \"status\": 0}", messageId);
+        sg_sprintf(ackMessage, PROSTR("{\"response_id\": \"%s\", \"status\": 0}"), messageId);
 #endif
     }
 
@@ -1097,7 +1100,7 @@ static void checkAndRemoveExpiredHandler(int *msgId, unsigned int *timeout, cons
 
     if(*timeout <= 0)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "No %s received for msgid [%u], removing..", info, *msgId);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("No %s received for msgid [%u], removing.."), info, *msgId);
         info_log(LOG_GLOBAL_BUFFER);
 
         *msgId = 0;
@@ -1137,7 +1140,8 @@ void sendPingReqToServer(InstaMsg *c)
 
     if((c->ipstack).socketCorrupted == 1)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Socket not available at physical layer .. so server cannot be pinged for maintaining keep-alive.");
+        sg_sprintf(LOG_GLOBAL_BUFFER,
+                   PROSTR("Socket not available at physical layer .. so server cannot be pinged for maintaining keep-alive."));
         error_log(LOG_GLOBAL_BUFFER);
 
         return;
@@ -1165,38 +1169,38 @@ void clearInstaMsg(InstaMsg *c)
 static void setValuesOfSpecialTopics(InstaMsg *c)
 {
     memset(c->filesTopic, 0, sizeof(c->filesTopic));
-    sg_sprintf(c->filesTopic, "instamsg/clients/%s/files", c->clientIdComplete);
+    sg_sprintf(c->filesTopic, PROSTR("instamsg/clients/%s/files"), c->clientIdComplete);
 
     memset(c->rebootTopic, 0, sizeof(c->rebootTopic));
-    sg_sprintf(c->rebootTopic, "instamsg/clients/%s/reboot", c->clientIdComplete);
+    sg_sprintf(c->rebootTopic, PROSTR("instamsg/clients/%s/reboot"), c->clientIdComplete);
 
     memset(c->enableServerLoggingTopic, 0, sizeof(c->enableServerLoggingTopic));
-    sg_sprintf(c->enableServerLoggingTopic, "instamsg/clients/%s/enableServerLogging", c->clientIdComplete);
+    sg_sprintf(c->enableServerLoggingTopic, PROSTR("instamsg/clients/%s/enableServerLogging"), c->clientIdComplete);
 
     memset(c->serverLogsTopic, 0, sizeof(c->serverLogsTopic));
-    sg_sprintf(c->serverLogsTopic, "instamsg/clients/%s/logs", c->clientIdComplete);
+    sg_sprintf(c->serverLogsTopic, PROSTR("instamsg/clients/%s/logs"), c->clientIdComplete);
 
     memset(c->fileUploadUrl, 0, sizeof(c->fileUploadUrl));
-    sg_sprintf(c->fileUploadUrl, "/api/beta/clients/%s/files", c->clientIdComplete);
+    sg_sprintf(c->fileUploadUrl, PROSTR("/api/beta/clients/%s/files"), c->clientIdComplete);
 
     memset(c->receiveConfigTopic, 0, sizeof(c->receiveConfigTopic));
-    sg_sprintf(c->receiveConfigTopic, "instamsg/clients/%s/config/serverToClient", c->clientIdComplete);
+    sg_sprintf(c->receiveConfigTopic, PROSTR("instamsg/clients/%s/config/serverToClient"), c->clientIdComplete);
 
 #if MEDIA_STREAMING_ENABLED == 1
     memset(c->mediaTopic, 0, sizeof(c->mediaTopic));
-    sg_sprintf(c->mediaTopic, "instamsg/clients/%s/media", c->clientIdComplete);
+    sg_sprintf(c->mediaTopic, PROSTR("instamsg/clients/%s/media"), c->clientIdComplete);
 
     memset(c->mediaReplyTopic, 0, sizeof(c->mediaReplyTopic));
-    sg_sprintf(c->mediaReplyTopic, "instamsg/clients/%s/mediareply", c->clientIdComplete);
+    sg_sprintf(c->mediaReplyTopic, PROSTR("instamsg/clients/%s/mediareply"), c->clientIdComplete);
 
     memset(c->mediaStopTopic, 0, sizeof(c->mediaStopTopic));
-    sg_sprintf(c->mediaStopTopic, "instamsg/clients/%s/mediastop", c->clientIdComplete);
+    sg_sprintf(c->mediaStopTopic, PROSTR("instamsg/clients/%s/mediastop"), c->clientIdComplete);
 
     memset(c->mediaPauseTopic, 0, sizeof(c->mediaPauseTopic));
-    sg_sprintf(c->mediaPauseTopic, "instamsg/clients/%s/mediapause", c->clientIdComplete);
+    sg_sprintf(c->mediaPauseTopic, PROSTR("instamsg/clients/%s/mediapause"), c->clientIdComplete);
 
     memset(c->mediaStreamsTopic, 0, sizeof(c->mediaStreamsTopic));
-    sg_sprintf(c->mediaStreamsTopic, "instamsg/clients/%s/mediastreams", c->clientIdComplete);
+    sg_sprintf(c->mediaStreamsTopic, PROSTR("instamsg/clients/%s/mediastreams"), c->clientIdComplete);
 #endif
 
     sg_sprintf(LOG_GLOBAL_BUFFER, "\n\nThe special-topics value :: \n\n"
@@ -1307,7 +1311,7 @@ static void sendClientData(void (*func)(char *messageBuffer, int maxBufferLength
     }
     else
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Not publishing empty-message to topic [%s]", topicName);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Not publishing empty-message to topic [%s]"), topicName);
         info_log(LOG_GLOBAL_BUFFER);
     }
 }
@@ -1317,7 +1321,7 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc)
 {
     if(connack_rc == 0x00)  /* Connection Accepted */
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Connected successfully to InstaMsg-Server.");
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Connected successfully to InstaMsg-Server."));
         info_log(LOG_GLOBAL_BUFFER);
 
         c->connected = 1;
@@ -1371,7 +1375,7 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc)
     }
     else
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Client-Connection failed with code [%d]", connack_rc);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Client-Connection failed with code [%d]"), connack_rc);
         info_log(LOG_GLOBAL_BUFFER);
     }
 }
@@ -1428,7 +1432,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                                 memset(c->password, 0, sizeof(c->password));
                                 memcpy(c->password, (char*)msg.payload + 37, remainingPayloadLength - 1);
 
-                                sg_sprintf(LOG_GLOBAL_BUFFER, "Received client-secret from server via PROVACK [%s]", c->password);
+                                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Received client-secret from server via PROVACK [%s]"), c->password);
                                 info_log(LOG_GLOBAL_BUFFER);
 
                                 memset(messageBuffer, 0, sizeof(messageBuffer));
@@ -1451,7 +1455,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
 
                         memset(c->clientIdComplete, 0, sizeof(c->clientIdComplete));
                         memcpy(c->clientIdComplete, msg.payload, 36);
-                        sg_sprintf(LOG_GLOBAL_BUFFER, "Received client-id from server via PROVACK [%s]", c->clientIdComplete);
+                        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Received client-id from server via PROVACK [%s]"), c->clientIdComplete);
                         info_log(LOG_GLOBAL_BUFFER);
 
                         setValuesOfSpecialTopics(c);
@@ -1532,7 +1536,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                     topicName = (char*) sg_malloc(MAX_BUFFER_SIZE);
                     if(topicName == NULL)
                     {
-                        sg_sprintf(LOG_GLOBAL_BUFFER, "Could not allocate memory for topic");
+                        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Could not allocate memory for topic"));
                         error_log(LOG_GLOBAL_BUFFER);
 
                         goto publish_exit;
@@ -1558,7 +1562,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                     }
                     else if(strcmp(topicName, c->rebootTopic) == 0)
                     {
-                        sg_sprintf(LOG_GLOBAL_BUFFER, "Received REBOOT request from server.. rebooting !!!");
+                        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Received REBOOT request from server.. rebooting !!!"));
                         info_log(LOG_GLOBAL_BUFFER);
 
                         rebootDevice();
@@ -1633,7 +1637,7 @@ publish_exit:
 
             case PINGRESP:
             {
-                sg_sprintf(LOG_GLOBAL_BUFFER, "PINGRESP received... relations are intact !!\n");
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("PINGRESP received... relations are intact !!\n"));
                 info_log(LOG_GLOBAL_BUFFER);
 
                 break;
@@ -1733,7 +1737,7 @@ int subscribe(const char* topicName,
 
     if(logging == 1)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Subscribing to topic [%s]", topicName);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Subscribing to topic [%s]"), topicName);
         info_log(LOG_GLOBAL_BUFFER);
     }
 
@@ -1777,12 +1781,12 @@ exit:
     {
         if(rc == SUCCESS)
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, "Subscribed successfully.\n");
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Subscribed successfully.\n"));
             info_log(LOG_GLOBAL_BUFFER);
         }
         else
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, "Subscribing failed, error-code = [%d]\n", rc);
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Subscribing failed, error-code = [%d]\n"), rc);
             info_log(LOG_GLOBAL_BUFFER);
         }
     }
@@ -1844,7 +1848,7 @@ int publish(const char* topicName,
 
     if(logging == 1)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Publishing message [%s] to topic [%s]", payload, topicName);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Publishing message [%s] to topic [%s]"), payload, topicName);
         info_log(LOG_GLOBAL_BUFFER);
     }
 
@@ -1873,7 +1877,7 @@ exit:
     {
         if(logging == 1)
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, "Published successfully.\n");
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Published successfully.\n"));
             info_log(LOG_GLOBAL_BUFFER);
         }
 
@@ -1883,7 +1887,7 @@ exit:
             {
                 if(logging == 1)
                 {
-                    sg_sprintf(LOG_GLOBAL_BUFFER, "Doing out-of-order socket-read, as [%u] MQTT-Publishes have been done",
+                    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Doing out-of-order socket-read, as [%u] MQTT-Publishes have been done"),
                                compulsorySocketReadAfterMQTTPublishInterval);
                     info_log(LOG_GLOBAL_BUFFER);
                 }
@@ -1896,7 +1900,7 @@ exit:
     {
         if(logging == 1)
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, "Publishing failed, error-code = [%d]\n", rc);
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Publishing failed, error-code = [%d]\n"), rc);
             info_log(LOG_GLOBAL_BUFFER);
         }
     }
@@ -1914,7 +1918,7 @@ int sendOneToOne(const char* peer,
     int id = getNextPacketId(c);
 
     memset(messageBuffer, 0, sizeof(messageBuffer));
-    sg_sprintf(messageBuffer, "{\"message_id\": \"%u\", \"reply_to\": \"%s\", \"body\": \"%s\"}", id, c->clientIdComplete, payload);
+    sg_sprintf(messageBuffer, PROSTR("{\"message_id\": \"%u\", \"reply_to\": \"%s\", \"body\": \"%s\"}"), id, c->clientIdComplete, payload);
 
     return doMqttSendPublish(id, oneToOneHandler, timeout, peer, messageBuffer);
 }
@@ -1971,12 +1975,12 @@ void start(int (*onConnectOneTimeOperations)(),
 
         RESET_GLOBAL_BUFFER;
         get_device_uuid((char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Device-UUID :: [%s]", (char*)GLOBAL_BUFFER);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Device-UUID :: [%s]"), (char*)GLOBAL_BUFFER);
         info_log(LOG_GLOBAL_BUFFER);
 
         RESET_GLOBAL_BUFFER;
         get_device_ip_address((char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
-        sg_sprintf(LOG_GLOBAL_BUFFER, "IP-Address :: [%s]", (char*)GLOBAL_BUFFER);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("IP-Address :: [%s]"), (char*)GLOBAL_BUFFER);
         info_log(LOG_GLOBAL_BUFFER);
 
         while(1)
@@ -1985,7 +1989,7 @@ void start(int (*onConnectOneTimeOperations)(),
 
             if((c->ipstack).socketCorrupted == 1)
             {
-                sg_sprintf(LOG_GLOBAL_BUFFER, "Socket not available at physical layer .. so nothing can be read from socket.");
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Socket not available at physical layer .. so nothing can be read from socket."));
                 error_log(LOG_GLOBAL_BUFFER);
             }
             else
@@ -2011,7 +2015,7 @@ void start(int (*onConnectOneTimeOperations)(),
                          */
                         if(latestTick >= nextSocketTick)
                         {
-                            sg_sprintf(LOG_GLOBAL_BUFFER, "Time to send network-stats !!!");
+                            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Time to send network-stats !!!"));
                             info_log(LOG_GLOBAL_BUFFER);
 
                             sendClientData(get_network_data, TOPIC_NETWORK_DATA);
@@ -2024,7 +2028,7 @@ void start(int (*onConnectOneTimeOperations)(),
                          */
                         if((latestTick >= nextPingReqTick) && (pingRequestInterval != 0))
                         {
-                            sg_sprintf(LOG_GLOBAL_BUFFER, "Time to play ping-pong with server !!!\n");
+                            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Time to play ping-pong with server !!!\n"));
                             info_log(LOG_GLOBAL_BUFFER);
 
                             sendPingReqToServer(c);
@@ -2052,7 +2056,8 @@ void start(int (*onConnectOneTimeOperations)(),
 #if MEDIA_STREAMING_ENABLED == 1
                         if(mediaStreamingErrorOccurred == 1)
                         {
-                            sg_sprintf(LOG_GLOBAL_BUFFER, MEDIA "Error occurred in media-streaming ... rebooting device to reset everything");
+                            sg_sprintf(LOG_GLOBAL_BUFFER,
+                                       PROSTR(MEDIA "Error occurred in media-streaming ... rebooting device to reset everything"));
                             error_log(LOG_GLOBAL_BUFFER);
 
                             rebootDevice();
@@ -2071,7 +2076,7 @@ void start(int (*onConnectOneTimeOperations)(),
                     connectionAttempts++;
 
                     sg_sprintf(LOG_GLOBAL_BUFFER,
-                              "Socket is fine at physical layer, but no connection established (yet) with InstaMsg-Server.");
+                              PROSTR("Socket is fine at physical layer, but no connection established (yet) with InstaMsg-Server."));
                     error_log(LOG_GLOBAL_BUFFER);
 
                     if(connectionAttempts > MAX_CONN_ATTEMPTS_WITH_PHYSICAL_LAYER_FINE)
@@ -2079,7 +2084,7 @@ void start(int (*onConnectOneTimeOperations)(),
                         connectionAttempts = 0;
 
                         sg_sprintf(LOG_GLOBAL_BUFFER,
-                                  "Connection-Attempts exhausted ... so trying with re-initializing the socket-physical layer.");
+                                  PROSTR("Connection-Attempts exhausted ... so trying with re-initializing the socket-physical layer."));
                         error_log(LOG_GLOBAL_BUFFER);
 
                         (c->ipstack).socketCorrupted = 1;
