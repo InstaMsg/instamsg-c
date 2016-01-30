@@ -75,7 +75,7 @@ struct KeyValuePairs
 #define MAX_GSM_PROVISION_PARAM_SIZE 50
 /***************************************************************************************/
 
-static const char * const g_pcHex = PROSTR("0123456789abcdef");
+static const char * const g_pcHex = "0123456789abcdef";
 
 char LOG_GLOBAL_BUFFER[MAX_BUFFER_SIZE];
 
