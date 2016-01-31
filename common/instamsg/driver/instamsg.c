@@ -1303,11 +1303,11 @@ static void sendClientData(void (*func)(char *messageBuffer, int maxBufferLength
     {
         publish(topicName,
                 messageBuffer,
-                QOS1,
+                QOS0,
                 0,
                 NULL,
                 MQTT_RESULT_HANDLER_TIMEOUT,
-                0);
+                1);
     }
     else
     {
