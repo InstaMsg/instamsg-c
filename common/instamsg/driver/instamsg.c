@@ -1307,7 +1307,7 @@ static void sendClientData(void (*func)(char *messageBuffer, int maxBufferLength
                 0,
                 NULL,
                 MQTT_RESULT_HANDLER_TIMEOUT,
-                1);
+                0);
     }
     else
     {
