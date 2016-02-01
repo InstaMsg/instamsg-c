@@ -49,7 +49,7 @@ static int get_config_value_from_persistent_storage_and_delete_if_asked(const ch
 
     while(1)
     {
-       readLine(fp, tempBuffer, sizeof(tempBuffer));
+       sg_readLine(fp, tempBuffer, sizeof(tempBuffer));
        if(strlen(tempBuffer) == 0)
        {
            /*
@@ -96,7 +96,7 @@ static int get_config_value_from_persistent_storage_and_delete_if_asked(const ch
                    /*
                     * Write this non-matching-config to a new-temp file.
                     */
-                   appendLine(TEMP_FILE_NAME, tempBuffer);
+                   sg_appendLine(TEMP_FILE_NAME, tempBuffer);
                }
            }
        }
@@ -118,7 +118,7 @@ exit:
      */
     if(deleteConfig == 1)
     {
-        if((rc = renameFile(NULL, TEMP_FILE_NAME, CONFIG_FILE_NAME)) != 0)
+        if(renameFile(NULL, TEMP_FILE_NAME, CONFIG_FILE_NAME) != 0)
         {
             sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not move file from [%s] to [%s]", CONFIG_ERROR, TEMP_FILE_NAME, CONFIG_FILE_NAME);
             error_log(LOG_GLOBAL_BUFFER);
@@ -171,7 +171,7 @@ int get_config_value_from_persistent_storage(const char *key, char *buffer, int 
 int save_config_value_on_persistent_storage(const char *key, const char *value)
 {
     delete_config_value_from_persistent_storage(key);
-    return appendLine(CONFIG_FILE_NAME, value);
+    return sg_appendLine(CONFIG_FILE_NAME, value);
 }
 
 
