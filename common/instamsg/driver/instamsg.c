@@ -2135,7 +2135,7 @@ exit:
         if(logging == 1)
         {
             sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Publishing failed over socket.\n"));
-            info_log(LOG_GLOBAL_BUFFER);
+            error_log(LOG_GLOBAL_BUFFER);
         }
 
         if((qos == QOS1) || (qos == QOS2))
