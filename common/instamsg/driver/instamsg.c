@@ -2077,7 +2077,7 @@ int publish(const char* topicName,
 
     if(logging == 1)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Publishing message [%s] to topic [%s]"), payload, topicName);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("\nPublishing message [%s] to topic [%s]"), payload, topicName);
         info_log(LOG_GLOBAL_BUFFER);
     }
 
@@ -2106,7 +2106,7 @@ exit:
     {
         if(logging == 1)
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Published successfully over socket.\n"));
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Published successfully over socket."));
             info_log(LOG_GLOBAL_BUFFER);
         }
 
