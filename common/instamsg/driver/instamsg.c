@@ -72,8 +72,6 @@ static unsigned char mqttConnectFlag;
 
 static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("[DEFAULT-PUBLISH-HANDLER] PUBACK received for msg-id [%u]"), fixedHeaderPlusMsgId->msgId);
-    info_log(LOG_GLOBAL_BUFFER);
 }
 
 
@@ -207,8 +205,12 @@ static void fireResultHandlerAndRemove(InstaMsg *c, MQTTFixedHeaderPlusMsgId *fi
 
             if(fixedHeaderPlusMsgId->msgId == pubAckMsgId)
             {
+                sg_sprintf(LOG_GLOBAL_BUFFER, "PUBACK received for message [%s]", lastPubPayload);
+                info_log(LOG_GLOBAL_BUFFER);
+
                 freeLastPubMessageResources();
                 waitingForPuback = NOT_WAITING_FOR_PUBACK;
+
             }
 
             break;
@@ -464,7 +466,7 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     int multiplier = 1;
     int numRetries = MAX_TRIES_ALLOWED_WHILE_READING_FROM_SOCKET_MEDIUM;
 
-    watchdog_reset_and_enable(10 * MAX_TRIES_ALLOWED_WHILE_READING_FROM_SOCKET_MEDIUM * SOCKET_READ_TIMEOUT_SECS,
+    watchdog_reset_and_enable(30 * MAX_TRIES_ALLOWED_WHILE_READING_FROM_SOCKET_MEDIUM * SOCKET_READ_TIMEOUT_SECS,
                               "readPacket");
 
     if((c->ipstack).socketCorrupted == 1)
@@ -2104,7 +2106,7 @@ exit:
     {
         if(logging == 1)
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Published successfully.\n"));
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Published successfully over socket.\n"));
             info_log(LOG_GLOBAL_BUFFER);
         }
 
@@ -2132,7 +2134,7 @@ exit:
     {
         if(logging == 1)
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Publishing failed, error-code = [%d]\n"), rc);
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Publishing failed over socket.\n"));
             info_log(LOG_GLOBAL_BUFFER);
         }
 
