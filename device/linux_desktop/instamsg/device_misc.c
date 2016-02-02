@@ -11,8 +11,6 @@ void rebootDevice()
 {
     sg_sprintf(LOG_GLOBAL_BUFFER, "Rebooting the system.");
     info_log(LOG_GLOBAL_BUFFER);
-
-    exit(1);
 }
 
 

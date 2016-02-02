@@ -230,16 +230,6 @@ int publish         (const char *topic,
 
 
 /*
- * A useful-utility function using the "publish" API, that should suffice for most business-applications.
- */
-int publishMessageWithDeliveryGuarantee(char *topic, char *payload);
-
-
-
-
-
-
-/*
  *
  * peerClientId                         :
  *

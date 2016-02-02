@@ -3,7 +3,7 @@
 
 #include "../../../common/instamsg/driver/include/globals.h"
 
-void sg_readLine(FILE *fp, char *buffer, int maxBufferLength)
+void readLine(FILE *fp, char *buffer, int maxBufferLength)
 {
     int i = 0;
     char ch;
@@ -41,7 +41,7 @@ void sg_readLine(FILE *fp, char *buffer, int maxBufferLength)
 }
 
 
-int sg_appendLine(const char *filePath, char *buffer)
+int appendLine(const char *filePath, char *buffer)
 {
     int rc = FAILURE;
 
@@ -64,28 +64,6 @@ int sg_appendLine(const char *filePath, char *buffer)
     else
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, "Could not open file %s in append-mode", filePath);
-        error_log(LOG_GLOBAL_BUFFER);
-    }
-
-    return rc;
-}
-
-
-int sg_createEmptyFile(const char *filePath)
-{
-    int rc = FAILURE;
-
-    FILE *fp = NULL;
-    fp = fopen(filePath, "w");
-    if(fp != NULL)
-    {
-        fclose(fp);
-
-        rc = SUCCESS;
-    }
-    else
-    {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Could not open file %s in write-mode", filePath);
         error_log(LOG_GLOBAL_BUFFER);
     }
 

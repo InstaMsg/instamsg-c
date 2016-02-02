@@ -12,7 +12,7 @@ static int publishConfig(const char *topicName, const char *message)
 {
     return publish(topicName,
                    message,
-                   QOS0,
+                   QOS1,
                    0,
                    NULL,
                    MQTT_RESULT_HANDLER_TIMEOUT,
