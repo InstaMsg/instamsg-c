@@ -1854,7 +1854,7 @@ exit:
 }
 
 
-void saveFailedPublishedMessage()
+static void saveFailedPublishedMessage()
 {
     rebootPending = 1;
 
