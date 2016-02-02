@@ -728,8 +728,8 @@ static void broadcastMedia(InstaMsg * c, char *sdpAnswer)
                 memset(c->mediaServerPort, 0, sizeof(c->mediaServerPort));
                 strcpy(c->mediaServerPort, strtok(NULL, " "));
 
-                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(MEDIA "Media-Server IP-Address and Port being used for streaming [%s], [%s]"),
-                                              c->mediaServerIpAddress,  c->mediaServerPort);
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sMedia-Server IP-Address and Port being used for streaming [%s], [%s]"),
+                                              MEDIA, c->mediaServerIpAddress,  c->mediaServerPort);
                 info_log(LOG_GLOBAL_BUFFER);
 
                 create_and_start_streaming_pipeline(c->mediaServerIpAddress, c->mediaServerPort);
@@ -738,13 +738,14 @@ static void broadcastMedia(InstaMsg * c, char *sdpAnswer)
         }
     }
 
-    error_log(MEDIA "Could not find server-port for streaming.. not doing anything else !!!");
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCould not find server-port for streaming.. not doing anything else !!!"), MEDIA);
+    error_log(LOG_GLOBAL_BUFFER);
 }
 
 
 static void handleMediaReplyMessage(InstaMsg *c, MQTTMessage *msg)
 {
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(MEDIA "Received media-reply-message [%s]"), (char*)msg->payload);
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sReceived media-reply-message [%s]"), MEDIA, (char*)msg->payload);
     info_log(LOG_GLOBAL_BUFFER);
 
     {
@@ -759,7 +760,9 @@ static void handleMediaReplyMessage(InstaMsg *c, MQTTMessage *msg)
         sdpAnswer = (char *)sg_malloc(MAX_BUFFER_SIZE);
         if(sdpAnswer == NULL)
         {
-            error_log(MEDIA "Could not allocate memory for sdp-answer");
+            sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not allocate memory for sdp-answer", MEDIA);
+            error_log(LOG_GLOBAL_BUFFER);
+
             goto exit;
         }
         memset(sdpAnswer, 0, MAX_BUFFER_SIZE);
@@ -771,7 +774,7 @@ static void handleMediaReplyMessage(InstaMsg *c, MQTTMessage *msg)
         }
         else
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(MEDIA "Could not process sdp-answer ... media will not start streaming !!!"));
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCould not process sdp-answer ... media will not start streaming !!!"), MEDIA);
             error_log(LOG_GLOBAL_BUFFER);
 
             goto exit;
@@ -788,13 +791,13 @@ exit:
 
 static void handleMediaStreamsMessage(InstaMsg *c, MQTTMessage *msg)
 {
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR(MEDIA "Received media-streams-message [%s]"), (char*) msg->payload);
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sReceived media-streams-message [%s]"), MEDIA, (char*) msg->payload);
     info_log(LOG_GLOBAL_BUFFER);
 
     {
         const char *REPLY_TO = PROSTR("reply_to");
         const char *MESSAGE_ID = PROSTR("message_id");
-        const char *METHOD = PROSTR("method";)
+        const char *METHOD = PROSTR("method");
 
         char *replyTopic, *messageId, *method;
         replyTopic = (char*) sg_malloc(100);
@@ -803,7 +806,9 @@ static void handleMediaStreamsMessage(InstaMsg *c, MQTTMessage *msg)
 
         if((replyTopic == NULL) || (messageId == NULL) || (method == NULL))
         {
-            error_log(MEDIA "Could not allocate memory for replyTopic/messageId/method");
+            sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not allocate memory for replyTopic/messageId/method", MEDIA);
+            error_log(LOG_GLOBAL_BUFFER);
+
             goto exit;
         }
 
@@ -2336,7 +2341,7 @@ void start(int (*onConnectOneTimeOperations)(),
                         if(mediaStreamingErrorOccurred == 1)
                         {
                             sg_sprintf(LOG_GLOBAL_BUFFER,
-                                       PROSTR(MEDIA "Error occurred in media-streaming ... rebooting device to reset everything"));
+                                       PROSTR("%sError occurred in media-streaming ... rebooting device to reset everything"), MEDIA);
                             error_log(LOG_GLOBAL_BUFFER);
 
                             rebootDevice();
