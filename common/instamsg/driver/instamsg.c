@@ -2331,9 +2331,9 @@ void start(int (*onConnectOneTimeOperations)(),
                                 }
 
                                 businessLogicRunOnceAtStart = 1;
+                                nextBusinessLogicTick = latestTick + editableBusinessLogicInterval;
                             }
 
-                            nextBusinessLogicTick = latestTick + editableBusinessLogicInterval;
                         }
 
 #if MEDIA_STREAMING_ENABLED == 1
