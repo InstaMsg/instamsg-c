@@ -54,7 +54,6 @@ enum MESSAGE_SOURCE msgSource;
 unsigned char rebootPending;
 
 #define SECRET PROSTR("SECRET")
-#define NOTIFICATION_TOPIC PROSTR("instamsg/client/notifications")
 
 #if MEDIA_STREAMING_ENABLED == 1
 #include "./include/media.h"

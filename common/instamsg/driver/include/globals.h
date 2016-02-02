@@ -41,6 +41,8 @@ struct KeyValuePairs
 #define SOCKET_NOT_AVAILABLE PROSTR("Could not connect to the socket at physical-layer ... not retrying")
 #define MAX_CONN_ATTEMPTS_WITH_PHYSICAL_LAYER_FINE 5
 
+#define NOTIFICATION_TOPIC PROSTR("instamsg/client/notifications")
+
 
 /****************************************************************************************/
 #if 1
