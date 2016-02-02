@@ -1414,7 +1414,7 @@ static int send_previously_unsent_data()
 
             startAndCountdownTimer(1, 0);
 
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Sending data that could not be sent earlier [%s]"), messageBuffer);
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Sending data that could not be sent earlier [%s] over [%s]"), payload, topic);
             info_log(LOG_GLOBAL_BUFFER);
 
             if(publishMessageWithDeliveryGuarantee(topic, payload) != SUCCESS)
@@ -1876,7 +1876,8 @@ void saveFailedPublishedMessage()
             if(messageSavingJson)
                 sg_free(messageSavingJson);
 
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sDid not received PUBACK for message [%s] within time"),
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sEither message-sending failed over wire, "
+                                                 "or PUBACK was not received for message [%s] within time"),
                        DATA_LOGGING_ERROR, lastPubPayload);
             error_log(LOG_GLOBAL_BUFFER);
 
@@ -2117,6 +2118,11 @@ exit:
                 readAndProcessIncomingMQTTPacketsIfAny(c);
             }
         }
+
+        if((qos == QOS1) || (qos == QOS2))
+        {
+            waitForPubAck();
+        }
     }
     else
     {
@@ -2126,12 +2132,12 @@ exit:
             info_log(LOG_GLOBAL_BUFFER);
         }
 
+        if((qos == QOS1) || (qos == QOS2))
+        {
+            saveFailedPublishedMessage();
+        }
    }
 
-    if( ((qos == QOS1) || (qos == QOS2)) && (rc == SUCCESS))
-    {
-        waitForPubAck();
-    }
 
     return rc;
 }
@@ -2314,7 +2320,7 @@ void start(int (*onConnectOneTimeOperations)(),
                                 {
                                     sg_sprintf(LOG_GLOBAL_BUFFER,
                                                PROSTR(
-                                                  "There were some messages which did not receive acknowledgement from server, so rebooting"));
+                                                  "There were some messages which did not complete send-cum-ack cycle, so rebooting"));
                                     error_log(LOG_GLOBAL_BUFFER);
 
                                     rebootDevice();
