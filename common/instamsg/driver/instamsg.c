@@ -272,7 +272,7 @@ static int doMqttSendPublish(int msgId,
     attachOneToOneHandler(&instaMsg, msgId, timeout, oneToOneHandler);
     return publish(topic,
                    message,
-                   QOS2,
+                   QOS0,
                    0,
                    publishAckReceived,
                    MQTT_RESULT_HANDLER_TIMEOUT,
@@ -680,7 +680,7 @@ static void handleMediaStopMessage(InstaMsg *c)
 
     publish(c->mediaTopic,
             (char*)GLOBAL_BUFFER,
-            QOS1,
+            QOS0,
             0,
             NULL,
             MQTT_RESULT_HANDLER_TIMEOUT,
@@ -841,7 +841,7 @@ static void handleMediaStreamsMessage(InstaMsg *c, MQTTMessage *msg)
 
             publish(replyTopic,
                     (char*)GLOBAL_BUFFER,
-                    QOS1,
+                    QOS0,
                     0,
                     NULL,
                     MQTT_RESULT_HANDLER_TIMEOUT,
@@ -897,7 +897,7 @@ static void initiateStreaming()
 
     publish(c->mediaTopic,
 	    	messageBuffer,
-			QOS1,
+			QOS0,
 			0,
 			NULL,
 			MQTT_RESULT_HANDLER_TIMEOUT,
@@ -1578,7 +1578,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                                 mqttConnectFlag = 1;
                                 publish(NOTIFICATION_TOPIC,
                                         "SECRET RECEIVED",
-                                        QOS2,
+                                        QOS0,
                                         0,
                                         NULL,
                                         MQTT_RESULT_HANDLER_TIMEOUT,
