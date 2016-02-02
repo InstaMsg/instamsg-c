@@ -32,11 +32,26 @@
 
 #define MAX_CYCLES_TO_WAIT_FOR_PUBACK   10
 int pubAckMsgId;
+int pubAckRecvAttempts;
 unsigned char waitingForPuback;
 char *lastPubTopic;
 char *lastPubPayload;
-#define WAITING_FOR_PUBACK      0
-#define NOT_WAITING_FOR_PUBACK  1
+
+enum PUBACK_STATE
+{
+    WAITING_FOR_PUBACK,
+    NOT_WAITING_FOR_PUBACK,
+    PUBACK_TIMEOUT
+};
+
+enum MESSAGE_SOURCE
+{
+    PERSISTENT_STORAGE,
+    GENERAL
+};
+
+enum MESSAGE_SOURCE msgSource;
+unsigned char rebootPending;
 
 #define SECRET PROSTR("SECRET")
 #define NOTIFICATION_TOPIC PROSTR("instamsg/client/notifications")
@@ -1317,7 +1332,10 @@ void initInstaMsg(InstaMsg* c,
     c->connected = 0;
 
     init_data_logger();
+    pubAckRecvAttempts = 0;
     waitingForPuback = NOT_WAITING_FOR_PUBACK;
+    msgSource = GENERAL;
+    rebootPending = 0;
 
     MQTTConnect(c);
 }
@@ -1356,15 +1374,15 @@ static void sendClientData(void (*func)(char *messageBuffer, int maxBufferLength
 }
 
 
-static void send_previously_unsent_data()
+static int send_previously_unsent_data()
 {
+    int rc = FAILURE;
+
     /*
      * Also, try sending the records stored in the persistent-storage (if any).
      */
-    while(1)
+    if(1)
     {
-        int rc;
-
         memset(messageBuffer, 0, sizeof(messageBuffer));
         rc = get_next_record_from_persistent_storage(messageBuffer, sizeof(messageBuffer));
 
@@ -1391,20 +1409,19 @@ static void send_previously_unsent_data()
             memset(topic, 0, MAX_BUFFER_SIZE);
             memset(payload, 0, sizeof(messageBuffer));
 
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Sending data that could not be sent sometime earlier"));
-            info_log(LOG_GLOBAL_BUFFER);
-
             getJsonKeyValueIfPresent(messageBuffer, DATA_LOG_TOPIC, topic);
             getJsonKeyValueIfPresent(messageBuffer, DATA_LOG_PAYLOAD, payload);
 
-            rc = publishMessageWithDeliveryGuarantee(topic, payload);
-            if(rc != SUCCESS)
+            startAndCountdownTimer(1, 0);
+
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Sending data that could not be sent earlier [%s]"), messageBuffer);
+            info_log(LOG_GLOBAL_BUFFER);
+
+            if(publishMessageWithDeliveryGuarantee(topic, payload) != SUCCESS)
             {
                 sg_sprintf(LOG_GLOBAL_BUFFER,
                            PROSTR("Since the data could not be sent to InstaMsg-Server, so not retrying sending data from persistent-storage"));
                 error_log(LOG_GLOBAL_BUFFER);
-
-                break;
             }
 
 exit:
@@ -1421,10 +1438,10 @@ exit:
              */
             sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("\n\nNo more pending-data to be sent from persistent-storage\n\n"));
             info_log(LOG_GLOBAL_BUFFER);
-
-            break;
         }
     }
+
+    return rc;
 }
 
 
@@ -1436,8 +1453,6 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc)
         info_log(LOG_GLOBAL_BUFFER);
 
         c->connected = 1;
-
-        send_previously_unsent_data();
 
         sendClientData(get_client_session_data, TOPIC_SESSION_DATA);
         sendClientData(get_client_metadata, TOPIC_METADATA);
@@ -1837,6 +1852,8 @@ exit:
 
 void saveFailedPublishedMessage()
 {
+    rebootPending = 1;
+
     if(1)
     {
         if(1)
@@ -1859,12 +1876,12 @@ void saveFailedPublishedMessage()
             if(messageSavingJson)
                 sg_free(messageSavingJson);
 
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sDid not received PUBACK for message [%s] within time.. rebooting system"),
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sDid not received PUBACK for message [%s] within time"),
                        DATA_LOGGING_ERROR, lastPubPayload);
             error_log(LOG_GLOBAL_BUFFER);
 
+            waitingForPuback = PUBACK_TIMEOUT;
             freeLastPubMessageResources();
-            rebootDevice();
         }
     }
 }
@@ -1963,6 +1980,39 @@ int MQTTUnsubscribe(const char* topicFilter)
 
 exit:
     return rc;
+}
+
+
+static void waitForPubAck()
+{
+    if(1)
+    {
+        if(1)
+        {
+            if(1)
+            {
+                while(1)
+                {
+                    readAndProcessIncomingMQTTPacketsIfAny(&instaMsg);
+                    if(waitingForPuback == WAITING_FOR_PUBACK)
+                    {
+                        pubAckRecvAttempts = pubAckRecvAttempts + 1;
+                        if(pubAckRecvAttempts >= MAX_CYCLES_TO_WAIT_FOR_PUBACK)
+                        {
+                            pubAckRecvAttempts = 0;
+                            saveFailedPublishedMessage();
+
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+    }
 }
 
 
@@ -2078,6 +2128,11 @@ exit:
 
    }
 
+    if( ((qos == QOS1) || (qos == QOS2)) && (rc == SUCCESS))
+    {
+        waitForPubAck();
+    }
+
     return rc;
 }
 
@@ -2170,7 +2225,6 @@ void start(int (*onConnectOneTimeOperations)(),
 
         while(1)
         {
-            static int pubAckRecvAttempts = 0;
             startAndCountdownTimer(1, 0);
 
             if((c->ipstack).socketCorrupted == 1)
@@ -2180,20 +2234,22 @@ void start(int (*onConnectOneTimeOperations)(),
             }
             else
             {
-                while(1)
+                if(1)
                 {
                     readAndProcessIncomingMQTTPacketsIfAny(c);
-                    if(waitingForPuback == WAITING_FOR_PUBACK)
+
+                    if((msgSource == PERSISTENT_STORAGE) && (waitingForPuback != WAITING_FOR_PUBACK) && (rebootPending == 0))
                     {
-                        pubAckRecvAttempts = pubAckRecvAttempts + 1;
-                        if(pubAckRecvAttempts >= MAX_CYCLES_TO_WAIT_FOR_PUBACK)
+                        int retrievedFromPersistentStorage = send_previously_unsent_data();
+                        if(retrievedFromPersistentStorage != SUCCESS)
                         {
-                            saveFailedPublishedMessage();
+                            msgSource = GENERAL;
                         }
                     }
-                    else
+
+                    if(rebootPending == 1)
                     {
-                        break;
+                        msgSource = GENERAL;
                     }
                 }
             }
@@ -2243,11 +2299,27 @@ void start(int (*onConnectOneTimeOperations)(),
                         if((latestTick >= nextBusinessLogicTick) || (runBusinessLogicImmediately == 1) ||
                            (businessLogicRunOnceAtStart == 0))
                         {
-                            if(coreLoopyBusinessLogicInitiatedBySelf != NULL)
+                            if((coreLoopyBusinessLogicInitiatedBySelf != NULL) && (msgSource == GENERAL))
 
                             {
                                 coreLoopyBusinessLogicInitiatedBySelf(NULL);
                                 runBusinessLogicImmediately = 0;
+
+                                if(businessLogicRunOnceAtStart == 0)
+                                {
+                                    msgSource = PERSISTENT_STORAGE;
+                                }
+
+                                if((rebootPending == 1) && (businessLogicRunOnceAtStart == 1))
+                                {
+                                    sg_sprintf(LOG_GLOBAL_BUFFER,
+                                               PROSTR(
+                                                  "There were some messages which did not receive acknowledgement from server, so rebooting"));
+                                    error_log(LOG_GLOBAL_BUFFER);
+
+                                    rebootDevice();
+                                }
+
                                 businessLogicRunOnceAtStart = 1;
                             }
 
