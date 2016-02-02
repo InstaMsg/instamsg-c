@@ -46,6 +46,7 @@ SOURCES=`echo                                                                   
         device/${VENDOR}/instamsg/device_config.c                                               \
         device/${VENDOR}/instamsg/device_media.c                                                \
         device/${VENDOR}/instamsg/device_file_system.c                                          \
+        device/${VENDOR}/instamsg/device_data_logger.c                                          \
         device/${VENDOR}/instamsg/device_misc.c                                                 `
 
 

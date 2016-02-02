@@ -3,11 +3,7 @@
 
 char TOPIC[100];
 
-static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
-{
-    sg_sprintf(LOG_GLOBAL_BUFFER, "PUBACK received for msg-id [%u]", fixedHeaderPlusMsgId->msgId);
-    info_log(LOG_GLOBAL_BUFFER);
-}
+
 
 
 static void coreLoopyBusinessLogicInitiatedBySelf()
@@ -18,13 +14,7 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
     counter++;
     sg_sprintf(buf, "Test %d", counter);
 
-    publish(TOPIC,
-            buf,
-            QOS2,
-            0,
-            publishAckReceived,
-            MQTT_RESULT_HANDLER_TIMEOUT,
-            1);
+    publishMessageWithDeliveryGuarantee(TOPIC, buf);
 }
 
 

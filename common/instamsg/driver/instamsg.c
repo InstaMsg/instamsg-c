@@ -24,10 +24,34 @@
 #include "./include/watchdog.h"
 #include "./include/misc.h"
 #include "./include/config.h"
+#include "./include/data_logger.h"
 
 #include <string.h>
 
 #define NO_CLIENT_ID PROSTR("NONE")
+
+#define MAX_CYCLES_TO_WAIT_FOR_PUBACK   10
+int pubAckMsgId;
+int pubAckRecvAttempts;
+unsigned char waitingForPuback;
+char *lastPubTopic;
+char *lastPubPayload;
+
+enum PUBACK_STATE
+{
+    WAITING_FOR_PUBACK,
+    NOT_WAITING_FOR_PUBACK,
+    PUBACK_TIMEOUT
+};
+
+enum MESSAGE_SOURCE
+{
+    PERSISTENT_STORAGE,
+    GENERAL
+};
+
+enum MESSAGE_SOURCE msgSource;
+unsigned char rebootPending;
 
 #define SECRET PROSTR("SECRET")
 #define NOTIFICATION_TOPIC PROSTR("instamsg/client/notifications")
@@ -42,6 +66,10 @@ static char streamId[MAX_BUFFER_SIZE];
 
 static int editableBusinessLogicInterval;
 static unsigned char mqttConnectFlag;
+
+#define DATA_LOG_TOPIC      PROSTR("topic")
+#define DATA_LOG_PAYLOAD    PROSTR("payload")
+
 
 static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
@@ -151,6 +179,22 @@ static void attachResultHandler(InstaMsg *c, int msgId, unsigned int timeout, vo
 }
 
 
+static void freeLastPubMessageResources()
+{
+    if(lastPubTopic)
+    {
+        sg_free(lastPubTopic);
+        lastPubTopic = NULL;
+    }
+
+    if(lastPubPayload)
+    {
+        sg_free(lastPubPayload);
+        lastPubPayload = NULL;
+    }
+}
+
+
 static void fireResultHandlerAndRemove(InstaMsg *c, MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
     int i;
@@ -161,6 +205,12 @@ static void fireResultHandlerAndRemove(InstaMsg *c, MQTTFixedHeaderPlusMsgId *fi
         {
             c->resultHandlers[i].fp(fixedHeaderPlusMsgId);
             c->resultHandlers[i].msgId = 0;
+
+            if(fixedHeaderPlusMsgId->msgId == pubAckMsgId)
+            {
+                freeLastPubMessageResources();
+                waitingForPuback = NOT_WAITING_FOR_PUBACK;
+            }
 
             break;
         }
@@ -1280,6 +1330,13 @@ void initInstaMsg(InstaMsg* c,
     strcpy(c->clientIdComplete, "");
 
     c->connected = 0;
+
+    init_data_logger();
+    pubAckRecvAttempts = 0;
+    waitingForPuback = NOT_WAITING_FOR_PUBACK;
+    msgSource = GENERAL;
+    rebootPending = 0;
+
     MQTTConnect(c);
 }
 
@@ -1314,6 +1371,77 @@ static void sendClientData(void (*func)(char *messageBuffer, int maxBufferLength
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Not publishing empty-message to topic [%s]"), topicName);
         info_log(LOG_GLOBAL_BUFFER);
     }
+}
+
+
+static int send_previously_unsent_data()
+{
+    int rc = FAILURE;
+
+    /*
+     * Also, try sending the records stored in the persistent-storage (if any).
+     */
+    if(1)
+    {
+        memset(messageBuffer, 0, sizeof(messageBuffer));
+        rc = get_next_record_from_persistent_storage(messageBuffer, sizeof(messageBuffer));
+
+        if(rc == SUCCESS)
+        {
+            /*
+             * We got the record.
+             */
+
+            char *topic = NULL;
+            char *payload = NULL;
+
+            topic = (char*) sg_malloc(MAX_BUFFER_SIZE);
+            payload = (char*) sg_malloc(sizeof(messageBuffer));
+
+            if((topic == NULL) || (payload == NULL))
+            {
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCould not allocate memory in data-logging.. not proceeding"), DATA_LOGGING_ERROR);
+                error_log(LOG_GLOBAL_BUFFER);
+
+                goto exit;
+            }
+
+            memset(topic, 0, MAX_BUFFER_SIZE);
+            memset(payload, 0, sizeof(messageBuffer));
+
+            getJsonKeyValueIfPresent(messageBuffer, DATA_LOG_TOPIC, topic);
+            getJsonKeyValueIfPresent(messageBuffer, DATA_LOG_PAYLOAD, payload);
+
+            startAndCountdownTimer(1, 0);
+
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Sending data that could not be sent earlier [%s] over [%s]"), payload, topic);
+            info_log(LOG_GLOBAL_BUFFER);
+
+            if(publishMessageWithDeliveryGuarantee(topic, payload) != SUCCESS)
+            {
+                sg_sprintf(LOG_GLOBAL_BUFFER,
+                           PROSTR("Since the data could not be sent to InstaMsg-Server, so not retrying sending data from persistent-storage"));
+                error_log(LOG_GLOBAL_BUFFER);
+            }
+
+exit:
+            if(topic)
+                sg_free(topic);
+
+            if(payload)
+                sg_free(payload);
+        }
+        else
+        {
+            /*
+             * We did not get any record.
+             */
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("\n\nNo more pending-data to be sent from persistent-storage\n\n"));
+            info_log(LOG_GLOBAL_BUFFER);
+        }
+    }
+
+    return rc;
 }
 
 
@@ -1722,6 +1850,44 @@ exit:
 }
 
 
+void saveFailedPublishedMessage()
+{
+    rebootPending = 1;
+
+    if(1)
+    {
+        if(1)
+        {
+            int messageJsonSize = sizeof(messageBuffer) + 200;
+
+            char *messageSavingJson = (char*) sg_malloc(messageJsonSize);
+            if(messageSavingJson == NULL)
+            {
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCould not allocate memory for data-logging .. returning"), DATA_LOGGING_ERROR);
+                return;
+            }
+
+            memset(messageSavingJson, 0, messageJsonSize);
+            sg_sprintf(messageSavingJson, "{'%s' : '%s', '%s' : '%s'}",
+                       DATA_LOG_TOPIC, lastPubTopic,
+                       DATA_LOG_PAYLOAD, lastPubPayload);
+
+            save_record_to_persistent_storage(messageSavingJson);
+            if(messageSavingJson)
+                sg_free(messageSavingJson);
+
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sEither message-sending failed over wire, "
+                                                 "or PUBACK was not received for message [%s] within time"),
+                       DATA_LOGGING_ERROR, lastPubPayload);
+            error_log(LOG_GLOBAL_BUFFER);
+
+            waitingForPuback = PUBACK_TIMEOUT;
+            freeLastPubMessageResources();
+        }
+    }
+}
+
+
 int subscribe(const char* topicName,
               const int qos,
               void (*messageHandler)(MessageData *),
@@ -1818,6 +1984,39 @@ exit:
 }
 
 
+static void waitForPubAck()
+{
+    if(1)
+    {
+        if(1)
+        {
+            if(1)
+            {
+                while(1)
+                {
+                    readAndProcessIncomingMQTTPacketsIfAny(&instaMsg);
+                    if(waitingForPuback == WAITING_FOR_PUBACK)
+                    {
+                        pubAckRecvAttempts = pubAckRecvAttempts + 1;
+                        if(pubAckRecvAttempts >= MAX_CYCLES_TO_WAIT_FOR_PUBACK)
+                        {
+                            pubAckRecvAttempts = 0;
+                            saveFailedPublishedMessage();
+
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 int publish(const char* topicName,
             const char* payload,
             const int qos,
@@ -1840,6 +2039,28 @@ int publish(const char* topicName,
     if (qos == QOS1 || qos == QOS2)
     {
         id = getNextPacketId(c);
+
+        pubAckMsgId = id;
+        waitingForPuback = WAITING_FOR_PUBACK;
+
+        lastPubTopic = (char*) sg_malloc(100);
+        lastPubPayload = (char*) sg_malloc(sizeof(messageBuffer));
+
+        if((lastPubTopic == NULL) || (lastPubPayload == NULL))
+        {
+            sg_sprintf(LOG_GLOBAL_BUFFER, "Could not allocate memory to track publish-messages");
+            error_log(LOG_GLOBAL_BUFFER);
+
+            return;
+        }
+
+        memset(lastPubTopic, 0, 100);
+        memset(lastPubPayload, 0, sizeof(messageBuffer));
+
+        memcpy(lastPubTopic, topicName, strlen(topicName));
+        memcpy(lastPubPayload, payload, strlen(payload));
+
+
 
         /*
          * We will get PUBACK from server only for QOS1 and QOS2.
@@ -1897,6 +2118,11 @@ exit:
                 readAndProcessIncomingMQTTPacketsIfAny(c);
             }
         }
+
+        if((qos == QOS1) || (qos == QOS2))
+        {
+            waitForPubAck();
+        }
     }
     else
     {
@@ -1905,9 +2131,27 @@ exit:
             sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Publishing failed, error-code = [%d]\n"), rc);
             info_log(LOG_GLOBAL_BUFFER);
         }
-    }
+
+        if((qos == QOS1) || (qos == QOS2))
+        {
+            saveFailedPublishedMessage();
+        }
+   }
+
 
     return rc;
+}
+
+
+int publishMessageWithDeliveryGuarantee(char *topic, char *payload)
+{
+    return publish(topic,
+                   payload,
+                   QOS1,
+                   0,
+                   publishAckReceived,
+                   MQTT_RESULT_HANDLER_TIMEOUT,
+                   1);
 }
 
 
@@ -1996,7 +2240,24 @@ void start(int (*onConnectOneTimeOperations)(),
             }
             else
             {
-                readAndProcessIncomingMQTTPacketsIfAny(c);
+                if(1)
+                {
+                    readAndProcessIncomingMQTTPacketsIfAny(c);
+
+                    if((msgSource == PERSISTENT_STORAGE) && (waitingForPuback != WAITING_FOR_PUBACK) && (rebootPending == 0))
+                    {
+                        int retrievedFromPersistentStorage = send_previously_unsent_data();
+                        if(retrievedFromPersistentStorage != SUCCESS)
+                        {
+                            msgSource = GENERAL;
+                        }
+                    }
+
+                    if(rebootPending == 1)
+                    {
+                        msgSource = GENERAL;
+                    }
+                }
             }
 
             if(1)
@@ -2044,11 +2305,27 @@ void start(int (*onConnectOneTimeOperations)(),
                         if((latestTick >= nextBusinessLogicTick) || (runBusinessLogicImmediately == 1) ||
                            (businessLogicRunOnceAtStart == 0))
                         {
-                            if(coreLoopyBusinessLogicInitiatedBySelf != NULL)
+                            if((coreLoopyBusinessLogicInitiatedBySelf != NULL) && (msgSource == GENERAL))
 
                             {
                                 coreLoopyBusinessLogicInitiatedBySelf(NULL);
                                 runBusinessLogicImmediately = 0;
+
+                                if(businessLogicRunOnceAtStart == 0)
+                                {
+                                    msgSource = PERSISTENT_STORAGE;
+                                }
+
+                                if((rebootPending == 1) && (businessLogicRunOnceAtStart == 1))
+                                {
+                                    sg_sprintf(LOG_GLOBAL_BUFFER,
+                                               PROSTR(
+                                                  "There were some messages which did not complete send-cum-ack cycle, so rebooting"));
+                                    error_log(LOG_GLOBAL_BUFFER);
+
+                                    rebootDevice();
+                                }
+
                                 businessLogicRunOnceAtStart = 1;
                             }
 
