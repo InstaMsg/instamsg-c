@@ -2056,7 +2056,7 @@ int publish(const char* topicName,
             sg_sprintf(LOG_GLOBAL_BUFFER, "Could not allocate memory to track publish-messages");
             error_log(LOG_GLOBAL_BUFFER);
 
-            return;
+            return FAILURE;
         }
 
         memset(lastPubTopic, 0, 100);
