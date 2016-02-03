@@ -58,9 +58,10 @@ unsigned char rebootPending;
 #if MEDIA_STREAMING_ENABLED == 1
 #include "./include/media.h"
 
-static char streamId[MAX_BUFFER_SIZE];
-#define MEDIA PROSTR("[MEDIA] ")
+static unsigned char mediaReplyReceived;
+unsigned long mediaMessageRequestTime;
 
+static char streamId[MAX_BUFFER_SIZE];
 #endif
 
 static int editableBusinessLogicInterval;
@@ -733,7 +734,9 @@ static void broadcastMedia(InstaMsg * c, char *sdpAnswer)
                                               MEDIA, c->mediaServerIpAddress,  c->mediaServerPort);
                 info_log(LOG_GLOBAL_BUFFER);
 
+                mediaReplyReceived = 1;
                 create_and_start_streaming_pipeline(c->mediaServerIpAddress, c->mediaServerPort);
+
                 return;
             }
         }
@@ -896,6 +899,7 @@ static void initiateStreaming()
                 c->clientIdComplete);
 
 
+    mediaMessageRequestTime = getCurrentTick();
     publish(c->mediaTopic,
 	    	messageBuffer,
 			QOS0,
@@ -1343,6 +1347,10 @@ void initInstaMsg(InstaMsg* c,
     msgSource = GENERAL;
     rebootPending = 0;
 
+#if MEDIA_STREAMING_ENABLED == 1
+    mediaReplyReceived = 0;
+#endif
+
     MQTTConnect(c);
 }
 
@@ -1465,16 +1473,16 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc)
         sendClientData(get_network_data, TOPIC_NETWORK_DATA);
 
         registerEditableConfig(&pingRequestInterval,
-                               "PING_REQ_INTERVAL",
+                               PROSTR("PING_REQ_INTERVAL"),
                                CONFIG_INT,
-                               "180",
-                               "Keep-Alive Interval between Device and InstaMsg-Server");
+                               PROSTR("180"),
+                               PROSTR("Keep-Alive Interval between Device and InstaMsg-Server"));
 
         registerEditableConfig(&compulsorySocketReadAfterMQTTPublishInterval,
-                               "COMPULSORY_SOCKET_READ_AFTER_MQTT_PUBLISH_INTERVAL",
+                               PROSTR("COMPULSORY_SOCKET_READ_AFTER_MQTT_PUBLISH_INTERVAL"),
                                CONFIG_INT,
                                "3",
-                               "This variable controls after how many MQTT-Publishes a compulsory socket-read is done. This prevents any socket-pverrun errors (particularly in hardcore embedded-devices");
+                               PROSTR("This variable controls after how many MQTT-Publishes a compulsory socket-read is done. This prevents any socket-pverrun errors (particularly in hardcore embedded-devices"));
 
         {
             char interval[6];
@@ -1482,18 +1490,18 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc)
 
             sg_sprintf(interval, "%d", editableBusinessLogicInterval);
             registerEditableConfig(&editableBusinessLogicInterval,
-                                   "BUSINESS_LOGIC_INTERVAL",
+                                   PROSTR("BUSINESS_LOGIC_INTERVAL"),
                                    CONFIG_INT,
                                    interval,
-                                   "Business-Logic Interval (in seconds)");
+                                   PROSTR("Business-Logic Interval (in seconds)"));
         }
 
 #if MEDIA_STREAMING_ENABLED == 1
         registerEditableConfig(&mediaStreamingEnabledRuntime,
-                               "MEDIA_STREAMING_ENABLED",
+                               PROSTR("MEDIA_STREAMING_ENABLED"),
                                CONFIG_INT,
                                "0",
-                               "0 - Disabled; 1 - Enabled");
+                               PROSTR("0 - Disabled; 1 - Enabled"));
         if(mediaStreamingEnabledRuntime == 1)
         {
             initiateStreaming();
@@ -2277,6 +2285,20 @@ void start(int (*onConnectOneTimeOperations)(),
                         static unsigned char businessLogicRunOnceAtStart = 0;
 
                         latestTick = getCurrentTick();
+
+#if MEDIA_STREAMING_ENABLED == 1
+                        if(mediaReplyReceived == 0)
+                        {
+                            if(latestTick >= (mediaMessageRequestTime + 10))
+                            {
+                                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sMedia-Reply message not received in 10 seconds ... rebooting"),
+                                           MEDIA_ERROR);
+                                error_log(LOG_GLOBAL_BUFFER);
+
+                                rebootDevice();
+                            }
+                        }
+#endif
 
 
                         /*

@@ -2,6 +2,7 @@
 #define DEVICE_MEDIA
 
 #include "../../../common/instamsg/driver/include/globals.h"
+#include "../../../common/instamsg/driver/include/media.h"
 
 #if MEDIA_STREAMING_ENABLED == 1
 #include <string.h>
@@ -19,13 +20,14 @@ static void *startPipeline(void *arg)
     GstMessage *msg;
 
     gst_init (NULL, NULL);
-    RESET_GLOBAL_BUFFER;
-    sg_sprintf((char*) GLOBAL_BUFFER, "v4l2src device=/dev/video0 ! x264enc ! rtph264pay ! udpsink host=%s port=%s", mediaIp, mediaPort);
 
-    sg_sprintf(LOG_GLOBAL_BUFFER, "%s", (char*) GLOBAL_BUFFER);
-    info_log(LOG_GLOBAL_BUFFER);
+    processGstTypeUrl(mediaIp, mediaPort);
+    if(strlen(mediaUrl) == 0)
+    {
+        return;
+    }
 
-    pipeline = gst_parse_launch ((char*) GLOBAL_BUFFER, NULL);
+    pipeline = gst_parse_launch (mediaUrl, NULL);
     gst_element_set_state (pipeline, GST_STATE_PLAYING);
 
 
