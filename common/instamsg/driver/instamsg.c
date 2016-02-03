@@ -899,7 +899,9 @@ static void initiateStreaming()
                 c->clientIdComplete);
 
 
+    mediaReplyReceived = 2;
     mediaMessageRequestTime = getCurrentTick();
+
     publish(c->mediaTopic,
 	    	messageBuffer,
 			QOS0,
@@ -2287,7 +2289,7 @@ void start(int (*onConnectOneTimeOperations)(),
                         latestTick = getCurrentTick();
 
 #if MEDIA_STREAMING_ENABLED == 1
-                        if(mediaReplyReceived == 0)
+                        if(mediaReplyReceived == 2)
                         {
                             if(latestTick >= (mediaMessageRequestTime + 10))
                             {
