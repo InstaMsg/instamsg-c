@@ -1842,7 +1842,7 @@ void* MQTTConnect(void* arg)
 #if GSM_INTERFACE_ENABLED == 1
         strcpy(c->username, (c->ipstack).gsmPin);
 #else
-        strcpy(c->username, "");
+        get_pin_for_non_gsm_devices(c->username, sizeof(c->username));
 #endif
         get_device_uuid(c->password, sizeof(c->password));
     }

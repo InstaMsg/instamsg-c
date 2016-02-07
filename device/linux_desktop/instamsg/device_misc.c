@@ -168,3 +168,14 @@ void get_device_ip_address(char *buffer, int maxbufferlength)
     if(ifAddrStruct != NULL)
         freeifaddrs(ifAddrStruct);
 }
+
+
+#if GSM_INTERFACE_ENABLED == 1
+#else
+/*
+ * This method returns the ip-address of this device.
+ */
+void get_pin_for_non_gsm_devices(char *buffer, int maxbufferlength)
+{
+}
+#endif
