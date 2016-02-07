@@ -19,6 +19,7 @@ struct Socket
     char gsmApn[MAX_GSM_PROVISION_PARAM_SIZE];
     char gsmUser[MAX_GSM_PROVISION_PARAM_SIZE];
     char gsmPass[MAX_GSM_PROVISION_PARAM_SIZE];
+    char gsmPin[MAX_GSM_PROVISION_PARAM_SIZE];
 #endif
 
     int (*read) (Socket *socket, unsigned char* buffer, int len, unsigned char guaranteed);

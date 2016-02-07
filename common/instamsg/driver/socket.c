@@ -25,6 +25,7 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port)
     memset(socket->gsmApn, 0, sizeof(socket->gsmApn));
     memset(socket->gsmUser, 0, sizeof(socket->gsmUser));
     memset(socket->gsmPass, 0, sizeof(socket->gsmPass));
+    memset(socket->gsmPin, 0, sizeof(socket->gsmPin));
 
     /* Fill-in the provisioning-parameters from the SMS obtained from InstaMsg-Server */
     memset(sms, 0, sizeof(sms));
@@ -69,9 +70,10 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port)
     getJsonKeyValueIfPresent(sms, "sg_apn", socket->gsmApn);
     getJsonKeyValueIfPresent(sms, "sg_user", socket->gsmUser);
     getJsonKeyValueIfPresent(sms, "sg_pass", socket->gsmPass);
+    getJsonKeyValueIfPresent(sms, "sg_pin", socket->gsmPin);
 
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("\n\nProvisioning-Params ::  sg_apn : [%s], sg_user : [%s], sg_pass : [%s]\n\n"),
-               socket->gsmApn, socket->gsmUser, socket->gsmPass);
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("\n\nProvisioning-Params ::  sg_apn : [%s], sg_user : [%s], sg_pass : [%s], sg_pin : [%s]\n\n"),
+               socket->gsmApn, socket->gsmUser, socket->gsmPass, socket->gsmPin);
     info_log(LOG_GLOBAL_BUFFER);
 
     startAndCountdownTimer(3, 0);

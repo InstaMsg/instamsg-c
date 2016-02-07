@@ -1839,7 +1839,11 @@ void* MQTTConnect(void* arg)
          * We will receive PROVACK for this leg.
          */
         strcpy(c->clientIdMachine, NO_CLIENT_ID);
+#if GSM_INTERFACE_ENABLED == 1
+        strcpy(c->username, (c->ipstack).gsmPin);
+#else
         strcpy(c->username, "");
+#endif
         get_device_uuid(c->password, sizeof(c->password));
     }
 
