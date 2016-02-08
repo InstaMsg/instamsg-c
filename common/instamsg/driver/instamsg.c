@@ -211,7 +211,7 @@ static void fireResultHandlerAndRemove(InstaMsg *c, MQTTFixedHeaderPlusMsgId *fi
 
                 freeLastPubMessageResources();
                 waitingForPuback = NOT_WAITING_FOR_PUBACK;
-
+                pubAckRecvAttempts = 0;
             }
 
             break;
