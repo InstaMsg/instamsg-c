@@ -173,9 +173,9 @@ void get_device_ip_address(char *buffer, int maxbufferlength)
 #if GSM_INTERFACE_ENABLED == 1
 #else
 /*
- * This method returns the ip-address of this device.
+ * This method returns the provisioning-pin for this device.
  */
-void get_pin_for_non_gsm_devices(char *buffer, int maxbufferlength)
+void get_prov_pin_for_non_gsm_devices(char *buffer, int maxbufferlength)
 {
 }
 #endif
