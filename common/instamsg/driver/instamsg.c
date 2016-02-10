@@ -67,6 +67,8 @@ static char streamId[MAX_BUFFER_SIZE];
 static int editableBusinessLogicInterval;
 static unsigned char mqttConnectFlag;
 
+static unsigned char notifyServerOfSecretReceived;
+
 #define DATA_LOG_TOPIC      PROSTR("topic")
 #define DATA_LOG_PAYLOAD    PROSTR("payload")
 
@@ -1513,6 +1515,17 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc)
         }
 #endif
 
+        if(notifyServerOfSecretReceived == 1)
+        {
+            mqttConnectFlag = 1;
+            publish(NOTIFICATION_TOPIC,
+                    "SECRET RECEIVED",
+                    QOS0,
+                    0,
+                    NULL,
+                    MQTT_RESULT_HANDLER_TIMEOUT,
+                    1);
+        }
 
         if(c->onConnectCallback != NULL)
         {
@@ -1589,15 +1602,8 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                                 /*
                                  * Send notification to the server, that the secret-password has been saved.
                                  */
-                                mqttConnectFlag = 1;
-                                publish(NOTIFICATION_TOPIC,
-                                        "SECRET RECEIVED",
-                                        QOS0,
-                                        0,
-                                        NULL,
-                                        MQTT_RESULT_HANDLER_TIMEOUT,
-                                        1);
-                            }
+                                notifyServerOfSecretReceived = 1;
+                           }
                         }
 
                         memset(c->clientIdComplete, 0, sizeof(c->clientIdComplete));
@@ -1835,6 +1841,8 @@ void* MQTTConnect(void* arg)
         memcpy(c->clientIdMachine, secret, 23);
         memcpy(c->username, secret + 24, 12);
         memcpy(c->password, secret + 37, strlen(secret) - 37);
+
+        notifyServerOfSecretReceived = 1;
     }
     else
     {
@@ -2233,6 +2241,8 @@ void start(int (*onConnectOneTimeOperations)(),
 
     mqttConnectFlag = 0;
     pingRequestInterval = 0;
+    notifyServerOfSecretReceived = 0;
+
     compulsorySocketReadAfterMQTTPublishInterval = 0;
 #if MEDIA_STREAMING_ENABLED == 1
     mediaStreamingErrorOccurred = 0;
