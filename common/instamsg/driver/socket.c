@@ -38,7 +38,7 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port)
         startAndCountdownTimer(5, 1);
 
         watchdog_reset_and_enable(300, "SMS-SCANNING-FOR-PROVISIONG-SMS");
-        get_latest_sms_containing_substring(socket, sms, "\"sg_apn\":\"");
+        get_latest_sms_containing_substring(socket, sms, "\"prov_pin\":\"");
         watchdog_disable();
     }
 
