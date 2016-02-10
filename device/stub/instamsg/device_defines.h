@@ -7,6 +7,9 @@
  * However, this implementation has shown to give problems for Harvard/RISC architectures, so such devices will need
  * to provide the reference to an implementation shipped with their compiler-environment.
  */
+
+#define DEVICE_VERSION "1.0.0"
+
 #define sg_sprintf DEFAULT_SPRINTF
 
 #define USE_DEFAULT_MALLOC      1

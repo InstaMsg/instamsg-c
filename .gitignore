@@ -65,4 +65,7 @@ device/stub/ioeye
 device/test_device
 
 common/apps/atoll-gms
+common/apps/energy-meter
+
+common/ioeye
 common/ioeye
