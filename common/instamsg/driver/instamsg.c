@@ -206,8 +206,11 @@ static void fireResultHandlerAndRemove(InstaMsg *c, MQTTFixedHeaderPlusMsgId *fi
 
             if(fixedHeaderPlusMsgId->msgId == pubAckMsgId)
             {
-                sg_sprintf(LOG_GLOBAL_BUFFER, "PUBACK received for message [%s]", lastPubPayload);
-                info_log(LOG_GLOBAL_BUFFER);
+                if(lastPubPayload != NULL)
+                {
+                    sg_sprintf(LOG_GLOBAL_BUFFER, "PUBACK received for message [%s]", lastPubPayload);
+                    info_log(LOG_GLOBAL_BUFFER);
+                }
 
                 freeLastPubMessageResources();
                 waitingForPuback = NOT_WAITING_FOR_PUBACK;
