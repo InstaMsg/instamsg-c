@@ -1517,6 +1517,8 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc)
 
         if(notifyServerOfSecretReceived == 1)
         {
+            startAndCountdownTimer(5, 0);
+
             mqttConnectFlag = 1;
             publish(NOTIFICATION_TOPIC,
                     "SECRET RECEIVED",
