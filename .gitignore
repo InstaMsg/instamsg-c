@@ -66,6 +66,7 @@ device/test_device
 
 common/apps/atoll-gms
 common/apps/energy-meter
+common/apps/generator-monitoring
 
 common/ioeye
 common/ioeye
