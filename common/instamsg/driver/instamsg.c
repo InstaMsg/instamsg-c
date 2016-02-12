@@ -2067,6 +2067,7 @@ int publish(const char* topicName,
     MQTTString topic = MQTTString_initializer;
     topic.cstring = (char *)topicName;
 
+    startAndCountdownTimer(1, 0);
     RESET_GLOBAL_BUFFER;
 
     if (qos == QOS1 || qos == QOS2)
