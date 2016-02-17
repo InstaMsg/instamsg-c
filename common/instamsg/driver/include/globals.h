@@ -108,7 +108,7 @@ int compulsorySocketReadAfterMQTTPublishInterval;
 int mediaStreamingEnabledRuntime;
 #endif
 
-char messageBuffer[2 * MAX_BUFFER_SIZE];
+char messageBuffer[MAX_BUFFER_SIZE];
 
 
 #if MEDIA_STREAMING_ENABLED == 1
