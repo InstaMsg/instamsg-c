@@ -425,7 +425,7 @@ static int sendPacket(InstaMsg *c, unsigned char *buf, int length)
      * We assume that if a packet cannot be sent within 30 seconds,
      * there has been some (undetectable) issue somewehre.
      */
-    watchdog_reset_and_enable(60, "sendPacket");
+    watchdog_reset_and_enable(60, "sendPacket", NULL, NULL);
 
     if((c->ipstack).socketCorrupted == 1)
     {
@@ -473,7 +473,7 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     int numRetries = MAX_TRIES_ALLOWED_WHILE_READING_FROM_SOCKET_MEDIUM;
 
     watchdog_reset_and_enable(60 * MAX_TRIES_ALLOWED_WHILE_READING_FROM_SOCKET_MEDIUM * SOCKET_READ_TIMEOUT_SECS,
-                              "readPacket");
+                              "readPacket", NULL, NULL);
 
     if((c->ipstack).socketCorrupted == 1)
     {
