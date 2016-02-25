@@ -1,3 +1,5 @@
+#include <time.h>
+
 /*
  * This method gets the time in the following-format
  *
@@ -6,6 +8,13 @@
  */
 void getTimeInDesiredFormat(char *buffer, int maxBufferLength)
 {
+    time_t rawtime;
+    struct tm *info;
+
+    time(&rawtime);
+    info = localtime(&rawtime);
+
+    strftime(buffer, maxBufferLength,"%Y%m%d4%H%M%S", info);
 }
 
 
@@ -14,4 +23,5 @@ void getTimeInDesiredFormat(char *buffer, int maxBufferLength)
  */
 void getTimezoneOffset(char *buffer, int maxBufferLength)
 {
+    strcpy(buffer, "19800");
 }
