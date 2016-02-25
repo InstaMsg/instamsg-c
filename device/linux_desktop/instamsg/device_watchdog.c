@@ -14,6 +14,8 @@
 static unsigned char watchdogActive;
 static int num_seconds;
 static char calling_method[MAX_BUFFER_SIZE];
+static void* (*callback_func)(void *);
+static void* callback_arg;
 
 
 static void* watchdog_func(void *arg)
@@ -38,7 +40,14 @@ static void* watchdog_func(void *arg)
                                   num_seconds, calling_method);
     info_log(LOG_GLOBAL_BUFFER);
 
-    rebootDevice();
+    if(callback_func != NULL)
+    {
+        callback_func(callback_arg);
+    }
+    else
+    {
+        rebootDevice();
+    }
 }
 
 
@@ -73,6 +82,8 @@ void watchdog_reset_and_enable(int n, char *callee, void * (*func)(void *), void
 {
     watchdogActive = 1;
     num_seconds = n;
+    callback_func = func;
+    callback_arg = arg;
 
     memset(calling_method, 0, sizeof(calling_method));
     strcpy(calling_method, callee);
