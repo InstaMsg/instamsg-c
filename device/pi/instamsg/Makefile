@@ -16,7 +16,7 @@ EXTRA_OBJECT_FILES=`echo	`
 
 # Compile-cum-Link command for the platform.
 #
-COMPILE_COMMAND="gcc -g -pthread "
+COMPILE_COMMAND="gcc -g -pthread `pkg-config gstreamer-1.0 --cflags` "
 
 
 # Any final libraries that need to be linked.
