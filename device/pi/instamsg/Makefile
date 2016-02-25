@@ -1,14 +1,6 @@
 # Device-specific extra includes
 #
-SYSTEM_INCLUDES=`echo                                               		\
-        -isystem/usr/lib/gcc/i686-linux-gnu/4.8/include                   	\
-        -isystem/usr/local/include                                        	\
-        -isystem/usr/lib/gcc/i686-linux-gnu/4.8/include-fixed             	\
-        -isystem/usr/include/i386-linux-gnu                               	\
-        -isystem/usr/include  												\
-		-isystem/usr/include/gstreamer-1.0                                  \
-		-isystem/usr/include/glib-2.0                                       \
-	   	-isystem/usr/lib/i386-linux-gnu/glib-2.0/include					`
+SYSTEM_INCLUDES=`echo                                               		`
 
 
 # Device-specific extra source-files.
@@ -24,7 +16,7 @@ EXTRA_OBJECT_FILES=`echo	`
 
 # Compile-cum-Link command for the platform.
 #
-COMPILE_COMMAND="gcc -g -nostdinc -pedantic -pthread "
+COMPILE_COMMAND="gcc -g -pthread "
 
 
 # Any final libraries that need to be linked.
