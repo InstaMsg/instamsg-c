@@ -69,7 +69,7 @@ void watchdog_init()
  * "watch_dog_reset_and_enable" loop is repeated).
  *
  */
-void watchdog_reset_and_enable(int n, char *callee)
+void watchdog_reset_and_enable(int n, char *callee, void * (*func)(void *), void *arg)
 {
     watchdogActive = 1;
     num_seconds = n;
