@@ -48,6 +48,7 @@ subscriber.sh
 filetester.sh
 publisher.sh
 diff.sh
+move_files.sh
 
 config.txt
 config.txt_local_testing
@@ -66,6 +67,7 @@ common/apps/atoll-gms
 common/apps/energy-meter
 common/apps/generator-monitoring
 common/apps/generator-monitoring-plus-energy-meter
+common/apps/generator-monitoring-plus-energy-meter-plus-gps-monitoring
 common/apps/gps
 
 common/ioeye
