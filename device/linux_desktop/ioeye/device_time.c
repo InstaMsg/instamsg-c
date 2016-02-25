@@ -1,4 +1,5 @@
 #include <time.h>
+#include <string.h>
 
 /*
  * This method gets the time in the following-format
