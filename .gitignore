@@ -60,8 +60,6 @@ lwip/
 lwip-contrib/
 
 device/ar501
-device/linux_desktop/ioeye
-device/stub/ioeye
 device/test_device
 
 common/apps/atoll-gms
