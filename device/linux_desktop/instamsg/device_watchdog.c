@@ -5,11 +5,49 @@
  *
  *******************************************************************************/
 
+#include <pthread.h>
+#include <string.h>
+
+#include "../driver/include/globals.h"
+
+
+static unsigned char watchdogActive;
+static int num_seconds;
+static char calling_method[MAX_BUFFER_SIZE];
+
+
+static void* watchdog_func(void *arg)
+{
+    int i;
+
+    for(i = num_seconds; i >= 0; i--)
+    {
+        if(watchdogActive == 0)
+        {
+            return;
+        }
+
+        startAndCountdownTimer(1, 0);
+    }
+
+    /*
+     * If control reaches here.. it means that the loop has run to completion, and the
+     * watchdog is still active.
+     */
+    sg_sprintf(LOG_GLOBAL_BUFFER, "Watchdog-timer of interval [%u] seconds expired for callee [%s]... rebooting device.",
+                                  num_seconds, calling_method);
+    info_log(LOG_GLOBAL_BUFFER);
+
+    rebootDevice();
+}
+
+
 /*
  * This method initializes the watchdog-timer.
  */
 void watchdog_init()
 {
+    watchdogActive = 0;
 }
 
 
@@ -33,6 +71,16 @@ void watchdog_init()
  */
 void watchdog_reset_and_enable(int n, char *callee)
 {
+    watchdogActive = 1;
+    num_seconds = n;
+
+    memset(calling_method, 0, sizeof(calling_method));
+    strcpy(calling_method, callee);
+
+    {
+        pthread_t tid;
+        pthread_create(&tid, NULL, watchdog_func, NULL);
+    }
 }
 
 
@@ -41,4 +89,5 @@ void watchdog_reset_and_enable(int n, char *callee)
  */
 void watchdog_disable()
 {
+    watchdogActive = 0;
 }
