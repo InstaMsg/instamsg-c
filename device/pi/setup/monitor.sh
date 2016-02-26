@@ -2,7 +2,7 @@ PID=`pgrep -x pi`
 
 if [ -z "${PID}" ]
 then
-	echo "Streaming-Process not running"
+	echo "Binary not running"
 
 	RESTART_CASE=`cat /home/sensegrow/restart | head -1`
 	if [ "${RESTART_CASE}" = "1" ]
@@ -13,5 +13,5 @@ then
 
 	/home/sensegrow/pi &
 else
-	echo "Streaming-Process running fine"
+	echo "Binary running fine"
 fi
