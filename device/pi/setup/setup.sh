@@ -1,5 +1,7 @@
 set -e
 
+sudo kill `pgrep -x pi`
+
 HOME_DIRECTORY="/home/sensegrow"
 
 sudo mkdir -p "${HOME_DIRECTORY}"
