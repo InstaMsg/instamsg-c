@@ -1,0 +1,2 @@
+*/1 * * * * /home/sensegrow/monitor.sh
+0   0 * * * /home/sensegrow/reset.sh
