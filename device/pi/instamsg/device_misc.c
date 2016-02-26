@@ -66,6 +66,7 @@ void get_network_data(char *messageBuffer, int maxBufferLength)
  */
 void get_manufacturer(char *messagebuffer, int maxbufferlength)
 {
+    strcpy(messageBuffer, "Raspberry Pi");
 }
 
 
