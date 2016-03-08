@@ -28,7 +28,8 @@
 
 #include <string.h>
 
-#define NO_CLIENT_ID PROSTR("NONE")
+#define EMPTY_CLIENT_ID PROSTR("EMPTY")
+#define NO_CLIENT_ID    PROSTR("NONE")
 
 #define MAX_CYCLES_TO_WAIT_FOR_PUBACK   10
 int pubAckMsgId;
@@ -1838,8 +1839,8 @@ void* MQTTConnect(void* arg)
         memcpy(c->clientIdComplete, secret, 36);
         setValuesOfSpecialTopics(c);
 
-        memcpy(c->clientIdMachine, secret, 23);
-        memcpy(c->username, secret + 24, 12);
+        strcpy(c->clientIdMachine, EMPTY_CLIENT_ID);
+        memcpy(c->username, secret, 36);
         memcpy(c->password, secret + 37, strlen(secret) - 37);
 
         notifyServerOfSecretReceived = 1;
