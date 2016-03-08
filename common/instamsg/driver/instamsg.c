@@ -1851,11 +1851,11 @@ void* MQTTConnect(void* arg)
          */
         strcpy(c->clientIdMachine, NO_CLIENT_ID);
 #if GSM_INTERFACE_ENABLED == 1
-        strcpy(c->username, (c->ipstack).provPin);
+        strcpy(c->password, (c->ipstack).provPin);
 #else
-        get_prov_pin_for_non_gsm_devices(c->username, sizeof(c->username));
+        get_prov_pin_for_non_gsm_devices(c->password, sizeof(c->username));
 #endif
-        get_device_uuid(c->password, sizeof(c->password));
+        get_device_uuid(c->username, sizeof(c->password));
     }
 
     c->connectOptions.clientID.cstring = c->clientIdMachine;
