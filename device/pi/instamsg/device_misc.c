@@ -48,6 +48,9 @@ void get_client_session_data(char *messageBuffer, int maxBufferLength)
  */
 void get_client_metadata(char *messageBuffer, int maxBufferLength)
 {
+    strcat(messageBuffer, ", {'client_version' : '");
+    strcat(messageBuffer, INSTAMSG_VERSION);
+    strcat(messageBuffer, "'}");
 }
 
 
