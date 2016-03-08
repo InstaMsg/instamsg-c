@@ -1,7 +1,7 @@
 #ifndef INSTAMSG_GLOBALS
 #define INSTAMSG_GLOBALS
 
-#define INSTAMSG_VERSION "1.5.4"
+#define INSTAMSG_VERSION "1.5.5"
 
 #include "device_defines.h"
 
@@ -45,7 +45,7 @@ struct KeyValuePairs
 
 
 /****************************************************************************************/
-#if 1
+#if 0
 #define INSTAMSG_HOST       PROSTR("device.instamsg.io")
 
 #if  SSL_ENABLED == 1
