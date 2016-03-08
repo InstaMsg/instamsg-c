@@ -45,7 +45,7 @@ struct KeyValuePairs
 
 
 /****************************************************************************************/
-#if 0
+#if 1
 #define INSTAMSG_HOST       PROSTR("device.instamsg.io")
 
 #if  SSL_ENABLED == 1
