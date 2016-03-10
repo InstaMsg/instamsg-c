@@ -31,6 +31,10 @@
 #define EMPTY_CLIENT_ID PROSTR("EMPTY")
 #define NO_CLIENT_ID    PROSTR("NONE")
 
+#define PROVISIONED     PROSTR("PROVISIONED")
+#define CONNECTED       PROSTR("CONNECTED")
+
+
 #define MAX_CYCLES_TO_WAIT_FOR_PUBACK   10
 int pubAckMsgId;
 int pubAckRecvAttempts;
@@ -1467,11 +1471,11 @@ exit:
 }
 
 
-static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc)
+static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *mode)
 {
     if(connack_rc == 0x00)  /* Connection Accepted */
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Connected successfully to InstaMsg-Server."));
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s successfully to InstaMsg-Server."), mode);
         info_log(LOG_GLOBAL_BUFFER);
 
         c->connected = 1;
@@ -1536,7 +1540,7 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc)
     }
     else
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Client-Connection failed with code [%d]"), connack_rc);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Client-%s failed with code [%d]"), mode, connack_rc);
         info_log(LOG_GLOBAL_BUFFER);
     }
 }
@@ -1564,7 +1568,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                 char sessionPresent = 0;
                 if (MQTTDeserialize_connack((unsigned char*)&sessionPresent, &connack_rc, c->readbuf, sizeof(c->readbuf)) == 1)
                 {
-                    handleConnOrProvAckGeneric(c, connack_rc);
+                    handleConnOrProvAckGeneric(c, connack_rc, CONNECTED);
                 }
 
                 break;
@@ -1613,9 +1617,9 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                         info_log(LOG_GLOBAL_BUFFER);
 
                         setValuesOfSpecialTopics(c);
-
-                        handleConnOrProvAckGeneric(c, connack_rc);
                     }
+
+                    handleConnOrProvAckGeneric(c, connack_rc, PROVISIONED);
                 }
 
                 break;
