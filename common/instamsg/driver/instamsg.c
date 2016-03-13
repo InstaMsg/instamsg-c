@@ -28,11 +28,11 @@
 
 #include <string.h>
 
-#define EMPTY_CLIENT_ID PROSTR("EMPTY")
-#define NO_CLIENT_ID    PROSTR("NONE")
+#define EMPTY_CLIENT_ID             PROSTR("EMPTY")
+#define PROVISIONING_CLIENT_ID      PROSTR("PROVISIONING")
 
-#define PROVISIONED     PROSTR("PROVISIONED")
-#define CONNECTED       PROSTR("CONNECTED")
+#define PROVISIONED                 PROSTR("PROVISIONED")
+#define CONNECTED                   PROSTR("CONNECTED")
 
 
 #define MAX_CYCLES_TO_WAIT_FOR_PUBACK   10
@@ -1854,7 +1854,7 @@ void* MQTTConnect(void* arg)
         /*
          * We will receive PROVACK for this leg.
          */
-        strcpy(c->clientIdMachine, NO_CLIENT_ID);
+        strcpy(c->clientIdMachine, PROVISIONING_CLIENT_ID);
 #if GSM_INTERFACE_ENABLED == 1
         strcpy(c->password, (c->ipstack).provPin);
 #else
