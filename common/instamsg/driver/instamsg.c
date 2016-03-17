@@ -1858,9 +1858,9 @@ void* MQTTConnect(void* arg)
 #if GSM_INTERFACE_ENABLED == 1
         strcpy(c->password, (c->ipstack).provPin);
 #else
-        get_prov_pin_for_non_gsm_devices(c->password, sizeof(c->username));
+        get_prov_pin_for_non_gsm_devices(c->password, sizeof(c->password));
 #endif
-        get_device_uuid(c->username, sizeof(c->password));
+        get_device_uuid(c->username, sizeof(c->username));
     }
 
     c->connectOptions.clientID.cstring = c->clientIdMachine;
