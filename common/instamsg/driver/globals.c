@@ -457,6 +457,8 @@ void globalSystemInit(char *logFilePath)
 #if FILE_SYSTEM_ENABLED == 1
     init_file_logger(&fileLogger, logFilePath);
 #endif
+
+    init_config();
 }
 
 

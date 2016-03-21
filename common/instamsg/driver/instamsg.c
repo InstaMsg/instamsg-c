@@ -1306,7 +1306,6 @@ void initInstaMsg(InstaMsg* c,
     int i;
 
     runBusinessLogicImmediately = 0;
-    init_config();
 
     c->FRESH_SERVER_LOGS_TIME = -1;
 
