@@ -25,6 +25,7 @@
 #include "./include/misc.h"
 #include "./include/config.h"
 #include "./include/data_logger.h"
+#include "./include/globals.h"
 
 #include <string.h>
 
@@ -69,7 +70,6 @@ unsigned long mediaMessageRequestTime;
 static char streamId[MAX_BUFFER_SIZE];
 #endif
 
-static int editableBusinessLogicInterval;
 static unsigned char mqttConnectFlag;
 
 static unsigned char notifyServerOfSecretReceived;
@@ -430,7 +430,7 @@ static int sendPacket(InstaMsg *c, unsigned char *buf, int length)
      * We assume that if a packet cannot be sent within 30 seconds,
      * there has been some (undetectable) issue somewehre.
      */
-    watchdog_reset_and_enable(60, "sendPacket", NULL, NULL);
+    watchdog_reset_and_enable(60, "sendPacket", 1);
 
     if((c->ipstack).socketCorrupted == 1)
     {
@@ -461,7 +461,7 @@ static int sendPacket(InstaMsg *c, unsigned char *buf, int length)
     }
 
 exit:
-    watchdog_disable();
+    watchdog_disable(NULL, NULL);
     return rc;
 }
 
@@ -478,7 +478,7 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     int numRetries = MAX_TRIES_ALLOWED_WHILE_READING_FROM_SOCKET_MEDIUM;
 
     watchdog_reset_and_enable(60 * MAX_TRIES_ALLOWED_WHILE_READING_FROM_SOCKET_MEDIUM * SOCKET_READ_TIMEOUT_SECS,
-                              "readPacket", NULL, NULL);
+                              "readPacket", 1);
 
     if((c->ipstack).socketCorrupted == 1)
     {
@@ -558,7 +558,7 @@ static int readPacket(InstaMsg* c, MQTTFixedHeader *fixedHeader)
     rc = SUCCESS;
 
 exit:
-    watchdog_disable();
+    watchdog_disable(NULL, NULL);
     return rc;
 }
 

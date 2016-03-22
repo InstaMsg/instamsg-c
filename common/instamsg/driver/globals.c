@@ -3,6 +3,7 @@
 #include "./include/time.h"
 #include "./include/watchdog.h"
 #include "./include/misc.h"
+#include "./include/config.h"
 
 
 #include <string.h>

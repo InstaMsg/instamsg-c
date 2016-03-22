@@ -37,9 +37,9 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port)
 
         startAndCountdownTimer(5, 1);
 
-        watchdog_reset_and_enable(300, "SMS-SCANNING-FOR-PROVISIONG-SMS", NULL, NULL);
+        watchdog_reset_and_enable(300, "SMS-SCANNING-FOR-PROVISIONG-SMS", 1);
         get_latest_sms_containing_substring(socket, sms, "\"sg_apn\":\"");
-        watchdog_disable();
+        watchdog_disable(NULL, NULL);
     }
 
     /*
@@ -83,9 +83,9 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port)
 #endif
 
     /* Connect the medium (socket). */
-    watchdog_reset_and_enable(300, "TRYING-SOCKET-CONNECTION-SOLITARY-ATTEMPT", NULL, NULL);
+    watchdog_reset_and_enable(300, "TRYING-SOCKET-CONNECTION-SOLITARY-ATTEMPT", 1);
     connect_underlying_socket_medium_try_once(socket);
-    watchdog_disable();
+    watchdog_disable(NULL, NULL);
 }
 
 

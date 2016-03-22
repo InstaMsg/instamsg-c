@@ -120,4 +120,5 @@ char USER_LOG_FILE_PATH[MAX_BUFFER_SIZE];
 char USER_DEVICE_UUID[MAX_BUFFER_SIZE];
 #endif
 
+unsigned long editableBusinessLogicInterval;
 #endif

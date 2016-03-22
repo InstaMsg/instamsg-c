@@ -22,16 +22,16 @@ void watchdog_init()
  * a)
  * Counter reaches 0.
  *
- * The device must then be reset/restarted.
+ * In this case, the global "watchdog_expired" variable must be set to 1.
+ * Also, if "immediate" is 1, the device must be reboooted immediately.
  *
  * b)
- * "watch_dog_disable()" is called.
+ * "watch_dog_disable()" (the global API-function) is called by the callee.
  *
- * In this case, the countdown-timer stops, and the device must never be reset/restarted (until the entire
- * "watch_dog_reset_and_enable" loop is repeated).
+ * In this case, the countdown-timer stops, and the device must not be reset/restarted.
  *
  */
-void watchdog_reset_and_enable(int n, char *callee, void * (*func)(void *), void *arg)
+void watchdog_reset_and_enable(int n, unsigned char immediate)
 {
 }
 

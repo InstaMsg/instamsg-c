@@ -23,6 +23,7 @@ SOURCES=`echo                                                                   
         common/instamsg/driver/sg_stdlib.c                                                      \
         common/instamsg/driver/socket.c                                                         \
         common/instamsg/driver/config.c                                                         \
+        common/instamsg/driver/watchdog.c                                                       \
         common/instamsg/driver/file_system.c                                                    \
         common/instamsg/driver/httpclient.c                                                     \
         common/instamsg/driver/media.c                                                          \
