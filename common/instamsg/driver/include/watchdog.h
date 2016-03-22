@@ -6,7 +6,7 @@ void do_watchdog_reset_and_enable(int n, unsigned char immediate);
 void do_watchdog_disable();
 void print_rebooting_message();
 
-unsigned char watchdog_expired;
+volatile unsigned char watchdog_expired;
 
 
 
