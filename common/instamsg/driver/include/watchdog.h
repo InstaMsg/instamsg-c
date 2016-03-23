@@ -42,6 +42,10 @@ volatile unsigned char watchdog_expired;
 void watchdog_reset_and_enable(int n, char *callee, unsigned char immediate);
 
 
+
+
+
+
 /*
  * This method disables the watchdog.
  *
