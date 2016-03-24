@@ -80,6 +80,13 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port)
                        PROSTR("\n\n\nProvisioning-SMS not available from storage-area, trying to fetch from config\n\n\n"));
             info_log(LOG_GLOBAL_BUFFER);
 
+#if 0
+            sg_sprintf(LOG_GLOBAL_BUFFER, "Giving 10 seconds to insert back the sim-card to test failed-sms-received procedure");
+            info_log(LOG_GLOBAL_BUFFER);
+
+            startAndCountdownTimer(10, 1);
+#endif
+
             {
                 memset(messageBuffer, 0, sizeof(messageBuffer));
 
@@ -120,6 +127,10 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port)
                 info_log(LOG_GLOBAL_BUFFER);
             }
         }
+
+#if 0
+        sms[0] = 0;
+#endif
     }
 
 
