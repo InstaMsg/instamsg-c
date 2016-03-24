@@ -19,7 +19,6 @@ static void replaceSmsCharacter(char *sms, char old_char, char new_char)
             if(sms[i] == old_char)
             {
                 sms[i] = new_char;
-                break;
             }
         }
 
@@ -28,10 +27,15 @@ static void replaceSmsCharacter(char *sms, char old_char, char new_char)
             if(sms[i] == ')')
             {
                 sms[i] = '}';
-                break;
             }
         }
     }
+}
+
+
+static void* emptyCallback(void *arg)
+{
+    return NULL;
 }
 
 
@@ -66,9 +70,9 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port)
 
         startAndCountdownTimer(5, 1);
 
-        watchdog_reset_and_enable(180, "SMS-SCANNING-FOR-PROVISIONG-SMS", 1);
+        watchdog_reset_and_enable(180, "SMS-SCANNING-FOR-PROVISIONG-SMS", 0);
         get_latest_sms_containing_substring(socket, sms, "\"sg_apn\":\"");
-        watchdog_disable(NULL, NULL);
+        watchdog_disable(emptyCallback, NULL);
 
         if(strlen(sms) == 0)
         {
@@ -104,6 +108,8 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port)
              */
             replaceSmsCharacter(sms, '{', '(');
             replaceSmsCharacter(sms, '}', ')');
+            replaceSmsCharacter(sms, '\'', '@');
+            replaceSmsCharacter(sms, '"', '#');
 
             {
                 memset(messageBuffer, 0, sizeof(messageBuffer));
@@ -122,6 +128,8 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port)
      */
     replaceSmsCharacter(sms, '(', '{');
     replaceSmsCharacter(sms, ')', '}');
+    replaceSmsCharacter(sms, '@', '\'');
+    replaceSmsCharacter(sms, '#', '"');
 
     getJsonKeyValueIfPresent(sms, "sg_apn", socket->gsmApn);
     getJsonKeyValueIfPresent(sms, "sg_user", socket->gsmUser);

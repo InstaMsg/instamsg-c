@@ -39,17 +39,15 @@ void watchdog_disable(void * (*func)(void *), void *arg)
     watchdog_active = 0;
 
     do_watchdog_disable();
-
     if(watchdog_expired == 1)
     {
-        print_rebooting_message();
-
         if(func != NULL)
         {
             func(arg);
         }
         else
         {
+            print_rebooting_message();
             rebootDevice();
         }
     }
