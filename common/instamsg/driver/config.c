@@ -48,7 +48,7 @@ void process_config(char *configJson)
     /*
      * Save the config on persistent-storage.
      */
-    save_config_value_on_persistent_storage(config_key, configJson);
+    save_config_value_on_persistent_storage(config_key, configJson, 1);
 
     /*
      * Finally, publish the config on the server, so that the device and server remain in sync.

@@ -25,6 +25,8 @@ void print_rebooting_message()
 
 void watchdog_reset_and_enable(int n, char *callee, unsigned char immediate)
 {
+    watchdog_active = 1;
+
     watchdog_expired = 0;
     trackString = callee;
 
@@ -34,6 +36,8 @@ void watchdog_reset_and_enable(int n, char *callee, unsigned char immediate)
 
 void watchdog_disable(void * (*func)(void *), void *arg)
 {
+    watchdog_active = 0;
+
     do_watchdog_disable();
 
     if(watchdog_expired == 1)

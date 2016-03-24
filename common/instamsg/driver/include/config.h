@@ -19,7 +19,7 @@ enum CONFIG_TYPE
 
 void init_config();
 int get_config_value_from_persistent_storage(const char *key, char *buffer, int maxBufferLength);
-int save_config_value_on_persistent_storage(const char *key, const char *value);
+int save_config_value_on_persistent_storage(const char *key, const char *value, unsigned char logging);
 int delete_config_value_from_persistent_storage(const char *key);
 
 void generate_config_json(char *messageBuffer, const char *key, enum CONFIG_TYPE type, const char *stringified_value, const char *desc);

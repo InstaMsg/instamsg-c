@@ -3,9 +3,37 @@
 #include "./include/log.h"
 #include "./include/json.h"
 #include "./include/watchdog.h"
+#include "./include/config.h"
 
+#define SMS     PROSTR("SMS")
 
 static char sms[200];
+
+
+static void replaceSmsCharacter(char *sms, char old_char, char new_char)
+{
+    {
+        int i;
+        for(i = 0; i < strlen(sms); i++)
+        {
+            if(sms[i] == old_char)
+            {
+                sms[i] = new_char;
+                break;
+            }
+        }
+
+        for(i = strlen(sms) - 1; i >= 0; i--)
+        {
+            if(sms[i] == ')')
+            {
+                sms[i] = '}';
+                break;
+            }
+        }
+    }
+}
+
 
 void init_socket(Socket *socket, const char *hostName, unsigned int port)
 {
@@ -28,45 +56,72 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port)
     memset(socket->gsmPin, 0, sizeof(socket->gsmPin));
     memset(socket->provPin, 0, sizeof(socket->provPin));
 
-    /* Fill-in the provisioning-parameters from the SMS obtained from InstaMsg-Server */
+    /* Fill-in the provisioning-parameters. */
     memset(sms, 0, sizeof(sms));
+
     while(strlen(sms) == 0)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("\n\n\nProvisioning-SMS not available, retrying to fetch from storage area\n\n\n"));
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("\n\n\nProvisioning-SMS not available, retrying to fetch from storage-area\n\n\n"));
         info_log(LOG_GLOBAL_BUFFER);
 
         startAndCountdownTimer(5, 1);
 
-        watchdog_reset_and_enable(300, "SMS-SCANNING-FOR-PROVISIONG-SMS", 1);
+        watchdog_reset_and_enable(180, "SMS-SCANNING-FOR-PROVISIONG-SMS", 1);
         get_latest_sms_containing_substring(socket, sms, "\"sg_apn\":\"");
         watchdog_disable(NULL, NULL);
+
+        if(strlen(sms) == 0)
+        {
+            sg_sprintf(LOG_GLOBAL_BUFFER,
+                       PROSTR("\n\n\nProvisioning-SMS not available from storage-area, trying to fetch from config\n\n\n"));
+            info_log(LOG_GLOBAL_BUFFER);
+
+            {
+                memset(messageBuffer, 0, sizeof(messageBuffer));
+
+                {
+                    int rc = get_config_value_from_persistent_storage(SMS, messageBuffer, sizeof(messageBuffer));
+                    if(rc == SUCCESS)
+                    {
+
+                        getJsonKeyValueIfPresent(messageBuffer, CONFIG_VALUE_KEY, sms);
+                        if(strlen(sms) > 0)
+                        {
+                            sg_sprintf(LOG_GLOBAL_BUFFER, "Provisioning-Info SMS extracted from config = [%s]", sms);
+                            info_log(LOG_GLOBAL_BUFFER);
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            sg_sprintf(LOG_GLOBAL_BUFFER, "Provisioning-Info SMS extracted from storage-area = [%s]", sms);
+            info_log(LOG_GLOBAL_BUFFER);
+
+            /*
+             * Store this into config, after removing any curly-braces, as config does not support nested-json.
+             */
+            replaceSmsCharacter(sms, '{', '(');
+            replaceSmsCharacter(sms, '}', ')');
+
+            {
+                memset(messageBuffer, 0, sizeof(messageBuffer));
+                generate_config_json(messageBuffer, SMS, CONFIG_STRING, sms, "");
+                save_config_value_on_persistent_storage(SMS, messageBuffer, 1);
+
+                sg_sprintf(LOG_GLOBAL_BUFFER, "Persisted [%s] ==> [%s]", SMS, sms);
+                info_log(LOG_GLOBAL_BUFFER);
+            }
+        }
     }
+
 
     /*
-     * For some SIMs, the "{" and "}" sent from server are replaced by "(" and ")".
-     * Rectify them.
+     * Convert back the simple-brackets to curly-braces.
      */
-    {
-        int i;
-        for(i = 0; i < strlen(sms); i++)
-        {
-            if(sms[i] == '(')
-            {
-                sms[i] = '{';
-                break;
-            }
-        }
-
-        for(i = strlen(sms) - 1; i >= 0; i--)
-        {
-            if(sms[i] == ')')
-            {
-                sms[i] = '}';
-                break;
-            }
-        }
-
-    }
+    replaceSmsCharacter(sms, '(', '{');
+    replaceSmsCharacter(sms, ')', '}');
 
     getJsonKeyValueIfPresent(sms, "sg_apn", socket->gsmApn);
     getJsonKeyValueIfPresent(sms, "sg_user", socket->gsmUser);
