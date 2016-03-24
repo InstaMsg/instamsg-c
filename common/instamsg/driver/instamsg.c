@@ -2181,13 +2181,39 @@ exit:
 
 int publishMessageWithDeliveryGuarantee(char *topic, char *payload)
 {
-    return publish(topic,
-                   payload,
-                   QOS1,
-                   0,
-                   publishAckReceived,
-                   MQTT_RESULT_HANDLER_TIMEOUT,
-                   1);
+    static int actuallyEnsureGuaranteeWhereRequired;
+    static unsigned char valueLoaded;
+
+    if(valueLoaded == 0)
+    {
+        registerEditableConfig(&actuallyEnsureGuaranteeWhereRequired,
+                               PROSTR("ACTUALLY_ENSURE_MESSAGE_DELIVERY_WHERE_REQUIRED"),
+                               CONFIG_INT,
+                               PROSTR("1"),
+                               PROSTR(""));
+        valueLoaded = 1;
+    }
+
+    if(actuallyEnsureGuaranteeWhereRequired == 0)
+    {
+        return publish(topic,
+                       payload,
+                       QOS0,
+                       0,
+                       NULL,
+                       MQTT_RESULT_HANDLER_TIMEOUT,
+                       1);
+    }
+    else
+    {
+        return publish(topic,
+                       payload,
+                       QOS1,
+                       0,
+                       publishAckReceived,
+                       MQTT_RESULT_HANDLER_TIMEOUT,
+                       1);
+    }
 }
 
 
