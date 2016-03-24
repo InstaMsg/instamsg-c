@@ -71,8 +71,8 @@ static char streamId[MAX_BUFFER_SIZE];
 #endif
 
 static unsigned char mqttConnectFlag;
-
 static unsigned char notifyServerOfSecretReceived;
+static int actuallyEnsureGuaranteeWhereRequired;
 
 #define DATA_LOG_TOPIC      PROSTR("topic")
 #define DATA_LOG_PAYLOAD    PROSTR("payload")
@@ -1507,6 +1507,12 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
                                    PROSTR("Business-Logic Interval (in seconds)"));
         }
 
+        registerEditableConfig(&actuallyEnsureGuaranteeWhereRequired,
+                               PROSTR("ACTUALLY_ENSURE_MESSAGE_DELIVERY_WHERE_REQUIRED"),
+                               CONFIG_INT,
+                               PROSTR("1"),
+                               PROSTR(""));
+
 #if MEDIA_STREAMING_ENABLED == 1
         registerEditableConfig(&mediaStreamingEnabledRuntime,
                                PROSTR("MEDIA_STREAMING_ENABLED"),
@@ -2181,19 +2187,6 @@ exit:
 
 int publishMessageWithDeliveryGuarantee(char *topic, char *payload)
 {
-    static int actuallyEnsureGuaranteeWhereRequired;
-    static unsigned char valueLoaded;
-
-    if(valueLoaded == 0)
-    {
-        registerEditableConfig(&actuallyEnsureGuaranteeWhereRequired,
-                               PROSTR("ACTUALLY_ENSURE_MESSAGE_DELIVERY_WHERE_REQUIRED"),
-                               CONFIG_INT,
-                               PROSTR("1"),
-                               PROSTR(""));
-        valueLoaded = 1;
-    }
-
     if(actuallyEnsureGuaranteeWhereRequired == 0)
     {
         return publish(topic,
@@ -2306,6 +2299,31 @@ void start(int (*onConnectOneTimeOperations)(),
             {
                 if(1)
                 {
+                    while(1)
+                    {
+                        static unsigned char maxConnectionWaitAttempts;
+
+                        if(c->connected != 1)
+                        {
+                            maxConnectionWaitAttempts++;
+                            readAndProcessIncomingMQTTPacketsIfAny(c);
+                        }
+
+                        if(maxConnectionWaitAttempts >= 5)
+                        {
+                            sg_sprintf(LOG_GLOBAL_BUFFER, "No PROVACK/CONNACK received even after %d attempts", maxConnectionWaitAttempts);
+                            info_log(LOG_GLOBAL_BUFFER);
+
+                            maxConnectionWaitAttempts = 0;
+                            break;
+                        }
+
+                        if(c->connected == 1)
+                        {
+                            break;
+                        }
+                    }
+
                     readAndProcessIncomingMQTTPacketsIfAny(c);
 
                     if((msgSource == PERSISTENT_STORAGE) && (waitingForPuback != WAITING_FOR_PUBACK) && (rebootPending == 0))
