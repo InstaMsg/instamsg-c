@@ -91,7 +91,7 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port)
                         getJsonKeyValueIfPresent(messageBuffer, CONFIG_VALUE_KEY, sms);
                         if(strlen(sms) > 0)
                         {
-                            sg_sprintf(LOG_GLOBAL_BUFFER, "Provisioning-Info SMS extracted from config = [%s]", sms);
+                            sg_sprintf(LOG_GLOBAL_BUFFER, "\n\nProvisioning-Info SMS extracted from config = [%s]\n\n", sms);
                             info_log(LOG_GLOBAL_BUFFER);
                         }
                     }
@@ -100,7 +100,7 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port)
         }
         else
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, "Provisioning-Info SMS extracted from storage-area = [%s]", sms);
+            sg_sprintf(LOG_GLOBAL_BUFFER, "\n\nProvisioning-Info SMS extracted from storage-area = [%s]\n\n", sms);
             info_log(LOG_GLOBAL_BUFFER);
 
             /*
@@ -130,6 +130,9 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port)
     replaceSmsCharacter(sms, ')', '}');
     replaceSmsCharacter(sms, '@', '\'');
     replaceSmsCharacter(sms, '#', '"');
+
+    sg_sprintf(LOG_GLOBAL_BUFFER, "\n\nFinal (Converted) SMS being used for variables-extraction = [%s]\n\n", sms);
+    info_log(LOG_GLOBAL_BUFFER);
 
     getJsonKeyValueIfPresent(sms, "sg_apn", socket->gsmApn);
     getJsonKeyValueIfPresent(sms, "sg_user", socket->gsmUser);

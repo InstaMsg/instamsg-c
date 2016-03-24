@@ -4,7 +4,9 @@
 
 #if GSM_INTERFACE_ENABLED == 1
 /*
- * This method returns the *****LATEST****** sms, which contains the desired substring.
+ * This method returns the *****LATEST****** sms, which contains the desired substring, while the following returns 1 ::
+ *
+ *                                      time_fine_for_time_limit_function()
  *
  * Note that "{" are sometimes not processed correctly by some SIMs, so a prefix-match (which
  * otherwise is a stronger check) is not being done.

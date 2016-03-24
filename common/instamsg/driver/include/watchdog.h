@@ -80,4 +80,16 @@ void watchdog_reset_and_enable(int n, char *callee, unsigned char immediate);
 void watchdog_disable(void * (*func)(void *), void *arg);
 
 
+
+
+
+
+/*
+ * This method tells whether the watchdog has expired or not.
+ *
+ * If it has, the method returns 1.
+ * If not, the method returns 0.
+ */
+unsigned char time_fine_for_time_limit_function();
+
 #endif

@@ -52,4 +52,10 @@ void watchdog_disable(void * (*func)(void *), void *arg)
         }
     }
 }
+
+
+unsigned char time_fine_for_time_limit_function()
+{
+    return ( ((watchdog_active == 1) && (watchdog_expired == 0)) || (watchdog_active == 0) );
+}
 #endif
