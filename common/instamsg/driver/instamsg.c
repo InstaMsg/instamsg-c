@@ -2316,7 +2316,7 @@ void start(int (*onConnectOneTimeOperations)(),
                             readAndProcessIncomingMQTTPacketsIfAny(c);
                         }
 
-                        if(maxConnectionWaitAttempts >= 5)
+                        if(maxConnectionWaitAttempts >= 10)
                         {
                             sg_sprintf(LOG_GLOBAL_BUFFER, "No PROVACK/CONNACK received even after %d attempts", maxConnectionWaitAttempts);
                             info_log(LOG_GLOBAL_BUFFER);
