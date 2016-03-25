@@ -2424,9 +2424,7 @@ void start(int (*onConnectOneTimeOperations)(),
 
                                 if((rebootPending == 1) && (businessLogicRunOnceAtStart == 1))
                                 {
-                                    sg_sprintf(LOG_GLOBAL_BUFFER,
-                                               PROSTR(
-                                                  "There were some messages which did not complete send-cum-ack cycle, so rebooting"));
+                                    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Rebooting due to an error condition that occurred before."));
                                     error_log(LOG_GLOBAL_BUFFER);
 
                                     rebootDevice();
