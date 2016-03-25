@@ -151,6 +151,11 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port)
     getJsonKeyValueIfPresent(sms, "sg_pin", socket->gsmPin);
     getJsonKeyValueIfPresent(sms, "prov_pin", socket->provPin);
 
+#if 0
+    memset(socket->gsmApn, 0, sizeof(socket->gsmApn));
+    strcpy(socket->gsmApn, "random_apn");
+#endif
+
     sg_sprintf(LOG_GLOBAL_BUFFER,
                PROSTR("\n\nProvisioning-Params ::  sg_apn : [%s], sg_user : [%s], sg_pass : [%s], sg_pin : [%s], prov_pin : [%s]\n\n"),
                socket->gsmApn, socket->gsmUser, socket->gsmPass, socket->gsmPin, socket->provPin);

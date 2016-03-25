@@ -2299,9 +2299,16 @@ void start(int (*onConnectOneTimeOperations)(),
             {
                 if(1)
                 {
+#if 1
                     while(1)
                     {
                         static unsigned char maxConnectionWaitAttempts;
+                        static unsigned char onceTried;
+
+                        if(onceTried == 1)
+                        {
+                            break;
+                        }
 
                         if(c->connected != 1)
                         {
@@ -2315,6 +2322,8 @@ void start(int (*onConnectOneTimeOperations)(),
                             info_log(LOG_GLOBAL_BUFFER);
 
                             maxConnectionWaitAttempts = 0;
+                            onceTried = 1;
+
                             break;
                         }
 
@@ -2323,6 +2332,7 @@ void start(int (*onConnectOneTimeOperations)(),
                             break;
                         }
                     }
+#endif
 
                     readAndProcessIncomingMQTTPacketsIfAny(c);
 
