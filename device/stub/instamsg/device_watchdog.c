@@ -31,7 +31,7 @@ void watchdog_init()
  * In this case, the countdown-timer stops, and the device must not be reset/restarted.
  *
  */
-void watchdog_reset_and_enable(int n, unsigned char immediate)
+void do_watchdog_reset_and_enable(int n, unsigned char immediate)
 {
 }
 
@@ -39,6 +39,6 @@ void watchdog_reset_and_enable(int n, unsigned char immediate)
 /*
  * This method disables the watchdog-timer.
  */
-void watchdog_disable()
+void do_watchdog_disable()
 {
 }

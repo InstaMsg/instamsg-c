@@ -33,6 +33,7 @@ static void* watchdog_func(void *arg)
      * If control reaches here.. it means that the loop has run to completion, and the
      * watchdog is still active.
      */
+    watchdog_expired = 1;
     if(immediate_reboot == 1)
     {
         print_rebooting_message();
