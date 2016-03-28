@@ -1621,6 +1621,11 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Received client-id from server via PROVACK [%s]"), c->clientIdComplete);
                         info_log(LOG_GLOBAL_BUFFER);
 
+                        /*
+                         * Reboot the device, so that the next time the CONNECT-cycle takes place.
+                         */
+                        rebootDevice();
+
                         setValuesOfSpecialTopics(c);
                     }
 
