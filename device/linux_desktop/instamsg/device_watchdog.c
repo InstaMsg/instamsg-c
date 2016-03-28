@@ -13,10 +13,7 @@
 
 static unsigned char watchdogActive;
 static int num_seconds;
-static char calling_method[MAX_BUFFER_SIZE];
-static void* (*callback_func)(void *);
-static void* callback_arg;
-
+static unsigned char immediate_reboot;
 
 static void* watchdog_func(void *arg)
 {
@@ -36,16 +33,9 @@ static void* watchdog_func(void *arg)
      * If control reaches here.. it means that the loop has run to completion, and the
      * watchdog is still active.
      */
-    sg_sprintf(LOG_GLOBAL_BUFFER, "Watchdog-timer of interval [%u] seconds expired for callee [%s]... rebooting device.",
-                                  num_seconds, calling_method);
-    info_log(LOG_GLOBAL_BUFFER);
-
-    if(callback_func != NULL)
+    if(immediate_reboot == 1)
     {
-        callback_func(callback_arg);
-    }
-    else
-    {
+        print_rebooting_message();
         rebootDevice();
     }
 }
@@ -78,15 +68,11 @@ void watchdog_init()
  * In this case, the countdown-timer stops, and the device must not be reset/restarted.
  *
  */
-void watchdog_reset_and_enable(int n, char *callee, unsigned char immediate)
+void do_watchdog_reset_and_enable(int n, unsigned char immediate)
 {
     watchdogActive = 1;
     num_seconds = n;
-    callback_func = func;
-    callback_arg = arg;
-
-    memset(calling_method, 0, sizeof(calling_method));
-    strcpy(calling_method, callee);
+    immediate_reboot = immediate;
 
     {
         pthread_t tid;
@@ -98,7 +84,7 @@ void watchdog_reset_and_enable(int n, char *callee, unsigned char immediate)
 /*
  * This method disables the watchdog-timer.
  */
-void watchdog_disable()
+void do_watchdog_disable()
 {
     watchdogActive = 0;
 }

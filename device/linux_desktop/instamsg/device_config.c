@@ -168,7 +168,7 @@ int get_config_value_from_persistent_storage(const char *key, char *buffer, int 
  * SUCCESS ==> If the config was successfully saved.
  * FAILURE ==> If the config could not be saved.
  */
-int save_config_value_on_persistent_storage(const char *key, const char *value)
+int save_config_value_on_persistent_storage(const char *key, const char *value, unsigned char logging)
 {
     delete_config_value_from_persistent_storage(key);
     return sg_appendLine(CONFIG_FILE_NAME, value);
