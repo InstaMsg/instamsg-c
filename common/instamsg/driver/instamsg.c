@@ -2302,8 +2302,13 @@ void start(int (*onConnectOneTimeOperations)(),
 #if 1
                     while(1)
                     {
-                        static unsigned char maxConnectionWaitAttempts;
-                        static unsigned char onceTried;
+                        static unsigned char maxConnectionWaitAttempts = 0;
+                        static unsigned char onceTried = 0;
+
+                        if(c->connected == 1)
+                        {
+                            break;
+                        }
 
                         if(onceTried == 1)
                         {
@@ -2324,11 +2329,6 @@ void start(int (*onConnectOneTimeOperations)(),
                             maxConnectionWaitAttempts = 0;
                             onceTried = 1;
 
-                            break;
-                        }
-
-                        if(c->connected == 1)
-                        {
                             break;
                         }
                     }
