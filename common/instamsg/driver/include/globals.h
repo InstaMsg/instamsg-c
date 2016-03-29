@@ -1,7 +1,7 @@
 #ifndef INSTAMSG_GLOBALS
 #define INSTAMSG_GLOBALS
 
-#define INSTAMSG_VERSION "2.4.1"
+#define INSTAMSG_VERSION "2.5.0"
 
 #include "device_defines.h"
 
