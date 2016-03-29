@@ -9,6 +9,7 @@
 #include <string.h>
 
 #include "../driver/include/globals.h"
+#include "../../../common/instamsg/driver/include/watchdog.h"
 
 
 static unsigned char watchdogActive;
