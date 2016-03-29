@@ -1547,6 +1547,8 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Client-%s failed with code [%d]"), mode, connack_rc);
         info_log(LOG_GLOBAL_BUFFER);
+
+        rebootDevice();
     }
 }
 
