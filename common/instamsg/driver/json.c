@@ -131,13 +131,15 @@ void getJsonKeyValueIfPresent(char *json_original, const char *key, char *buf)
     }
 
 exit:
-    if(newJsonBeginnerPointer)
-        sg_free(newJsonBeginnerPointer);
+
+    if(parsedValueToken)
+        sg_free(parsedValueToken);
 
     if(parsedKeyToken)
         sg_free(parsedKeyToken);
 
-    if(parsedValueToken)
-        sg_free(parsedValueToken);
+    if(newJsonBeginnerPointer)
+        sg_free(newJsonBeginnerPointer);
+
 }
 

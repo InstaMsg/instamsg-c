@@ -497,14 +497,14 @@ HTTPResponse uploadFile(const char *url,
 
 exit:
 
-    if(request)
-        sg_free(request);
+    if(fourthLevel)
+        sg_free(fourthLevel);
 
     if(secondLevel)
         sg_free(secondLevel);
 
-    if(fourthLevel)
-        sg_free(fourthLevel);
+    if(request)
+        sg_free(request);
 
     release_socket(&socket);
 

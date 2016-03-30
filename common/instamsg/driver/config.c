@@ -147,10 +147,10 @@ void registerEditableConfig(void *var,
     process_config(messageBuffer);
 
 exit:
-    if(stored_value)
-        sg_free(stored_value);
-
     if(stored_desc)
         sg_free(stored_desc);
+
+    if(stored_value)
+        sg_free(stored_value);
 }
 

@@ -129,11 +129,11 @@ static void serverLoggingTopicMessageArrived(InstaMsg *c, MQTTMessage *msg)
     }
 
 exit:
-    if(clientId)
-        sg_free(clientId);
-
     if(logging)
         sg_free(logging);
+
+    if(clientId)
+        sg_free(clientId);
 
     return;
 }
@@ -186,16 +186,16 @@ static void attachResultHandler(InstaMsg *c, int msgId, unsigned int timeout, vo
 
 static void freeLastPubMessageResources()
 {
-    if(lastPubTopic)
-    {
-        sg_free(lastPubTopic);
-        lastPubTopic = NULL;
-    }
-
     if(lastPubPayload)
     {
         sg_free(lastPubPayload);
         lastPubPayload = NULL;
+    }
+
+    if(lastPubTopic)
+    {
+        sg_free(lastPubTopic);
+        lastPubTopic = NULL;
     }
 }
 
@@ -405,11 +405,11 @@ static void oneToOneMessageArrived(InstaMsg *c, MQTTMessage *msg)
     }
 
 exit:
-    if(peerMessage)
-        sg_free(peerMessage);
-
     if(peer)
         sg_free(peer);
+
+    if(peerMessage)
+        sg_free(peerMessage);
 }
 
 
@@ -863,14 +863,14 @@ static void handleMediaStreamsMessage(InstaMsg *c, MQTTMessage *msg)
         }
 
 exit:
-        if(replyTopic)
-            sg_free(replyTopic);
+        if(method)
+            sg_free(method);
 
         if(messageId)
             sg_free(messageId);
 
-        if(method)
-            sg_free(method);
+        if(replyTopic)
+            sg_free(replyTopic);
     }
 }
 
@@ -1140,23 +1140,23 @@ terminateFileUpload:
             0);
 
 exit:
-    if(replyTopic)
-        sg_free(replyTopic);
-
-    if(messageId)
-        sg_free(messageId);
-
-    if(method)
-        sg_free(method);
-
-    if(url)
-        sg_free(url);
+    if(ackMessage)
+        sg_free(ackMessage);
 
     if(filename)
         sg_free(filename);
 
-    if(ackMessage)
-        sg_free(ackMessage);
+    if(url)
+        sg_free(url);
+
+    if(method)
+        sg_free(method);
+
+    if(messageId)
+        sg_free(messageId);
+
+    if(replyTopic)
+        sg_free(replyTopic);
 
 
     return;
@@ -1450,11 +1450,11 @@ static int send_previously_unsent_data()
             }
 
 exit:
-            if(topic)
-                sg_free(topic);
-
             if(payload)
                 sg_free(payload);
+
+            if(topic)
+                sg_free(topic);
         }
         else
         {
