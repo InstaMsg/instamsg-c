@@ -8,8 +8,6 @@
 #include <string.h>
 
 
-extern volatile unsigned char modbusResultObtained;
-
 static int set_interface_attribs (int fd, int speed, int parity)
 {
     {
@@ -170,7 +168,7 @@ int modbus_send_command_and_read_response_sync(Modbus *modbus,
 
     {
         int bytes_received = 0;
-        while((bytes_received < responseBytesLength) && (modbusResultObtained == 0))
+        while((bytes_received < responseBytesLength) && (time_fine_for_time_limit_function() == 1))
         {
             bytes_received = bytes_received + read(modbus->fd, responseByteBuffer + bytes_received, responseBytesLength - bytes_received);
         }

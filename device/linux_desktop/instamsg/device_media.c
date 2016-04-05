@@ -21,7 +21,6 @@ static void *startPipeline(void *arg)
 
     gst_init (NULL, NULL);
 
-    processGstTypeUrl(mediaIp, mediaPort);
     if(strlen(mediaUrl) == 0)
     {
         return;
@@ -74,6 +73,7 @@ void create_and_start_streaming_pipeline(const char *mediaServerIpAddress, const
     memset(mediaPort, 0, sizeof(mediaPort));
     strcpy(mediaPort, mediaServerPort);
 
+    processGstTypeUrl(mediaIp, mediaPort);
     pthread_create(&tid, NULL, startPipeline, NULL);
 }
 
