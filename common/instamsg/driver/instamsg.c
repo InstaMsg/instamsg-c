@@ -74,6 +74,8 @@ static unsigned char mqttConnectFlag;
 static unsigned char notifyServerOfSecretReceived;
 static int actuallyEnsureGuaranteeWhereRequired;
 
+static int mediaReplyMessageWaitInterval;
+
 #define DATA_LOG_TOPIC      PROSTR("topic")
 #define DATA_LOG_PAYLOAD    PROSTR("payload")
 
@@ -1519,6 +1521,12 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
                                CONFIG_INT,
                                "0",
                                PROSTR("0 - Disabled; 1 - Enabled"));
+        registerEditableConfig(&mediaReplyMessageWaitInterval,
+                               PROSTR("MEDIA_REPLY_MESSAGE_WAIT_INTERVAL"),
+                               CONFIG_INT,
+                               "120",
+                               PROSTR(""));
+
         if(mediaStreamingEnabledRuntime == 1)
         {
             initiateStreaming();
@@ -2374,10 +2382,10 @@ void start(int (*onConnectOneTimeOperations)(),
 #if MEDIA_STREAMING_ENABLED == 1
                         if(mediaReplyReceived == 2)
                         {
-                            if(latestTick >= (mediaMessageRequestTime + 10))
+                            if(latestTick >= (mediaMessageRequestTime + mediaReplyMessageWaitInterval))
                             {
-                                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sMedia-Reply message not received in 10 seconds ... rebooting"),
-                                           MEDIA_ERROR);
+                                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sMedia-Reply message not received in %u seconds ... rebooting"),
+                                           MEDIA_ERROR, mediaReplyMessageWaitInterval);
                                 error_log(LOG_GLOBAL_BUFFER);
 
                                 rebootDevice();
