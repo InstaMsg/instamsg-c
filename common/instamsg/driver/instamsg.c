@@ -66,6 +66,7 @@ unsigned char rebootPending;
 
 static unsigned char mediaReplyReceived;
 unsigned long mediaMessageRequestTime;
+static int mediaReplyMessageWaitInterval;
 
 static char streamId[MAX_BUFFER_SIZE];
 #endif
@@ -74,7 +75,6 @@ static unsigned char mqttConnectFlag;
 static unsigned char notifyServerOfSecretReceived;
 static int actuallyEnsureGuaranteeWhereRequired;
 
-static int mediaReplyMessageWaitInterval;
 
 #define DATA_LOG_TOPIC      PROSTR("topic")
 #define DATA_LOG_PAYLOAD    PROSTR("payload")
