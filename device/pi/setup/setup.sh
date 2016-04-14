@@ -1,5 +1,3 @@
-set -e
-
 sudo kill `pgrep -x pi`
 
 HOME_DIRECTORY="/home/sensegrow"
