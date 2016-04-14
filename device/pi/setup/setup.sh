@@ -1,5 +1,11 @@
 sudo kill `pgrep -x pi`
 
+
+set -e
+
+sudo apt-get update
+sudo apt-get install vim
+
 HOME_DIRECTORY="/home/sensegrow"
 
 sudo mkdir -p "${HOME_DIRECTORY}"
