@@ -4,6 +4,8 @@
 #include "../../../common/instamsg/driver/include/globals.h"
 
 
+#define RASPBERRY_PI    "Raspberrypi"
+
 /*
  * Utility-function that reboots the device.
  */
@@ -48,9 +50,7 @@ void get_client_session_data(char *messageBuffer, int maxBufferLength)
  */
 void get_client_metadata(char *messageBuffer, int maxBufferLength)
 {
-    strcat(messageBuffer, ", {'client_version' : '");
-    strcat(messageBuffer, INSTAMSG_VERSION);
-    strcat(messageBuffer, "'}");
+    sg_sprintf(messageBuffer, "{'client_version' : '%s_%s', 'manufacturer' : '%s'}", INSTAMSG_VERSION, DEVICE_VERSION, RASPBERRY_PI);
 }
 
 
@@ -69,7 +69,7 @@ void get_network_data(char *messageBuffer, int maxBufferLength)
  */
 void get_manufacturer(char *messagebuffer, int maxbufferlength)
 {
-    strcpy(messagebuffer, "Raspberrypi");
+    strcpy(messagebuffer, RASPBERRY_PI);
 }
 
 
