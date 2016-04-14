@@ -1,7 +1,7 @@
 #ifndef DEVICE_DEFINES
 #define DEVICE_DEFINES
 
-#define DEVICE_VERSION "2.6.0"
+#define DEVICE_VERSION "2.7.0"
 
 /*
  * We use the vanilla "sprintf" method for Linux.
@@ -25,7 +25,7 @@
 #define MAX_BUFFER_SIZE 1000
 #define MAX_HEAP_SIZE (10 * (MAX_BUFFER_SIZE + HEADER_SIZE))
 
-#define MODBUS_COMMAND_BUFFER_SIZE 150
+#define MODBUS_COMMAND_BUFFER_SIZE 600
 
 #define MEDIA_STREAMING_ENABLED     1
 #define FILE_SYSTEM_ENABLED         1
