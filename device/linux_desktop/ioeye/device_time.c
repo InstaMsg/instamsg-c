@@ -27,10 +27,7 @@ void getTimeInDesiredFormat(char *buffer, int maxBufferLength)
  */
 void getTimezoneOffset(char *buffer, int maxBufferLength)
 {
-#if 0
-    /*
-     Causing random-hangs.
-     */
+#if 1
     time_t rawtime;
     struct tm *info;
 
@@ -39,6 +36,4 @@ void getTimezoneOffset(char *buffer, int maxBufferLength)
 
     sg_sprintf(buffer, "%ld", info->tm_gmtoff);
 #endif
-
-    strcpy(buffer, "19800");
 }
