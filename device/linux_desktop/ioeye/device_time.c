@@ -27,10 +27,11 @@ void getTimeInDesiredFormat(char *buffer, int maxBufferLength)
  */
 void getTimezoneOffset(char *buffer, int maxBufferLength)
 {
-  time_t t = time(NULL);
-  struct tm lt = {0};
+    time_t rawtime;
+    struct tm *info;
 
-  localtime_r(&t, &lt);
+    time(&rawtime);
+    info = localtime(&rawtime);
 
-  sg_sprintf(buffer, "%ld", lt.tm_gmtoff);
+    sg_sprintf(buffer, "%ld", info->tm_gmtoff);
 }
