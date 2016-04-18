@@ -1,6 +1,9 @@
 #include <time.h>
 #include <string.h>
 
+#include "../../../common/instamsg/driver/include/globals.h"
+
+
 /*
  * This method gets the time in the following-format
  *
@@ -24,5 +27,10 @@ void getTimeInDesiredFormat(char *buffer, int maxBufferLength)
  */
 void getTimezoneOffset(char *buffer, int maxBufferLength)
 {
-    strcpy(buffer, "19800");
+  time_t t = time(NULL);
+  struct tm lt = {0};
+
+  localtime_r(&t, &lt);
+
+  sg_sprintf(buffer, "%ld", lt.tm_gmtoff);
 }
