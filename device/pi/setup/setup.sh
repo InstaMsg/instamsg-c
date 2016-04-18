@@ -11,6 +11,9 @@ sudo chmod 777 "${HOME_DIRECTORY}/reset.sh"
 sudo cp monitor.sh "${HOME_DIRECTORY}"
 sudo chmod 777 "${HOME_DIRECTORY}/monitor.sh"
 
+sudo cp restart.sh "${HOME_DIRECTORY}"
+sudo chmod 777 "${HOME_DIRECTORY}/restart.sh"
+
 sudo cp $1 "${HOME_DIRECTORY}/pi"
 sudo chmod 777 "${HOME_DIRECTORY}/pi"
 
