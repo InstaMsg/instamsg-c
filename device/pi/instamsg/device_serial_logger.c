@@ -1,1 +1,0 @@
-../../linux_desktop/instamsg/device_serial_logger.c

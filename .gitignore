@@ -57,6 +57,7 @@ lwip-contrib/
 
 device/ar501
 device/maestro_e220
+device/pi
 device/test_device
 
 common/apps/atoll-gms
