@@ -36,13 +36,8 @@ client/stdoutsub
 client/tiva_build
 
 # Generated-Files while setting up the embedded-environment
-third_party/ti-compiler-environment/bin/
-third_party/ti-compiler-environment/gcc-arm-none-eabi-4_9-2015q2/
-third_party/ti-compiler-environment/lm4tools/
-third_party/ti-compiler-environment/openocd/
-third_party/ti-compiler-environment/share/
-third_party/ti-compiler-environment/tiva-template/
-third_party/ti-compiler-environment/tivaware/
+third_party/ti-compiler-environment
+third_party/openwrt
 
 subscriber.sh
 filetester.sh
@@ -61,6 +56,7 @@ lwip/
 lwip-contrib/
 
 device/ar501
+device/maestro_e220
 device/test_device
 
 common/apps/atoll-gms
