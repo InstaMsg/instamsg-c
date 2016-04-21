@@ -13,6 +13,7 @@ void init_file_system(FileSystem *fs, void *arg)
 	fs->write = file_system_write;
 
     /* Register other-callbacks. */
+    fs->copyFile = copyFile;
     fs->renameFile = renameFile;
     fs->deleteFile = deleteFile;
     fs->getFileListing = getFileListing;

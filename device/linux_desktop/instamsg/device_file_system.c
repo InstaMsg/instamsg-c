@@ -79,6 +79,16 @@ int renameFile(FileSystem *fs, const char *oldPath, const char *newPath)
 }
 
 
+
+/*
+ * This method copies a file on the file-system.
+ */
+int copyFile(FileSystem *fs, const char *oldPath, const char *newPath)
+{
+    return link(oldPath, newPath);
+}
+
+
 /*
  * This method deletes a file from the file-system.
  */

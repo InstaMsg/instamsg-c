@@ -14,6 +14,7 @@ struct FileSystem
 
     int (*read) (FileSystem *fs, unsigned char* buffer, int len, unsigned char guaranteed);
     int (*write)(FileSystem *fs, unsigned char* buffer, int len);
+    int (*copyFile)(FileSystem *fs, const char *oldPath, const char *newPath);
     int (*renameFile)(FileSystem *fs, const char *oldPath, const char *newPath);
     int (*deleteFile)(FileSystem *fs, const char *filePath);
     void (*getFileListing)(FileSystem *fs, char *buf, int maxValueLenAllowed, const char *directoryPath);

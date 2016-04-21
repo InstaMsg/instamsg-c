@@ -1,10 +1,11 @@
 #include "./include/globals.h"
 #include "./include/instamsg.h"
 #include "./include/httpclient.h"
+#include "./include/sg_stdlib.h"
+#include "./include/config.h"
+#include "./include/upgrade.h"
 
 #include "device_file_system.h"
-
-#if FILE_SYSTEM_ENABLED == 1
 #include <string.h>
 
 #define HTTP_RESPONSE_STATUS_PREFIX "HTTP/1.0"
@@ -27,9 +28,11 @@ static int getNextLine(Socket *socket, char *buf, int *responseCode)
             {
                 char *saveptr;
                 char *firstToken = strtok_r(buf, " ", &saveptr);
-                char *secondToken = strtok_r(NULL, " ", &saveptr);
-
-                *responseCode = atoi(secondToken);
+                if(firstToken != NULL)
+                {
+                    char *secondToken = strtok_r(NULL, " ", &saveptr);
+                    *responseCode = sg_atoi(secondToken);
+                }
             }
 
             return SUCCESS;
@@ -136,7 +139,7 @@ static long getBytesIfContentLengthBytes(char *line)
     {
         if(strcmp(headerKey, CONTENT_LENGTH) == 0)
         {
-            numBytes = atol(headerValue);
+            numBytes = sg_atoi(headerValue);
         }
     }
 
@@ -144,162 +147,7 @@ static long getBytesIfContentLengthBytes(char *line)
 }
 
 
-/*
- * Either of the URLs form work ::
- *
- *      http://platform.instamsg.io:8081/files/d2f9d9e7-e98b-4777-989e-605073a55efd.0003-Missed-a-path-export.patch
- *      /files/d2f9d9e7-e98b-4777-989e-605073a55efd.0003-Missed-a-path-export.patch
- */
-
-
-/*
- * BYTE-LEVEL-REQUEST ::
- * ======================
- *
- * GET /1.txt HTTP/1.0\r\n\r\n
- *
- *
- * BYTE-LEVEL-RESPONSE ::
- * =======================
- *
- * HTTP/1.1 200 OK
- * Date: Wed, 05 Aug 2015 09:43:26 GMT
- * Server: Apache/2.4.7 (Ubuntu)
- * Last-Modified: Wed, 05 Aug 2015 09:14:51 GMT
- * ETag: "f-51c8cd5d313d7"
- * Accept-Ranges: bytes
- * Content-Length: 15
- * Connection: close
- * Content-Type: text/plain
- *
- * echo "hi ajay"
-*/
-HTTPResponse downloadFile(const char *url,
-                          const char *filename,
-                          KeyValuePairs *params,
-                          KeyValuePairs *headers,
-                          unsigned int timeout)
-{
-    Socket socket;
-    HTTPResponse response = {0};
-
-    unsigned int numBytes;
-
-	init_socket(&socket, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
-
-    {
-        char *urlComplete;
-
-        RESET_GLOBAL_BUFFER;
-        urlComplete = (char*) GLOBAL_BUFFER;
-
-        generateRequest("GET", url, params, headers, urlComplete, MAX_BUFFER_SIZE, 1);
-
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sComplete URL that will be hit : [%s]"), FILE_DOWNLOAD, urlComplete);
-        info_log(LOG_GLOBAL_BUFFER);
-
-        /*
-        * Fire the request-bytes over the socket-medium.
-        */
-        if(socket.write(&socket, (unsigned char*)urlComplete, strlen(urlComplete)) == FAILURE)
-        {
-            goto exit;
-        }
-    }
-
-    numBytes = 0;
-    while(1)
-    {
-        char beginPayloadDownload = 0;
-
-        {
-            char *newLine;
-
-            RESET_GLOBAL_BUFFER;
-            newLine = (char*)GLOBAL_BUFFER;
-
-            strcpy(newLine, "");
-            if(getNextLine(&socket, newLine, &(response.status)) == FAILURE)
-            {
-                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sError downloading file-metadata"), FILE_DOWNLOAD);
-                info_log(LOG_GLOBAL_BUFFER);
-
-                goto exit;
-            }
-
-            /*
-            * The actual file-payload begins after we receive an empty line.
-            */
-            if(strlen(newLine) == 0)
-            {
-                beginPayloadDownload = 1;
-            }
-
-            if(numBytes == 0)
-            {
-                numBytes = getBytesIfContentLengthBytes(newLine);
-            }
-        }
-
-        if(beginPayloadDownload == 1)
-        {
-            long i;
-            char *tempFileName;
-            FileSystem fs;
-
-            RESET_GLOBAL_BUFFER;
-            tempFileName = (char*)GLOBAL_BUFFER;
-
-            sg_sprintf(tempFileName, "~%s", filename);
-
-            /*
-             * Delete the file (it might have been downloaded partially some other time).
-             */
-            instaMsg.singletonUtilityFs.deleteFile(&(instaMsg.singletonUtilityFs), tempFileName);
-            init_file_system(&fs, (void *)tempFileName);
-
-            /* Now, we need to start reading the bytes */
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sBeginning downloading of [%s] worth [%u] bytes"),
-                       FILE_DOWNLOAD, tempFileName, numBytes);
-            info_log(LOG_GLOBAL_BUFFER);
-
-            for(i = 0; i < numBytes; i++)
-            {
-                char ch[2] = {0};
-
-                if(socket.read(&socket, (unsigned char*)ch, 1, 1) == FAILURE) /* Pseudo-Blocking Call */
-                {
-                    release_file_system(&fs);
-                    goto exit;
-                }
-
-                fs.write(&fs, (unsigned char*)ch, 1);
-            }
-
-            release_file_system(&fs);
-
-            /*
-             * If we reach here, the file has been downloaded successfully.
-             * So, move the "temp"-file to the actual file.
-             */
-            instaMsg.singletonUtilityFs.renameFile(&(instaMsg.singletonUtilityFs), tempFileName, filename);
-
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFile [%s] successfully moved to [%s] worth [%u] bytes"),
-                       FILE_DOWNLOAD, tempFileName, filename, numBytes);
-            info_log(LOG_GLOBAL_BUFFER);
-
-exit:
-            release_socket(&socket);
-
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sHTTP-Response Status = [%d]"), FILE_DOWNLOAD, response.status);
-            info_log(LOG_GLOBAL_BUFFER);
-
-            return response;
-        }
-    }
-}
-
-
+#if FILE_SYSTEM_ENABLED == 1
 /*
  * BYTE-LEVEL-REQUEST ::
  * ======================
@@ -530,3 +378,145 @@ exit:
     return response;
 }
 #endif
+
+
+/*
+ * Either of the URLs form work ::
+ *
+ *      http://platform.instamsg.io:8081/files/d2f9d9e7-e98b-4777-989e-605073a55efd.0003-Missed-a-path-export.patch
+ *      /files/d2f9d9e7-e98b-4777-989e-605073a55efd.0003-Missed-a-path-export.patch
+ */
+
+
+/*
+ * BYTE-LEVEL-REQUEST ::
+ * ======================
+ *
+ * GET /1.txt HTTP/1.0\r\n\r\n
+ *
+ *
+ * BYTE-LEVEL-RESPONSE ::
+ * =======================
+ *
+ * HTTP/1.1 200 OK
+ * Date: Wed, 05 Aug 2015 09:43:26 GMT
+ * Server: Apache/2.4.7 (Ubuntu)
+ * Last-Modified: Wed, 05 Aug 2015 09:14:51 GMT
+ * ETag: "f-51c8cd5d313d7"
+ * Accept-Ranges: bytes
+ * Content-Length: 15
+ * Connection: close
+ * Content-Type: text/plain
+ *
+ * echo "hi ajay"
+*/
+HTTPResponse downloadFile(const char *url,
+                          const char *filename,
+                          KeyValuePairs *params,
+                          KeyValuePairs *headers,
+                          unsigned int timeout)
+{
+    Socket socket;
+    HTTPResponse response = {0};
+
+    unsigned int numBytes;
+
+	init_socket(&socket, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
+
+    {
+        char *urlComplete;
+
+        RESET_GLOBAL_BUFFER;
+        urlComplete = (char*) GLOBAL_BUFFER;
+
+        generateRequest("GET", url, params, headers, urlComplete, MAX_BUFFER_SIZE, 1);
+
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sComplete URL that will be hit : [%s]"), FILE_DOWNLOAD, urlComplete);
+        info_log(LOG_GLOBAL_BUFFER);
+
+        /*
+        * Fire the request-bytes over the socket-medium.
+        */
+        if(socket.write(&socket, (unsigned char*)urlComplete, strlen(urlComplete)) == FAILURE)
+        {
+            goto exit;
+        }
+    }
+
+    numBytes = 0;
+    while(1)
+    {
+        char beginPayloadDownload = 0;
+
+        {
+            char *newLine;
+
+            RESET_GLOBAL_BUFFER;
+            newLine = (char*)GLOBAL_BUFFER;
+
+            strcpy(newLine, "");
+            if(getNextLine(&socket, newLine, &(response.status)) == FAILURE)
+            {
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sError downloading file-metadata"), FILE_DOWNLOAD);
+                info_log(LOG_GLOBAL_BUFFER);
+
+                goto exit;
+            }
+
+            /*
+            * The actual file-payload begins after we receive an empty line.
+            */
+            if(strlen(newLine) == 0)
+            {
+                beginPayloadDownload = 1;
+            }
+
+            if(numBytes == 0)
+            {
+                numBytes = getBytesIfContentLengthBytes(newLine);
+            }
+        }
+
+        if(beginPayloadDownload == 1)
+        {
+            long i;
+
+            prepare_for_new_binary_download();
+
+            /* Now, we need to start reading the bytes */
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sBeginning downloading worth [%u] bytes"), FILE_DOWNLOAD, numBytes);
+            info_log(LOG_GLOBAL_BUFFER);
+
+            for(i = 0; i < numBytes; i++)
+            {
+                char ch[2] = {0};
+
+                if(socket.read(&socket, (unsigned char*)ch, 1, 1) == FAILURE) /* Pseudo-Blocking Call */
+                {
+                    tear_down_binary_download();
+                    goto exit;
+                }
+
+                copy_next_char(ch[0]);
+            }
+
+            tear_down_binary_download();
+
+
+            /*
+             * Mark that file was downloaded successfully.
+             */
+            RESET_GLOBAL_BUFFER;
+            generate_config_json((char*)GLOBAL_BUFFER, NEW_FILE_KEY, CONFIG_STRING, NEW_FILE_ARRIVED, "");
+            save_config_value_on_persistent_storage(NEW_FILE_KEY, messageBuffer, 1);
+
+exit:
+            release_socket(&socket);
+
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sHTTP-Response Status = [%d]"), FILE_DOWNLOAD, response.status);
+            info_log(LOG_GLOBAL_BUFFER);
+
+            return response;
+        }
+    }
+}

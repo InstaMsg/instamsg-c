@@ -27,6 +27,7 @@ SOURCES=`echo                                                                   
         common/instamsg/driver/file_system.c                                                    \
         common/instamsg/driver/httpclient.c                                                     \
         common/instamsg/driver/media.c                                                          \
+        common/instamsg/driver/upgrade.c                                                        \
                                                                                                 \
         common/instamsg/mqtt/src/MQTTFormat.c                                                   \
         common/instamsg/mqtt/src/MQTTPacket.c                                                   \
@@ -47,6 +48,7 @@ SOURCES=`echo                                                                   
         device/${VENDOR}/instamsg/device_media.c                                                \
         device/${VENDOR}/instamsg/device_file_system.c                                          \
         device/${VENDOR}/instamsg/device_data_logger.c                                          \
+        device/${VENDOR}/instamsg/device_upgrade.c                                              \
         device/${VENDOR}/instamsg/device_misc.c                                                 `
 
 

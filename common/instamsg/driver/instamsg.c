@@ -26,6 +26,7 @@
 #include "./include/config.h"
 #include "./include/data_logger.h"
 #include "./include/globals.h"
+#include "./include/upgrade.h"
 
 #include <string.h>
 
@@ -1020,16 +1021,12 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
          *
          */
 
-#if FILE_SYSTEM_ENABLED == 1
         HTTPResponse response = downloadFile(url, filename, NULL, NULL, 10);
         if(response.status == HTTP_FILE_DOWNLOAD_SUCCESS)
         {
             ackStatus = 1;
         }
         sg_sprintf(ackMessage, PROSTR("{\"response_id\": \"%s\", \"status\": %d}"), messageId, ackStatus);
-#else
-        sg_sprintf(ackMessage, PROSTR("{\"response_id\": \"%s\", \"status\": %d}"), messageId, ackStatus);
-#endif
 
     }
     else if( (strcmp(method, "GET") == 0) && (strlen(filename) == 0))
@@ -1315,6 +1312,7 @@ void initInstaMsg(InstaMsg* c,
     init_file_system(&(c->singletonUtilityFs), "");
 #endif
 
+    check_for_upgrade();
 
     (c->ipstack).socketCorrupted = 1;
 	init_socket(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT);
