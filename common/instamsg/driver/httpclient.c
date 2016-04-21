@@ -10,7 +10,7 @@
 #define HTTP_RESPONSE_STATUS_PREFIX "HTTP/1.0"
 
 
-static void getNextLine(Socket *socket, char *buf, int *responseCode)
+static int getNextLine(Socket *socket, char *buf, int *responseCode)
 {
     while(1)
     {
@@ -18,7 +18,7 @@ static void getNextLine(Socket *socket, char *buf, int *responseCode)
 
         if(socket->read(socket, (unsigned char*)ch, 1, 1) == FAILURE) /* Pseudo-Blocking Call */
         {
-            return;
+            return FAILURE;
         }
 
         if(ch[0] == '\n')
@@ -32,7 +32,7 @@ static void getNextLine(Socket *socket, char *buf, int *responseCode)
                 *responseCode = atoi(secondToken);
             }
 
-            return;
+            return SUCCESS;
         }
         else
         {
@@ -42,6 +42,8 @@ static void getNextLine(Socket *socket, char *buf, int *responseCode)
             }
         }
     }
+
+    return FAILURE;
 }
 
 
@@ -217,7 +219,13 @@ HTTPResponse downloadFile(const char *url,
             newLine = (char*)GLOBAL_BUFFER;
 
             strcpy(newLine, "");
-            getNextLine(&socket, newLine, &(response.status));
+            if(getNextLine(&socket, newLine, &(response.status)) == FAILURE)
+            {
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sError downloading file-metadata"), FILE_DOWNLOAD);
+                info_log(LOG_GLOBAL_BUFFER);
+
+                goto exit;
+            }
 
             /*
             * The actual file-payload begins after we receive an empty line.
@@ -459,7 +467,14 @@ HTTPResponse uploadFile(const char *url,
         newLine = (char*)GLOBAL_BUFFER;
         strcpy(newLine, "");
 
-        getNextLine(&socket, newLine, &(response.status));
+        if(getNextLine(&socket, newLine, &(response.status)) == FAILURE)
+        {
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sSocket error while reading URL-payload for uploaded file [%s] (stage 1)"),
+                                          FILE_UPLOAD, filename);
+            error_log(LOG_GLOBAL_BUFFER);
+
+            goto exit;
+        }
 
         /*
          * The actual payload begins after we receive an empty line.
@@ -479,7 +494,8 @@ HTTPResponse uploadFile(const char *url,
         {
             if(socket.read(&socket, (unsigned char*)response.body, numBytes, 1) == FAILURE) /* Pseudo-Blocking Call */
             {
-                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sSocket error while reading URL-payload for uploaded file [%s]"), FILE_UPLOAD, filename);
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sSocket error while reading URL-payload for uploaded file [%s] (stage 2)"),
+                                              FILE_UPLOAD, filename);
                 error_log(LOG_GLOBAL_BUFFER);
 
                 goto exit;
