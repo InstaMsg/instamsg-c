@@ -12,34 +12,32 @@
 #include "../../../common/instamsg/driver/include/watchdog.h"
 
 
-static unsigned char watchdogActive;
-static int num_seconds;
+static unsigned char watchdog;
+static int watchdog_time;
 static unsigned char immediate_reboot;
 
 static void* watchdog_func(void *arg)
 {
-    int i;
-
-    for(i = num_seconds; i >= 0; i--)
+    while(1)
     {
-        if(watchdogActive == 0)
+        if(watchdog == 1)
         {
-            return;
+            watchdog_time--;
+            if(watchdog_time == 0)
+            {
+                watchdog_expired = 1;
+                if(immediate_reboot == 1)
+                {
+                    print_rebooting_message();
+                    rebootDevice();
+                }
+            }
         }
 
-        startAndCountdownTimer(1, 0);
+        sleep(1);
     }
 
-    /*
-     * If control reaches here.. it means that the loop has run to completion, and the
-     * watchdog is still active.
-     */
-    watchdog_expired = 1;
-    if(immediate_reboot == 1)
-    {
-        print_rebooting_message();
-        rebootDevice();
-    }
+    return NULL;
 }
 
 
@@ -48,7 +46,12 @@ static void* watchdog_func(void *arg)
  */
 void watchdog_init()
 {
-    watchdogActive = 0;
+    watchdog = 0;
+
+    {
+        pthread_t tid;
+        pthread_create(&tid, NULL, watchdog_func, NULL);
+    }
 }
 
 
@@ -72,14 +75,9 @@ void watchdog_init()
  */
 void do_watchdog_reset_and_enable(int n, unsigned char immediate)
 {
-    watchdogActive = 1;
-    num_seconds = n;
+    watchdog = 1;
+    watchdog_time = n;
     immediate_reboot = immediate;
-
-    {
-        pthread_t tid;
-        pthread_create(&tid, NULL, watchdog_func, NULL);
-    }
 }
 
 
@@ -88,5 +86,5 @@ void do_watchdog_reset_and_enable(int n, unsigned char immediate)
  */
 void do_watchdog_disable()
 {
-    watchdogActive = 0;
+    watchdog = 0;
 }
