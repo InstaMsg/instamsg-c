@@ -12,9 +12,9 @@
 #include "../../../common/instamsg/driver/include/watchdog.h"
 
 
-static unsigned char watchdog;
-static int watchdog_time;
-static unsigned char immediate_reboot;
+static volatile unsigned char watchdog;
+static volatile int watchdog_time;
+static volatile unsigned char immediate_reboot;
 
 static void* watchdog_func(void *arg)
 {
