@@ -8,7 +8,7 @@
 #include "device_file_system.h"
 #include <string.h>
 
-#define HTTP_RESPONSE_STATUS_PREFIX "HTTP/1.0"
+#define HTTP_RESPONSE_STATUS_PREFIX "HTTP/"
 
 
 static int getNextLine(Socket *socket, char *buf, int *responseCode)
@@ -32,6 +32,15 @@ static int getNextLine(Socket *socket, char *buf, int *responseCode)
                 {
                     char *secondToken = strtok_r(NULL, " ", &saveptr);
                     *responseCode = sg_atoi(secondToken);
+
+                    if(*responseCode != HTTP_FILE_DOWNLOAD_SUCCESS)
+                    {
+                        sg_sprintf(LOG_GLOBAL_BUFFER, "%s%sResponse-Code is not %d, instead %d", FILE_UPLOAD, FILE_DOWNLOAD,
+                                                                                                 HTTP_FILE_DOWNLOAD_SUCCESS, *responseCode);
+                        error_log(LOG_GLOBAL_BUFFER);
+
+                        return FAILURE;
+                    }
                 }
             }
 
@@ -209,7 +218,7 @@ HTTPResponse uploadFile(const char *url,
 
 	init_socket(&socket, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
 
-    /* Now, generate the isecond-level (form) data
+    /* Now, generate the second-level (form) data
      * Please consult ::
      *
      *          http://stackoverflow.com/questions/8659808/how-does-http-file-upload-work
@@ -392,7 +401,7 @@ exit:
  * BYTE-LEVEL-REQUEST ::
  * ======================
  *
- * GET /1.txt HTTP/1.0\r\n\r\n
+ * GET /files/1.txt HTTP/1.0\r\n\r\n
  *
  *
  * BYTE-LEVEL-RESPONSE ::
@@ -508,7 +517,10 @@ HTTPResponse downloadFile(const char *url,
              */
             RESET_GLOBAL_BUFFER;
             generate_config_json((char*)GLOBAL_BUFFER, NEW_FILE_KEY, CONFIG_STRING, NEW_FILE_ARRIVED, "");
-            save_config_value_on_persistent_storage(NEW_FILE_KEY, messageBuffer, 1);
+            save_config_value_on_persistent_storage(NEW_FILE_KEY, (char*)GLOBAL_BUFFER, 1);
+
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFile-Download SUCCESS !!!!!!!!!!"), FILE_DOWNLOAD);
+            info_log(LOG_GLOBAL_BUFFER);
 
 exit:
             release_socket(&socket);

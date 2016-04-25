@@ -39,7 +39,8 @@ void check_for_upgrade()
 
     if(strcmp(new_file_arrived_config, NEW_FILE_ARRIVED) == 0)
     {
-        upgrade_executable_binary();
+        remove_old_executable_binary();
+        copy_new_executable_binary_from_temp_location();
 
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sBinary upgraded, restarting to take effect"), FILE_UPGRADE);
         info_log(LOG_GLOBAL_BUFFER);

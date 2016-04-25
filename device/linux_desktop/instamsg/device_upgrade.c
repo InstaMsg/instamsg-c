@@ -34,11 +34,19 @@ void tear_down_binary_download()
 }
 
 
-void upgrade_executable_binary()
+void remove_old_executable_binary()
 {
     instaMsg.singletonUtilityFs.deleteFile(&(instaMsg.singletonUtilityFs), BINARY_NAME);
+
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sOld Binary [%s] successfully deleted."), FILE_UPGRADE, BINARY_NAME);
+    info_log(LOG_GLOBAL_BUFFER);
+}
+
+
+void copy_new_executable_binary_from_temp_location()
+{
     instaMsg.singletonUtilityFs.copyFile(&(instaMsg.singletonUtilityFs), TEMP_FILE_NAME, BINARY_NAME);
 
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFile [%s] successfully moved to [%s]"), FILE_UPGRADE, TEMP_FILE_NAME, BINARY_NAME);
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFile [%s] successfully copied to [%s]"), FILE_UPGRADE, TEMP_FILE_NAME, BINARY_NAME);
     info_log(LOG_GLOBAL_BUFFER);
 }

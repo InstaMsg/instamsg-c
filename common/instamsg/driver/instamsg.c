@@ -932,6 +932,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     const char *MESSAGE_ID = PROSTR("message_id");
     const char *METHOD = PROSTR("method");
     char *replyTopic, *messageId, *method, *url, *filename, *ackMessage;
+    unsigned char downloadCase = 0;
 
     replyTopic = (char *)sg_malloc(MAX_BUFFER_SIZE);
     memset(replyTopic, 0, MAX_BUFFER_SIZE);
@@ -957,6 +958,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     getJsonKeyValueIfPresent(msg->payload, "url", url);
     getJsonKeyValueIfPresent(msg->payload, "filename", filename);
 
+
     if(strlen(replyTopic) == 0)
     {
         logJsonFailureMessageAndReturn(FILE_TRANSFER, REPLY_TOPIC, msg);
@@ -978,6 +980,37 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
     if( (   (strcmp(method, "POST") == 0) || (strcmp(method, "PUT") == 0)   ) &&
             (strlen(filename) > 0) &&
             (strlen(url) > 0)   )
+    {
+        downloadCase = 1;
+    }
+
+    if(downloadCase == 1)
+    {
+        /*
+         * Remove the protocol:hostname.
+         *
+         * Eg. ::  https://localhost, http://localhost, etc.
+         */
+        if(strlen(url) > 0)
+        {
+            int original_length = strlen(url);
+            char *subs = "//";
+
+            char *tmp = strstr(url, subs);
+            if(tmp != NULL)
+            {
+                tmp = strstr(tmp + strlen(subs), "/");
+                if(tmp != NULL)
+                {
+                    strncpy(url, tmp, strlen(tmp));
+                    url[strlen(tmp)] = 0;
+                }
+            }
+        }
+    }
+
+
+    if(downloadCase == 1)
     {
         int ackStatus = 0;
 
