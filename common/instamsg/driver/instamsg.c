@@ -1234,6 +1234,7 @@ void clearInstaMsg(InstaMsg *c)
 #endif
 
     c->connected = 0;
+    rebootDevice();
 }
 
 
