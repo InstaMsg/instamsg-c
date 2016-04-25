@@ -1127,7 +1127,7 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         }
         memset(clientIdBuf, 0, MAX_BUFFER_SIZE);
 
-        sg_sprintf(clientIdBuf, "%s-%s", c->connectOptions.clientID.cstring, c->connectOptions.username.cstring);
+        sg_sprintf(clientIdBuf, "%s", c->clientIdComplete);
         headers[1].value = clientIdBuf;
 
         headers[2].key = "Content-Type";
