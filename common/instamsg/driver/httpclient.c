@@ -10,6 +10,7 @@
 
 #define HTTP_RESPONSE_STATUS_PREFIX "HTTP/"
 
+static Socket socket;
 
 static int getNextLine(Socket *socket, char *buf, int *responseCode)
 {
@@ -195,7 +196,6 @@ void uploadFile(const char *url,
     int i = 0;
     unsigned int numBytes = 0;
 
-    Socket socket;
     FileSystem fs;
 
     unsigned int totalLength;
@@ -216,7 +216,15 @@ void uploadFile(const char *url,
     memset(secondLevel, 0, MAX_BUFFER_SIZE);
     memset(fourthLevel, 0, MAX_BUFFER_SIZE);
 
+    socket.socketCorrupted = 1;
 	init_socket(&socket, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
+    if(socket.socketCorrupted == 1)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCould not initiate-socket for file-upload, not proceeding"), FILE_UPLOAD);
+        error_log(LOG_GLOBAL_BUFFER);
+
+        goto exit2;
+    }
 
     /* Now, generate the second-level (form) data
      * Please consult ::
@@ -369,7 +377,9 @@ void uploadFile(const char *url,
     }
 
 exit:
+    release_socket(&socket);
 
+exit2:
     if(fourthLevel)
         sg_free(fourthLevel);
 
@@ -379,7 +389,6 @@ exit:
     if(request)
         sg_free(request);
 
-    release_socket(&socket);
 
     sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sHTTP-Response Status = [%d]"), FILE_UPLOAD, httpResponse->status);
     info_log(LOG_GLOBAL_BUFFER);
@@ -424,10 +433,17 @@ void downloadFile(const char *url,
                   unsigned int timeout,
                   HTTPResponse *httpResponse)
 {
-    Socket socket;
     unsigned int numBytes = 0;
 
+    socket.socketCorrupted = 1;
 	init_socket(&socket, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
+    if(socket.socketCorrupted == 1)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCould not initiate-socket for file-download, not proceeding"), FILE_DOWNLOAD);
+        error_log(LOG_GLOBAL_BUFFER);
+
+        goto exit2;
+    }
 
     {
         char *urlComplete;
@@ -522,6 +538,7 @@ void downloadFile(const char *url,
 exit:
             release_socket(&socket);
 
+exit2:
             sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sHTTP-Response Status = [%d]"), FILE_DOWNLOAD, httpResponse->status);
             info_log(LOG_GLOBAL_BUFFER);
         }
