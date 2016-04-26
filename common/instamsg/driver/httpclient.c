@@ -392,6 +392,8 @@ exit2:
 
     sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sHTTP-Response Status = [%d]"), FILE_UPLOAD, httpResponse->status);
     info_log(LOG_GLOBAL_BUFFER);
+
+    return;
 }
 #endif
 
@@ -541,6 +543,8 @@ exit:
 exit2:
             sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sHTTP-Response Status = [%d]"), FILE_DOWNLOAD, httpResponse->status);
             info_log(LOG_GLOBAL_BUFFER);
+
+            return;
         }
     }
 }
