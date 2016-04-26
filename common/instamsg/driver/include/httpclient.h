@@ -10,20 +10,24 @@ struct HTTPResponse
     char body[MAX_BUFFER_SIZE];
 };
 
+HTTPResponse httpResponse;
+#define RESET_HTTP_RESPONSE memset(&httpResponse, 0, sizeof(HTTPResponse));
 
-HTTPResponse downloadFile(const char *url,
-                          const char *downloadedFileName,
-                          KeyValuePairs *params,
-                          KeyValuePairs *headers,
-                          unsigned int timeout);
+void downloadFile(const char *url,
+                  const char *downloadedFileName,
+                  KeyValuePairs *params,
+                  KeyValuePairs *headers,
+                  unsigned int timeout,
+                  HTTPResponse *httpResponse);
 
 
 #if FILE_SYSTEM_ENABLED == 1
-HTTPResponse uploadFile(const char *url,
-                        const char *filename,
-                        KeyValuePairs *params,
-                        KeyValuePairs *headers,
-                        unsigned int timeout);
+void uploadFile(const char *url,
+                const char *filename,
+                KeyValuePairs *params,
+                KeyValuePairs *headers,
+                unsigned int timeout,
+                HTTPResponse *httpResponse);
 
 #endif
 #endif

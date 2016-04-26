@@ -184,18 +184,18 @@ static long getBytesIfContentLengthBytes(char *line)
  *
  * http://platform.instamsg.io:8081/files/1325d1f4-a585-4dbd-84e7-d4c6cfa6fd9d.filetester.sh
  */
-HTTPResponse uploadFile(const char *url,
-                        const char *filename,
-                        KeyValuePairs *params,
-                        KeyValuePairs *headers,
-                        unsigned int timeout)
+void uploadFile(const char *url,
+                const char *filename,
+                KeyValuePairs *params,
+                KeyValuePairs *headers,
+                unsigned int timeout,
+                HTTPResponse *httpResponse)
 {
 
     int i = 0;
     unsigned int numBytes = 0;
 
     Socket socket;
-    HTTPResponse response = {0};
     FileSystem fs;
 
     unsigned int totalLength;
@@ -324,7 +324,7 @@ HTTPResponse uploadFile(const char *url,
         newLine = (char*)GLOBAL_BUFFER;
         strcpy(newLine, "");
 
-        if(getNextLine(&socket, newLine, &(response.status)) == FAILURE)
+        if(getNextLine(&socket, newLine, &(httpResponse->status)) == FAILURE)
         {
             sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sSocket error while reading URL-payload for uploaded file [%s] (stage 1)"),
                                           FILE_UPLOAD, filename);
@@ -349,7 +349,7 @@ HTTPResponse uploadFile(const char *url,
 
         if(beginPayloadDownload == 1)
         {
-            if(socket.read(&socket, (unsigned char*)response.body, numBytes, 1) == FAILURE) /* Pseudo-Blocking Call */
+            if(socket.read(&socket, (unsigned char*)(httpResponse->body), numBytes, 1) == FAILURE) /* Pseudo-Blocking Call */
             {
                 sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sSocket error while reading URL-payload for uploaded file [%s] (stage 2)"),
                                               FILE_UPLOAD, filename);
@@ -360,7 +360,7 @@ HTTPResponse uploadFile(const char *url,
             else
             {
                 sg_sprintf(LOG_GLOBAL_BUFFER,
-                           PROSTR("%sURL being provided to peer for uploaded file [%s] is [%s]"), FILE_UPLOAD, filename, response.body);
+                           PROSTR("%sURL being provided to peer for uploaded file [%s] is [%s]"), FILE_UPLOAD, filename, httpResponse->body);
                 info_log(LOG_GLOBAL_BUFFER);
 
                 break;
@@ -381,10 +381,8 @@ exit:
 
     release_socket(&socket);
 
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sHTTP-Response Status = [%d]"), FILE_UPLOAD, response.status);
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sHTTP-Response Status = [%d]"), FILE_UPLOAD, httpResponse->status);
     info_log(LOG_GLOBAL_BUFFER);
-
-    return response;
 }
 #endif
 
@@ -419,16 +417,15 @@ exit:
  *
  * echo "hi ajay"
 */
-HTTPResponse downloadFile(const char *url,
-                          const char *filename,
-                          KeyValuePairs *params,
-                          KeyValuePairs *headers,
-                          unsigned int timeout)
+void downloadFile(const char *url,
+                  const char *filename,
+                  KeyValuePairs *params,
+                  KeyValuePairs *headers,
+                  unsigned int timeout,
+                  HTTPResponse *httpResponse)
 {
     Socket socket;
-    HTTPResponse response = {0};
-
-    unsigned int numBytes;
+    unsigned int numBytes = 0;
 
 	init_socket(&socket, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT);
 
@@ -464,7 +461,7 @@ HTTPResponse downloadFile(const char *url,
             newLine = (char*)GLOBAL_BUFFER;
 
             strcpy(newLine, "");
-            if(getNextLine(&socket, newLine, &(response.status)) == FAILURE)
+            if(getNextLine(&socket, newLine, &(httpResponse->status)) == FAILURE)
             {
                 sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sError downloading file-metadata"), FILE_DOWNLOAD);
                 info_log(LOG_GLOBAL_BUFFER);
@@ -525,10 +522,8 @@ HTTPResponse downloadFile(const char *url,
 exit:
             release_socket(&socket);
 
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sHTTP-Response Status = [%d]"), FILE_DOWNLOAD, response.status);
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sHTTP-Response Status = [%d]"), FILE_DOWNLOAD, httpResponse->status);
             info_log(LOG_GLOBAL_BUFFER);
-
-            return response;
         }
     }
 }

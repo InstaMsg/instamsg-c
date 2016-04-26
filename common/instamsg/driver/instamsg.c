@@ -993,7 +993,6 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
          */
         if(strlen(url) > 0)
         {
-            int original_length = strlen(url);
             char *subs = "//";
 
             char *tmp = strstr(url, subs);
@@ -1054,8 +1053,10 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
          *
          */
 
-        HTTPResponse response = downloadFile(url, filename, NULL, NULL, 10);
-        if(response.status == HTTP_FILE_DOWNLOAD_SUCCESS)
+        RESET_HTTP_RESPONSE;
+        downloadFile(url, filename, NULL, NULL, 10, &httpResponse);
+
+        if(httpResponse.status == HTTP_FILE_DOWNLOAD_SUCCESS)
         {
             ackStatus = 1;
         }
@@ -1140,7 +1141,8 @@ static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
         headers[4].value = 0;
 
 
-        response = uploadFile(c->fileUploadUrl, filename, NULL, headers, 10);
+        RESET_HTTP_RESPONSE;
+        uploadFile(c->fileUploadUrl, filename, NULL, headers, 10, &httpResponse);
 
 terminateFileUpload:
 
