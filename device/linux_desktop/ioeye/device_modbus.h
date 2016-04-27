@@ -27,20 +27,4 @@ struct Modbus
     int fd;
     /* ============================= ANY EXTRA FIELDS GO HERE ============================================= */
 };
-
-struct SimulatedModbus
-{
-    /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
-    MODBUS_DEVICE_TYPE deviceType;
-    const char *identifier;
-    short (*shortPayloadValueGetter)(void *arg);
-    void *shortPayloadValueGetterArg;
-    /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
-
-
-
-    /* ============================= ANY EXTRA FIELDS GO HERE ============================================= */
-    /* ============================= ANY EXTRA FIELDS GO HERE ============================================= */
-};
-
 #endif
