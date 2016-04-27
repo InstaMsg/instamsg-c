@@ -5,6 +5,7 @@
 #include "../../../common/ioeye/include/globals.h"
 
 typedef struct Modbus Modbus;
+typedef struct SimulatedModbus SimulatedModbus;
 
 struct Modbus
 {
@@ -18,7 +19,19 @@ struct Modbus
                                                int responseBytesLength);
 
     char modbusCommands[MODBUS_COMMAND_BUFFER_SIZE];
+    /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
 
+
+
+    /* ============================= ANY EXTRA FIELDS GO HERE ============================================= */
+    /* ============================= ANY EXTRA FIELDS GO HERE ============================================= */
+};
+
+struct SimulatedModbus
+{
+    /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
+    MODBUS_DEVICE_TYPE deviceType;
+    const char *identifier;
     short (*shortPayloadValueGetter)(void *arg);
     void *shortPayloadValueGetterArg;
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
