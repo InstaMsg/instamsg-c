@@ -398,6 +398,30 @@ exit2:
 #endif
 
 
+static void handleDownloadedBytesBatch(char *batch, int batchSize, int *totalBytesSoFar, int totalBytes)
+{
+    int j = 0;
+
+    for(j = 0; j < batchSize; j++)
+    {
+        *totalBytesSoFar = *totalBytesSoFar + 1;
+        copy_next_char(batch[j]);
+    }
+
+    if(((*totalBytesSoFar) % OTA_PING_BUFFER_SIZE) == 0)
+    {
+        /*
+         * So that we do not time-out with the InstaMsg-Server.
+        */
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%u / %u bytes downloaded ..."), *totalBytesSoFar, totalBytes);
+        info_log(LOG_GLOBAL_BUFFER);
+
+        sendPingReqToServer(&instaMsg);
+        readAndProcessIncomingMQTTPacketsIfAny(&instaMsg);
+    }
+}
+
+
 /*
  * Either of the URLs form work ::
  *
@@ -503,7 +527,7 @@ void downloadFile(const char *url,
 
         if(beginPayloadDownload == 1)
         {
-            long i = 0, j = 0;
+            int i = 0, j = 0;
 
             prepare_for_new_binary_download();
 
@@ -530,8 +554,7 @@ void downloadFile(const char *url,
                             goto exit;
                         }
 
-                        i++;
-                        copy_next_char(ch[0]);
+                        handleDownloadedBytesBatch(ch, 1, &i, numBytes);
                     }
                 }
                 else
@@ -543,20 +566,7 @@ void downloadFile(const char *url,
                         goto exit;
                     }
 
-                    for(j = 0; j < OTA_BUFFER_SIZE; j++)
-                    {
-                        i++;
-                        copy_next_char(ch[j]);
-                    }
-
-                    /*
-                     * So that we do not time-out with the InstaMsg-Server.
-                     */
-                    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%u / %u bytes downloaded ..."), i, numBytes);
-                    info_log(LOG_GLOBAL_BUFFER);
-
-                    sendPingReqToServer(&instaMsg);
-                    readAndProcessIncomingMQTTPacketsIfAny(&instaMsg);
+                    handleDownloadedBytesBatch(ch, OTA_BUFFER_SIZE, &i, numBytes);
                 }
             }
 
