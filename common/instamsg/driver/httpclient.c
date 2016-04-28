@@ -520,8 +520,19 @@ void downloadFile(const char *url,
                     tear_down_binary_download();
                     goto exit;
                 }
-
                 copy_next_char(ch[0]);
+
+                if((i % 200) == 0)
+                {
+                    /*
+                     * So that we do not time-out with the InstaMsg-Server.
+                     */
+                    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%u / %u bytes downloaded ..."), i, numBytes);
+                    info_log(LOG_GLOBAL_BUFFER);
+
+                    sendPingReqToServer(&instaMsg);
+                    readAndProcessIncomingMQTTPacketsIfAny(&instaMsg);
+                }
             }
 
             tear_down_binary_download();

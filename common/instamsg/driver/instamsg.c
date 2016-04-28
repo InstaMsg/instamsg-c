@@ -1171,7 +1171,7 @@ terminateFileUpload:
             (msg->fixedHeaderPlusMsgId).fixedHeader.dup,
             NULL,
             MQTT_RESULT_HANDLER_TIMEOUT,
-            0);
+            1);
 
 exit:
     if(ackMessage)
