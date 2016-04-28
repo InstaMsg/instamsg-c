@@ -503,7 +503,7 @@ void downloadFile(const char *url,
 
         if(beginPayloadDownload == 1)
         {
-            long i;
+            long i = 0, j = 0;
 
             prepare_for_new_binary_download();
 
@@ -511,19 +511,44 @@ void downloadFile(const char *url,
             sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sBeginning downloading worth [%u] bytes"), FILE_DOWNLOAD, numBytes);
             info_log(LOG_GLOBAL_BUFFER);
 
-            for(i = 0; i < numBytes; i++)
+            while(1)
             {
-                char ch[2] = {0};
-
-                if(socket.read(&socket, (unsigned char*)ch, 1, 1) == FAILURE) /* Pseudo-Blocking Call */
+                int remaining_bytes = numBytes - i;
+                if(remaining_bytes == 0)
                 {
-                    tear_down_binary_download();
-                    goto exit;
+                    break;
                 }
-                copy_next_char(ch[0]);
 
-                if((i % 200) == 0)
+                if(remaining_bytes < OTA_BUFFER_SIZE)
                 {
+                    char ch[2] = {0};
+                    for(j = i; j < numBytes; j++)
+                    {
+                        if(socket.read(&socket, (unsigned char*)ch, 1, 1) == FAILURE) /* Pseudo-Blocking Call */
+                        {
+                            tear_down_binary_download();
+                            goto exit;
+                        }
+
+                        i++;
+                        copy_next_char(ch[0]);
+                    }
+                }
+                else
+                {
+                    char ch[OTA_BUFFER_SIZE + 1] = {0};
+                    if(socket.read(&socket, (unsigned char*)ch, OTA_BUFFER_SIZE, 1) == FAILURE) /* Pseudo-Blocking Call */
+                    {
+                        tear_down_binary_download();
+                        goto exit;
+                    }
+
+                    for(j = 0; j < OTA_BUFFER_SIZE; j++)
+                    {
+                        i++;
+                        copy_next_char(ch[j]);
+                    }
+
                     /*
                      * So that we do not time-out with the InstaMsg-Server.
                      */
@@ -534,6 +559,9 @@ void downloadFile(const char *url,
                     readAndProcessIncomingMQTTPacketsIfAny(&instaMsg);
                 }
             }
+
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%u / %u bytes downloaded ..."), i, numBytes);
+            info_log(LOG_GLOBAL_BUFFER);
 
             tear_down_binary_download();
 
