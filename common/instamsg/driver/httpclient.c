@@ -306,6 +306,18 @@ void uploadFile(const char *url,
             release_file_system(&fs);
             goto exit;
         }
+
+        if((i % OTA_PING_BUFFER_SIZE) == 0)
+        {
+            /*
+             * So that we do not time-out with the InstaMsg-Server.
+             */
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%u / %u bytes uploaded ..."), i, numBytes);
+            info_log(LOG_GLOBAL_BUFFER);
+
+            sendPingReqToServer(&instaMsg);
+            readAndProcessIncomingMQTTPacketsIfAny(&instaMsg);
+        }
     }
 
     sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFile [%s] successfully uploaded worth [%u] bytes"), FILE_UPLOAD, filename, numBytes);
