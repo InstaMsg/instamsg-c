@@ -26,6 +26,62 @@ void init_data_logger()
  */
 void save_record_to_persistent_storage(char *record)
 {
+    while(1)
+    {
+        long currentFileSize = getFileSize(NULL, DATA_FILE_NAME);
+
+        if(currentFileSize < MAX_DATA_LOGGER_SIZE_BYTES)
+        {
+            break;
+        }
+        else
+        {
+            /*
+             * Remove the first (oldest) record.
+             */
+            FILE *fp = NULL;
+            unsigned char firstLineIgnored = 0;
+
+            sg_sprintf(LOG_GLOBAL_BUFFER, "%sRemoving the oldest record ....", DATA_LOGGING);
+            error_log(LOG_GLOBAL_BUFFER);
+
+            fp = fopen(DATA_FILE_NAME, "r");
+            if(fp != NULL)
+            {
+                while(1)
+                {
+                    memset(tempBuffer, 0, sizeof(tempBuffer));
+                    sg_readLine(fp, tempBuffer, sizeof(tempBuffer));
+
+                    if(strlen(tempBuffer) == 0)
+                    {
+                        break;
+                    }
+                    else if(firstLineIgnored == 1)
+                    {
+                        sg_appendLine(TEMP_FILE_NAME, tempBuffer);
+                    }
+
+                    firstLineIgnored = 1;
+                }
+
+                fclose(fp);
+
+                if(renameFile(NULL, TEMP_FILE_NAME, DATA_FILE_NAME) != 0)
+                {
+                    sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not move file from [%s] to [%s]",
+                               DATA_LOGGING_ERROR, TEMP_FILE_NAME, DATA_FILE_NAME);
+                    error_log(LOG_GLOBAL_BUFFER);
+                }
+            }
+            else
+            {
+                sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not open file [%s] for reading", DATA_LOGGING_ERROR, DATA_FILE_NAME);
+                error_log(LOG_GLOBAL_BUFFER);
+            }
+        }
+    }
+
     sg_appendLine(DATA_FILE_NAME, record);
 }
 
