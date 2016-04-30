@@ -1351,6 +1351,11 @@ void initInstaMsg(InstaMsg* c,
 
     (c->ipstack).socketCorrupted = 1;
 	init_socket(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT);
+    if((c->ipstack).socketCorrupted ==1)
+    {
+        return;
+    }
+
 
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {
@@ -2309,7 +2314,6 @@ void start(int (*onConnectOneTimeOperations)(),
     mqttConnectFlag = 0;
     pingRequestInterval = 0;
     notifyServerOfSecretReceived = 0;
-    actuallyEnsureGuaranteeWhereRequired = 1;
 
     compulsorySocketReadAfterMQTTPublishInterval = 0;
 #if MEDIA_STREAMING_ENABLED == 1
