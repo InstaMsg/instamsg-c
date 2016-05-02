@@ -35,6 +35,7 @@
 
 #define PROVISIONED                 PROSTR("PROVISIONED")
 #define CONNECTED                   PROSTR("CONNECTED")
+#define SIMULATED                   PROSTR("SIMULATED")
 
 
 #define MAX_CYCLES_TO_WAIT_FOR_PUBACK   10
@@ -76,6 +77,7 @@ static unsigned char mqttConnectFlag;
 static unsigned char notifyServerOfSecretReceived;
 static int actuallyEnsureGuaranteeWhereRequired;
 
+static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *mode);
 
 #define DATA_LOG_TOPIC      PROSTR("topic")
 #define DATA_LOG_PAYLOAD    PROSTR("payload")
@@ -1353,7 +1355,7 @@ void initInstaMsg(InstaMsg* c,
 	init_socket(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT);
     if((c->ipstack).socketCorrupted ==1)
     {
-        return;
+        handleConnOrProvAckGeneric(c, 0, SIMULATED);
     }
 
 
@@ -1390,7 +1392,6 @@ void initInstaMsg(InstaMsg* c,
     init_data_logger();
     pubAckRecvAttempts = 0;
     waitingForPuback = NOT_WAITING_FOR_PUBACK;
-    msgSource = GENERAL;
     rebootPending = 0;
 
 #if MEDIA_STREAMING_ENABLED == 1
@@ -1514,6 +1515,15 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
 
         c->connected = 1;
 
+        if(strcmp(mode, SIMULATED) == 0)
+        {
+            msgSource = GENERAL;
+        }
+        else
+        {
+            msgSource = PERSISTENT_STORAGE;
+        }
+
         sendClientData(get_client_session_data, TOPIC_SESSION_DATA);
         sendClientData(get_client_metadata, TOPIC_METADATA);
         sendClientData(get_network_data, TOPIC_NETWORK_DATA);
@@ -1562,7 +1572,12 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
 
         if(mediaStreamingEnabledRuntime == 1)
         {
-            initiateStreaming();
+            static unsigned char streamingInitDone = 0;
+            if(streamingInitDone == 0)
+            {
+                initiateStreaming();
+                streamingInitDone = 1;
+            }
         }
 #endif
 
