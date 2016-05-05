@@ -1535,7 +1535,7 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
                                PROSTR("Keep-Alive Interval between Device and InstaMsg-Server"));
 
         registerEditableConfig(&compulsorySocketReadAfterMQTTPublishInterval,
-                               PROSTR("COMPULSORY_SOCKET_READ_AFTER_MQTT_PUBLISH_INTERVAL"),
+                               PROSTR("COMPULSORY_SOCKET_READ_AFTER_WRITE_COUNT"),
                                CONFIG_INT,
                                "3",
                                PROSTR("This variable controls after how many MQTT-Publishes a compulsory socket-read is done. This prevents any socket-pverrun errors (particularly in hardcore embedded-devices"));
@@ -1553,7 +1553,7 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
         }
 
         registerEditableConfig(&actuallyEnsureGuaranteeWhereRequired,
-                               PROSTR("ACTUALLY_ENSURE_MESSAGE_DELIVERY_WHERE_REQUIRED"),
+                               PROSTR("ENABLE_MESSAGE_ACK"),
                                CONFIG_INT,
                                PROSTR("1"),
                                PROSTR(""));
