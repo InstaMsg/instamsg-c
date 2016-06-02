@@ -121,23 +121,23 @@ unsigned char GLOBAL_BUFFER[MAX_BUFFER_SIZE];
 #define TOPIC_CONFIG_SEND       PROSTR("instamsg/client/config/clientToServer")
 
 #define NETWORK_INFO_INTERVAL           300
-int pingRequestInterval;
-int compulsorySocketReadAfterMQTTPublishInterval;
+extern int pingRequestInterval;
+extern int compulsorySocketReadAfterMQTTPublishInterval;
 #if MEDIA_STREAMING_ENABLED == 1
-int mediaStreamingEnabledRuntime;
+extern int mediaStreamingEnabledRuntime;
 #endif
 
-char messageBuffer[MAX_BUFFER_SIZE];
+extern char messageBuffer[MAX_BUFFER_SIZE];
 
 
 #if MEDIA_STREAMING_ENABLED == 1
-unsigned char mediaStreamingErrorOccurred;
+extern unsigned char mediaStreamingErrorOccurred;
 #endif
 
 #ifdef DEBUG_MODE
-char USER_LOG_FILE_PATH[MAX_BUFFER_SIZE];
-char USER_DEVICE_UUID[MAX_BUFFER_SIZE];
+extern char USER_LOG_FILE_PATH[MAX_BUFFER_SIZE];
+extern char USER_DEVICE_UUID[MAX_BUFFER_SIZE];
 #endif
 
-int editableBusinessLogicInterval;
+extern int editableBusinessLogicInterval;
 #endif

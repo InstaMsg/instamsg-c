@@ -466,3 +466,24 @@ void globalSystemInit(char *logFilePath)
 }
 
 
+int pingRequestInterval;
+int compulsorySocketReadAfterMQTTPublishInterval;
+#if MEDIA_STREAMING_ENABLED == 1
+int mediaStreamingEnabledRuntime;
+#endif
+
+char messageBuffer[MAX_BUFFER_SIZE];
+
+
+#if MEDIA_STREAMING_ENABLED == 1
+unsigned char mediaStreamingErrorOccurred;
+#endif
+
+#ifdef DEBUG_MODE
+char USER_LOG_FILE_PATH[MAX_BUFFER_SIZE];
+char USER_DEVICE_UUID[MAX_BUFFER_SIZE];
+#endif
+
+int editableBusinessLogicInterval;
+
+
