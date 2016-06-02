@@ -26,7 +26,7 @@ FileLogger fileLogger;
 #define INSTAMSG_LOG_LEVEL_DEBUG    3
 
 typedef int (*LOG_WRITE_FUNC)(void *logger_medium, unsigned char *buffer, int len);
-int currentLogLevel;
+extern int currentLogLevel;
 
 
 

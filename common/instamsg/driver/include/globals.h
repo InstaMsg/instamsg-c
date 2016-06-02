@@ -98,7 +98,7 @@ struct KeyValuePairs
 
 static const char * const g_pcHex = "0123456789abcdef";
 
-char LOG_GLOBAL_BUFFER[MAX_BUFFER_SIZE];
+extern char LOG_GLOBAL_BUFFER[MAX_BUFFER_SIZE];
 
 #include <stdarg.h>
 void DEFAULT_SPRINTF(char *out, const char *format, ...);
@@ -110,7 +110,7 @@ void globalSystemInit(char *logFilePath);
 
 #define MEM_ALLOC     PROSTR("[MEM-ALLOC] ")
 
-unsigned char GLOBAL_BUFFER[MAX_BUFFER_SIZE];
+extern unsigned char GLOBAL_BUFFER[MAX_BUFFER_SIZE];
 #define RESET_GLOBAL_BUFFER memset(GLOBAL_BUFFER, 0, MAX_BUFFER_SIZE);
 
 #define LOG_FILE_PATH           PROSTR("/home/sensegrow/instamsg.log")

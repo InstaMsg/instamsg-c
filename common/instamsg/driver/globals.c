@@ -466,6 +466,8 @@ void globalSystemInit(char *logFilePath)
 }
 
 
+char LOG_GLOBAL_BUFFER[MAX_BUFFER_SIZE];
+unsigned char GLOBAL_BUFFER[MAX_BUFFER_SIZE];
 int pingRequestInterval;
 int compulsorySocketReadAfterMQTTPublishInterval;
 #if MEDIA_STREAMING_ENABLED == 1

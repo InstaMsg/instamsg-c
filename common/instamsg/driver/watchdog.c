@@ -7,6 +7,8 @@
 #include "./include/log.h"
 #include "./include/misc.h"
 
+volatile unsigned char watchdog_active;
+volatile unsigned char watchdog_expired;
 
 static char *trackString;
 

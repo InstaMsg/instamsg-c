@@ -18,6 +18,7 @@
 
 #define EXPIRY_SECONDS "600"
 
+int currentLogLevel;
 
 #if FILE_SYSTEM_ENABLED == 1
 #define LOG_COMMON_CODE(log, level)                                                                     \

@@ -103,8 +103,8 @@ struct InstaMsg {
     long serverLogsStartTime;
 };
 
-InstaMsg instaMsg;
-volatile unsigned char runBusinessLogicImmediately;
+extern InstaMsg instaMsg;
+extern volatile unsigned char runBusinessLogicImmediately;
 void* MQTTConnect(void* arg);
 
 

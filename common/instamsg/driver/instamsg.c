@@ -30,6 +30,9 @@
 
 #include <string.h>
 
+InstaMsg instaMsg;
+volatile unsigned char runBusinessLogicImmediately;
+
 #define EMPTY_CLIENT_ID             PROSTR("EMPTY")
 #define PROVISIONING_CLIENT_ID      PROSTR("PROVISIONING")
 

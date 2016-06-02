@@ -10,7 +10,7 @@ struct HTTPResponse
     char body[MAX_BUFFER_SIZE];
 };
 
-HTTPResponse httpResponse;
+extern HTTPResponse httpResponse;
 #define RESET_HTTP_RESPONSE memset(&httpResponse, 0, sizeof(HTTPResponse));
 
 void downloadFile(const char *url,
