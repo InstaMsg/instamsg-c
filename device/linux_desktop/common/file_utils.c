@@ -3,7 +3,7 @@
 
 #include "../../../common/instamsg/driver/include/globals.h"
 
-void sg_readLine(FILE *fp, char *buffer, int maxBufferLength)
+void sg_readLine(FILE_STRUCT *fp, char *buffer, int maxBufferLength)
 {
     int i = 0;
     char ch;
@@ -12,8 +12,8 @@ void sg_readLine(FILE *fp, char *buffer, int maxBufferLength)
 
     while(1)
     {
-        ch = fgetc(fp);
-        if((ch != EOF) && (ch != '\n'))
+        ch = FILE_GETC(fp);
+        if((ch != FILE_END_ID) && (ch != '\n'))
         {
             buffer[i++] = ch;
         }
@@ -45,19 +45,19 @@ int sg_appendLine(const char *filePath, char *buffer)
 {
     int rc = FAILURE;
 
-    FILE *fp = NULL;
+    FILE_STRUCT *fp = NULL;
     int i;
 
-    fp = fopen(filePath, "a+");
+    fp = FILE_OPEN(filePath, "a+");
     if(fp != NULL)
     {
         for(i = 0; i < strlen(buffer); i++)
         {
-            fputc(buffer[i], fp);
+            FILE_PUTC(buffer[i], fp);
         }
 
-        fputc('\n', fp);
-        fclose(fp);
+        FILE_PUTC('\n', fp);
+        FILE_CLOSE(fp);
 
         rc = SUCCESS;
     }
@@ -75,11 +75,11 @@ int sg_createEmptyFile(const char *filePath)
 {
     int rc = FAILURE;
 
-    FILE *fp = NULL;
-    fp = fopen(filePath, "w");
+    FILE_STRUCT *fp = NULL;
+    fp = FILE_OPEN(filePath, "w");
     if(fp != NULL)
     {
-        fclose(fp);
+        FILE_CLOSE(fp);
 
         rc = SUCCESS;
     }

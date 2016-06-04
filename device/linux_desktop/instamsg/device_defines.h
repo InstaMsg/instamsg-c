@@ -25,6 +25,9 @@
 #define FILE_STRUCT                 FILE
 #define FILE_OPEN                   fopen
 #define FILE_CLOSE                  fclose
+#define FILE_END_ID                 EOF
+#define FILE_GETC                   fgetc
+#define FILE_PUTC                   fputc
 
 #define MAX_BUFFER_SIZE 1000
 #define MAX_HEAP_SIZE (10 * (MAX_BUFFER_SIZE + HEADER_SIZE))
