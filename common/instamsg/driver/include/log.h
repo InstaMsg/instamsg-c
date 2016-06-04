@@ -15,8 +15,10 @@ struct FileLogger
 
 void init_file_logger(FileLogger *fileLogger, void *arg);
 void release_file_logger(FileLogger *fileLogger);
+#endif
 
-FileLogger fileLogger;
+#if FILE_LOGGING_ENABLED == 1
+extern FileLogger fileLogger;
 #endif
 
 

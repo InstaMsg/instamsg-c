@@ -18,6 +18,10 @@
 
 #define EXPIRY_SECONDS "600"
 
+#if FILE_LOGGING_ENABLED == 1
+extern FileLogger fileLogger;
+#endif
+
 int currentLogLevel;
 
 #if FILE_LOGGING_ENABLED == 1
