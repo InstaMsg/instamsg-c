@@ -19,7 +19,7 @@
 #define EXPIRY_SECONDS "600"
 
 #if FILE_LOGGING_ENABLED == 1
-extern FileLogger fileLogger;
+FileLogger fileLogger;
 #endif
 
 int currentLogLevel;
