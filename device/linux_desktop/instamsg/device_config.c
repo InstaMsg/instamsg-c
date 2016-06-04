@@ -12,8 +12,8 @@
 #include "../../../common/instamsg/driver/include/globals.h"
 #include "../../../common/instamsg/driver/include/log.h"
 
-#define CONFIG_FILE_NAME "/home/sensegrow/config.txt"
-#define TEMP_FILE_NAME   "/home/sensegrow/temp"
+#define CONFIG_FILE_NAME "config.txt"
+#define TEMP_FILE_NAME   "temp"
 
 static char tempBuffer[1024];
 
@@ -25,7 +25,7 @@ static int get_config_value_from_persistent_storage_and_delete_if_asked(const ch
 {
     int rc = FAILURE;
 
-    FILE *fp = fopen(CONFIG_FILE_NAME, "r");
+    FILE_STRUCT *fp = FILE_OPEN(CONFIG_FILE_NAME, "r");
     char *jsonKey = NULL;
 
     if(fp == NULL)
@@ -105,7 +105,7 @@ static int get_config_value_from_persistent_storage_and_delete_if_asked(const ch
 exit:
     if(fp != NULL)
     {
-        fclose(fp);
+        FILE_CLOSE(fp);
     }
 
     if(jsonKey != NULL)

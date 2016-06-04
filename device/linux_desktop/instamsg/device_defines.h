@@ -14,13 +14,17 @@
 /*
  * We use the vanilla "malloc/free" methods for Linux.
  */
-#define USE_DEFAULT_MALLOC      0
+#define USE_DEFAULT_MALLOC          0
 
 #include <stdlib.h>
-#define sg_malloc               malloc
-#define sg_free                 free
+#define sg_malloc                   malloc
+#define sg_free                     free
 
 #define PROSTR
+
+#define FILE_STRUCT                 FILE
+#define FILE_OPEN                   fopen
+#define FILE_CLOSE                  fclose
 
 #define MAX_BUFFER_SIZE 1000
 #define MAX_HEAP_SIZE (10 * (MAX_BUFFER_SIZE + HEADER_SIZE))

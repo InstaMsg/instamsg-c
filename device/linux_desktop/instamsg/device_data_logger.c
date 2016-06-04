@@ -5,8 +5,8 @@
 #include "../../../common/instamsg/driver/include/globals.h"
 #include "../../../common/instamsg/driver/include/log.h"
 
-#define DATA_FILE_NAME      "/home/sensegrow/data.txt"
-#define TEMP_FILE_NAME      "/home/sensegrow/temp"
+#define DATA_FILE_NAME      "data.txt"
+#define TEMP_FILE_NAME      "temp"
 
 static char tempBuffer[1024];
 
@@ -45,7 +45,7 @@ void save_record_to_persistent_storage(char *record)
             sg_sprintf(LOG_GLOBAL_BUFFER, "%sRemoving the oldest record ....", DATA_LOGGING);
             error_log(LOG_GLOBAL_BUFFER);
 
-            fp = fopen(DATA_FILE_NAME, "r");
+            fp = FILE_OPEN(DATA_FILE_NAME, "r");
             if(fp != NULL)
             {
                 while(1)
@@ -65,7 +65,7 @@ void save_record_to_persistent_storage(char *record)
                     firstLineIgnored = 1;
                 }
 
-                fclose(fp);
+                FILE_CLOSE(fp);
 
                 if(renameFile(NULL, TEMP_FILE_NAME, DATA_FILE_NAME) != 0)
                 {
@@ -117,7 +117,7 @@ int get_next_record_from_persistent_storage(char *buffer, int maxLength)
     int rc = FAILURE;
     unsigned char lineRead = 0;
 
-    FILE *fp = fopen(DATA_FILE_NAME, "r");
+    FILE_STRUCT *fp = FILE_OPEN(DATA_FILE_NAME, "r");
     if(fp == NULL)
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not open data-log-file [%s] for reading", DATA_LOGGING_ERROR, DATA_FILE_NAME);
@@ -166,7 +166,7 @@ int get_next_record_from_persistent_storage(char *buffer, int maxLength)
 exit:
     if(fp != NULL)
     {
-        fclose(fp);
+        FILE_CLOSE(fp);
     }
 
     if(1)
