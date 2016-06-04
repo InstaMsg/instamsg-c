@@ -64,7 +64,7 @@ int currentLogLevel;
 #endif
 
 
-#if FILE_SYSTEM_ENABLED == 1
+#if FILE_LOGGING_ENABLED == 1
 void init_file_logger(FileLogger *fileLogger, void *arg)
 {
     /* Here, physical medium is a file-system. */
