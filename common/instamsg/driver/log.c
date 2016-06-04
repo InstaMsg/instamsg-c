@@ -20,7 +20,7 @@
 
 int currentLogLevel;
 
-#if FILE_SYSTEM_ENABLED == 1
+#if FILE_LOGGING_ENABLED == 1
 #define LOG_COMMON_CODE(log, level)                                                                     \
                                                                                                         \
     strcat(log, "\r\n");                                                                                \
