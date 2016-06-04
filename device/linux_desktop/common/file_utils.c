@@ -6,7 +6,7 @@
 void sg_readLine(FILE_STRUCT *fp, char *buffer, int maxBufferLength)
 {
     int i = 0;
-    char ch;
+    int ch;
 
     memset(buffer, 0, maxBufferLength);
 
@@ -15,7 +15,7 @@ void sg_readLine(FILE_STRUCT *fp, char *buffer, int maxBufferLength)
         ch = FILE_GETC(fp);
         if((ch != FILE_END_ID) && (ch != '\n'))
         {
-            buffer[i++] = ch;
+            buffer[i++] = (char)ch;
         }
         else
         {
