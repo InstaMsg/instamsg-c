@@ -2480,7 +2480,7 @@ void start(int (*onConnectOneTimeOperations)(),
                             if((coreLoopyBusinessLogicInitiatedBySelf != NULL) && (msgSource == GENERAL))
 
                             {
-                                coreLoopyBusinessLogicInitiatedBySelf(NULL);
+                                coreLoopyBusinessLogicInitiatedBySelf();
                                 runBusinessLogicImmediately = 0;
 
                                 if(businessLogicRunOnceAtStart == 0)
