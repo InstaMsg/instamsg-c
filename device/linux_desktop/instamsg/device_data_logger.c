@@ -4,6 +4,8 @@
 #include "../../../common/instamsg/driver/include/data_logger.h"
 #include "../../../common/instamsg/driver/include/globals.h"
 #include "../../../common/instamsg/driver/include/log.h"
+#include "../../../common/instamsg/driver/include/file_system.h"
+#include "../../../common/instamsg/driver/include/file_utils.h"
 
 #define DATA_FILE_NAME      "data.txt"
 #define TEMP_FILE_NAME      "temp"
@@ -39,7 +41,7 @@ void save_record_to_persistent_storage(char *record)
             /*
              * Remove the first (oldest) record.
              */
-            FILE *fp = NULL;
+            FILE_STRUCT *fp = NULL;
             unsigned char firstLineIgnored = 0;
 
             sg_sprintf(LOG_GLOBAL_BUFFER, "%sRemoving the oldest record ....", DATA_LOGGING);

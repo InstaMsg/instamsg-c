@@ -4,6 +4,11 @@
 #include "./include/sg_stdlib.h"
 #include "./include/config.h"
 #include "./include/upgrade.h"
+#include "./include/sg_mem.h"
+
+#if FILE_SYSTEM_ENABLED == 1
+#include "./include/file_system.h"
+#endif
 
 #include "device_file_system.h"
 #include <string.h>

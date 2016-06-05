@@ -7,8 +7,9 @@
 
 #define SMS     PROSTR("SMS")
 
-static char sms[200];
+#if GSM_INTERFACE_ENABLED == 1
 
+static char sms[200];
 
 static void replaceSmsCharacter(char *sms, char old_char, char new_char)
 {
@@ -37,6 +38,7 @@ static void* emptyCallback(void *arg)
 {
     return NULL;
 }
+#endif
 
 
 void init_socket(Socket *socket, const char *hostName, unsigned int port)

@@ -32,8 +32,12 @@ int main(int argc, char** argv)
      * This method is only for the test publisher/subscriber apps.
      * For real-world apps, this method will not be needed.
      */
+#if 0
     init_publisher_subscriber_params(argc, argv, &logFilePath);
+#endif
 
     globalSystemInit(logFilePath);
     start(NULL, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, 3);
+
+    return 0;
 }

@@ -28,6 +28,10 @@
 #include "./include/globals.h"
 #include "./include/upgrade.h"
 
+#if FILE_SYSTEM_ENABLED == 1
+#include "include/file_system.h"
+#endif
+
 #include <string.h>
 
 InstaMsg instaMsg;

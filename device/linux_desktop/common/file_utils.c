@@ -2,6 +2,9 @@
 #include <string.h>
 
 #include "../../../common/instamsg/driver/include/globals.h"
+#include "../../../common/instamsg/driver/include/log.h"
+#include "../../../common/instamsg/driver/include/file_utils.h"
+
 
 void sg_readLine(FILE_STRUCT *fp, char *buffer, int maxBufferLength)
 {
@@ -41,7 +44,7 @@ void sg_readLine(FILE_STRUCT *fp, char *buffer, int maxBufferLength)
 }
 
 
-int sg_appendLine(const char *filePath, char *buffer)
+int sg_appendLine(const char *filePath, const char *buffer)
 {
     int rc = FAILURE;
 
