@@ -3,6 +3,8 @@
 
 #include "device_socket.h"
 
+#define SOCKET_CONNECTION_SOLITARY_ATTEMPT_MAX_ALLOWED_TIME_SECONDS 300
+
 /*
  * Global-functions callable.
  */
