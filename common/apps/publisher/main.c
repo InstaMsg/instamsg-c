@@ -36,6 +36,10 @@ int main(int argc, char** argv)
     init_publisher_subscriber_params(argc, argv, &logFilePath);
 #endif
 
+    memset(TOPIC, 0, sizeof(TOPIC));
+    strcpy(TOPIC, "listener_topic");
+
+
     globalSystemInit(logFilePath);
     start(NULL, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, 3);
 
