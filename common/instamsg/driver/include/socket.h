@@ -3,6 +3,8 @@
 
 #include "device_socket.h"
 
+#define SOCKET			PROSTR("[SOCKET] ")
+#define SOCKET_ERROR	PROSTR("[SOCKET_ERROR] ")
 #define SOCKET_CONNECTION_SOLITARY_ATTEMPT_MAX_ALLOWED_TIME_SECONDS 300
 
 /*
