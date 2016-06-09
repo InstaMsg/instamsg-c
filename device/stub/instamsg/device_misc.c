@@ -32,7 +32,7 @@ void get_client_session_data(char *messageBuffer, int maxBufferLength)
 /*
  * This method returns the client-network-data, in simple JSON form, of type ::
  *
- * {'imei' : 'value', 'serial_number' : 'value', 'model' : 'value', 'firmware_version' : 'value', 'manufacturer' : 'value', 'client_version' : 'value'}
+ * {'imei' : 'value', 'serial_number' : 'value', 'model' : 'value', 'firmware_version' : 'value', 'manufacturer' : 'value', 'imsi' : 'value', 'client_version' : 'value'}
  */
 void get_client_metadata(char *messageBuffer, int maxBufferLength)
 {
