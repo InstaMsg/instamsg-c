@@ -1354,6 +1354,7 @@ void initInstaMsg(InstaMsg* c,
 
 #if FILE_SYSTEM_ENABLED == 1
     init_file_system(&(c->singletonUtilityFs), "");
+    deleteFile(&(c->singletonUtilityFs), SYSTEM_WIDE_TEMP_FILE);
 #endif
 
     check_for_upgrade();

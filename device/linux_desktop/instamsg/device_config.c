@@ -20,7 +20,6 @@
 
 
 #define CONFIG_FILE_NAME "config.txt"
-#define TEMP_FILE_NAME   "temp"
 
 static char tempBuffer[1024];
 
@@ -103,7 +102,7 @@ static int get_config_value_from_persistent_storage_and_delete_if_asked(const ch
                    /*
                     * Write this non-matching-config to a new-temp file.
                     */
-                   sg_appendLine(TEMP_FILE_NAME, tempBuffer);
+                   sg_appendLine(SYSTEM_WIDE_TEMP_FILE, tempBuffer);
                }
            }
        }
@@ -125,9 +124,9 @@ exit:
      */
     if(deleteConfig == 1)
     {
-        if(renameFile(NULL, TEMP_FILE_NAME, CONFIG_FILE_NAME) != 0)
+        if(renameFile(NULL, SYSTEM_WIDE_TEMP_FILE, CONFIG_FILE_NAME) != 0)
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not move file from [%s] to [%s]", CONFIG_ERROR, TEMP_FILE_NAME, CONFIG_FILE_NAME);
+            sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not move file from [%s] to [%s]", CONFIG_ERROR, SYSTEM_WIDE_TEMP_FILE, CONFIG_FILE_NAME);
             error_log(LOG_GLOBAL_BUFFER);
         }
     }

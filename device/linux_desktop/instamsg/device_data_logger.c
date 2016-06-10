@@ -8,7 +8,6 @@
 #include "../../../common/instamsg/driver/include/file_utils.h"
 
 #define DATA_FILE_NAME      "data.txt"
-#define TEMP_FILE_NAME      "temp"
 
 static char tempBuffer[1024];
 
@@ -61,7 +60,7 @@ void save_record_to_persistent_storage(char *record)
                     }
                     else if(firstLineIgnored == 1)
                     {
-                        sg_appendLine(TEMP_FILE_NAME, tempBuffer);
+                        sg_appendLine(SYSTEM_WIDE_TEMP_FILE, tempBuffer);
                     }
 
                     firstLineIgnored = 1;
@@ -69,10 +68,10 @@ void save_record_to_persistent_storage(char *record)
 
                 FILE_CLOSE(fp);
 
-                if(renameFile(NULL, TEMP_FILE_NAME, DATA_FILE_NAME) != 0)
+                if(renameFile(NULL, SYSTEM_WIDE_TEMP_FILE, DATA_FILE_NAME) != 0)
                 {
                     sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not move file from [%s] to [%s]",
-                               DATA_LOGGING_ERROR, TEMP_FILE_NAME, DATA_FILE_NAME);
+                               DATA_LOGGING_ERROR, SYSTEM_WIDE_TEMP_FILE, DATA_FILE_NAME);
                     error_log(LOG_GLOBAL_BUFFER);
                 }
             }
@@ -128,7 +127,7 @@ int get_next_record_from_persistent_storage(char *buffer, int maxLength)
         goto exit;
     }
 
-    sg_createEmptyFile(TEMP_FILE_NAME);
+    sg_createEmptyFile(SYSTEM_WIDE_TEMP_FILE);
 
     while(1)
     {
@@ -160,7 +159,7 @@ int get_next_record_from_persistent_storage(char *buffer, int maxLength)
                 /*
                  * Copy to temp-file.
                  */
-                sg_appendLine(TEMP_FILE_NAME, tempBuffer);
+                sg_appendLine(SYSTEM_WIDE_TEMP_FILE, tempBuffer);
             }
         }
     }
@@ -173,9 +172,9 @@ exit:
 
     if(1)
     {
-        if(renameFile(NULL, TEMP_FILE_NAME, DATA_FILE_NAME) != 0)
+        if(renameFile(NULL, SYSTEM_WIDE_TEMP_FILE, DATA_FILE_NAME) != 0)
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not move file from [%s] to [%s]", DATA_LOGGING_ERROR, TEMP_FILE_NAME, DATA_FILE_NAME);
+            sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not move file from [%s] to [%s]", DATA_LOGGING_ERROR, SYSTEM_WIDE_TEMP_FILE, DATA_FILE_NAME);
             error_log(LOG_GLOBAL_BUFFER);
         }
     }

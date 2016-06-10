@@ -1,7 +1,7 @@
 #ifndef INSTAMSG_GLOBALS
 #define INSTAMSG_GLOBALS
 
-#define INSTAMSG_VERSION "2.8.6"
+#define INSTAMSG_VERSION "2.8.7"
 
 #include "device_defines.h"
 
@@ -140,4 +140,6 @@ extern char USER_DEVICE_UUID[MAX_BUFFER_SIZE];
 #endif
 
 extern int editableBusinessLogicInterval;
+
+#define SYSTEM_WIDE_TEMP_FILE   "temp"
 #endif
