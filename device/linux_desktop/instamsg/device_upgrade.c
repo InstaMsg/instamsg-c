@@ -11,7 +11,7 @@
 #include "../../../common/instamsg/driver/include/upgrade.h"
 #include "../../../common/instamsg/driver/include/instamsg.h"
 #include "../../../common/instamsg/driver/include/log.h"
-
+#include "../../../common/instamsg/driver/include/file_system.h"
 
 static FileSystem fs;
 
