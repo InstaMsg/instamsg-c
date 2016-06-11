@@ -30,6 +30,7 @@ int socket_write(Socket *socket, unsigned char* buffer, int len);
  * Must not be called by anyone.
  */
 #if GSM_INTERFACE_ENABLED == 1
+void store_sms_in_config(char *sms, char *smsConfigBuffer, int smsConfigBufferLength);
 void get_latest_sms_containing_substring(Socket *socket, char *buffer, const char *prefix);
 #endif
 void connect_underlying_socket_medium_try_once(Socket* socket);
