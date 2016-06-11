@@ -17,13 +17,9 @@
 #include "../../../common/instamsg/driver/include/file_utils.h"
 
 
-
-
-#define CONFIG_FILE_NAME "config.txt"
-
 static char tempBuffer[1024];
 
-
+#define CONFIG_FILE_NAME "config.txt"
 
 
 static int get_config_value_from_persistent_storage_and_delete_if_asked(const char *key, char *buffer, int maxBufferLength,
@@ -153,7 +149,13 @@ void init_config()
  */
 int get_config_value_from_persistent_storage(const char *key, char *buffer, int maxBufferLength)
 {
-    return get_config_value_from_persistent_storage_and_delete_if_asked(key, buffer, maxBufferLength, 0);
+	int rc = FAILURE;
+	ACQUIRE_THREAD_MUTEX
+
+    rc =  get_config_value_from_persistent_storage_and_delete_if_asked(key, buffer, maxBufferLength, 0);
+
+    RELEASE_THREAD_MUTEX
+    return rc;
 }
 
 
@@ -176,8 +178,14 @@ int get_config_value_from_persistent_storage(const char *key, char *buffer, int 
  */
 int save_config_value_on_persistent_storage(const char *key, const char *value, unsigned char logging)
 {
+	int rc = FAILURE;
+	ACQUIRE_THREAD_MUTEX
+
     delete_config_value_from_persistent_storage(key);
-    return sg_appendLine(CONFIG_FILE_NAME, value);
+    rc = sg_appendLine(CONFIG_FILE_NAME, value);
+
+    RELEASE_THREAD_MUTEX
+	return rc;
 }
 
 
@@ -191,5 +199,11 @@ int save_config_value_on_persistent_storage(const char *key, const char *value, 
  */
 int delete_config_value_from_persistent_storage(const char *key)
 {
-    return get_config_value_from_persistent_storage_and_delete_if_asked(key, NULL, 0, 1);
+	int rc = FAILURE;
+	ACQUIRE_THREAD_MUTEX
+
+    rc = get_config_value_from_persistent_storage_and_delete_if_asked(key, NULL, 0, 1);
+
+    RELEASE_THREAD_MUTEX
+    return rc;
 }
