@@ -131,6 +131,25 @@ exit:
 }
 
 
+static int do_delete_config_value_from_persistent_storage(const char *key, unsigned char acquireMutex)
+{
+	int rc = FAILURE;
+	if(acquireMutex == 1)
+	{
+		ACQUIRE_THREAD_MUTEX
+	}
+
+    rc = get_config_value_from_persistent_storage_and_delete_if_asked(key, NULL, 0, 1);
+
+    if(acquireMutex == 1)
+    {
+    	RELEASE_THREAD_MUTEX
+    }
+
+    return rc;
+}
+
+
 /*
  * This method initializes the Config-Interface for the device.
  */
@@ -181,7 +200,7 @@ int save_config_value_on_persistent_storage(const char *key, const char *value, 
 	int rc = FAILURE;
 	ACQUIRE_THREAD_MUTEX
 
-    delete_config_value_from_persistent_storage(key);
+	do_delete_config_value_from_persistent_storage(key, 0);
     rc = sg_appendLine(CONFIG_FILE_NAME, value);
 
     RELEASE_THREAD_MUTEX
@@ -199,11 +218,5 @@ int save_config_value_on_persistent_storage(const char *key, const char *value, 
  */
 int delete_config_value_from_persistent_storage(const char *key)
 {
-	int rc = FAILURE;
-	ACQUIRE_THREAD_MUTEX
-
-    rc = get_config_value_from_persistent_storage_and_delete_if_asked(key, NULL, 0, 1);
-
-    RELEASE_THREAD_MUTEX
-    return rc;
+	return do_delete_config_value_from_persistent_storage(key, 1);
 }
