@@ -154,7 +154,7 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port)
             sg_sprintf(LOG_GLOBAL_BUFFER, "\n\nProvisioning-Info SMS extracted from sim-area = [%s]\n\n", sms);
             info_log(LOG_GLOBAL_BUFFER);
 
-            store_sms_in_config(sms);
+            store_sms_in_config(sms, NULL, NULL);
         }
 
 #if 0
