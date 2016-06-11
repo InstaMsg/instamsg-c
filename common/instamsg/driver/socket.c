@@ -38,7 +38,6 @@ static void* emptyCallback(void *arg)
 {
     return NULL;
 }
-#endif
 
 
 void store_sms_in_config(char *sms, char *smsConfigBuffer, int smsConfigBufferLength)
@@ -81,7 +80,7 @@ void store_sms_in_config(char *sms, char *smsConfigBuffer, int smsConfigBufferLe
     	}
     }
 }
-
+#endif
 
 void init_socket(Socket *socket, const char *hostName, unsigned int port)
 {
