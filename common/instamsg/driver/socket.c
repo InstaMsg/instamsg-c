@@ -41,6 +41,48 @@ static void* emptyCallback(void *arg)
 #endif
 
 
+void store_sms_in_config(char *sms, char *smsConfigBuffer, int smsConfigBufferLength)
+{
+	char *bufferToUse = NULL;
+	int bufferLengthToUse = 0;
+
+	if(1)
+    {
+    	if(1)
+    	{
+    		/*
+    		 * Store this into config, after removing any curly-braces, as config does not support nested-json.
+    		 */
+    		replaceSmsCharacter(sms, '{', '(');
+    		replaceSmsCharacter(sms, '}', ')');
+    		replaceSmsCharacter(sms, '\'', '@');
+    		replaceSmsCharacter(sms, '"', '#');
+
+    		if(smsConfigBuffer != NULL)
+    		{
+    			bufferToUse = smsConfigBuffer;
+    			bufferLengthToUse = smsConfigBufferLength;
+    		}
+    		else
+    		{
+    			bufferToUse = messageBuffer;
+    			bufferLengthToUse = sizeof(messageBuffer);
+    		}
+
+    		if(1)
+    		{
+    			memset(bufferToUse, 0, bufferLengthToUse);
+    			generate_config_json(bufferToUse, SMS, CONFIG_STRING, sms, "");
+    			save_config_value_on_persistent_storage(SMS, bufferToUse, 1);
+
+    			sg_sprintf(LOG_GLOBAL_BUFFER, "Persisted [%s] ==> [%s]", SMS, sms);
+    			info_log(LOG_GLOBAL_BUFFER);
+    		}
+    	}
+    }
+}
+
+
 void init_socket(Socket *socket, const char *hostName, unsigned int port)
 {
     /* Register read-callback. */
@@ -109,25 +151,10 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port)
         }
         else
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, "\n\nProvisioning-Info SMS extracted from storage-area = [%s]\n\n", sms);
+            sg_sprintf(LOG_GLOBAL_BUFFER, "\n\nProvisioning-Info SMS extracted from sim-area = [%s]\n\n", sms);
             info_log(LOG_GLOBAL_BUFFER);
 
-            /*
-             * Store this into config, after removing any curly-braces, as config does not support nested-json.
-             */
-            replaceSmsCharacter(sms, '{', '(');
-            replaceSmsCharacter(sms, '}', ')');
-            replaceSmsCharacter(sms, '\'', '@');
-            replaceSmsCharacter(sms, '"', '#');
-
-            {
-                memset(messageBuffer, 0, sizeof(messageBuffer));
-                generate_config_json(messageBuffer, SMS, CONFIG_STRING, sms, "");
-                save_config_value_on_persistent_storage(SMS, messageBuffer, 1);
-
-                sg_sprintf(LOG_GLOBAL_BUFFER, "Persisted [%s] ==> [%s]", SMS, sms);
-                info_log(LOG_GLOBAL_BUFFER);
-            }
+            store_sms_in_config(sms);
         }
 
 #if 0
