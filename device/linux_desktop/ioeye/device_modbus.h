@@ -19,6 +19,7 @@ struct Modbus
                                                int responseBytesLength);
 
     char modbusCommands[MODBUS_COMMAND_BUFFER_SIZE];
+    unsigned char commandsLoaded;
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
 
 
