@@ -1350,6 +1350,11 @@ void initInstaMsg(InstaMsg* c,
 
     runBusinessLogicImmediately = 0;
 
+    /*
+     * At the very start, start this to true.
+     */
+    actuallyEnsureGuaranteeWhereRequired = 1;
+
     c->FRESH_SERVER_LOGS_TIME = -1;
 
 #if FILE_SYSTEM_ENABLED == 1
@@ -1976,6 +1981,8 @@ static void saveFailedPublishedMessage()
             if(messageSavingJson == NULL)
             {
                 sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCould not allocate memory for data-logging .. returning"), DATA_LOGGING_ERROR);
+                error_log(LOG_GLOBAL_BUFFER);
+
                 return;
             }
 
