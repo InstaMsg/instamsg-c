@@ -55,5 +55,8 @@ unsigned long getCurrentTick()
  */
 int sync_system_clock(DateParams *dateParams)
 {
+    sg_sprintf(LOG_GLOBAL_BUFFER, "%sTime-Syncing at grass-root-level not required for this device", CLOCK);
+    info_log(LOG_GLOBAL_BUFFER);
+
     return SUCCESS;
 }

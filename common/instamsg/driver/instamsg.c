@@ -68,7 +68,8 @@ enum MESSAGE_SOURCE
 enum MESSAGE_SOURCE msgSource;
 unsigned char rebootPending;
 
-#define SECRET PROSTR("SECRET")
+#define SECRET      PROSTR("SECRET")
+#define NTP_SERVER  PROSTR("NTP_SERVER")
 
 #if MEDIA_STREAMING_ENABLED == 1
 #include "./include/media.h"
@@ -85,6 +86,11 @@ static unsigned char notifyServerOfSecretReceived;
 static int actuallyEnsureGuaranteeWhereRequired;
 
 static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *mode);
+
+static unsigned char ntpPacket[48];
+static DateParams dateParams;
+static unsigned char ntpTimeSyncedOnce;
+static char ntpServer[100];
 
 #define DATA_LOG_TOPIC      PROSTR("topic")
 #define DATA_LOG_PAYLOAD    PROSTR("payload")
@@ -1341,26 +1347,54 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
 }
 
 
-#if TIME_SYNC_BY_NTP_ENABLED == 1
-static unsigned char ntpPacket[48];
-static DateParams dateParams;
-static unsigned char ntpTimeSyncedOnce;
 
 static void syncTimeIfApplicable(InstaMsg *c)
 {
     int rc = FAILURE;
+    unsigned char ntpEnabled = 0;
 
     unsigned long seconds1970 = 0x83aa7e80;   /* number of seconds from 1900 to 1970 */
     unsigned long seconds1900;                /* number of seconds from 1900         */
 
+
     if(ntpTimeSyncedOnce == 1)
     {
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sNTP-Time already synced.. not re-syncing"), CLOCK);
+        info_log(LOG_GLOBAL_BUFFER);
+
+        return;
+    }
+
+    RESET_GLOBAL_BUFFER;
+
+    rc = get_config_value_from_persistent_storage(NTP_SERVER, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
+    if(rc == SUCCESS)
+    {
+        memset(ntpServer, 0, sizeof(ntpServer));
+        getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, ntpServer);
+
+        if(strlen(ntpServer) > 0)
+        {
+            ntpEnabled = 1;
+        }
+    }
+
+    if(ntpEnabled == 1)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sNTP-Time-Sync in ENABLED."), CLOCK);
+        info_log(LOG_GLOBAL_BUFFER);
+    }
+    else
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sNTP-Time-Sync in DISABLED."), CLOCK);
+        info_log(LOG_GLOBAL_BUFFER);
+
         return;
     }
 
     (c->timeSyncerSocket).socketCorrupted = 1;
 
-	init_socket(&(c->timeSyncerSocket), NTP_SERVER, NTP_PORT, SOCKET_UDP);
+	init_socket(&(c->timeSyncerSocket), ntpServer, NTP_PORT, SOCKET_UDP);
     if((c->timeSyncerSocket).socketCorrupted == 1)
     {
         goto failure_in_time_syncing;
@@ -1433,7 +1467,6 @@ failure_in_time_syncing:
 
         rebootDevice();
 }
-#endif
 
 
 void initInstaMsg(InstaMsg* c,
@@ -1458,9 +1491,7 @@ void initInstaMsg(InstaMsg* c,
 #endif
 
     check_for_upgrade();
-#if TIME_SYNC_BY_NTP_ENABLED == 1
     syncTimeIfApplicable(c);
-#endif
 
     (c->ipstack).socketCorrupted = 1;
 	init_socket(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT, SOCKET_TCP);
@@ -1667,6 +1698,17 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
                                PROSTR("ENABLE_MESSAGE_ACK"),
                                CONFIG_INT,
                                PROSTR("1"),
+                               PROSTR(""));
+
+        /*
+         * Although we took the decision to enable/disable NTP earlier in the flow, yet we do the following,
+         * do make the NTP-Server a configurable-parameter from the server.
+         */
+        memset(ntpServer, 0, sizeof(ntpServer));
+        registerEditableConfig(ntpServer,
+                               NTP_SERVER,
+                               CONFIG_STRING,
+                               PROSTR(""),
                                PROSTR(""));
 
 #if MEDIA_STREAMING_ENABLED == 1

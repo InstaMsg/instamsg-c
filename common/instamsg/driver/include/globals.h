@@ -88,7 +88,6 @@ struct KeyValuePairs
 #endif
 
 
-#define NTP_SERVER          PROSTR("pool.ntp.org")
 #define NTP_PORT            123
 
 #define SOCKET_READ_TIMEOUT_SECS 1
