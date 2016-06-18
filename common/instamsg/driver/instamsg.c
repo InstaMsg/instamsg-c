@@ -1341,6 +1341,7 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
 }
 
 
+#if TIME_SYNC_BY_NTP_ENABLED == 1
 static unsigned char ntpPacket[48];
 static DateParams dateParams;
 static unsigned char ntpTimeSyncedOnce;
@@ -1432,6 +1433,7 @@ failure_in_time_syncing:
 
         rebootDevice();
 }
+#endif
 
 
 void initInstaMsg(InstaMsg* c,
@@ -1456,7 +1458,9 @@ void initInstaMsg(InstaMsg* c,
 #endif
 
     check_for_upgrade();
+#if TIME_SYNC_BY_NTP_ENABLED == 1
     syncTimeIfApplicable(c);
+#endif
 
     (c->ipstack).socketCorrupted = 1;
 	init_socket(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT, SOCKET_TCP);

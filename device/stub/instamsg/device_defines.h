@@ -28,5 +28,6 @@
 #define FILE_SYSTEM_ENABLED         0
 #define GSM_INTERFACE_ENABLED       0
 #define SSL_ENABLED                 0
+#define TIME_SYNC_BY_NTP_ENABLED    0
 
 #endif

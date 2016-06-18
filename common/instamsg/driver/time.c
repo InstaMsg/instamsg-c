@@ -1,5 +1,6 @@
 #include "./include/globals.h"
 #include "./include/time.h"
+#include "./include/log.h"
 
 /* 2000-03-01 (mod 400 year, immediately after feb29 */
 #define LEAPOCH (946684800 + (86400 * (31 + 29)) )
