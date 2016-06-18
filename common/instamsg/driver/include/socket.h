@@ -7,10 +7,13 @@
 #define SOCKET_ERROR	PROSTR("[SOCKET_ERROR] ")
 #define SOCKET_CONNECTION_SOLITARY_ATTEMPT_MAX_ALLOWED_TIME_SECONDS 300
 
+#define SOCKET_TCP      PROSTR("TCP")
+#define SOCKET_UDP      PROSTR("UDP")
+
 /*
  * Global-functions callable.
  */
-void init_socket(Socket *socket, const char *hostName, unsigned int port);
+void init_socket(Socket *socket, const char *hostName, unsigned int port, const char *type);
 void release_socket(Socket *socket);
 
 

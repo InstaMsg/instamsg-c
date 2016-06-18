@@ -12,6 +12,7 @@ struct Socket
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
     char host[MAX_BUFFER_SIZE];
     int port;
+    char *type;
 
     unsigned char socketCorrupted;
 

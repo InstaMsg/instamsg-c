@@ -50,7 +50,7 @@ void get_latest_sms_containing_substring(Socket *socket, char *buffer, const cha
  */
 void connect_underlying_socket_medium_try_once(Socket* s)
 {
-	int type = SOCK_STREAM;
+	int type = -1;
 	struct sockaddr_in address;
 
 	int rc = SUCCESS;
@@ -59,6 +59,15 @@ void connect_underlying_socket_medium_try_once(Socket* s)
 	sa_family_t family = AF_INET;
 	struct addrinfo *result = NULL;
 	struct addrinfo hints = {0, AF_UNSPEC, SOCK_STREAM, IPPROTO_TCP, 0, NULL, NULL, NULL};
+
+    if(strcmp(s->type, SOCKET_TCP) == 0)
+    {
+        type = SOCK_STREAM;
+    }
+    else if(strcmp(s->type, SOCKET_UDP) == 0)
+    {
+        type = SOCK_DGRAM;
+    }
 
 	if ((rc = getaddrinfo(s->host, NULL, &hints, &result)) == 0)
 	{
@@ -119,8 +128,8 @@ void connect_underlying_socket_medium_try_once(Socket* s)
     /* Set timeout-limitation in the socket-receiving function */
     setsockopt(s->socket, SOL_SOCKET, SO_RCVTIMEO, (char *)&interval, sizeof(struct timeval));
 
-    sg_sprintf(LOG_GLOBAL_BUFFER, "TCP-SOCKET UNDERLYING_MEDIUM INITIATED FOR HOST = [%s], PORT = [%d].",
-             s->host, s->port);
+    sg_sprintf(LOG_GLOBAL_BUFFER, "%s-SOCKET UNDERLYING_MEDIUM INITIATED FOR HOST = [%s], PORT = [%d].",
+             s->type, s->host, s->port);
     info_log(LOG_GLOBAL_BUFFER);
 }
 

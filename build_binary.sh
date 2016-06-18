@@ -28,6 +28,7 @@ SOURCES=`echo                                                                   
         common/instamsg/driver/httpclient.c                                                     \
         common/instamsg/driver/media.c                                                          \
         common/instamsg/driver/upgrade.c                                                        \
+        common/instamsg/driver/time.c                                                           \
                                                                                                 \
         common/instamsg/mqtt/src/MQTTFormat.c                                                   \
         common/instamsg/mqtt/src/MQTTPacket.c                                                   \

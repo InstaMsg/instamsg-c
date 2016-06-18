@@ -80,7 +80,7 @@ static int mediaReplyMessageWaitInterval;
 static char streamId[MAX_BUFFER_SIZE];
 #endif
 
-static unsigned char mqttConnectFlag;
+static unsigned char sendPacketIrrespective;
 static unsigned char notifyServerOfSecretReceived;
 static int actuallyEnsureGuaranteeWhereRequired;
 
@@ -434,7 +434,7 @@ static void handleConfigReceived(InstaMsg *c, MQTTMessage *msg)
 }
 
 
-static int sendPacket(InstaMsg *c, unsigned char *buf, int length)
+static int sendPacket(InstaMsg * c, Socket *s, unsigned char *buf, int length)
 {
     int rc = SUCCESS;
 
@@ -444,7 +444,7 @@ static int sendPacket(InstaMsg *c, unsigned char *buf, int length)
      */
     watchdog_reset_and_enable(60, "sendPacket", 1);
 
-    if((c->ipstack).socketCorrupted == 1)
+    if(s->socketCorrupted == 1)
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Socket not available at physical layer .. so packet cannot be sent to server."));
         error_log(LOG_GLOBAL_BUFFER);
@@ -453,7 +453,7 @@ static int sendPacket(InstaMsg *c, unsigned char *buf, int length)
         goto exit;
     }
 
-    if(mqttConnectFlag != 1)
+    if(sendPacketIrrespective != 1)
     {
         if(c->connected == 0)
         {
@@ -464,11 +464,11 @@ static int sendPacket(InstaMsg *c, unsigned char *buf, int length)
             goto exit;
         }
     }
-    mqttConnectFlag = 0;
+    sendPacketIrrespective = 0;
 
-    if((c->ipstack).write(&(c->ipstack), buf, length) == FAILURE)
+    if(s->write(s, buf, length) == FAILURE)
     {
-        (c->ipstack).socketCorrupted = 1;
+        s->socketCorrupted = 1;
         rc = FAILURE;
     }
 
@@ -659,7 +659,7 @@ static int deliverMessageToSelf(InstaMsg* c, MQTTString* topicName, MQTTMessage*
 
         if (len > 0)
         {
-            rc = sendPacket(c, GLOBAL_BUFFER, len);
+            rc = sendPacket(c, &(c->ipstack), GLOBAL_BUFFER, len);
         }
     }
 
@@ -1264,7 +1264,7 @@ void sendPingReqToServer(InstaMsg *c)
 
     if (len > 0)
     {
-        sendPacket(c, GLOBAL_BUFFER, len);
+        sendPacket(c, &(c->ipstack), GLOBAL_BUFFER, len);
     }
 }
 
@@ -1341,6 +1341,100 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
 }
 
 
+static unsigned char ntpPacket[48];
+static DateParams dateParams;
+static unsigned char ntpTimeSyncedOnce;
+
+static void syncTimeIfApplicable(InstaMsg *c)
+{
+    int rc = FAILURE;
+    int i = 0;
+
+    unsigned long seconds1970 = 0x83aa7e80;   /* number of seconds from 1900 to 1970 */
+    unsigned long seconds1900;                /* number of seconds from 1900         */
+
+    if(ntpTimeSyncedOnce == 1)
+    {
+        return;
+    }
+
+    (c->timeSyncerSocket).socketCorrupted = 1;
+
+	init_socket(&(c->timeSyncerSocket), NTP_SERVER, NTP_PORT, SOCKET_UDP);
+    if((c->timeSyncerSocket).socketCorrupted ==1)
+    {
+        goto failure_in_time_syncing;
+    }
+
+    /*
+     * Construct the sender-packet.
+     */
+    memset(ntpPacket, 0, sizeof(ntpPacket));
+    ntpPacket[0] = 0x0b;
+
+    /*
+     * Send the packet.
+     */
+    sendPacketIrrespective = 1;
+    rc = sendPacket(c, &(c->timeSyncerSocket), ntpPacket, sizeof(ntpPacket));
+    if(rc != SUCCESS)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to send NTP-Packet"), CLOCK_ERROR);
+        error_log(LOG_GLOBAL_BUFFER);
+
+        goto failure_in_time_syncing;
+    }
+
+    /*
+     * Wait for response.
+     */
+    watchdog_reset_and_enable(60 * MAX_TRIES_ALLOWED_WHILE_READING_FROM_SOCKET_MEDIUM * SOCKET_READ_TIMEOUT_SECS,
+                              PROSTR("reading-ntp-packet-from-ntp-server"), 1);
+
+    memset(messageBuffer, 0, sizeof(messageBuffer));
+    rc = socket_read(&(c->timeSyncerSocket), (unsigned char*) messageBuffer, 48, 1);
+    if(rc != SUCCESS)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to read NTP-Packet"), CLOCK_ERROR);
+        error_log(LOG_GLOBAL_BUFFER);
+
+        goto failure_in_time_syncing;
+    }
+
+    watchdog_disable(NULL, NULL);
+
+    seconds1900 = (messageBuffer[40] * 16777216) + (messageBuffer[41] * 65536) + (messageBuffer[42] * 256) + messageBuffer[43];
+    extract_date_params(seconds1900 - seconds1970, &dateParams);
+
+    rc = sync_system_clock(&dateParams);
+    if(rc != SUCCESS)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed in last step to sync time with system-clock"), CLOCK_ERROR);
+        error_log(LOG_GLOBAL_BUFFER);
+
+        goto failure_in_time_syncing;
+    }
+
+    /*
+     * We do not close the socket, as some devices reboot on restarting the socket.
+     * Anyway, we would be good, as long as devices support at least 2 open sockets at a time.
+     */
+
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sTime-Synced Successfully !!!!"), CLOCK);
+    info_log(LOG_GLOBAL_BUFFER);
+
+    ntpTimeSyncedOnce = 1;
+    return;
+
+
+failure_in_time_syncing:
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to sync-time ... no point proceeding further"), CLOCK_ERROR);
+        error_log(LOG_GLOBAL_BUFFER);
+
+        rebootDevice();
+}
+
+
 void initInstaMsg(InstaMsg* c,
                   int (*connectHandler)(),
                   int (*disconnectHandler)(),
@@ -1363,9 +1457,10 @@ void initInstaMsg(InstaMsg* c,
 #endif
 
     check_for_upgrade();
+    syncTimeIfApplicable(c);
 
     (c->ipstack).socketCorrupted = 1;
-	init_socket(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT);
+	init_socket(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT, SOCKET_TCP);
     if((c->ipstack).socketCorrupted ==1)
     {
         handleConnOrProvAckGeneric(c, 0, SIMULATED);
@@ -1596,7 +1691,7 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
 
         if(notifyServerOfSecretReceived == 1)
         {
-            mqttConnectFlag = 1;
+            sendPacketIrrespective = 1;
             publish(NOTIFICATION_TOPIC,
                     "SECRET RECEIVED",
                     QOS0,
@@ -1863,7 +1958,7 @@ publish_exit:
                 }
 
                 attachResultHandler(c, msgId, MQTT_RESULT_HANDLER_TIMEOUT, publishQoS2CycleCompleted);
-                sendPacket(c, GLOBAL_BUFFER, len); /* send the PUBREL packet */
+                sendPacket(c, &(c->ipstack), GLOBAL_BUFFER, len); /* send the PUBREL packet */
 
                 break;
             }
@@ -1954,8 +2049,8 @@ void* MQTTConnect(void* arg)
         goto exit;
     }
 
-    mqttConnectFlag = 1;
-    sendPacket(c, GLOBAL_BUFFER, len);
+    sendPacketIrrespective = 1;
+    sendPacket(c, &(c->ipstack), GLOBAL_BUFFER, len);
 
 exit:
     if(secret)
@@ -2059,7 +2154,7 @@ int subscribe(const char* topicName,
          }
     }
 
-    if ((rc = sendPacket(c, GLOBAL_BUFFER, len)) != SUCCESS) /* send the subscribe packet */
+    if ((rc = sendPacket(c, &(c->ipstack), GLOBAL_BUFFER, len)) != SUCCESS) /* send the subscribe packet */
         goto exit;             /* there was a problem */
 
 exit:
@@ -2095,7 +2190,7 @@ int MQTTUnsubscribe(const char* topicFilter)
 
     if ((len = MQTTSerialize_unsubscribe(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), 0, getNextPacketId(c), 1, &topic)) <= 0)
         goto exit;
-    if ((rc = sendPacket(c, GLOBAL_BUFFER, len)) != SUCCESS) /* send the subscribe packet */
+    if ((rc = sendPacket(c, &(c->ipstack), GLOBAL_BUFFER, len)) != SUCCESS) /* send the subscribe packet */
         goto exit; /* there was a problem */
 
 exit:
@@ -2198,7 +2293,7 @@ int publish(const char* topicName,
     len = MQTTSerialize_publish(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), 0, qos, 0, id, topic, (unsigned char*)payload, strlen((char*)payload));
     if (len <= 0)
         goto exit;
-    if ((rc = sendPacket(c, GLOBAL_BUFFER, len)) != SUCCESS) /* send the subscribe packet */
+    if ((rc = sendPacket(c, &(c->ipstack), GLOBAL_BUFFER, len)) != SUCCESS) /* send the subscribe packet */
     {
         goto exit; /* there was a problem */
     }
@@ -2313,7 +2408,7 @@ int MQTTDisconnect(InstaMsg* c)
     len = MQTTSerialize_disconnect(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
 
     if (len > 0)
-        rc = sendPacket(c, GLOBAL_BUFFER, len);            /* send the disconnect packet */
+        rc = sendPacket(c, &(c->ipstack), GLOBAL_BUFFER, len);            /* send the disconnect packet */
 
     if(c->onDisconnectCallback != NULL)
     {
@@ -2341,7 +2436,7 @@ void start(int (*onConnectOneTimeOperations)(),
     nextBusinessLogicTick = latestTick + editableBusinessLogicInterval;
 
 
-    mqttConnectFlag = 0;
+    sendPacketIrrespective = 0;
     pingRequestInterval = 0;
     notifyServerOfSecretReceived = 0;
 

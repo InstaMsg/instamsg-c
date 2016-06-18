@@ -5,7 +5,12 @@
  *
  *******************************************************************************/
 
+#include "../driver/include/socket.h"
+#include "../driver/include/time.h"
+
 #include <time.h>
+
+
 
 /*
  * This method does the global-level-initialization for time (if any).
@@ -39,4 +44,16 @@ void minimumDelay()
 unsigned long getCurrentTick()
 {
     return time(NULL);
+}
+
+
+/*
+ * Syncs the system-clock.
+ *
+ * Returns SUCCESS on successful-syncing.
+ * Else returns FAILURE.
+ */
+int sync_system_clock(DateParams *dateParams)
+{
+    return SUCCESS;
 }

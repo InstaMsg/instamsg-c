@@ -82,7 +82,7 @@ void store_sms_in_config(char *sms, char *smsConfigBuffer, int smsConfigBufferLe
 }
 #endif
 
-void init_socket(Socket *socket, const char *hostName, unsigned int port)
+void init_socket(Socket *socket, const char *hostName, unsigned int port, const char *type)
 {
     /* Register read-callback. */
 	socket->read = socket_read;
@@ -94,6 +94,7 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port)
     memset(socket->host, 0, sizeof(socket->host));
     sg_sprintf(socket->host, "%s", hostName);
     socket->port = port;
+    socket->type = (char*) type;
 
 #if GSM_INTERFACE_ENABLED == 1
     /* Empty-initialize the GSM-params. */

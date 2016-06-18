@@ -1,7 +1,7 @@
 #ifndef INSTAMSG_GLOBALS
 #define INSTAMSG_GLOBALS
 
-#define INSTAMSG_VERSION "2.8.9"
+#define INSTAMSG_VERSION "2.9.0"
 
 #include "device_defines.h"
 
@@ -87,6 +87,9 @@ struct KeyValuePairs
 
 #endif
 
+
+#define NTP_SERVER          PROSTR("pool.ntp.org")
+#define NTP_PORT            123
 
 #define SOCKET_READ_TIMEOUT_SECS 1
 #define MAX_TRIES_ALLOWED_WHILE_READING_FROM_SOCKET_MEDIUM 1
