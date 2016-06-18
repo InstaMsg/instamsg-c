@@ -1348,7 +1348,6 @@ static unsigned char ntpTimeSyncedOnce;
 static void syncTimeIfApplicable(InstaMsg *c)
 {
     int rc = FAILURE;
-    int i = 0;
 
     unsigned long seconds1970 = 0x83aa7e80;   /* number of seconds from 1900 to 1970 */
     unsigned long seconds1900;                /* number of seconds from 1900         */
@@ -1361,7 +1360,7 @@ static void syncTimeIfApplicable(InstaMsg *c)
     (c->timeSyncerSocket).socketCorrupted = 1;
 
 	init_socket(&(c->timeSyncerSocket), NTP_SERVER, NTP_PORT, SOCKET_UDP);
-    if((c->timeSyncerSocket).socketCorrupted ==1)
+    if((c->timeSyncerSocket).socketCorrupted == 1)
     {
         goto failure_in_time_syncing;
     }
