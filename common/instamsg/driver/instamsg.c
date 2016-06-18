@@ -1437,7 +1437,28 @@ static void syncTimeIfApplicable(InstaMsg *c)
 
     watchdog_disable(NULL, NULL);
 
-    seconds1900 = (messageBuffer[40] * 16777216) + (messageBuffer[41] * 65536) + (messageBuffer[42] * 256) + messageBuffer[43];
+    {
+        int i = 0;
+        seconds1900 = 0;
+
+        for(i = 0; i < (unsigned char)(messageBuffer[40]); i++)
+        {
+            seconds1900 = seconds1900 + 16777216;
+        }
+
+        for(i = 0; i < (unsigned char)(messageBuffer[41]); i++)
+        {
+            seconds1900 = seconds1900 + 65536;
+        }
+
+        for(i = 0; i < (unsigned char)(messageBuffer[42]); i++)
+        {
+            seconds1900 = seconds1900 + 256;
+        }
+
+        seconds1900 = seconds1900 + (unsigned char)(messageBuffer[43]);
+    }
+
     extract_date_params(seconds1900 - seconds1970, &dateParams);
 
     rc = sync_system_clock(&dateParams);

@@ -93,7 +93,7 @@ void extract_date_params(unsigned long t, DateParams *tm)
 
 	tm->tm_year = years;
 	tm->tm_mon = months + 3;
-	if(tm->tm_mon >= 12)
+	if(tm->tm_mon > 12)
     {
 		tm->tm_mon -=12;
 		tm->tm_year++;
