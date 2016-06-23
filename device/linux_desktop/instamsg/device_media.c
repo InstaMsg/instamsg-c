@@ -63,10 +63,9 @@ static void *startPipeline(void *arg)
  *
  * The variable "mediaStreamingErrorOccurred" is present in "globals.h" (already included in this module by default).
  */
+static pthread_t tid;
 void create_and_start_streaming_pipeline(const char *mediaServerIpAddress, const char *mediaServerPort)
 {
-    pthread_t tid;
-
     memset(mediaIp, 0, sizeof(mediaIp));
     strcpy(mediaIp, mediaServerIpAddress);
 
