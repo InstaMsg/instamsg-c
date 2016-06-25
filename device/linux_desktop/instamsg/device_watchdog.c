@@ -41,6 +41,8 @@ static void* watchdog_func(void *arg)
 }
 
 
+static pthread_t tid;
+
 /*
  * This method initializes the watchdog-timer.
  */
@@ -49,7 +51,6 @@ void watchdog_init()
     watchdog = 0;
 
     {
-        pthread_t tid;
         pthread_create(&tid, NULL, watchdog_func, NULL);
     }
 }
