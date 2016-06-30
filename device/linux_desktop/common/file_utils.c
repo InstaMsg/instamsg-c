@@ -31,7 +31,7 @@ void sg_readLine(FILE_STRUCT *fp, char *buffer, int maxBufferLength)
      */
     while(1)
     {
-        int lastIndex = strlen(buffer - 1);
+        int lastIndex = strlen(buffer) - 1;
         if(buffer[lastIndex] == '\r')
         {
             buffer[lastIndex] = 0;
