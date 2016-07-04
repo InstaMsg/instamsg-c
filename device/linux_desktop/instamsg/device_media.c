@@ -3,6 +3,7 @@
 
 #include "../../../common/instamsg/driver/include/globals.h"
 #include "../../../common/instamsg/driver/include/media.h"
+#include "../../../common/instamsg/driver/include/misc.h"
 
 #if MEDIA_STREAMING_ENABLED == 1
 #include <string.h>
@@ -40,6 +41,13 @@ static void *startPipeline(void *arg)
      * If code reaches here, it means the media-loop had some error occurred.
      */
     mediaStreamingErrorOccurred = 1;
+    rebootDevice();
+
+#if 0
+
+    /*
+     * OBSOLETE.
+     */
 
     /*
      * Free resources
@@ -50,6 +58,8 @@ static void *startPipeline(void *arg)
     gst_object_unref (bus);
     gst_element_set_state (pipeline, GST_STATE_NULL);
     gst_object_unref (pipeline);
+
+#endif
 }
 
 
