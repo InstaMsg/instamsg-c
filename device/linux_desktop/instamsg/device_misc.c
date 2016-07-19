@@ -77,12 +77,12 @@ void get_manufacturer(char *messagebuffer, int maxbufferlength)
 #include <net/if.h>
 #include <unistd.h>
 
-const char *IFACE = "wlan0";
+const char *IFACE = "eth0";
 
 void get_device_uuid(char *buffer, int maxbufferlength)
 {
     /*
-     * We assume that """EVERY""" Linux-Desktop device-type has an interface called "wlan0",
+     * We assume that """EVERY""" Linux-Desktop device-type has an interface called "eth0",
      * with a unique MAC-address.
      *
      * We use that, in combination with LINUX-DESKTOP:WLAN0:MAC as the prefix.
