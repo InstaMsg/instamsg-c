@@ -6,6 +6,7 @@ then
 
     rm -f /home/sensegrow/instamsg.log
     cd /home/sensegrow
+    sleep 3
 	./instamsg &
 else
 	echo "Binary running fine"
