@@ -106,7 +106,7 @@ void extract_date_params(unsigned long t, DateParams *tm)
 	tm->tm_min = remsecs / 60 % 60;
 	tm->tm_sec = remsecs % 60;
 
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sExtracted Date in GMT [YYYY-MM-DD, hh:mm:ss] = [%u-%u-%u, %u:%u:%u]"), CLOCK,
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sExtracted Date in GMT [YY-MM-DD, hh:mm:ss] = [%u-%u-%u, %u:%u:%u]"), CLOCK,
                                   tm->tm_year, tm->tm_mon, tm->tm_mday,
                                   tm->tm_hour, tm->tm_min, tm->tm_sec);
     info_log(LOG_GLOBAL_BUFFER);

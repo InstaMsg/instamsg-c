@@ -8,7 +8,7 @@
 typedef struct DateParams DateParams;
 struct DateParams
 {
-    int tm_year;        /* year    in YYYY              */
+    int tm_year;        /* year    in YY                */
 	int tm_mon;         /* month   in MM    (01-12)     */
 	int tm_mday;        /* day     in DD    (01-31)     */
 	int tm_wday;

@@ -47,7 +47,7 @@ unsigned long getCurrentTick()
  *
  * In particular, following fields need to be filled
  *
- *      dateParams->tm_year  // year    in YYYY
+ *      dateParams->tm_year  // year    in YY
  *      dateParams->tm_mon;  // month   in MM    (01-12)
  *      dateParams->tm_mday; // day     in DD    (01-31)
  *      dateParams->tm_hour; // hour    in hh    (00-23)
