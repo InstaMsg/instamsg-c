@@ -8,14 +8,14 @@
 typedef struct DateParams DateParams;
 struct DateParams
 {
-    int tm_year;
-	int tm_mon;
-	int tm_mday;
+    int tm_year;        // year    in YYYY
+	int tm_mon;         // month   in MM    (01-12)
+	int tm_mday;        // day     in DD    (01-31)
 	int tm_wday;
 	int tm_yday;
-	int tm_hour;
-	int tm_min;
-	int tm_sec;
+	int tm_hour;        // hour    in hh    (00-23)
+	int tm_min;         // minute  in mm    (00-59)
+	int tm_sec;         // second  in ss    (00-59)
 };
 
 /*
