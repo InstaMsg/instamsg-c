@@ -43,6 +43,28 @@ unsigned long getCurrentTick()
 
 
 /*
+ * Fills in the time-coordinates from GPS.
+ *
+ * In particular, following fields need to be filled
+ *
+ *      dateParams->tm_year  // year    in YYYY
+ *      dateParams->tm_mon;  // month   in MM    (01-12)
+ *      dateParams->tm_mday; // day     in DD    (01-31)
+ *      dateParams->tm_hour; // hour    in hh    (00-23)
+ *      dateParams->tm_min;  // minute  in mm    (00-59)
+ *      dateParams->tm_sec;  // second  in ss    (00-59)
+ *
+ *
+ * Returns SUCCESS on successful fetching of all time-coordinates.
+ * Else returns FAILURE.
+ */
+int fill_in_time_coordinates_from_gps(DateParams *dateParams)
+{
+    return SUCCESS;
+}
+
+
+/*
  * Syncs the system-clock.
  *
  * Returns SUCCESS on successful-syncing.

@@ -68,8 +68,9 @@ enum MESSAGE_SOURCE
 enum MESSAGE_SOURCE msgSource;
 unsigned char rebootPending;
 
-#define SECRET      PROSTR("SECRET")
-#define NTP_SERVER  PROSTR("NTP_SERVER")
+#define SECRET                      PROSTR("SECRET")
+#define GPS_TIME_SYNC_ENABLED       PROSTR("GPS_TIME_SYNC_ENABLED")
+#define NTP_SERVER                  PROSTR("NTP_SERVER")
 
 #if MEDIA_STREAMING_ENABLED == 1
 #include "./include/media.h"
@@ -89,7 +90,9 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
 
 static unsigned char ntpPacket[48];
 static DateParams dateParams;
+static unsigned char gpsTimeSyncedOnce;
 static unsigned char ntpTimeSyncedOnce;
+static char gpsTimeSyncEnabled[5];
 static char ntpServer[100];
 
 #define DATA_LOG_TOPIC      PROSTR("topic")
@@ -1347,8 +1350,73 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
 }
 
 
+static void syncTimeThroughGPSIfApplicable(InstaMsg *c)
+{
+    int rc = FAILURE;
 
-static void syncTimeIfApplicable(InstaMsg *c)
+    if(gpsTimeSyncedOnce == 1)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sGPS-Time already synced.. not re-syncing"), CLOCK);
+        info_log(LOG_GLOBAL_BUFFER);
+
+        return;
+    }
+
+    RESET_GLOBAL_BUFFER;
+
+    rc = get_config_value_from_persistent_storage(GPS_TIME_SYNC_ENABLED, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
+    if(rc == SUCCESS)
+    {
+        memset(gpsTimeSyncEnabled, 0, sizeof(gpsTimeSyncEnabled));
+        getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, gpsTimeSyncEnabled);
+    }
+
+    if(strcmp(gpsTimeSyncEnabled, "1") == 0)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sGPS-Time-Sync is ENABLED."), CLOCK);
+        info_log(LOG_GLOBAL_BUFFER);
+    }
+    else
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sGPS-Time-Sync is DISABLED."), CLOCK);
+        info_log(LOG_GLOBAL_BUFFER);
+
+        return;
+    }
+
+
+    rc = fill_in_time_coordinates_from_gps(&dateParams);
+    if(rc != SUCCESS)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sTime-coordinates could not be fetched from GPS"), CLOCK_ERROR);
+        error_log(LOG_GLOBAL_BUFFER);
+
+        goto failure_in_time_syncing_via_gps;
+    }
+
+    rc = sync_system_clock(&dateParams);
+    if(rc != SUCCESS)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed in last step to sync time with system-clock"), CLOCK_ERROR);
+        error_log(LOG_GLOBAL_BUFFER);
+
+        goto failure_in_time_syncing_via_gps;
+    }
+
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sTime-Synced Successfully through GPS !!!!"), CLOCK);
+    info_log(LOG_GLOBAL_BUFFER);
+
+    gpsTimeSyncedOnce = 1;
+    return;
+
+
+failure_in_time_syncing_via_gps:
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to sync-time through GPS."), CLOCK_ERROR);
+        error_log(LOG_GLOBAL_BUFFER);
+}
+
+
+static void syncTimeThroughNTPIfApplicable(InstaMsg *c)
 {
     int rc = FAILURE;
     unsigned char ntpEnabled = 0;
@@ -1356,6 +1424,13 @@ static void syncTimeIfApplicable(InstaMsg *c)
     unsigned long seconds1970 = 0x83aa7e80;   /* number of seconds from 1900 to 1970 */
     unsigned long seconds1900;                /* number of seconds from 1900         */
 
+    if(gpsTimeSyncedOnce == 1)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sTime has already been synced via GPS, no need for NTP-Time-Syncing :)"), CLOCK);
+        info_log(LOG_GLOBAL_BUFFER);
+
+        return;
+    }
 
     if(ntpTimeSyncedOnce == 1)
     {
@@ -1381,12 +1456,12 @@ static void syncTimeIfApplicable(InstaMsg *c)
 
     if(ntpEnabled == 1)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sNTP-Time-Sync in ENABLED."), CLOCK);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sNTP-Time-Sync is ENABLED."), CLOCK);
         info_log(LOG_GLOBAL_BUFFER);
     }
     else
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sNTP-Time-Sync in DISABLED."), CLOCK);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sNTP-Time-Sync is DISABLED."), CLOCK);
         info_log(LOG_GLOBAL_BUFFER);
 
         return;
@@ -1475,7 +1550,7 @@ static void syncTimeIfApplicable(InstaMsg *c)
      * Anyway, we would be good, as long as devices support at least 2 open sockets at a time.
      */
 
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sTime-Synced Successfully !!!!"), CLOCK);
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sTime-Synced Successfully through NTP !!!!"), CLOCK);
     info_log(LOG_GLOBAL_BUFFER);
 
     ntpTimeSyncedOnce = 1;
@@ -1483,7 +1558,7 @@ static void syncTimeIfApplicable(InstaMsg *c)
 
 
 failure_in_time_syncing:
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to sync-time ... no point proceeding further"), CLOCK_ERROR);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to sync-time through NTP ... no point proceeding further"), CLOCK_ERROR);
         error_log(LOG_GLOBAL_BUFFER);
 
         rebootDevice();
@@ -1512,7 +1587,9 @@ void initInstaMsg(InstaMsg* c,
 #endif
 
     check_for_upgrade();
-    syncTimeIfApplicable(c);
+
+    syncTimeThroughGPSIfApplicable(c);
+    syncTimeThroughNTPIfApplicable(c);
 
     (c->ipstack).socketCorrupted = 1;
 	init_socket(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT, SOCKET_TCP);
@@ -1722,9 +1799,16 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
                                PROSTR(""));
 
         /*
-         * Although we took the decision to enable/disable NTP earlier in the flow, yet we do the following,
-         * do make the NTP-Server a configurable-parameter from the server.
+         * Although we took the decision to enable/disable GPS and NTP earlier in the flow, yet we do the following,
+         * to make the GPS-Time-Sync and NTP-Server configurable-parameters from the server.
          */
+        memset(gpsTimeSyncEnabled, 0, sizeof(gpsTimeSyncEnabled));
+        registerEditableConfig(gpsTimeSyncEnabled,
+                               GPS_TIME_SYNC_ENABLED,
+                               CONFIG_STRING,
+                               PROSTR("0"),
+                               PROSTR(""));
+
         memset(ntpServer, 0, sizeof(ntpServer));
         registerEditableConfig(ntpServer,
                                NTP_SERVER,
