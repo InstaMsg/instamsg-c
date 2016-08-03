@@ -1433,7 +1433,7 @@ static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
             }
             else
             {
-                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GPS-Iteration-%u]Time-Synced Successfully through GPS."), CLOCK, i);
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GPS-Iteration-%u] Time-Synced Successfully through GPS."), CLOCK, i);
                 info_log(LOG_GLOBAL_BUFFER);
 
                 timeSyncedViaExternalResources = 1;
@@ -1448,10 +1448,10 @@ try_syncing_with_gsm:
             timestampFromGSM = get_GSM_timestamp();
             if(timestampFromGSM == 0)
             {
-                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GSM-Iteration-%u]Timestamp not available from GSM."), CLOCK_ERROR, i);
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GSM-Iteration-%u] Timestamp not available from GSM."), CLOCK_ERROR, i);
                 error_log(LOG_GLOBAL_BUFFER);
 
-                continue;
+                goto failure_while_syncing_through_gsm;
             }
 
             extract_date_params(timestampFromGSM, &dateParams);
@@ -1464,16 +1464,19 @@ try_syncing_with_gsm:
                            CLOCK_ERROR, i);
                 error_log(LOG_GLOBAL_BUFFER);
 
-                continue;
+                goto failure_while_syncing_through_gsm;
             }
             else
             {
-                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GSM-Iteration-%u]Time-Synced Successfully through GSM."), CLOCK, i);
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GSM-Iteration-%u] Time-Synced Successfully through GSM."), CLOCK, i);
                 info_log(LOG_GLOBAL_BUFFER);
 
                 timeSyncedViaExternalResources = 1;
                 break;
             }
+
+failure_while_syncing_through_gsm:
+            startAndCountdownTimer(remainingSeconds, 0);
 #endif
         }
     }
