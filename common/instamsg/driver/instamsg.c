@@ -1442,8 +1442,6 @@ static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
 #endif
 
 try_syncing_with_gsm:
-            startAndCountdownTimer(remainingSeconds, 0);
-
 #if GSM_TIME_SYNC_PRESENT ==1
             timestampFromGSM = get_GSM_timestamp();
             if(timestampFromGSM == 0)
