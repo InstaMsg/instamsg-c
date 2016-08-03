@@ -10,7 +10,56 @@
 
 void trim_buffer_to_contain_only_first_GPRMC_sentence(unsigned char *buffer, int bufferLength)
 {
-    memset(buffer, 0, bufferLength);
+    unsigned char *original = buffer;
+    int i = 0;
+    char *ptrBegin = NULL, *ptrEnd = NULL;
+
+    /*
+     * Discard any 0-bytes in the beginning (as that is seen in live-devices).
+     */
+    while(1)
+    {
+        if(i < bufferLength)
+        {
+            if((*buffer) != 0)
+            {
+                break;
+            }
+        }
+        buffer++;
+        i++;
+    }
+
+    /*
+     * Now, search for "$GPRMC"
+     */
+    ptrBegin = sg_strnstr((char*)buffer, "$GPRMC", strlen((char*)buffer) - 1);
+    if(ptrBegin != NULL)
+    {
+        /*
+         * Now, search for closing *
+         */
+        ptrEnd = sg_strnstr(ptrBegin, "*", strlen(ptrBegin) - 1);
+        if(ptrEnd != NULL)
+        {
+            int j = 0;
+            while(1)
+            {
+                original[j] = *ptrBegin;
+
+                if(ptrBegin == ptrEnd)
+                {
+                    original[j + 1] = 0;
+                    break;
+                }
+                else
+                {
+                    ptrBegin++;
+                    j++;
+                }
+            }
+        }
+    }
 
     sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sGPRMC-sentence extracted from NMEA-Blob = [%s]"), GPS, (char*)buffer);
     info_log(LOG_GLOBAL_BUFFER);
