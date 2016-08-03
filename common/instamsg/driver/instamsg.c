@@ -1616,9 +1616,9 @@ failure_in_time_syncing:
 
 static void check_if_ntp_and_gps_time_sync_features_are_enabled()
 {
-#if NTP_TIME_SYNC_PRESENT == 1
     int rc = FAILURE;
 
+#if NTP_TIME_SYNC_PRESENT == 1
     RESET_GLOBAL_BUFFER;
 
     rc = get_config_value_from_persistent_storage(NTP_SERVER, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
