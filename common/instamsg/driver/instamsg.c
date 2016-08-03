@@ -1354,7 +1354,7 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
 }
 
 
-static void syncTimeThroughGPSIfApplicable(InstaMsg *c)
+static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
 {
     int rc = FAILURE;
     int maxIterations = 0;
@@ -1382,11 +1382,12 @@ static void syncTimeThroughGPSIfApplicable(InstaMsg *c)
     }
 
 
-    maxIterations = (sg_stoi(maxSecondsWaitForGpsTimeSync) / maxTimeForOneIteration);
+    maxIterations = (sg_atoi(maxSecondsWaitForGpsTimeSync) / maxTimeForOneIteration);
     {
         int i = 0;
         for(i = 0; i < maxIterations, timeSyncedViaExternalResources != 1; i++)
         {
+#if GPS_TIME_SYNC_PRESENT == 1
             /*
              * As of now, it seems that the whole universe uses NMEA as the de-facto standard for GPS.
              * So, till we see something new, we assume that NMEA-sentences are our source of inspiration.
@@ -1394,7 +1395,7 @@ static void syncTimeThroughGPSIfApplicable(InstaMsg *c)
             RESET_GLOBAL_BUFFER;
             fill_in_gps_nmea_blob_until_buffer_fills_or_time_expires(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), maxTimeForOneIteration);
 
-            trim_buffer_to_contain_only_first_GPRMC_sentence(GLOBAL_BUFFER);
+            trim_buffer_to_contain_only_first_GPRMC_sentence(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
             rc = fill_in_time_coordinates_from_GPRMC_sentence(GLOBAL_BUFFER, &dateParams);
 
             if(rc != SUCCESS)
@@ -1423,8 +1424,10 @@ static void syncTimeThroughGPSIfApplicable(InstaMsg *c)
                 timeSyncedViaExternalResources = 1;
                 break;
             }
+#endif
 
 try_syncing_with_gsm:
+            startAndCountdownTimer(1, 0);
         }
     }
 
@@ -1439,7 +1442,7 @@ try_syncing_with_gsm:
 }
 
 
-static void syncTimeThroughNTPIfApplicable(InstaMsg *c)
+static void sync_time_through_NTP(InstaMsg *c)
 {
     int rc = FAILURE;
 
@@ -1555,7 +1558,8 @@ failure_in_time_syncing:
 
         if(gpsTimeSyncFeatureEnabled == 0)
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sSince GPS-Time-Syncing is absent/disabled, so no point proceeding further."), CLOCK_ERROR);
+            sg_sprintf(LOG_GLOBAL_BUFFER,
+                       PROSTR("%sSince GPS/GSM-Time-Syncing is absent/disabled, so no point proceeding further ..."), CLOCK_ERROR);
             error_log(LOG_GLOBAL_BUFFER);
 
             rebootDevice();
@@ -1565,9 +1569,6 @@ failure_in_time_syncing:
 
 static void check_if_ntp_and_gps_time_sync_features_are_enabled()
 {
-#ifndef NTP_TIME_SYNC_PRESENT
-#error "NTP_TIME_SYNC_PRESENT compile-time-parameter undefined"
-#endif
 #if NTP_TIME_SYNC_PRESENT == 1
     int rc = FAILURE;
 
@@ -1587,9 +1588,6 @@ static void check_if_ntp_and_gps_time_sync_features_are_enabled()
 #endif
 
 
-#ifndef GPS_TIME_SYNC_PRESENT
-#error "GPS_TIME_SYNC_PRESENT compile-time-parameter undefined"
-#endif
 #if GPS_TIME_SYNC_PRESENT == 1
     RESET_GLOBAL_BUFFER;
 
@@ -1630,13 +1628,24 @@ void initInstaMsg(InstaMsg* c,
 #endif
 
     check_for_upgrade();
+
+#ifndef NTP_TIME_SYNC_PRESENT
+#error "NTP_TIME_SYNC_PRESENT compile-time-parameter undefined"
+#endif
+#ifndef GPS_TIME_SYNC_PRESENT
+#error "GPS_TIME_SYNC_PRESENT compile-time-parameter undefined"
+#endif
+#ifndef GSM_TIME_SYNC_PRESENT
+#error "GSM_TIME_SYNC_PRESENT compile-time-parameter undefined"
+#endif
+
     check_if_ntp_and_gps_time_sync_features_are_enabled();
 
 #if NTP_TIME_SYNC_PRESENT == 1
-    syncTimeThroughNTPIfApplicable(c);
+    sync_time_through_NTP(c);
 #endif
 #if GPS_TIME_SYNC_PRESENT == 1
-    syncTimeThroughGPSIfApplicable(c);
+    sync_time_through_GPS_or_GSM_interleaved(c);
 #endif
 
     (c->ipstack).socketCorrupted = 1;

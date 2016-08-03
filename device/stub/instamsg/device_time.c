@@ -42,8 +42,9 @@ unsigned long getCurrentTick()
 }
 
 
+#if GPS_TIME_SYNC_PRESENT == 1
 /*
- * Fills in the time-coordinates from GPS.
+ * Fills in the time-coordinates from GPRMC-sentence, as per http://aprs.gids.nl/nmea/#rmc
  *
  * In particular, following fields need to be filled
  *
@@ -58,10 +59,11 @@ unsigned long getCurrentTick()
  * Returns SUCCESS on successful fetching of all time-coordinates.
  * Else returns FAILURE.
  */
-int fill_in_time_coordinates_from_gps(DateParams *dateParams)
+int fill_in_time_coordinates_from_GPRMC_sentence(char *buffer, DateParams *dateParams)
 {
     return SUCCESS;
 }
+#endif
 
 
 /*

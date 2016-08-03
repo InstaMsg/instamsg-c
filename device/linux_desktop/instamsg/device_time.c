@@ -47,8 +47,17 @@ unsigned long getCurrentTick()
 }
 
 
+int fill_in_time_coordinates_from_gps(DateParams *dateParams)
+{
+    sg_sprintf(LOG_GLOBAL_BUFFER,
+              "%sTime-Syncing at grass-root-level not required for this device, so returning pseudo-success for GPS-Time-Sync", CLOCK);
+    info_log(LOG_GLOBAL_BUFFER);
+
+    return SUCCESS;
+}
+#if GPS_TIME_SYNC_PRESENT == 1
 /*
- * Fills in the time-coordinates from GPS.
+ * Fills in the time-coordinates from GPRMC-sentence, as per http://aprs.gids.nl/nmea/#rmc
  *
  * In particular, following fields need to be filled
  *
@@ -63,14 +72,11 @@ unsigned long getCurrentTick()
  * Returns SUCCESS on successful fetching of all time-coordinates.
  * Else returns FAILURE.
  */
-int fill_in_time_coordinates_from_gps(DateParams *dateParams)
+int fill_in_time_coordinates_from_GPRMC_sentence(char *buffer, DateParams *dateParams)
 {
-    sg_sprintf(LOG_GLOBAL_BUFFER,
-              "%sTime-Syncing at grass-root-level not required for this device, so returning pseudo-success for GPS-Time-Sync", CLOCK);
-    info_log(LOG_GLOBAL_BUFFER);
-
     return SUCCESS;
 }
+#endif
 
 
 /*
