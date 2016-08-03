@@ -1402,8 +1402,17 @@ static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
             remainingSeconds = maxTimeForOneIteration - (getCurrentTick() - currentTick);
 
             trim_buffer_to_contain_only_first_GPRMC_sentence(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
-            rc = fill_in_time_coordinates_from_GPRMC_sentence(GLOBAL_BUFFER, &dateParams);
+            if(strlen(GLOBAL_BUFFER) == 0)
+            {
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GPS-Iteration-%u] GPRMC-sentence could not be fetched from NMEA-blob."),
+                           CLOCK_ERROR, i);
+                error_log(LOG_GLOBAL_BUFFER);
 
+                goto try_syncing_with_gsm;
+            }
+
+
+            rc = fill_in_time_coordinates_from_GPRMC_sentence(GLOBAL_BUFFER, &dateParams);
             if(rc != SUCCESS)
             {
                 sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GPS-Iteration-%u] Time-coordinates could not be fetched from GPS."), CLOCK_ERROR, i);

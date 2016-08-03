@@ -76,7 +76,7 @@ int fill_in_time_coordinates_from_gps(DateParams *dateParams)
  */
 int fill_in_time_coordinates_from_GPRMC_sentence(char *buffer, DateParams *dateParams)
 {
-    return SUCCESS;
+    return FAILURE;
 }
 #endif
 
