@@ -1387,7 +1387,7 @@ static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
     maxIterations = (sg_atoi(maxSecondsWaitForGpsTimeSync) / maxTimeForOneIteration);
     {
         int i = 0;
-        for(i = 0; i < maxIterations, timeSyncedViaExternalResources != 1; i++)
+        for(i = 0; i < maxIterations; i++)
         {
             unsigned long currentTick = getCurrentTick();
             int remainingSeconds = maxTimeForOneIteration;
