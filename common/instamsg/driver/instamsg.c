@@ -1404,8 +1404,8 @@ static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
             trim_buffer_to_contain_only_first_GPRMC_sentence(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
             if(strlen((char*)GLOBAL_BUFFER) == 0)
             {
-                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GPS-Iteration-%u] GPRMC-sentence could not be fetched from NMEA-blob."),
-                           CLOCK_ERROR, i);
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GPS-Iteration-%u/%u] GPRMC-sentence could not be fetched from NMEA-blob."),
+                           CLOCK_ERROR, i + 1, maxIterations);
                 error_log(LOG_GLOBAL_BUFFER);
 
                 goto try_syncing_with_gsm;
@@ -1415,7 +1415,8 @@ static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
             rc = fill_in_time_coordinates_from_GPRMC_sentence(GLOBAL_BUFFER, &dateParams);
             if(rc != SUCCESS)
             {
-                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GPS-Iteration-%u] Time-coordinates could not be fetched from GPS."), CLOCK_ERROR, i);
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GPS-Iteration-%u/%u] Time-coordinates could not be fetched from GPS."),
+                           CLOCK_ERROR, i + 1, maxIterations);
                 error_log(LOG_GLOBAL_BUFFER);
 
                 goto try_syncing_with_gsm;
@@ -1425,15 +1426,16 @@ static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
             if(rc != SUCCESS)
             {
                 sg_sprintf(LOG_GLOBAL_BUFFER,
-                           PROSTR("%s[GPS-Iteration-%u] Time-coordinates fetched from GPS, but failed to sync time with system-clock."),
-                           CLOCK_ERROR, i);
+                           PROSTR("%s[GPS-Iteration-%u/%u] Time-coordinates fetched from GPS, but failed to sync time with system-clock."),
+                           CLOCK_ERROR, i + 1, maxIterations);
                 error_log(LOG_GLOBAL_BUFFER);
 
                 goto try_syncing_with_gsm;
             }
             else
             {
-                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GPS-Iteration-%u] Time-Synced Successfully through GPS."), CLOCK, i);
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GPS-Iteration-%u/%u] Time-Synced Successfully through GPS."),
+                           CLOCK, i + 1, maxIterations);
                 info_log(LOG_GLOBAL_BUFFER);
 
                 timeSyncedViaExternalResources = 1;
@@ -1446,7 +1448,8 @@ try_syncing_with_gsm:
             timestampFromGSM = get_GSM_timestamp();
             if(timestampFromGSM == 0)
             {
-                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GSM-Iteration-%u] Timestamp not available from GSM."), CLOCK_ERROR, i);
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GSM-Iteration-%u/%u] Timestamp not available from GSM."),
+                           CLOCK_ERROR, i + 1, maxIterations);
                 error_log(LOG_GLOBAL_BUFFER);
 
                 goto failure_while_syncing_through_gsm;
@@ -1458,15 +1461,16 @@ try_syncing_with_gsm:
             if(rc != SUCCESS)
             {
                 sg_sprintf(LOG_GLOBAL_BUFFER,
-                           PROSTR("%s[GSM-Iteration-%u] Timestamp fetched from GSM, but failed to sync time with system-clock."),
-                           CLOCK_ERROR, i);
+                           PROSTR("%s[GSM-Iteration-%u/%u] Timestamp fetched from GSM, but failed to sync time with system-clock."),
+                           CLOCK_ERROR, i + 1, maxIterations);
                 error_log(LOG_GLOBAL_BUFFER);
 
                 goto failure_while_syncing_through_gsm;
             }
             else
             {
-                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GSM-Iteration-%u] Time-Synced Successfully through GSM."), CLOCK, i);
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GSM-Iteration-%u/%u] Time-Synced Successfully through GSM."),
+                           CLOCK, i + 1, maxIterations);
                 info_log(LOG_GLOBAL_BUFFER);
 
                 timeSyncedViaExternalResources = 1;
