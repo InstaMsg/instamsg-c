@@ -93,7 +93,7 @@ static unsigned char ntpPacket[48];
 static DateParams dateParams;
 
 static unsigned char ntpTimeSyncFeatureEnabled;
-static unsigned char gpsTimeSyncFeatureEnabled;
+static unsigned char gpsGsmTimeSyncFeatureEnabled;
 
 static volatile unsigned char timeSyncedViaExternalResources;
 
@@ -1371,7 +1371,7 @@ static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
         return;
     }
 
-    if(gpsTimeSyncFeatureEnabled == 1)
+    if(gpsGsmTimeSyncFeatureEnabled == 1)
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sGPS/GSM-Time-Sync is ENABLED."), CLOCK);
         info_log(LOG_GLOBAL_BUFFER);
@@ -1609,7 +1609,7 @@ failure_in_time_syncing:
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to sync-time through NTP."), CLOCK_ERROR);
         error_log(LOG_GLOBAL_BUFFER);
 
-        if(gpsTimeSyncFeatureEnabled == 0)
+        if(gpsGsmTimeSyncFeatureEnabled == 0)
         {
             sg_sprintf(LOG_GLOBAL_BUFFER,
                        PROSTR("%sSince GPS/GSM-Time-Syncing is absent/disabled, so no point proceeding further ..."), CLOCK_ERROR);
@@ -1652,7 +1652,7 @@ static void check_if_ntp_and_gps_time_sync_features_are_enabled()
 
         if(sg_atoi(maxSecondsWaitForGpsGsmTimeSync) > 0)
         {
-            gpsTimeSyncFeatureEnabled = 1;
+            gpsGsmTimeSyncFeatureEnabled = 1;
         }
     }
 #endif
