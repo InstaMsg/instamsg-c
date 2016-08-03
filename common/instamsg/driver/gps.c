@@ -118,7 +118,7 @@ int fill_in_time_coordinates_from_GPRMC_sentence(char *buffer, int bufferLength,
             goto failure;
         }
 
-        get_nth_token(original, ",", 1, &t);
+        get_nth_token(original, ',', 1, &t);
         if(strcmp(t, "$GPRMC") != 0)
         {
             sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFirst token is not $GPRMC in GPRMC-sentence [%s]."), GPS_ERROR, original);
@@ -127,7 +127,7 @@ int fill_in_time_coordinates_from_GPRMC_sentence(char *buffer, int bufferLength,
             goto failure;
         }
 
-        get_nth_token(original, ",", 3, &t);
+        get_nth_token(original, ',', 3, &t);
         if(strcmp(t, "A") != 0)
         {
             sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sThird token [%s] indicates GPRMC-sentence [%s] is invalid."), GPS_ERROR, t, original);
@@ -136,7 +136,7 @@ int fill_in_time_coordinates_from_GPRMC_sentence(char *buffer, int bufferLength,
             goto failure;
         }
 
-        get_nth_token(original, ",", 2, &t);
+        get_nth_token(original, ',', 2, &t);
         number = sg_atoi(t);
         if( (strlen(t) != 6) || (number < 1) )
         {
@@ -155,7 +155,7 @@ int fill_in_time_coordinates_from_GPRMC_sentence(char *buffer, int bufferLength,
 
             dateParams->tm_hour = number;
 
-            get_nth_token(original, ",", 10, &t);
+            get_nth_token(original, ',', 10, &t);
             number = sg_atoi(t);
             if( (strlen(t) != 6) || (number < 1) )
             {

@@ -76,21 +76,62 @@ char* sg_strnstr(char *str1, char *str2, int maxSize)
 
 
 static char temp[100];
-void get_nth_token(char *original, char *separator, int pos, char **res)
+void get_nth_token(char *original, char separator, int pos, char **res)
 {
-    int i;
+    int buffer_index = 0, num_separators_encountered = 0, token_start_pos = 0, tmp_index = 0;
+    int token_end_pos = -1;
 
     memset(temp, 0, sizeof(temp));
-    memcpy(temp, original, strlen(original));
 
-    *res = strtok(temp, separator);
-    if(*res == NULL)
+    while(1)
     {
-        return;
+    	if(buffer_index == strlen(original))
+    	{
+    		break;
+    	}
+
+    	if(original[buffer_index] == separator)
+    	{
+    		num_separators_encountered++;
+
+    		if(num_separators_encountered == pos)
+    		{
+    			token_end_pos = buffer_index;
+    			break;
+    		}
+    		else
+    		{
+    			token_start_pos = buffer_index + 1;
+    		}
+    	}
+
+    	buffer_index++;
     }
 
-    for(i = 1; i < pos; i++)
+
+    if(token_end_pos == -1)
     {
-        *res = strtok(NULL, separator);
+    	if(num_separators_encountered == 0)
+    	{
+    		/*
+    		 * If no separator found, this means that the whole original-string is the token.
+    		 */
+    		token_end_pos = strlen(original);
+    	}
+    	else
+    	{
+    		*res = NULL;
+    		return;
+    	}
     }
+
+    buffer_index = 0;
+    for(tmp_index = token_start_pos; tmp_index < token_end_pos; tmp_index++)
+    {
+    	temp[buffer_index] = original[tmp_index];
+    	buffer_index++;
+    }
+
+    temp[tmp_index] = 0;
+    *res = temp;
 }
