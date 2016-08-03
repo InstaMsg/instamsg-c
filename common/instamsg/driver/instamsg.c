@@ -99,6 +99,8 @@ static volatile unsigned char timeSyncedViaExternalResources;
 static char maxSecondsWaitForGpsTimeSync[10];
 static char ntpServer[100];
 
+static volatile unsigned long timestampFromGSM;
+
 #define DATA_LOG_TOPIC      PROSTR("topic")
 #define DATA_LOG_PAYLOAD    PROSTR("payload")
 
@@ -1370,12 +1372,12 @@ static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
 
     if(gpsTimeSyncFeatureEnabled == 1)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sGPS-Time-Sync is ENABLED."), CLOCK);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sGPS/GSM-Time-Sync is ENABLED."), CLOCK);
         info_log(LOG_GLOBAL_BUFFER);
     }
     else
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sGPS-Time-Sync is DISABLED."), CLOCK);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sGPS/GSM-Time-Sync is DISABLED."), CLOCK);
         info_log(LOG_GLOBAL_BUFFER);
 
         return;
@@ -1387,6 +1389,9 @@ static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
         int i = 0;
         for(i = 0; i < maxIterations, timeSyncedViaExternalResources != 1; i++)
         {
+            unsigned long currentTick = getCurrentTick();
+            int remainingSeconds = maxTimeForOneIteration;
+
 #if GPS_TIME_SYNC_PRESENT == 1
             /*
              * As of now, it seems that the whole universe uses NMEA as the de-facto standard for GPS.
@@ -1394,6 +1399,7 @@ static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
              */
             RESET_GLOBAL_BUFFER;
             fill_in_gps_nmea_blob_until_buffer_fills_or_time_expires(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), maxTimeForOneIteration);
+            remainingSeconds = maxTimeForOneIteration - (getCurrentTick() - currentTick);
 
             trim_buffer_to_contain_only_first_GPRMC_sentence(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
             rc = fill_in_time_coordinates_from_GPRMC_sentence(GLOBAL_BUFFER, &dateParams);
@@ -1427,7 +1433,39 @@ static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
 #endif
 
 try_syncing_with_gsm:
-            startAndCountdownTimer(1, 0);
+            startAndCountdownTimer(remainingSeconds, 0);
+
+#if GSM_TIME_SYNC_PRESENT ==1
+            timestampFromGSM = get_GSM_timestamp();
+            if(timestampFromGSM == 0)
+            {
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GSM-Iteration-%u]Timestamp not available from GSM."), CLOCK_ERROR, i);
+                error_log(LOG_GLOBAL_BUFFER);
+
+                continue;
+            }
+
+            extract_date_params(timestampFromGSM, &dateParams);
+
+            rc = sync_system_clock(&dateParams);
+            if(rc != SUCCESS)
+            {
+                sg_sprintf(LOG_GLOBAL_BUFFER,
+                           PROSTR("%s[GSM-Iteration-%u] Timestamp fetched from GSM, but failed to sync time with system-clock."),
+                           CLOCK_ERROR, i);
+                error_log(LOG_GLOBAL_BUFFER);
+
+                continue;
+            }
+            else
+            {
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GSM-Iteration-%u]Time-Synced Successfully through GSM."), CLOCK, i);
+                info_log(LOG_GLOBAL_BUFFER);
+
+                timeSyncedViaExternalResources = 1;
+                break;
+            }
+#endif
         }
     }
 

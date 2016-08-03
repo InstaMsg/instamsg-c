@@ -55,6 +55,8 @@ int fill_in_time_coordinates_from_gps(DateParams *dateParams)
 
     return SUCCESS;
 }
+
+
 #if GPS_TIME_SYNC_PRESENT == 1
 /*
  * Fills in the time-coordinates from GPRMC-sentence, as per http://aprs.gids.nl/nmea/#rmc
@@ -79,6 +81,18 @@ int fill_in_time_coordinates_from_GPRMC_sentence(char *buffer, DateParams *dateP
 #endif
 
 
+#if GSM_TIME_SYNC_PRESENT == 1
+/*
+ * Returns the current-timestamp, the original of which was returned via GSM. *
+ * Returns 0 in case no informaton is received from GSM (yet).
+ */
+unsigned long get_GSM_timestamp()
+{
+    return 0;
+}
+#endif
+
+
 /*
  * Syncs the system-clock.
  *
@@ -87,8 +101,5 @@ int fill_in_time_coordinates_from_GPRMC_sentence(char *buffer, DateParams *dateP
  */
 int sync_system_clock(DateParams *dateParams)
 {
-    sg_sprintf(LOG_GLOBAL_BUFFER, "%sTime-Syncing at grass-root-level not required for this device", CLOCK);
-    info_log(LOG_GLOBAL_BUFFER);
-
     return SUCCESS;
 }
