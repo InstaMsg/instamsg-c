@@ -69,7 +69,7 @@ enum MESSAGE_SOURCE msgSource;
 unsigned char rebootPending;
 
 #define SECRET                      PROSTR("SECRET")
-#define GPS_TIME_SYNC_ENABLED       PROSTR("GPS_TIME_SYNC_ENABLED")
+#define GPS_TIME_SYNC_ENABLED       PROSTR("MAX_SECONDS_FOR_GPS_TIME_SYNC")
 #define NTP_SERVER                  PROSTR("NTP_SERVER")
 
 #if MEDIA_STREAMING_ENABLED == 1
@@ -90,9 +90,13 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
 
 static unsigned char ntpPacket[48];
 static DateParams dateParams;
-static unsigned char gpsTimeSyncedOnce;
-static unsigned char ntpTimeSyncedOnce;
-static char gpsTimeSyncEnabled[5];
+
+static unsigned char ntpTimeSyncFeatureEnabled;
+static unsigned char gpsTimeSyncFeatureEnabled;
+
+static unsigned char timeSyncedViaExternalResources;
+
+static char maxSecondsWaitForGpsTimeSync[10];
 static char ntpServer[100];
 
 #define DATA_LOG_TOPIC      PROSTR("topic")
@@ -1354,24 +1358,15 @@ static void syncTimeThroughGPSIfApplicable(InstaMsg *c)
 {
     int rc = FAILURE;
 
-    if(gpsTimeSyncedOnce == 1)
+    if(timeSyncedViaExternalResources == 1)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sGPS-Time already synced.. not re-syncing"), CLOCK);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sTime has already been synced via NTP.. not re-syncing."), CLOCK);
         info_log(LOG_GLOBAL_BUFFER);
 
         return;
     }
 
-    RESET_GLOBAL_BUFFER;
-
-    rc = get_config_value_from_persistent_storage(GPS_TIME_SYNC_ENABLED, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
-    if(rc == SUCCESS)
-    {
-        memset(gpsTimeSyncEnabled, 0, sizeof(gpsTimeSyncEnabled));
-        getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, gpsTimeSyncEnabled);
-    }
-
-    if(strcmp(gpsTimeSyncEnabled, "1") == 0)
+    if(gpsTimeSyncFeatureEnabled == 1)
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sGPS-Time-Sync is ENABLED."), CLOCK);
         info_log(LOG_GLOBAL_BUFFER);
@@ -1388,7 +1383,7 @@ static void syncTimeThroughGPSIfApplicable(InstaMsg *c)
     rc = fill_in_time_coordinates_from_gps(&dateParams);
     if(rc != SUCCESS)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sTime-coordinates could not be fetched from GPS"), CLOCK_ERROR);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sTime-coordinates could not be fetched from GPS."), CLOCK_ERROR);
         error_log(LOG_GLOBAL_BUFFER);
 
         goto failure_in_time_syncing_via_gps;
@@ -1397,64 +1392,35 @@ static void syncTimeThroughGPSIfApplicable(InstaMsg *c)
     rc = sync_system_clock(&dateParams);
     if(rc != SUCCESS)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed in last step to sync time with system-clock"), CLOCK_ERROR);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed in last step to sync time with system-clock."), CLOCK_ERROR);
         error_log(LOG_GLOBAL_BUFFER);
 
         goto failure_in_time_syncing_via_gps;
     }
 
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sTime-Synced Successfully through GPS !!!!"), CLOCK);
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sTime-Synced Successfully through GPS."), CLOCK);
     info_log(LOG_GLOBAL_BUFFER);
 
-    gpsTimeSyncedOnce = 1;
+    timeSyncedViaExternalResources = 1;
     return;
 
 
 failure_in_time_syncing_via_gps:
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to sync-time through GPS."), CLOCK_ERROR);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to sync-time through GPS and GSM."), CLOCK_ERROR);
         error_log(LOG_GLOBAL_BUFFER);
+
+        rebootDevice();
 }
 
 
 static void syncTimeThroughNTPIfApplicable(InstaMsg *c)
 {
     int rc = FAILURE;
-    unsigned char ntpEnabled = 0;
 
     unsigned long seconds1970 = 0x83aa7e80;   /* number of seconds from 1900 to 1970 */
     unsigned long seconds1900;                /* number of seconds from 1900         */
 
-    if(gpsTimeSyncedOnce == 1)
-    {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sTime has already been synced via GPS, no need for NTP-Time-Syncing :)"), CLOCK);
-        info_log(LOG_GLOBAL_BUFFER);
-
-        return;
-    }
-
-    if(ntpTimeSyncedOnce == 1)
-    {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sNTP-Time already synced.. not re-syncing"), CLOCK);
-        info_log(LOG_GLOBAL_BUFFER);
-
-        return;
-    }
-
-    RESET_GLOBAL_BUFFER;
-
-    rc = get_config_value_from_persistent_storage(NTP_SERVER, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
-    if(rc == SUCCESS)
-    {
-        memset(ntpServer, 0, sizeof(ntpServer));
-        getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, ntpServer);
-
-        if(strlen(ntpServer) > 0)
-        {
-            ntpEnabled = 1;
-        }
-    }
-
-    if(ntpEnabled == 1)
+    if(ntpTimeSyncFeatureEnabled == 1)
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sNTP-Time-Sync is ENABLED."), CLOCK);
         info_log(LOG_GLOBAL_BUFFER);
@@ -1488,7 +1454,7 @@ static void syncTimeThroughNTPIfApplicable(InstaMsg *c)
     rc = sendPacket(c, &(c->timeSyncerSocket), ntpPacket, sizeof(ntpPacket));
     if(rc != SUCCESS)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to send NTP-Packet"), CLOCK_ERROR);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to send NTP-Packet."), CLOCK_ERROR);
         error_log(LOG_GLOBAL_BUFFER);
 
         goto failure_in_time_syncing;
@@ -1504,7 +1470,7 @@ static void syncTimeThroughNTPIfApplicable(InstaMsg *c)
     rc = socket_read(&(c->timeSyncerSocket), (unsigned char*) messageBuffer, 48, 1);
     if(rc != SUCCESS)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to read NTP-Packet"), CLOCK_ERROR);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to read NTP-Packet."), CLOCK_ERROR);
         error_log(LOG_GLOBAL_BUFFER);
 
         goto failure_in_time_syncing;
@@ -1539,7 +1505,7 @@ static void syncTimeThroughNTPIfApplicable(InstaMsg *c)
     rc = sync_system_clock(&dateParams);
     if(rc != SUCCESS)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed in last step to sync time with system-clock"), CLOCK_ERROR);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed in last step to sync time with system-clock."), CLOCK_ERROR);
         error_log(LOG_GLOBAL_BUFFER);
 
         goto failure_in_time_syncing;
@@ -1550,18 +1516,69 @@ static void syncTimeThroughNTPIfApplicable(InstaMsg *c)
      * Anyway, we would be good, as long as devices support at least 2 open sockets at a time.
      */
 
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sTime-Synced Successfully through NTP !!!!"), CLOCK);
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sTime-Synced Successfully through NTP."), CLOCK);
     info_log(LOG_GLOBAL_BUFFER);
 
-    ntpTimeSyncedOnce = 1;
+    timeSyncedViaExternalResources = 1;
     return;
 
 
 failure_in_time_syncing:
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to sync-time through NTP ... no point proceeding further"), CLOCK_ERROR);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to sync-time through NTP."), CLOCK_ERROR);
         error_log(LOG_GLOBAL_BUFFER);
 
-        rebootDevice();
+        if(gpsTimeSyncFeatureEnabled == 0)
+        {
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sSince GPS-Time-Syncing is absent/disabled, so no point proceeding further."), CLOCK_ERROR);
+            error_log(LOG_GLOBAL_BUFFER);
+
+            rebootDevice();
+        }
+}
+
+
+static void check_if_ntp_and_gps_time_sync_features_are_enabled()
+{
+#ifndef NTP_TIME_SYNC_PRESENT
+#error "NTP_TIME_SYNC_PRESENT compile-time-parameter undefined"
+#endif
+#if NTP_TIME_SYNC_PRESENT == 1
+    int rc = FAILURE;
+
+    RESET_GLOBAL_BUFFER;
+
+    rc = get_config_value_from_persistent_storage(NTP_SERVER, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
+    if(rc == SUCCESS)
+    {
+        memset(ntpServer, 0, sizeof(ntpServer));
+        getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, ntpServer);
+
+        if(strlen(ntpServer) > 0)
+        {
+            ntpTimeSyncFeatureEnabled = 1;
+        }
+    }
+#endif
+
+
+#ifndef GPS_TIME_SYNC_PRESENT
+#error "GPS_TIME_SYNC_PRESENT compile-time-parameter undefined"
+#endif
+#if GPS_TIME_SYNC_PRESENT == 1
+    RESET_GLOBAL_BUFFER;
+
+    rc = get_config_value_from_persistent_storage(GPS_TIME_SYNC_ENABLED, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
+    if(rc == SUCCESS)
+    {
+        memset(maxSecondsWaitForGpsTimeSync, 0, sizeof(maxSecondsWaitForGpsTimeSync));
+        getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, maxSecondsWaitForGpsTimeSync);
+
+        if(sg_atoi(maxSecondsWaitForGpsTimeSync) > 0)
+        {
+            gpsTimeSyncFeatureEnabled = 1;
+        }
+    }
+#endif
 }
 
 
@@ -1587,9 +1604,14 @@ void initInstaMsg(InstaMsg* c,
 #endif
 
     check_for_upgrade();
+    check_if_ntp_and_gps_time_sync_features_are_enabled();
 
-    syncTimeThroughGPSIfApplicable(c);
+#if NTP_TIME_SYNC_PRESENT == 1
     syncTimeThroughNTPIfApplicable(c);
+#endif
+#if GPS_TIME_SYNC_PRESENT == 1
+    syncTimeThroughGPSIfApplicable(c);
+#endif
 
     (c->ipstack).socketCorrupted = 1;
 	init_socket(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT, SOCKET_TCP);
@@ -1802,8 +1824,8 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
          * Although we took the decision to enable/disable GPS and NTP earlier in the flow, yet we do the following,
          * to make the GPS-Time-Sync and NTP-Server configurable-parameters from the server.
          */
-        memset(gpsTimeSyncEnabled, 0, sizeof(gpsTimeSyncEnabled));
-        registerEditableConfig(gpsTimeSyncEnabled,
+        memset(maxSecondsWaitForGpsTimeSync, 0, sizeof(maxSecondsWaitForGpsTimeSync));
+        registerEditableConfig(maxSecondsWaitForGpsTimeSync,
                                GPS_TIME_SYNC_ENABLED,
                                CONFIG_STRING,
                                PROSTR("0"),

@@ -45,6 +45,9 @@
 #define GSM_INTERFACE_ENABLED       0
 #define SSL_ENABLED                 0
 
+#define NTP_TIME_SYNC_PRESENT       0
+#define GPS_TIME_SYNC_PRESENT       0
+
 #define ACQUIRE_THREAD_MUTEX
 #define RELEASE_THREAD_MUTEX
 
