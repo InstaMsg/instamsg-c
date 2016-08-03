@@ -1,11 +1,15 @@
 #include <string.h>
 
+#include "device_defines.h"
+
+#include "./include/globals.h"
 #include "./include/gps.h"
 
 void trim_buffer_to_contain_only_first_GPRMC_sentence(unsigned char *buffer, int bufferLength)
 {
     memset(buffer, 0, bufferLength);
 }
+
 
 #if GPS_TIME_SYNC_PRESENT == 1
 /*

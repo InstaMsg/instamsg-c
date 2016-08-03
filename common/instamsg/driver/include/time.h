@@ -30,5 +30,3 @@ void extract_date_params(unsigned long t, DateParams *tm);
 int sync_system_clock(DateParams *dateParams);
 
 #endif
-
-
