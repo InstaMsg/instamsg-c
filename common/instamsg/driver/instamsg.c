@@ -1412,7 +1412,7 @@ static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
             }
 
 
-            rc = fill_in_time_coordinates_from_GPRMC_sentence(GLOBAL_BUFFER, &dateParams);
+            rc = fill_in_time_coordinates_from_GPRMC_sentence(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), &dateParams);
             if(rc != SUCCESS)
             {
                 sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GPS-Iteration-%u/%u] Time-coordinates could not be fetched from GPS."),
