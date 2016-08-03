@@ -13,6 +13,7 @@ void trim_buffer_to_contain_only_first_GPRMC_sentence(unsigned char *buffer, int
     unsigned char *original = buffer;
     int i = 0;
     char *ptrBegin = NULL, *ptrEnd = NULL;
+    int j = 0;
 
     /*
      * Discard any 0-bytes in the beginning (as that is seen in live-devices).
@@ -48,24 +49,24 @@ void trim_buffer_to_contain_only_first_GPRMC_sentence(unsigned char *buffer, int
         ptrEnd = sg_strnstr(ptrBegin, "*", strlen(ptrBegin) - 1);
         if(ptrEnd != NULL)
         {
-            int j = 0;
             while(1)
             {
                 original[j] = *ptrBegin;
+                j++;
 
                 if(ptrBegin == ptrEnd)
                 {
-                    original[j + 1] = 0;
                     break;
                 }
                 else
                 {
                     ptrBegin++;
-                    j++;
                 }
             }
         }
     }
+
+    original[j] = 0;
 
     sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sGPRMC-sentence extracted from NMEA-Blob = [%s]"), GPS, (char*)buffer);
     info_log(LOG_GLOBAL_BUFFER);
