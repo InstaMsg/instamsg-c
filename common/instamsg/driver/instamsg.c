@@ -69,7 +69,7 @@ enum MESSAGE_SOURCE msgSource;
 unsigned char rebootPending;
 
 #define SECRET                      PROSTR("SECRET")
-#define GPS_TIME_SYNC_ENABLED       PROSTR("MAX_SECONDS_FOR_GPS_TIME_SYNC")
+#define GPS_TIME_SYNC_ENABLED       PROSTR("MAX_SECONDS_FOR_GPS_AND_GSM_TIME_SYNC")
 #define NTP_SERVER                  PROSTR("NTP_SERVER")
 
 #if MEDIA_STREAMING_ENABLED == 1
@@ -94,7 +94,7 @@ static DateParams dateParams;
 static unsigned char ntpTimeSyncFeatureEnabled;
 static unsigned char gpsTimeSyncFeatureEnabled;
 
-static unsigned char timeSyncedViaExternalResources;
+static volatile unsigned char timeSyncedViaExternalResources;
 
 static char maxSecondsWaitForGpsTimeSync[10];
 static char ntpServer[100];
@@ -1357,6 +1357,8 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
 static void syncTimeThroughGPSIfApplicable(InstaMsg *c)
 {
     int rc = FAILURE;
+    int maxIterations = 0;
+    int maxTimeForOneIteration = 20;
 
     if(timeSyncedViaExternalResources == 1)
     {
@@ -1380,36 +1382,60 @@ static void syncTimeThroughGPSIfApplicable(InstaMsg *c)
     }
 
 
-    rc = fill_in_time_coordinates_from_gps(&dateParams);
-    if(rc != SUCCESS)
+    maxIterations = (sg_stoi(maxSecondsWaitForGpsTimeSync) / maxTimeForOneIteration);
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sTime-coordinates could not be fetched from GPS."), CLOCK_ERROR);
-        error_log(LOG_GLOBAL_BUFFER);
+        int i = 0;
+        for(i = 0; i < maxIterations, timeSyncedViaExternalResources != 1; i++)
+        {
+            /*
+             * As of now, it seems that the whole universe uses NMEA as the de-facto standard for GPS.
+             * So, till we see something new, we assume that NMEA-sentences are our source of inspiration.
+             */
+            RESET_GLOBAL_BUFFER;
+            fill_in_gps_nmea_blob_until_buffer_fills_or_time_expires(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), maxTimeForOneIteration);
 
-        goto failure_in_time_syncing_via_gps;
+            trim_buffer_to_contain_only_first_GPRMC_sentence(GLOBAL_BUFFER);
+            rc = fill_in_time_coordinates_from_GPRMC_sentence(GLOBAL_BUFFER, &dateParams);
+
+            if(rc != SUCCESS)
+            {
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GPS-Iteration-%u] Time-coordinates could not be fetched from GPS."), CLOCK_ERROR, i);
+                error_log(LOG_GLOBAL_BUFFER);
+
+                goto try_syncing_with_gsm;
+            }
+
+            rc = sync_system_clock(&dateParams);
+            if(rc != SUCCESS)
+            {
+                sg_sprintf(LOG_GLOBAL_BUFFER,
+                           PROSTR("%s[GPS-Iteration-%u] Time-coordinates fetched from GPS, but failed to sync time with system-clock."),
+                           CLOCK_ERROR, i);
+                error_log(LOG_GLOBAL_BUFFER);
+
+                goto try_syncing_with_gsm;
+            }
+            else
+            {
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GPS-Iteration-%u]Time-Synced Successfully through GPS."), CLOCK, i);
+                info_log(LOG_GLOBAL_BUFFER);
+
+                timeSyncedViaExternalResources = 1;
+                break;
+            }
+
+try_syncing_with_gsm:
+        }
     }
 
-    rc = sync_system_clock(&dateParams);
-    if(rc != SUCCESS)
+
+    if(timeSyncedViaExternalResources == 0)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed in last step to sync time with system-clock."), CLOCK_ERROR);
-        error_log(LOG_GLOBAL_BUFFER);
-
-        goto failure_in_time_syncing_via_gps;
-    }
-
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sTime-Synced Successfully through GPS."), CLOCK);
-    info_log(LOG_GLOBAL_BUFFER);
-
-    timeSyncedViaExternalResources = 1;
-    return;
-
-
-failure_in_time_syncing_via_gps:
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to sync-time through GPS and GSM."), CLOCK_ERROR);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to sync-time through NTP/GPS/GSM, no point proceeding further ..."), CLOCK_ERROR);
         error_log(LOG_GLOBAL_BUFFER);
 
         rebootDevice();
+    }
 }
 
 
