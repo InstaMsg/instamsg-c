@@ -4,6 +4,8 @@
 
 #include "./include/globals.h"
 #include "./include/gps.h"
+#include "./include/log.h"
+#include "./include/sg_stdlib.h"
 
 
 void trim_buffer_to_contain_only_first_GPRMC_sentence(unsigned char *buffer, int bufferLength)

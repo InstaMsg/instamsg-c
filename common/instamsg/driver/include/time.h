@@ -26,6 +26,10 @@ unsigned long getMinimumDelayPossibleInMicroSeconds();
 void minimumDelay();
 unsigned long getCurrentTick();
 
+#if GSM_TIME_SYNC_PRESENT == 1
+unsigned long get_GSM_timestamp();
+#endif
+
 void extract_date_params(unsigned long t, DateParams *tm, const char *mode);
 int sync_system_clock(DateParams *dateParams);
 void print_date_info(DateParams *tm, const char *mode);
