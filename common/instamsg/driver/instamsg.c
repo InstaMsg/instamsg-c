@@ -69,9 +69,9 @@ enum MESSAGE_SOURCE
 enum MESSAGE_SOURCE msgSource;
 unsigned char rebootPending;
 
-#define SECRET                      PROSTR("SECRET")
-#define GPS_TIME_SYNC_ENABLED       PROSTR("MAX_SECONDS_FOR_GPS_AND_GSM_TIME_SYNC")
-#define NTP_SERVER                  PROSTR("NTP_SERVER")
+#define SECRET                                      PROSTR("SECRET")
+#define MAX_SECONDS_FOR_GPS_GSM_TIME_SYNC           PROSTR("MAX_SECONDS_FOR_GPS_GSM_TIME_SYNC")
+#define NTP_SERVER                                  PROSTR("NTP_SERVER")
 
 #if MEDIA_STREAMING_ENABLED == 1
 #include "./include/media.h"
@@ -97,7 +97,7 @@ static unsigned char gpsTimeSyncFeatureEnabled;
 
 static volatile unsigned char timeSyncedViaExternalResources;
 
-static char maxSecondsWaitForGpsTimeSync[10];
+static char maxSecondsWaitForGpsGsmTimeSync[10];
 static char ntpServer[100];
 
 static volatile unsigned long timestampFromGSM;
@@ -1385,7 +1385,7 @@ static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
     }
 
 
-    maxIterations = (sg_atoi(maxSecondsWaitForGpsTimeSync) / maxTimeForOneIteration);
+    maxIterations = (sg_atoi(maxSecondsWaitForGpsGsmTimeSync) / maxTimeForOneIteration);
     {
         int i = 0;
         for(i = 0; i < maxIterations; i++)
@@ -1644,13 +1644,13 @@ static void check_if_ntp_and_gps_time_sync_features_are_enabled()
 #if GPS_TIME_SYNC_PRESENT == 1
     RESET_GLOBAL_BUFFER;
 
-    rc = get_config_value_from_persistent_storage(GPS_TIME_SYNC_ENABLED, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
+    rc = get_config_value_from_persistent_storage(MAX_SECONDS_FOR_GPS_GSM_TIME_SYNC, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
     if(rc == SUCCESS)
     {
-        memset(maxSecondsWaitForGpsTimeSync, 0, sizeof(maxSecondsWaitForGpsTimeSync));
-        getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, maxSecondsWaitForGpsTimeSync);
+        memset(maxSecondsWaitForGpsGsmTimeSync, 0, sizeof(maxSecondsWaitForGpsGsmTimeSync));
+        getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, maxSecondsWaitForGpsGsmTimeSync);
 
-        if(sg_atoi(maxSecondsWaitForGpsTimeSync) > 0)
+        if(sg_atoi(maxSecondsWaitForGpsGsmTimeSync) > 0)
         {
             gpsTimeSyncFeatureEnabled = 1;
         }
@@ -1912,19 +1912,23 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
          * Although we took the decision to enable/disable GPS and NTP earlier in the flow, yet we do the following,
          * to make the GPS-Time-Sync and NTP-Server configurable-parameters from the server.
          */
-        memset(maxSecondsWaitForGpsTimeSync, 0, sizeof(maxSecondsWaitForGpsTimeSync));
-        registerEditableConfig(maxSecondsWaitForGpsTimeSync,
-                               GPS_TIME_SYNC_ENABLED,
+#if (GPS_TIME_SYNC_PRESENT == 1) || (GSM_TIME_SYNC_PRESENT == 1)
+        memset(maxSecondsWaitForGpsGsmTimeSync, 0, sizeof(maxSecondsWaitForGpsGsmTimeSync));
+        registerEditableConfig(maxSecondsWaitForGpsGsmTimeSync,
+                               MAX_SECONDS_FOR_GPS_GSM_TIME_SYNC,
                                CONFIG_STRING,
                                PROSTR("0"),
                                PROSTR(""));
+#endif
 
+#if NTP_TIME_SYNC_PRESENT == 1
         memset(ntpServer, 0, sizeof(ntpServer));
         registerEditableConfig(ntpServer,
                                NTP_SERVER,
                                CONFIG_STRING,
                                PROSTR(""),
                                PROSTR(""));
+#endif
 
 #if MEDIA_STREAMING_ENABLED == 1
         registerEditableConfig(&mediaStreamingEnabledRuntime,
