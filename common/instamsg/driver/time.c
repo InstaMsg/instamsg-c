@@ -9,6 +9,15 @@
 #define DAYS_PER_100Y ((365 * 100) + 24)
 #define DAYS_PER_4Y   ((365 * 4  ) + 1)
 
+void print_date_info(DateParams *tm, const char *mode)
+{
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFrom [%s], Extracted Date in GMT [YY-MM-DD, hh:mm:ss] = [%u-%u-%u, %u:%u:%u]"), CLOCK, mode,
+                                  tm->tm_year, tm->tm_mon, tm->tm_mday,
+                                  tm->tm_hour, tm->tm_min, tm->tm_sec);
+    info_log(LOG_GLOBAL_BUFFER);
+}
+
+
 void extract_date_params(unsigned long t, DateParams *tm, const char *mode)
 {
 	unsigned long days, secs;
@@ -106,8 +115,5 @@ void extract_date_params(unsigned long t, DateParams *tm, const char *mode)
 	tm->tm_min = remsecs / 60 % 60;
 	tm->tm_sec = remsecs % 60;
 
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFrom [%s], Extracted Date in GMT [YY-MM-DD, hh:mm:ss] = [%u-%u-%u, %u:%u:%u]"), CLOCK, mode,
-                                  tm->tm_year, tm->tm_mon, tm->tm_mday,
-                                  tm->tm_hour, tm->tm_min, tm->tm_sec);
-    info_log(LOG_GLOBAL_BUFFER);
+    print_date_info(tm, mode);
 }
