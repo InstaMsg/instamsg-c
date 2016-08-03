@@ -28,7 +28,7 @@ void trim_buffer_to_contain_only_first_GPRMC_sentence(unsigned char *buffer, int
  * Returns SUCCESS on successful fetching of all time-coordinates.
  * Else returns FAILURE.
  */
-int fill_in_time_coordinates_from_GPRMC_sentence(char *buffer, DateParams *dateParams)
+int fill_in_time_coordinates_from_GPRMC_sentence(char *buffer, int bufferLength, DateParams *dateParams)
 {
     return FAILURE;
 }

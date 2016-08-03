@@ -26,7 +26,7 @@ unsigned long getMinimumDelayPossibleInMicroSeconds();
 void minimumDelay();
 unsigned long getCurrentTick();
 
-void extract_date_params(unsigned long t, DateParams *tm);
+void extract_date_params(unsigned long t, DateParams *tm, const char *mode);
 int sync_system_clock(DateParams *dateParams);
 
 #endif

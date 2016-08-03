@@ -1455,7 +1455,7 @@ try_syncing_with_gsm:
                 goto failure_while_syncing_through_gsm;
             }
 
-            extract_date_params(timestampFromGSM, &dateParams);
+            extract_date_params(timestampFromGSM, &dateParams, "GSM");
 
             rc = sync_system_clock(&dateParams);
             if(rc != SUCCESS)
@@ -1581,7 +1581,7 @@ static void sync_time_through_NTP(InstaMsg *c)
         seconds1900 = seconds1900 + (unsigned char)(messageBuffer[43]);
     }
 
-    extract_date_params(seconds1900 - seconds1970, &dateParams);
+    extract_date_params(seconds1900 - seconds1970, &dateParams, "NTP");
 
     rc = sync_system_clock(&dateParams);
     if(rc != SUCCESS)
