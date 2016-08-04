@@ -8,7 +8,7 @@
 #include "./include/sg_stdlib.h"
 
 
-void trim_buffer_to_contain_only_first_GPRMC_sentence(unsigned char *buffer, int bufferLength)
+void trim_buffer_to_contain_only_first_required_sentence_type(unsigned char *buffer, int bufferLength, const char *sentenceType)
 {
     unsigned char *original = buffer;
     int i = 0;
@@ -38,9 +38,9 @@ void trim_buffer_to_contain_only_first_GPRMC_sentence(unsigned char *buffer, int
     }
 
     /*
-     * Now, search for "$GPRMC"
+     * Now, search for "sentenceType"
      */
-    ptrBegin = sg_strnstr((char*)buffer, "$GPRMC", strlen((char*)buffer) - 1);
+    ptrBegin = sg_strnstr((const char*)buffer, sentenceType, strlen((char*)buffer) - 1);
     if(ptrBegin != NULL)
     {
         /*
@@ -68,7 +68,7 @@ void trim_buffer_to_contain_only_first_GPRMC_sentence(unsigned char *buffer, int
 
     original[j] = 0;
 
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sGPRMC-sentence extracted from NMEA-Blob = [%s]"), GPS, (char*)buffer);
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s%s-sentence extracted from NMEA-Blob = [%s]"), GPS, sentenceType, (char*)buffer);
     info_log(LOG_GLOBAL_BUFFER);
 }
 

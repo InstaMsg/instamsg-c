@@ -1402,7 +1402,7 @@ static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
             fill_in_gps_nmea_blob_until_buffer_fills_or_time_expires(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), maxTimeForOneIteration);
             remainingSeconds = maxTimeForOneIteration - (getCurrentTick() - currentTick);
 
-            trim_buffer_to_contain_only_first_GPRMC_sentence(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
+            trim_buffer_to_contain_only_first_required_sentence_type(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), GPS_TIME_SYNC_SENTENCE_TYPE);
             if(strlen((char*)GLOBAL_BUFFER) == 0)
             {
                 sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GPS-Iteration-%u/%u] GPRMC-sentence could not be fetched from NMEA-blob."),
@@ -1659,6 +1659,30 @@ static void check_if_ntp_and_gps_time_sync_features_are_enabled()
 }
 
 
+static void check_if_all_required_compile_time_defines_are_present()
+{
+#ifndef NTP_TIME_SYNC_PRESENT
+#error "NTP_TIME_SYNC_PRESENT compile-time-parameter undefined"
+#endif
+
+#ifndef GPS_TIME_SYNC_PRESENT
+#error "GPS_TIME_SYNC_PRESENT compile-time-parameter undefined"
+#elif   GPS_TIME_SYNC_PRESENT == 1
+#ifndef GPS_TIME_SYNC_SENTENCE_TYPE
+#error "GPS_TIME_SYNC_SENTENCE_TYPE compile-time-parameter undefined"
+#endif
+#endif
+
+#ifndef GSM_TIME_SYNC_PRESENT
+#error "GSM_TIME_SYNC_PRESENT compile-time-parameter undefined"
+#endif
+#ifndef SEND_GPS_LOCATION
+#error "SEND_GPS_LOCATION compile-time-parameter undefined"
+#endif
+
+}
+
+
 void initInstaMsg(InstaMsg* c,
                   int (*connectHandler)(),
                   int (*disconnectHandler)(),
@@ -1681,16 +1705,8 @@ void initInstaMsg(InstaMsg* c,
 #endif
 
     check_for_upgrade();
+    check_if_all_required_compile_time_defines_are_present();
 
-#ifndef NTP_TIME_SYNC_PRESENT
-#error "NTP_TIME_SYNC_PRESENT compile-time-parameter undefined"
-#endif
-#ifndef GPS_TIME_SYNC_PRESENT
-#error "GPS_TIME_SYNC_PRESENT compile-time-parameter undefined"
-#endif
-#ifndef GSM_TIME_SYNC_PRESENT
-#error "GSM_TIME_SYNC_PRESENT compile-time-parameter undefined"
-#endif
 
     check_if_ntp_and_gps_time_sync_features_are_enabled();
 

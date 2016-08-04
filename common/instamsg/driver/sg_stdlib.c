@@ -40,7 +40,7 @@ int sg_atoi(const char *buf)
 }
 
 
-char* sg_strnstr(char *str1, char *str2, int maxSize)
+char* sg_strnstr(const char *str1, const char *str2, int maxSize)
 {
     int i = 0, j = 0;
 
@@ -67,7 +67,7 @@ char* sg_strnstr(char *str1, char *str2, int maxSize)
 
         if(failure == 0)
         {
-            return (str1 + i);
+            return ((char*)(str1 + i));
         }
     }
 
