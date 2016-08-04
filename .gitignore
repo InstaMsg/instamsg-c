@@ -59,6 +59,7 @@ device/ar501
 device/maestro_e220
 device/maestro_m100_3g
 device/pi
+device/lanner_pc
 device/test_device
 
 common/apps/atoll-gms
