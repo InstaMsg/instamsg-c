@@ -96,6 +96,7 @@ int fill_in_time_coordinates_from_GPRMC_sentence(char *buffer, int bufferLength,
     char *original = buffer;
     char *t = NULL;
     unsigned int number;
+    int tmp;
 
     /*
      * First do some validations.
@@ -137,6 +138,14 @@ int fill_in_time_coordinates_from_GPRMC_sentence(char *buffer, int bufferLength,
         }
 
         get_nth_token(original, ',', 2, &t);
+        for(tmp = 0; tmp < strlen(t); tmp++)
+        {
+        	if(t[tmp] == '.')
+        	{
+        		t[tmp] = 0;
+        		break;
+        	}
+        }
         number = sg_atoi(t);
         if( (strlen(t) != 6) || (number < 1) )
         {
