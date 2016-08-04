@@ -70,8 +70,6 @@ enum MESSAGE_SOURCE msgSource;
 unsigned char rebootPending;
 
 #define SECRET                                      PROSTR("SECRET")
-#define MAX_SECONDS_FOR_GPS_GSM_TIME_SYNC           PROSTR("MAX_SECONDS_FOR_GPS_GSM_TIME_SYNC")
-#define NTP_SERVER                                  PROSTR("NTP_SERVER")
 
 #if MEDIA_STREAMING_ENABLED == 1
 #include "./include/media.h"
@@ -92,16 +90,29 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
 static unsigned char ntpPacket[48];
 static DateParams dateParams;
 
-static unsigned char ntpTimeSyncFeatureEnabled;
 static unsigned char gpsGsmTimeSyncFeatureEnabled;
 
 static volatile unsigned char timeSyncedViaExternalResources;
 
+#define MAX_TIME_ALLOWED_FOR_ONE_GPS_ITERATION      20
+
+#if NTP_TIME_SYNC_PRESENT == 1
+#define NTP_SERVER                                  PROSTR("NTP_SERVER")
+
+static unsigned char ntpTimeSyncFeatureEnabled;
+static char ntpServer[100];
+#endif
+
 #if (GPS_TIME_SYNC_PRESENT == 1) || (GSM_TIME_SYNC_PRESENT == 1)
+#define MAX_SECONDS_FOR_GPS_GSM_TIME_SYNC           PROSTR("MAX_SECONDS_FOR_GPS_GSM_TIME_SYNC")
+
 static char maxSecondsWaitForGpsGsmTimeSync[10];
 #endif
-#if NTP_TIME_SYNC_PRESENT == 1
-static char ntpServer[100];
+
+#if SEND_GPS_LOCATION == 1
+#define SEND_GPS_LOCATION_INTERVAL                  PROSTR("SEND_GPS_LOCATION_INTERVAL")
+
+int sendGpsLocationInterval;
 #endif
 
 static volatile unsigned long timestampFromGSM;
@@ -1365,7 +1376,6 @@ static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
 {
     int rc = FAILURE;
     int maxIterations = 0;
-    int maxTimeForOneIteration = 20;
 
     if(timeSyncedViaExternalResources == 1)
     {
@@ -1390,13 +1400,13 @@ static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
 
 
 #if (GPS_TIME_SYNC_PRESENT == 1) || (GSM_TIME_SYNC_PRESENT == 1)
-    maxIterations = (sg_atoi(maxSecondsWaitForGpsGsmTimeSync) / maxTimeForOneIteration);
+    maxIterations = (sg_atoi(maxSecondsWaitForGpsGsmTimeSync) / MAX_TIME_ALLOWED_FOR_ONE_GPS_ITERATION);
     {
         int i = 0;
         for(i = 0; i < maxIterations; i++)
         {
             unsigned long currentTick = getCurrentTick();
-            int remainingSeconds = maxTimeForOneIteration;
+            int remainingSeconds = MAX_TIME_ALLOWED_FOR_ONE_GPS_ITERATION;
 
 #if GPS_TIME_SYNC_PRESENT == 1
             /*
@@ -1404,21 +1414,21 @@ static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
              * So, till we see something new, we assume that NMEA-sentences are our source of inspiration.
              */
             RESET_GLOBAL_BUFFER;
-            fill_in_gps_nmea_blob_until_buffer_fills_or_time_expires(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), maxTimeForOneIteration);
-            remainingSeconds = maxTimeForOneIteration - (getCurrentTick() - currentTick);
+            fill_in_gps_nmea_blob_until_buffer_fills_or_time_expires(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER),
+                                                                     MAX_TIME_ALLOWED_FOR_ONE_GPS_ITERATION);
+            remainingSeconds = MAX_TIME_ALLOWED_FOR_ONE_GPS_ITERATION - (getCurrentTick() - currentTick);
 
             trim_buffer_to_contain_only_first_required_sentence_type(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), GPS_TIME_SYNC_SENTENCE_TYPE);
             if(strlen((char*)GLOBAL_BUFFER) == 0)
             {
-                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GPS-Iteration-%u/%u] GPRMC-sentence could not be fetched from NMEA-blob."),
-                           CLOCK_ERROR, i + 1, maxIterations);
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GPS-Iteration-%u/%u] %s-sentence could not be fetched from NMEA-blob."),
+                           CLOCK_ERROR, i + 1, maxIterations, GPS_TIME_SYNC_SENTENCE_TYPE);
                 error_log(LOG_GLOBAL_BUFFER);
 
                 goto try_syncing_with_gsm;
             }
 
-
-            rc = fill_in_time_coordinates_from_GPRMC_sentence((char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), &dateParams);
+            rc = fill_in_time_coordinates_from_sentence((char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), &dateParams, GPS_TIME_SYNC_SENTENCE_TYPE);
             if(rc != SUCCESS)
             {
                 sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GPS-Iteration-%u/%u] Time-coordinates could not be fetched from GPS."),
@@ -1628,7 +1638,7 @@ failure_in_time_syncing:
 #endif
 
 
-static void check_if_ntp_and_gps_time_sync_features_are_enabled()
+static void check_if_conditional_features_are_enabled()
 {
     int rc = FAILURE;
 
@@ -1648,7 +1658,6 @@ static void check_if_ntp_and_gps_time_sync_features_are_enabled()
     }
 #endif
 
-
 #if (GPS_TIME_SYNC_PRESENT == 1) || (GSM_TIME_SYNC_PRESENT == 1)
     RESET_GLOBAL_BUFFER;
 
@@ -1664,6 +1673,22 @@ static void check_if_ntp_and_gps_time_sync_features_are_enabled()
         }
     }
 #endif
+
+#if SEND_GPS_LOCATION == 1
+    RESET_GLOBAL_BUFFER;
+
+    rc = get_config_value_from_persistent_storage(SEND_GPS_LOCATION_INTERVAL, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
+    if(rc == SUCCESS)
+    {
+        char small[6] = {0};
+
+        memset(small, 0, sizeof(small));
+        getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, small);
+
+        sendGpsLocationInterval = sg_atoi(small);
+    }
+#endif
+
 }
 
 
@@ -1686,6 +1711,10 @@ static void check_if_all_required_compile_time_defines_are_present()
 #endif
 #ifndef SEND_GPS_LOCATION
 #error "SEND_GPS_LOCATION compile-time-parameter undefined"
+#elif SEND_GPS_LOCATION == 1
+#ifndef GPS_LOCATION_IDENTIFIER_TYPE
+#error "GPS_LOCATION_IDENTIFIER_TYPE compile-time-parameter undefined"
+#endif
 #endif
 
 }
@@ -1716,7 +1745,7 @@ void initInstaMsg(InstaMsg* c,
     check_if_all_required_compile_time_defines_are_present();
 
 
-    check_if_ntp_and_gps_time_sync_features_are_enabled();
+    check_if_conditional_features_are_enabled();
 
 #if NTP_TIME_SYNC_PRESENT == 1
     sync_time_through_NTP(c);
@@ -1951,6 +1980,14 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
                                NTP_SERVER,
                                CONFIG_STRING,
                                PROSTR(""),
+                               PROSTR(""));
+#endif
+
+#if SEND_GPS_LOCATION == 1
+        registerEditableConfig(&sendGpsLocationInterval,
+                               SEND_GPS_LOCATION_INTERVAL,
+                               CONFIG_INT,
+                               PROSTR("0"),
                                PROSTR(""));
 #endif
 
@@ -2707,6 +2744,31 @@ int MQTTDisconnect(InstaMsg* c)
 }
 
 
+#if SEND_GPS_LOCATION == 1
+void sendGpsLocationToServer()
+{
+    RESET_GLOBAL_BUFFER;
+    fill_in_gps_nmea_blob_until_buffer_fills_or_time_expires(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), MAX_TIME_ALLOWED_FOR_ONE_GPS_ITERATION);
+
+    trim_buffer_to_contain_only_first_required_sentence_type(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), GPS_LOCATION_IDENTIFIER_TYPE);
+    if(strlen((char*)GLOBAL_BUFFER) == 0)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s%s-sentence could not be fetched from NMEA-blob."), GPS_ERROR, GPS_LOCATION_IDENTIFIER_TYPE);
+        error_log(LOG_GLOBAL_BUFFER);
+
+        /*
+         * We, however, still send the empty string.
+         */
+    }
+
+    /*
+     * Send the data to the server.
+     */
+
+}
+#endif
+
+
 void start(int (*onConnectOneTimeOperations)(),
            int (*onDisconnect)(),
            int (*oneToOneMessageReceivedHandler)(OneToOneResult *),
@@ -2718,6 +2780,9 @@ void start(int (*onConnectOneTimeOperations)(),
     volatile unsigned long latestTick = getCurrentTick();
     unsigned long nextSocketTick = latestTick + NETWORK_INFO_INTERVAL;
     unsigned long nextPingReqTick = latestTick + pingRequestInterval;
+#if SEND_GPS_LOCATION == 1
+    unsigned long nextSendGpsLocationTick = latestTick + sendGpsLocationInterval;
+#endif
 
     unsigned long nextBusinessLogicTick;
     editableBusinessLogicInterval = businessLogicInterval;
@@ -2866,6 +2931,21 @@ void start(int (*onConnectOneTimeOperations)(),
                             nextPingReqTick = latestTick + pingRequestInterval;
                         }
 
+#if SEND_GPS_LOCATION == 1
+                        /*
+                         * Send GPS-Location, if time has arrived,
+                         */
+                        if((latestTick >= nextSendGpsLocationTick) && (sendGpsLocationInterval != 0))
+                        {
+                            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Time to send GPS-location to server !!!\n"));
+                            info_log(LOG_GLOBAL_BUFFER);
+
+                            sendGpsLocationToServer();
+
+                            nextSendGpsLocationTick = latestTick + sendGpsLocationInterval;
+                        }
+#endif
+
                         /*
                          * Time to run the business-logic !!
                          */
@@ -2876,6 +2956,19 @@ void start(int (*onConnectOneTimeOperations)(),
 
                             {
                                 coreLoopyBusinessLogicInitiatedBySelf();
+
+#if SEND_GPS_LOCATION == 1
+                                /*
+                                 * Also, send the gps-location immediately, if this is the first time business-logic is being run.
+                                 */
+                                if(businessLogicRunOnceAtStart == 0)
+                                {
+                                    sg_sprintf(LOG_GLOBAL_BUFFER, "Sending GPS-Location info for the first time ..");
+                                    info_log(LOG_GLOBAL_BUFFER);
+
+                                    sendGpsLocationToServer();
+                                }
+#endif
                                 runBusinessLogicImmediately = 0;
 
                                 if(businessLogicRunOnceAtStart == 0)
