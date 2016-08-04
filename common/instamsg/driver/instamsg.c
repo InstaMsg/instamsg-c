@@ -1477,10 +1477,10 @@ try_syncing_with_gsm:
                 timeSyncedViaExternalResources = 1;
                 break;
             }
+#endif
 
 failure_while_syncing_through_gsm:
             startAndCountdownTimer(remainingSeconds, 0);
-#endif
         }
     }
 
