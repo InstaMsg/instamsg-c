@@ -97,8 +97,12 @@ static unsigned char gpsGsmTimeSyncFeatureEnabled;
 
 static volatile unsigned char timeSyncedViaExternalResources;
 
+#if (GPS_TIME_SYNC_PRESENT == 1) || (GSM_TIME_SYNC_PRESENT == 1)
 static char maxSecondsWaitForGpsGsmTimeSync[10];
+#endif
+#if NTP_TIME_SYNC_PRESENT == 1
 static char ntpServer[100];
+#endif
 
 static volatile unsigned long timestampFromGSM;
 
@@ -1385,6 +1389,7 @@ static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
     }
 
 
+#if (GPS_TIME_SYNC_PRESENT == 1) || (GSM_TIME_SYNC_PRESENT == 1)
     maxIterations = (sg_atoi(maxSecondsWaitForGpsGsmTimeSync) / maxTimeForOneIteration);
     {
         int i = 0;
@@ -1483,6 +1488,7 @@ failure_while_syncing_through_gsm:
             startAndCountdownTimer(remainingSeconds, 0);
         }
     }
+#endif
 
 
     if(timeSyncedViaExternalResources == 0)
@@ -1495,6 +1501,7 @@ failure_while_syncing_through_gsm:
 }
 
 
+#if NTP_TIME_SYNC_PRESENT == 1
 static void sync_time_through_NTP(InstaMsg *c)
 {
     int rc = FAILURE;
@@ -1618,6 +1625,7 @@ failure_in_time_syncing:
             rebootDevice();
         }
 }
+#endif
 
 
 static void check_if_ntp_and_gps_time_sync_features_are_enabled()
@@ -1641,7 +1649,7 @@ static void check_if_ntp_and_gps_time_sync_features_are_enabled()
 #endif
 
 
-#if GPS_TIME_SYNC_PRESENT == 1
+#if (GPS_TIME_SYNC_PRESENT == 1) || (GSM_TIME_SYNC_PRESENT == 1)
     RESET_GLOBAL_BUFFER;
 
     rc = get_config_value_from_persistent_storage(MAX_SECONDS_FOR_GPS_GSM_TIME_SYNC, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
