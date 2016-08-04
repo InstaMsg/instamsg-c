@@ -1712,8 +1712,8 @@ static void check_if_all_required_compile_time_defines_are_present()
 #ifndef SEND_GPS_LOCATION
 #error "SEND_GPS_LOCATION compile-time-parameter undefined"
 #elif SEND_GPS_LOCATION == 1
-#ifndef GPS_LOCATION_IDENTIFIER_TYPE
-#error "GPS_LOCATION_IDENTIFIER_TYPE compile-time-parameter undefined"
+#ifndef GPS_LOCATION_SENTENCE_TYPE
+#error "GPS_LOCATION_SENTENCE_TYPE compile-time-parameter undefined"
 #endif
 #endif
 
@@ -2750,10 +2750,10 @@ void sendGpsLocationToServer()
     RESET_GLOBAL_BUFFER;
     fill_in_gps_nmea_blob_until_buffer_fills_or_time_expires(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), MAX_TIME_ALLOWED_FOR_ONE_GPS_ITERATION);
 
-    trim_buffer_to_contain_only_first_required_sentence_type(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), GPS_LOCATION_IDENTIFIER_TYPE);
+    trim_buffer_to_contain_only_first_required_sentence_type(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), GPS_LOCATION_SENTENCE_TYPE);
     if(strlen((char*)GLOBAL_BUFFER) == 0)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s%s-sentence could not be fetched from NMEA-blob."), GPS_ERROR, GPS_LOCATION_IDENTIFIER_TYPE);
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s%s-sentence could not be fetched from NMEA-blob."), GPS_ERROR, GPS_LOCATION_SENTENCE_TYPE);
         error_log(LOG_GLOBAL_BUFFER);
 
         /*
@@ -2761,10 +2761,7 @@ void sendGpsLocationToServer()
          */
     }
 
-    /*
-     * Send the data to the server.
-     */
-
+    send_gps_location((char*) GLOBAL_BUFFER);
 }
 #endif
 

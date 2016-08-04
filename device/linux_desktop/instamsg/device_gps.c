@@ -7,6 +7,7 @@
 
 
 #include "../driver/include/gps.h"
+#include "../driver/include/log.h"
 
 /*
  * This method fills the "buffer" with NMEA-blob.
@@ -19,3 +20,17 @@
 void fill_in_gps_nmea_blob_until_buffer_fills_or_time_expires(unsigned char *buffer, int bufferLength, int maxTime)
 {
 }
+
+
+#if SEND_GPS_LOCATION == 1
+/*
+ * The device may decide how to send the gps-location-string to the server.
+ * Or how to consume this string in general.
+ */
+void send_gps_location(const char *gps_location_string)
+{
+    sg_sprintf(LOG_GLOBAL_BUFFER, "GPS-Location String ==> [%s]", gps_location_string);
+    info_log(LOG_GLOBAL_BUFFER);
+}
+#endif
+
