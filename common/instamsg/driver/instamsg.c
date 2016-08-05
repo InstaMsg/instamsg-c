@@ -1372,6 +1372,7 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
 }
 
 
+#if (GPS_TIME_SYNC_PRESENT == 1) || (GSM_TIME_SYNC_PRESENT == 1)
 static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
 {
     int rc = FAILURE;
@@ -1399,7 +1400,6 @@ static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
     }
 
 
-#if (GPS_TIME_SYNC_PRESENT == 1) || (GSM_TIME_SYNC_PRESENT == 1)
     maxIterations = (sg_atoi(maxSecondsWaitForGpsGsmTimeSync) / MAX_TIME_ALLOWED_FOR_ONE_GPS_ITERATION);
     {
         int i = 0;
@@ -1498,8 +1498,6 @@ failure_while_syncing_through_gsm:
             startAndCountdownTimer(remainingSeconds, 0);
         }
     }
-#endif
-
 
     if(timeSyncedViaExternalResources == 0)
     {
@@ -1509,6 +1507,7 @@ failure_while_syncing_through_gsm:
         rebootDevice();
     }
 }
+#endif
 
 
 #if NTP_TIME_SYNC_PRESENT == 1
