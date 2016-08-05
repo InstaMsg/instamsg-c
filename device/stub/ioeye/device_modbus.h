@@ -12,6 +12,7 @@ struct Modbus
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
     MODBUS_DEVICE_TYPE deviceType;
     const char *identifier;
+    unsigned char assignedSerialNumber;
     int (*send_command_and_read_response_sync)(Modbus *modbus,
                                                unsigned char *commandBytes,
                                                int commandBytesLength,
