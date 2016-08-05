@@ -51,15 +51,15 @@ void trim_buffer_to_contain_only_first_required_sentence_type(unsigned char *buf
         {
             while(1)
             {
-                original[j] = *ptrBegin;
-                j++;
-
                 if(ptrBegin == ptrEnd)
                 {
                     break;
                 }
                 else
                 {
+                    original[j] = *ptrBegin;
+
+                    j++;
                     ptrBegin++;
                 }
             }
