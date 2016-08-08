@@ -103,7 +103,7 @@ void connect_serial_port(int *fd, const char *port_name)
         goto error_while_init;
     }
 
-    if(set_interface_attribs(*fd, B9600, 0) != SUCCESS)  /* set speed to 9600 bps, 8n1 (no parity) */
+    if(set_interface_attribs(*fd, SERIAL_BAUD_RATE_ATTRIBS, 0) != SUCCESS)
     {
         goto error_while_init;
     }
