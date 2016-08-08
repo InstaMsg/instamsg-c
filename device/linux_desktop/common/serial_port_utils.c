@@ -92,7 +92,7 @@ static int set_blocking(int fd, int should_block)
 }
 
 
-void connect_serial_port(int *fd, const char *port_name)
+void connect_serial_port(int *fd, const char *port_name, int speed, int parity)
 {
     *fd = open(port_name, O_RDWR | O_NOCTTY | O_SYNC);
     if(*fd < 0)
@@ -103,7 +103,7 @@ void connect_serial_port(int *fd, const char *port_name)
         goto error_while_init;
     }
 
-    if(set_interface_attribs(*fd, SERIAL_BAUD_RATE_ATTRIBS, 0) != SUCCESS)
+    if(set_interface_attribs(*fd, speed, parity) != SUCCESS)
     {
         goto error_while_init;
     }
