@@ -10,6 +10,13 @@
 #define SOCKET_TCP      PROSTR("TCP")
 #define SOCKET_UDP      PROSTR("UDP")
 
+#define SG_APN          PROSTR("sg_apn")
+#define SG_USER         PROSTR("sg_user")
+#define SG_PASS         PROSTR("sg_pass")
+#define SG_PIN          PROSTR("sg_pin")
+#define PROV_PIN        PROSTR("prov_pin")
+
+
 /*
  * Global-functions callable.
  */

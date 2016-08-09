@@ -174,11 +174,11 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port, const 
     sg_sprintf(LOG_GLOBAL_BUFFER, "\n\nFinal (Converted) SMS being used for variables-extraction = [%s]\n\n", sms);
     info_log(LOG_GLOBAL_BUFFER);
 
-    getJsonKeyValueIfPresent(sms, "sg_apn", socket->gsmApn);
-    getJsonKeyValueIfPresent(sms, "sg_user", socket->gsmUser);
-    getJsonKeyValueIfPresent(sms, "sg_pass", socket->gsmPass);
-    getJsonKeyValueIfPresent(sms, "sg_pin", socket->gsmPin);
-    getJsonKeyValueIfPresent(sms, "prov_pin", socket->provPin);
+    getJsonKeyValueIfPresent(sms, SG_APN, socket->gsmApn);
+    getJsonKeyValueIfPresent(sms, SG_USER, socket->gsmUser);
+    getJsonKeyValueIfPresent(sms, SG_PASS, socket->gsmPass);
+    getJsonKeyValueIfPresent(sms, SG_PIN, socket->gsmPin);
+    getJsonKeyValueIfPresent(sms, PROV_PIN, socket->provPin);
 
 #if 0
     memset(socket->gsmApn, 0, sizeof(socket->gsmApn));
