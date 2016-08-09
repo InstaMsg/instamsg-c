@@ -11,7 +11,7 @@
 
 static char sms[200];
 
-static void replaceSmsCharacter(char *sms, char old_char, char new_char)
+void replaceSmsCharacter(char *sms, char old_char, char new_char)
 {
     {
         int i;
