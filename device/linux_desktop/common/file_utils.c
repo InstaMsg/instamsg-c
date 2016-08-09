@@ -111,3 +111,32 @@ void read_singular_line_from_file(const char *filePath, const char *content, cha
     }
 }
 
+
+int write_singular_line_into_file(const char *filePath, const char *buffer)
+{
+    int rc = FAILURE;
+
+    FILE_STRUCT *fp = NULL;
+    int i;
+
+    fp = FILE_OPEN(filePath, "w");
+    if(fp != NULL)
+    {
+        for(i = 0; i < strlen(buffer); i++)
+        {
+            FILE_PUTC(buffer[i], fp);
+        }
+
+        FILE_CLOSE(fp);
+
+        rc = SUCCESS;
+    }
+    else
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Could not open file %s in write-mode", filePath);
+        error_log(LOG_GLOBAL_BUFFER);
+    }
+
+    return rc;
+}
+

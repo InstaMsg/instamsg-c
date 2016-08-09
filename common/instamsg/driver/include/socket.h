@@ -16,6 +16,9 @@
 #define SG_PIN          PROSTR("sg_pin")
 #define PROV_PIN        PROSTR("prov_pin")
 
+#define SMS_FILE        PROSTR("/home/sensegrow/sms.txt")
+#define SMS_TEMP_FILE   PROSTR("/home/sensegrow/sms_temp.txt")
+
 
 /*
  * Global-functions callable.

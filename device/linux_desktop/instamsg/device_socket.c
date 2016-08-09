@@ -36,11 +36,8 @@
  */
 void get_latest_sms_containing_substring(Socket *socket, char *buffer, const char *substring)
 {
-    /*
-     * We don't really need the SMS in InstaMsg-binary as of now, in linux-like systems.
-     */
-    sg_sprintf(buffer, "{\"%s\":\"dummy_apn\",\"%s\":\"dummy_user\",\"%s\":\"dummy_pass\",\"%s\":\"dummy_pin\",\"%s\":\"dummy_prov_pin\"}",
-                        SG_APN, SG_USER, SG_PASS, SG_PIN, PROV_PIN);
+    read_singular_line_from_file(SMS_FILE, "latest-sms", buffer, 200);
+    strip_leading_and_trailing_white_paces(buffer);
 }
 #endif
 
