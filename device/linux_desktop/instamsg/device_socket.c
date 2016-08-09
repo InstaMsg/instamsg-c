@@ -36,6 +36,7 @@
  */
 void get_latest_sms_containing_substring(Socket *socket, char *buffer, const char *substring)
 {
+    read_singular_line_from_file(SMS_FILE_FOR_IPC, "provisioning-sms", buffer, 200);
 }
 #endif
 

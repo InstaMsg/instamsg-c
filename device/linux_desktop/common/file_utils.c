@@ -94,3 +94,20 @@ int sg_createEmptyFile(const char *filePath)
 
     return rc;
 }
+
+
+void read_singular_line_from_file(const char *filePath, const char *content, char *buffer, int maxbufferlength)
+{
+    FILE_STRUCT *fp = FILE_OPEN(filePath, "r");
+    if(fp != NULL)
+    {
+        sg_readLine(fp, buffer, maxbufferlength);
+        FILE_CLOSE(fp);
+    }
+    else
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("File [%s] does not exist, so %s cannot be read"), filePath, content);
+        error_log(LOG_GLOBAL_BUFFER);
+    }
+}
+
