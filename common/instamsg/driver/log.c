@@ -123,19 +123,28 @@ static void processServerLoggingMetadata()
 void info_log(char *log)
 {
     processServerLoggingMetadata();
+
+    ACQUIRE_LOG_MUTEX
     LOG_COMMON_CODE(log, INSTAMSG_LOG_LEVEL_INFO)
+    RELEASE_LOG_MUTEX
 }
 
 
 void error_log(char *log)
 {
     processServerLoggingMetadata();
+
+    ACQUIRE_LOG_MUTEX
     LOG_COMMON_CODE(log, INSTAMSG_LOG_LEVEL_ERROR)
+    RELEASE_LOG_MUTEX
 }
 
 
 void debug_log(char *log)
 {
     processServerLoggingMetadata();
+
+    ACQUIRE_LOG_MUTEX
     LOG_COMMON_CODE(log, INSTAMSG_LOG_LEVEL_DEBUG)
+    RELEASE_LOG_MUTEX
 }
