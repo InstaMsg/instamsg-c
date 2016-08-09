@@ -20,6 +20,14 @@ void bootstrapInit()
 
 
 /*
+ * Run any initialization process, after all other basic APIs (logging, time etc.) have been initialized.
+ */
+void postBootupProcesses()
+{
+}
+
+
+/*
  * This method returns the client-network-data, in simple JSON form, of type ::
  *
  * {'method' : 'value', 'ip_address' : 'value', 'antina_status' : 'value', 'signal_strength' : 'value'}

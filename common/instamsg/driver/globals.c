@@ -463,6 +463,8 @@ void globalSystemInit(char *logFilePath)
 
     sg_sprintf(LOG_GLOBAL_BUFFER, "\n\nInstamsg-Version ====> [%s]\n\n", INSTAMSG_VERSION);
     info_log(LOG_GLOBAL_BUFFER);
+
+    postBootupProcesses();
 }
 
 
