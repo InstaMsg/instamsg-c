@@ -135,3 +135,36 @@ void get_nth_token(char *original, char separator, int pos, char **res)
     temp[tmp_index] = 0;
     *res = temp;
 }
+
+
+void strip_leading_and_trailing_white_paces(char *buffer)
+{
+	int i = 0;
+
+	/*
+	 * Remove the trailing \r and \n (if any).
+	 */
+	for(i = strlen(buffer) - 1; i >= 0; i--)
+	{
+		if( (buffer[i] == '\r') || (buffer[i] == '\n') )
+		{
+			buffer[i] = 0;
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	while( (buffer[0] == '\r') || (buffer[0] == '\n') )
+	{
+		int length = strlen(buffer);
+		for(i = 0; i < length; i++)
+		{
+			buffer[i] = buffer[i + 1];
+		}
+
+		buffer[i] = 0;
+	}
+}
+
