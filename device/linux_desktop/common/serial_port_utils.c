@@ -108,7 +108,7 @@ void connect_serial_port(int *fd, const char *port_name, int speed, int parity)
         goto error_while_init;
     }
 
-    if(set_blocking(*fd, 0) != SUCCESS) /* set no blocking */
+    if(set_blocking(*fd, 1) != SUCCESS) /* set no blocking */
     {
         goto error_while_init;
     }
