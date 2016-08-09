@@ -56,10 +56,10 @@ lwip/
 lwip-contrib/
 
 device/ar501
-device/maestro_e220
-device/maestro_m100_3g
+device/maestro-e220
+device/maestro-m100-3g
 device/pi
-device/lanner_pc
+device/lanner-pc
 device/test_device
 
 common/apps/atoll-gms
