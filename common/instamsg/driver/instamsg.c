@@ -2950,7 +2950,7 @@ void start(int (*onConnectOneTimeOperations)(),
                                 /*
                                  * Also, send the gps-location immediately, if this is the first time business-logic is being run.
                                  */
-                                if(businessLogicRunOnceAtStart == 0)
+                                if((businessLogicRunOnceAtStart == 0) && (sendGpsLocationInterval != 0))
                                 {
                                     sg_sprintf(LOG_GLOBAL_BUFFER, "Sending GPS-Location info for the first time ..");
                                     info_log(LOG_GLOBAL_BUFFER);
