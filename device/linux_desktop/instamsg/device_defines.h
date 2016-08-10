@@ -56,4 +56,7 @@
 #define ACQUIRE_THREAD_MUTEX
 #define RELEASE_THREAD_MUTEX
 
+#define ACQUIRE_LOG_MUTEX
+#define RELEASE_LOG_MUTEX
+
 #endif

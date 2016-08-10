@@ -8,7 +8,7 @@
 #include "./include/sg_stdlib.h"
 
 
-void trim_buffer_to_contain_only_first_required_sentence_type(unsigned char *buffer, int bufferLength, const char *sentenceType)
+static void trim_buffer_to_contain_only_first_required_sentence_type(unsigned char *buffer, int bufferLength, const char *sentenceType)
 {
     unsigned char *original = buffer;
     int i = 0;
@@ -207,4 +207,13 @@ failure:
     return FAILURE;
 }
 #endif
+
+
+void get_gps_sentence(unsigned char *buffer, int bufferLength, const char *sentenceType)
+{
+    memset(buffer, 0, bufferLength);
+
+    fill_in_gps_nmea_blob_until_buffer_fills_or_time_expires(buffer, bufferLength, MAX_TIME_ALLOWED_FOR_ONE_GPS_ITERATION);
+    trim_buffer_to_contain_only_first_required_sentence_type(buffer, bufferLength, sentenceType);
+}
 

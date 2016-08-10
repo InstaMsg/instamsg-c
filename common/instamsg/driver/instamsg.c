@@ -94,7 +94,6 @@ static unsigned char gpsGsmTimeSyncFeatureEnabled;
 
 static volatile unsigned char timeSyncedViaExternalResources;
 
-#define MAX_TIME_ALLOWED_FOR_ONE_GPS_ITERATION      20
 
 #if NTP_TIME_SYNC_PRESENT == 1
 #define NTP_SERVER                                  PROSTR("NTP_SERVER")
@@ -1413,12 +1412,9 @@ static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
              * As of now, it seems that the whole universe uses NMEA as the de-facto standard for GPS.
              * So, till we see something new, we assume that NMEA-sentences are our source of inspiration.
              */
-            RESET_GLOBAL_BUFFER;
-            fill_in_gps_nmea_blob_until_buffer_fills_or_time_expires(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER),
-                                                                     MAX_TIME_ALLOWED_FOR_ONE_GPS_ITERATION);
-            remainingSeconds = MAX_TIME_ALLOWED_FOR_ONE_GPS_ITERATION - (getCurrentTick() - currentTick);
+            get_gps_sentence(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), GPS_TIME_SYNC_SENTENCE_TYPE);
 
-            trim_buffer_to_contain_only_first_required_sentence_type(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), GPS_TIME_SYNC_SENTENCE_TYPE);
+            remainingSeconds = MAX_TIME_ALLOWED_FOR_ONE_GPS_ITERATION - (getCurrentTick() - currentTick);
             if(strlen((char*)GLOBAL_BUFFER) == 0)
             {
                 sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[GPS-Iteration-%u/%u] %s-sentence could not be fetched from NMEA-blob."),
@@ -2746,10 +2742,7 @@ int MQTTDisconnect(InstaMsg* c)
 #if SEND_GPS_LOCATION == 1
 void sendGpsLocationToServer()
 {
-    RESET_GLOBAL_BUFFER;
-    fill_in_gps_nmea_blob_until_buffer_fills_or_time_expires(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), MAX_TIME_ALLOWED_FOR_ONE_GPS_ITERATION);
-
-    trim_buffer_to_contain_only_first_required_sentence_type(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), GPS_LOCATION_SENTENCE_TYPE);
+    get_gps_sentence(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER), GPS_LOCATION_SENTENCE_TYPE);
     if(strlen((char*)GLOBAL_BUFFER) == 0)
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s%s-sentence could not be fetched from NMEA-blob."), GPS_ERROR, GPS_LOCATION_SENTENCE_TYPE);
