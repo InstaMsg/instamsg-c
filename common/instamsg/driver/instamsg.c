@@ -1712,6 +1712,9 @@ static void check_if_all_required_compile_time_defines_are_present()
 #endif
 #endif
 
+#ifndef DATA_LOGGING_ENABLED
+#error "DATA_LOGGING_ENABLED compile-time-parameter undefined"
+#endif
 }
 
 
@@ -2406,7 +2409,9 @@ static void saveFailedPublishedMessage()
                        DATA_LOG_TOPIC, lastPubTopic,
                        DATA_LOG_PAYLOAD, lastPubPayload);
 
+#if DATA_LOGGING_ENABLED == 1
             save_record_to_persistent_storage(messageSavingJson);
+#endif
             if(messageSavingJson)
                 sg_free(messageSavingJson);
 
