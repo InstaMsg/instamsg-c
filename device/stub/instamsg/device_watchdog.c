@@ -8,7 +8,7 @@
 /*
  * This method initializes the watchdog-timer.
  */
-void watchdog_init()
+void init_watchdog()
 {
 }
 

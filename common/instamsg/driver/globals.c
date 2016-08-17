@@ -453,13 +453,14 @@ void globalSystemInit(char *logFilePath)
     init_serial_logger();
 
     init_global_timer();
-    watchdog_init();
+    init_watchdog();
 
 #if FILE_LOGGING_ENABLED == 1
     init_file_logger(&fileLogger, logFilePath);
 #endif
 
     init_config();
+    init_data_logger();
 
     sg_sprintf(LOG_GLOBAL_BUFFER, "\n\nInstamsg-Version ====> [%s]\n\n", INSTAMSG_VERSION);
     info_log(LOG_GLOBAL_BUFFER);

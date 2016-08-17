@@ -64,3 +64,12 @@ int delete_config_value_from_persistent_storage(const char *key)
 {
     return FAILURE;
 }
+
+
+/*
+ * This method releases the config, just before the system is going for a reset.
+ */
+void release_config()
+{
+#error "release_config() method not defined."
+}

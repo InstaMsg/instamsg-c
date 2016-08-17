@@ -58,7 +58,7 @@ exit:
 
     if(reboot == 1)
     {
-        rebootDevice();
+        exitApp();
     }
 }
 

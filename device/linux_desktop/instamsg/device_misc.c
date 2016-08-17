@@ -3,15 +3,17 @@
 
 #include "../../../common/instamsg/driver/include/globals.h"
 
+void hardReboot()
+{
+    system("/sbin/reboot");
+}
+
 
 /*
- * Utility-function that reboots the device.
+ * Utility-function that resets the device, bringing it into a clean, fresh state.
  */
-void rebootDevice()
+void resetDevice()
 {
-    sg_sprintf(LOG_GLOBAL_BUFFER, "Rebooting the system.");
-    info_log(LOG_GLOBAL_BUFFER);
-
     exit(1);
 }
 

@@ -1790,7 +1790,6 @@ void initInstaMsg(InstaMsg* c,
 
     c->connected = 0;
 
-    init_data_logger();
     pubAckRecvAttempts = 0;
     waitingForPuback = NOT_WAITING_FOR_PUBACK;
     rebootPending = 0;
@@ -2035,7 +2034,7 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Client-%s failed with code [%d]"), mode, connack_rc);
         info_log(LOG_GLOBAL_BUFFER);
 
-        rebootDevice();
+        exitApp();
     }
 }
 
@@ -2113,7 +2112,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                         /*
                          * Reboot the device, so that the next time the CONNECT-cycle takes place.
                          */
-                        rebootDevice();
+                        exitApp();
 
                         setValuesOfSpecialTopics(c);
                     }
@@ -2222,7 +2221,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Received REBOOT request from server.. rebooting !!!"));
                         info_log(LOG_GLOBAL_BUFFER);
 
-                        rebootDevice();
+                        exitApp();
                     }
                     else if(strcmp(topicName, c->clientIdComplete) == 0)
                     {
@@ -2893,7 +2892,7 @@ void start(int (*onConnectOneTimeOperations)(),
                                            MEDIA_ERROR, mediaReplyMessageWaitInterval);
                                 error_log(LOG_GLOBAL_BUFFER);
 
-                                rebootDevice();
+                                exitApp();
                             }
                         }
 #endif
@@ -2975,7 +2974,7 @@ void start(int (*onConnectOneTimeOperations)(),
                                     sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Rebooting due to an error condition that occurred before."));
                                     error_log(LOG_GLOBAL_BUFFER);
 
-                                    rebootDevice();
+                                    exitApp();
                                 }
 
                                 businessLogicRunOnceAtStart = 1;
@@ -2991,7 +2990,7 @@ void start(int (*onConnectOneTimeOperations)(),
                                        PROSTR("%sError occurred in media-streaming ... rebooting device to reset everything"), MEDIA);
                             error_log(LOG_GLOBAL_BUFFER);
 
-                            rebootDevice();
+                            exitApp();
                         }
 #endif
                     }

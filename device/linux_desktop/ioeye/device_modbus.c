@@ -1,5 +1,6 @@
 #include "device_modbus.h"
 
+#include "../../../common/ioeye/include/modbus.h"
 
 #define PORT_NAME       PROSTR("/dev/ttyUSB0")
 
@@ -61,7 +62,23 @@ int modbus_send_command_and_read_response_sync(Modbus *modbus,
 
 /*
  * This method cleans up the modbus-interface.
+ *
+ * Returns SUCCESS, if the interface was closed successfully.
+ *         FAILURE, if the interface could not be closed successfully.
  */
-void release_underlying_modbus_medium_guaranteed(Modbus *modbus)
+int release_underlying_modbus_medium_guaranteed(Modbus *modbus)
 {
+    if(modbus->fd < 0)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Modbus-FD is less than zero");
+        error_log(LOG_GLOBAL_BUFFER);
+
+        return FAILURE;
+    }
+    else
+    {
+        close(modbus->fd);
+
+        return SUCCESS;
+    }
 }

@@ -29,7 +29,7 @@ static void* watchdog_func(void *arg)
                 if(immediate_reboot == 1)
                 {
                     print_rebooting_message();
-                    rebootDevice();
+                    hardReboot();
                 }
             }
         }
@@ -46,7 +46,7 @@ static pthread_t tid;
 /*
  * This method initializes the watchdog-timer.
  */
-void watchdog_init()
+void init_watchdog()
 {
     watchdog = 0;
 

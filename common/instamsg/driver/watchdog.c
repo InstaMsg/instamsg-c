@@ -50,7 +50,7 @@ void watchdog_disable(void * (*func)(void *), void *arg)
         else
         {
             print_rebooting_message();
-            rebootDevice();
+            exitApp();
         }
     }
 }

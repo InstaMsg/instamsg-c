@@ -31,6 +31,7 @@ SOURCES=`echo                                                                   
         common/instamsg/driver/gps.c                                                            \
         common/instamsg/driver/time.c                                                           \
         common/instamsg/driver/hex.c                                                            \
+        common/instamsg/driver/misc.c                                                           \
                                                                                                 \
         common/instamsg/mqtt/src/MQTTFormat.c                                                   \
         common/instamsg/mqtt/src/MQTTPacket.c                                                   \

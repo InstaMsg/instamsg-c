@@ -1,4 +1,5 @@
 #include "../../../common/instamsg/driver/include/globals.h"
+#include "../../../common/ioeye/include/modbus.h"
 
 #include "./device_modbus.h"
 
@@ -49,7 +50,10 @@ int modbus_send_command_and_read_response_sync(Modbus *modbus,
 
 /*
  * This method cleans up the modbus-interface.
+ *
+ * Returns SUCCESS, if the interface was closed successfully.
+ *         FAILURE, if the interface could not be closed successfully.
  */
-void release_underlying_modbus_medium_guaranteed(Modbus *modbus)
+int release_underlying_modbus_medium_guaranteed(Modbus *modbus)
 {
 }

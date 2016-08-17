@@ -94,6 +94,8 @@ static int set_blocking(int fd, int should_block)
 
 void connect_serial_port(int *fd, const char *port_name, int speed, int parity)
 {
+    *fd = -1;
+
     *fd = open(port_name, O_RDWR | O_NOCTTY | O_SYNC);
     if(*fd < 0)
     {
@@ -119,5 +121,5 @@ void connect_serial_port(int *fd, const char *port_name, int speed, int parity)
     return;
 
 error_while_init:
-    rebootDevice();
+    exitApp();
 }

@@ -181,3 +181,11 @@ exit:
 
     return rc;
 }
+
+
+/*
+ * This method releases the data-logger, just before the system is going for a reset.
+ */
+void release_data_logger()
+{
+}

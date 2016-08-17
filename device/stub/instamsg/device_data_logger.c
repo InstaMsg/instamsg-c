@@ -49,3 +49,12 @@ int get_next_record_from_persistent_storage(char *buffer, int maxLength)
 {
     return FAILURE;
 }
+
+
+/*
+ * This method releases the data-logger, just before the system is going for a reset.
+ */
+void release_data_logger()
+{
+#error "release_data_logger() method not defined."
+}
