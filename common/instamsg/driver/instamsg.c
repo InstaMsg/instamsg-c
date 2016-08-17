@@ -1500,7 +1500,7 @@ failure_while_syncing_through_gsm:
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to sync-time through NTP/GPS/GSM, no point proceeding further ..."), CLOCK_ERROR);
         error_log(LOG_GLOBAL_BUFFER);
 
-        rebootDevice();
+        exitApp();
     }
 }
 #endif
