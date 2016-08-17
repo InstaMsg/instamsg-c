@@ -1,7 +1,7 @@
 #ifndef INSTAMSG_WATCHDOG_COMMON
 #define INSTAMSG_WATCHDOG_COMMON
 
-void watchdog_init();
+void init_watchdog();
 void do_watchdog_reset_and_enable(int n, unsigned char immediate);
 void do_watchdog_disable();
 void print_rebooting_message();

@@ -2,6 +2,8 @@
 #define MISC_COMMON_IMPL
 
 #include "./include/misc.h"
+#include "./include/data_logger.h"
+#include "./include/config.h"
 
 
 void exitApp()

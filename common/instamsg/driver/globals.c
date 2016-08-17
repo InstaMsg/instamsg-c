@@ -4,6 +4,7 @@
 #include "./include/watchdog.h"
 #include "./include/misc.h"
 #include "./include/config.h"
+#include "./include/data_logger.h"
 
 
 #include <string.h>
