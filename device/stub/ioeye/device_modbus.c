@@ -56,4 +56,5 @@ int modbus_send_command_and_read_response_sync(Modbus *modbus,
  */
 int release_underlying_modbus_medium_guaranteed(Modbus *modbus)
 {
+#error "release_underlying_modbus_medium_guaranteed() method not defined."
 }
