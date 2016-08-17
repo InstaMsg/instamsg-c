@@ -49,7 +49,7 @@ int modbus_send_command_and_read_response_sync(Modbus *modbus,
 
 
 /*
- * This method cleans up the modbus-interface.
+ * This method cleans up the modbus-interface, just before the system is going for a reset.
  *
  * Returns SUCCESS, if the interface was closed successfully.
  *         FAILURE, if the interface could not be closed successfully.

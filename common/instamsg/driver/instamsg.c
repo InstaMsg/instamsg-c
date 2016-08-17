@@ -1627,7 +1627,7 @@ failure_in_time_syncing:
                        PROSTR("%sSince GPS/GSM-Time-Syncing is absent/disabled, so no point proceeding further ..."), CLOCK_ERROR);
             error_log(LOG_GLOBAL_BUFFER);
 
-            rebootDevice();
+            exitApp();
         }
 }
 #endif
