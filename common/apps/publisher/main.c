@@ -18,6 +18,11 @@ static void coreLoopyBusinessLogicInitiatedBySelf()
 }
 
 
+void release_app_resources()
+{
+}
+
+
 int main(int argc, char** argv)
 {
     char *logFilePath = NULL;
