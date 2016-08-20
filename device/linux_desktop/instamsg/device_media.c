@@ -41,7 +41,7 @@ static void *startPipeline(void *arg)
      * If code reaches here, it means the media-loop had some error occurred.
      */
     mediaStreamingErrorOccurred = 1;
-    hardReboot();
+    system("/sbin/reboot");
 
 #if 0
 

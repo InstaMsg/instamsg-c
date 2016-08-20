@@ -4,6 +4,7 @@ int sg_atoi(const char *buf)
 {
     int result, len, i, exponent, k;
     unsigned char someNumberParsed = 0;
+    unsigned char negative = 0;
 
     result = 0;
     exponent = -1;
@@ -21,8 +22,24 @@ int sg_atoi(const char *buf)
             }
             else
             {
-                return result;
+                break;
             }
+        }
+        else if(buf[i] == '-')
+        {
+            if(someNumberParsed == 0)
+            {
+            }
+            else
+            {
+                negative = 1;
+            }
+
+            continue;
+        }
+        else if( (buf[i] < '0') || (buf[i] > '9') )
+        {
+            return 0;
         }
 
         someNumberParsed = 1;
@@ -34,6 +51,11 @@ int sg_atoi(const char *buf)
         }
 
         result = result + (base * (buf[i] - '0'));
+    }
+
+    if(negative == 1)
+    {
+        result = result * -1;
     }
 
     return result;
@@ -168,3 +190,17 @@ void strip_leading_and_trailing_white_paces(char *buffer)
 	}
 }
 
+
+#if 0
+int main()
+{
+    printf("%d\n", sg_atoi("   123    "));
+    printf("%d\n", sg_atoi(" ajay123  "));
+    printf("%d\n", sg_atoi("  123ajay  "));
+    printf("%d\n", sg_atoi("  ajay123ajay  "));
+    printf("%d\n", sg_atoi("  -123  "));
+    printf("%d\n", sg_atoi(" -ajay123  "));
+    printf("%d\n", sg_atoi("  -123ajay  "));
+    printf("%d\n", sg_atoi("  -ajay123ajay "));
+}
+#endif

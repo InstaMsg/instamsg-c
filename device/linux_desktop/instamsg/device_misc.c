@@ -3,11 +3,6 @@
 
 #include "../../../common/instamsg/driver/include/globals.h"
 
-void hardReboot()
-{
-    system("/sbin/reboot");
-}
-
 
 /*
  * Utility-function that resets the device, bringing it into a clean, fresh state.
