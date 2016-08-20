@@ -1,7 +1,7 @@
 #ifndef INSTAMSG_GLOBALS
 #define INSTAMSG_GLOBALS
 
-#define INSTAMSG_VERSION "2.12.0"
+#define INSTAMSG_VERSION "2.20.0"
 
 #include "device_defines.h"
 
@@ -114,8 +114,6 @@ void globalSystemInit(char *logFilePath);
 
 extern unsigned char GLOBAL_BUFFER[MAX_BUFFER_SIZE];
 #define RESET_GLOBAL_BUFFER memset(GLOBAL_BUFFER, 0, MAX_BUFFER_SIZE);
-
-#define LOG_FILE_PATH           PROSTR("/home/sensegrow/instamsg.log")
 
 #define TOPIC_METADATA          PROSTR("instamsg/client/metadata")
 #define TOPIC_SESSION_DATA      PROSTR("instamsg/client/session")
