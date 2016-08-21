@@ -1,6 +1,9 @@
 #include "device_modbus.h"
 
 #include "../../../common/ioeye/include/modbus.h"
+#include "../common/serial_port_utils.h"
+
+#include <termios.h>
 
 #define PORT_NAME       PROSTR("/dev/ttyUSB0")
 
@@ -9,7 +12,7 @@
  */
 void connect_underlying_modbus_medium_guaranteed(Modbus *modbus)
 {
-    connect_serial_port(&(modbus->fd), PORT_NAME);
+    connect_serial_port(&(modbus->fd), PORT_NAME, B9600, 0, CS8, 1);
 }
 
 
