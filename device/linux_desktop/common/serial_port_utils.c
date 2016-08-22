@@ -96,3 +96,21 @@ void connect_serial_port(int *fd, const char *port_name, int speed, int parity, 
 error_while_init:
     exitApp();
 }
+
+
+int disconnect_serial_port(int fd)
+{
+    if(fd < 0)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, "File-Descritor is less than zero .. exiting-process ....");
+        error_log(LOG_GLOBAL_BUFFER);
+
+        resetDevice();
+        return FAILURE;
+    }
+    else
+    {
+        close(fd);
+        return SUCCESS;
+    }
+}
