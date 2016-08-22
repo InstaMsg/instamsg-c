@@ -4,14 +4,55 @@
 #include "../common/serial_port_utils.h"
 
 #include <termios.h>
+#include <string.h>
 
 #define PORT_NAME       PROSTR("/dev/ttyUSB0")
+
+static pthread_t tid;
+
+static unsigned char response_thread_started;
+
+static unsigned char *responseBuffer;
+static int bytesToRead;
+static int responseBytesSoFar;
+
+static int modbus_fd;
+static unsigned char readResponse;
+
+static void* modbus_poller_func(void *arg)
+{
+    while(1)
+    {
+        if(readResponse == 0)
+        {
+            startAndCountdownTimer(1, 0);
+            continue;
+        }
+
+        read(modbus_fd, responseBuffer + responseBytesSoFar, 1);
+        responseBytesSoFar++;
+
+        if(responseBytesSoFar == bytesToRead)
+        {
+            readResponse = 0;
+        }
+    }
+
+    return NULL;
+}
+
 
 /*
  * This method initializes and connects to the Modbus-interface.
  */
 void connect_underlying_modbus_medium_guaranteed(Modbus *modbus)
 {
+    if(response_thread_started == 0)
+    {
+        pthread_create(&tid, NULL, modbus_poller_func, NULL);
+        response_thread_started = 1;
+    }
+
     connect_serial_port(&(modbus->fd), PORT_NAME, B9600, 0, CS8, 1);
 }
 
@@ -52,10 +93,16 @@ int modbus_send_command_and_read_response_sync(Modbus *modbus,
     write(modbus->fd, commandBytes, commandBytesLength);
 
     {
-        int bytes_received = 0;
-        while((bytes_received < responseBytesLength) && (time_fine_for_time_limit_function() == 1))
+        responseBuffer = responseByteBuffer;
+        bytesToRead = responseBytesLength;
+        responseBytesSoFar = 0;
+
+        modbus_fd = modbus->fd;
+        readResponse = 1;
+
+        while((readResponse == 1) && (time_fine_for_time_limit_function() == 1))
         {
-            bytes_received = bytes_received + read(modbus->fd, responseByteBuffer + bytes_received, responseBytesLength - bytes_received);
+            startAndCountdownTimer(1, 0);
         }
     }
 
