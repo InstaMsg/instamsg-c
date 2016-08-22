@@ -9,8 +9,11 @@
 static int set_interface_attribs (int fd,
                                   int speed,
                                   int parity,
+                                  int odd_parity,
                                   int chars,
-                                  int blocking)
+                                  int blocking,
+                                  int two_stop_bits,
+                                  int hardware_control)
 {
     {
         struct termios tty;
@@ -49,11 +52,40 @@ static int set_interface_attribs (int fd,
         tty.c_iflag &= ~(IXON | IXOFF | IXANY);
         tty.c_cflag |= (CLOCAL | CREAD);
 
-        tty.c_cflag &= ~(PARENB | PARODD);
+        if(parity == 1)
+        {
+            if(odd_parity == 1)
+            {
+                tty.c_cflag &= (PARENB | PARODD);
+            }
+            else
+            {
+                tty.c_cflag &= (PARENB | (~PARODD));
+            }
+        }
+        else
+        {
+            tty.c_cflag &= ~(PARENB | PARODD);
+        }
         tty.c_cflag |= parity;
 
-        tty.c_cflag &= ~CSTOPB;
-        tty.c_cflag &= ~CRTSCTS;
+        if(two_stop_bits == 1)
+        {
+            tty.c_cflag &= CSTOPB;
+        }
+        else
+        {
+            tty.c_cflag &= ~CSTOPB;
+        }
+
+        if(hardware_control == 1)
+        {
+            tty.c_cflag &= CRTSCTS;
+        }
+        else
+        {
+            tty.c_cflag &= ~CRTSCTS;
+        }
 
         if(tcsetattr(fd, TCSANOW, &tty) != 0)
         {
@@ -70,7 +102,15 @@ static int set_interface_attribs (int fd,
 }
 
 
-void connect_serial_port(int *fd, const char *port_name, int speed, int parity, int chars, int blocking)
+void connect_serial_port(int *fd,
+                         const char *port_name,
+                         int speed,
+                         int parity,
+                         int odd_parity,
+                         int chars,
+                         int blocking,
+                         int two_stop_bits,
+                         int hardware_control)
 {
     *fd = -1;
 
@@ -83,7 +123,7 @@ void connect_serial_port(int *fd, const char *port_name, int speed, int parity, 
         goto error_while_init;
     }
 
-    if(set_interface_attribs(*fd, speed, parity, chars, blocking) != SUCCESS)
+    if(set_interface_attribs(*fd, speed, parity, odd_parity, chars, blocking, two_stop_bits, hardware_control) != SUCCESS)
     {
         goto error_while_init;
     }
