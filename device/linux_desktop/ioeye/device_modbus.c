@@ -53,7 +53,7 @@ void connect_underlying_modbus_medium_guaranteed(Modbus *modbus)
         response_thread_started = 1;
     }
 
-    connect_serial_port(&(modbus->fd), PORT_NAME, B9600, 0, CS8, 1);
+    connect_serial_port(&(modbus->fd), PORT_NAME, B9600, 0, 0, CS8, 1, 0, 0);
 }
 
 
