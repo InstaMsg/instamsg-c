@@ -28,7 +28,7 @@ int main(int argc, char** argv)
     char *logFilePath = NULL;
 
 #if FILE_SYSTEM_ENABLED == 1
-    logFilePath = "./instamsg.log";
+    logFilePath = "instamsg.log";
 #else
     logFilePath = NULL;
 #endif

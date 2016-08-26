@@ -66,12 +66,17 @@ static int onConnectOneTimeOperations()
 }
 
 
+void release_app_resources()
+{
+}
+
+
 int main(int argc, char** argv)
 {
     char *logFilePath = NULL;
 
 #if FILE_SYSTEM_ENABLED == 1
-    logFilePath = LOG_FILE_PATH;
+    logFilePath = "instamsg.log";
 #else
     logFilePath = NULL;
 #endif
