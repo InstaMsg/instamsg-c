@@ -17,8 +17,7 @@ struct Serial
                                                unsigned char *commandBytes,
                                                int commandBytesLength,
                                                unsigned char *responseByteBuffer,
-                                               int *responseBytesLength,
-                                               unsigned char delimiter);
+                                               int *responseBytesLength);
 
     char serialCommands[SERIAL_COMMANDS_BUFFER_SIZE];
     unsigned char commandsLoaded;

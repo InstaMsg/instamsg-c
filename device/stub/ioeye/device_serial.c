@@ -24,8 +24,8 @@ void connect_underlying_serial_medium_guaranteed(Serial *serial)
  *
  *      * If #*responseBytesLength > 0, then #*responseBytesLength bytes are read.
  *
- *      * Else bytes are read, UNLESS #delimiter occurs in the response-stream.
- *        In this case, value for *responseBytesLength must be set appropriately.
+ *      * Else the command-response is delimited by a delimiter, and the device needs
+ *        to handle it appropriately, AND *responseBytesLength MUST BE SET APPROPRIATELY.
  *
  *
  *
@@ -35,14 +35,13 @@ void connect_underlying_serial_medium_guaranteed(Serial *serial)
  * SUCCESS, if everything went fine.
  *
  * *
- * FAILURE, if #*responseBytesLength could not be received.
+ * FAILURE, else.
  */
 int serial_send_command_and_read_response_sync(Serial *serial,
                                                unsigned char *commandBytes,
                                                int commandBytesLength,
                                                unsigned char *responseByteBuffer,
-                                               int *responseBytesLength,
-                                               unsigned char delimiter)
+                                               int *responseBytesLength)
 {
     return FAILURE;
 }
