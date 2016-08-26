@@ -59,19 +59,10 @@ void init_watchdog()
 /*
  * This method resets the watchdog-timer.
  *
- * Once this is completed, the watchdog-timer starts counting down from "n" seconds to 0.
- * Then either of the following must happen ::
+ * n         : Number of seconds the watchdog should wait for.
  *
- * a)
- * Counter reaches 0.
- *
- * In this case, the global "watchdog_expired" variable must be set to 1.
- * Also, if "immediate" is 1, the device must be reboooted immediately.
- *
- * b)
- * "watch_dog_disable()" (the global API-function) is called by the callee.
- *
- * In this case, the countdown-timer stops, and the device must not be reset/restarted.
+ * immediate : 0/1
+ *             Denotes whether the device should be reset/rebooted immediately.
  *
  */
 void do_watchdog_reset_and_enable(int n, unsigned char immediate)
