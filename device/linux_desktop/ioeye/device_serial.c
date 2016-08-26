@@ -1,6 +1,6 @@
-#include "device_modbus.h"
+#include "device_serial.h"
 
-#include "../../../common/ioeye/include/modbus.h"
+#include "../../../common/ioeye/include/serial.h"
 #include "../common/serial_port_utils.h"
 
 #include <termios.h>
@@ -16,10 +16,10 @@ static unsigned char *responseBuffer;
 static int bytesToRead;
 static int responseBytesSoFar;
 
-static int modbus_fd;
+static int serial_fd;
 static unsigned char readResponse;
 
-static void* modbus_poller_func(void *arg)
+static void* serial_poller_func(void *arg)
 {
     while(1)
     {
@@ -29,7 +29,7 @@ static void* modbus_poller_func(void *arg)
             continue;
         }
 
-        read(modbus_fd, responseBuffer + responseBytesSoFar, 1);
+        read(serial_fd, responseBuffer + responseBytesSoFar, 1);
         responseBytesSoFar++;
 
         if(responseBytesSoFar == bytesToRead)
@@ -43,17 +43,17 @@ static void* modbus_poller_func(void *arg)
 
 
 /*
- * This method initializes and connects to the Modbus-interface.
+ * This method initializes and connects to the serial-interface.
  */
-void connect_underlying_modbus_medium_guaranteed(Modbus *modbus)
+void connect_underlying_serial_medium_guaranteed(Serial *serial)
 {
     if(response_thread_started == 0)
     {
-        pthread_create(&tid, NULL, modbus_poller_func, NULL);
+        pthread_create(&tid, NULL, serial_poller_func, NULL);
         response_thread_started = 1;
     }
 
-    connect_serial_port(&(modbus->fd), PORT_NAME, B9600, 0, 0, CS8, 1, 0, 0);
+    connect_serial_port(&(serial->fd), PORT_NAME, B9600, 0, 0, CS8, 1, 0, 0);
 }
 
 
@@ -61,15 +61,20 @@ void connect_underlying_modbus_medium_guaranteed(Modbus *modbus)
  * This method ::
  *
  * a)
- * Sends the command to the modbus-interface.
+ * Sends the command to the serial-interface.
  *
  * b)
- * Receives "responseBytesLength" number of bytes from the interface, while the following method returns 1 ::
+ * Response is received in "responseByteBuffer", while the following method returns 1 ::
  *
  *                                          time_fine_for_time_limit_function()
  *
- * Note that the calling-function must provide the number of bytes (responseBytesLength), since
- * the number of expected bytes is always calculatable from the sending-command itself.
+ * Number of bytes to-be-actually read is determined from the following ::
+ *
+ *      * If #*responseBytesLength > 0, then #*responseBytesLength bytes are read.
+ *
+ *      * Else bytes are read, UNLESS #delimiter occurs in the response-stream.
+ *        In this case, value for *responseBytesLength must be set appropriately.
+ *
  *
  *
  * The function must return exactly one of the following ::
@@ -78,26 +83,23 @@ void connect_underlying_modbus_medium_guaranteed(Modbus *modbus)
  * SUCCESS, if everything went fine.
  *
  * *
- * FAILURE, if "responseBytesLength" could not be received.
- *
- *
- * In general, modbus-interface (unlike a network-interface) is not expected to take too long in returning the response.
- * It will either return the response quickly, or will never.
+ * FAILURE, if #*responseBytesLength could not be received.
  */
-int modbus_send_command_and_read_response_sync(Modbus *modbus,
+int serial_send_command_and_read_response_sync(Serial *serial,
                                                unsigned char *commandBytes,
                                                int commandBytesLength,
                                                unsigned char *responseByteBuffer,
-                                               int responseBytesLength)
+                                               int *responseBytesLength,
+                                               unsigned char delimiter)
 {
-    write(modbus->fd, commandBytes, commandBytesLength);
+    write(serial->fd, commandBytes, commandBytesLength);
 
     {
         responseBuffer = responseByteBuffer;
-        bytesToRead = responseBytesLength;
+        bytesToRead = *responseBytesLength;
         responseBytesSoFar = 0;
 
-        modbus_fd = modbus->fd;
+        serial_fd = serial->fd;
         readResponse = 1;
 
         while((readResponse == 1) && (time_fine_for_time_limit_function() == 1))
@@ -116,7 +118,7 @@ int modbus_send_command_and_read_response_sync(Modbus *modbus,
  * Returns SUCCESS, if the interface was closed successfully.
  *         FAILURE, if the interface could not be closed successfully.
  */
-int release_underlying_modbus_medium_guaranteed(Modbus *modbus)
+int release_underlying_serial_medium_guaranteed(Serial *serial)
 {
-    return disconnect_serial_port(modbus->fd);
+    return disconnect_serial_port(serial->fd);
 }

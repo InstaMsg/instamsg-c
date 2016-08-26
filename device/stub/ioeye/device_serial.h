@@ -1,32 +1,31 @@
-#ifndef IOEYE_MODBUS
-#define IOEYE_MODBUS
+#ifndef IOEYE_SERIAL
+#define IOEYE_SERIAL
 
 #include "../../../common/instamsg/driver/include/globals.h"
 #include "../../../common/ioeye/include/globals.h"
 
-typedef struct Modbus Modbus;
-typedef struct SimulatedModbus SimulatedModbus;
+typedef struct Serial Serial;
 
-struct Modbus
+struct Serial
 {
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
-    MODBUS_DEVICE_TYPE deviceType;
+    SERIAL_DEVICE_TYPE deviceType;
     const char *identifier;
     unsigned char assignedSerialNumber;
-    int (*send_command_and_read_response_sync)(Modbus *modbus,
+    int (*send_command_and_read_response_sync)(Serial *serial,
                                                unsigned char *commandBytes,
                                                int commandBytesLength,
                                                unsigned char *responseByteBuffer,
-                                               int responseBytesLength);
+                                               int *responseBytesLength,
+                                               unsigned char delimiter);
 
-    char modbusCommands[MODBUS_COMMAND_BUFFER_SIZE];
+    char serialCommands[SERIAL_COMMANDS_BUFFER_SIZE];
     unsigned char commandsLoaded;
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
 
 
 
     /* ============================= ANY EXTRA FIELDS GO HERE ============================================= */
-    int fd;
     /* ============================= ANY EXTRA FIELDS GO HERE ============================================= */
 };
 #endif
