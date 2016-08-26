@@ -14,6 +14,7 @@
  */
 void init_global_timer()
 {
+#error "Function not implemented."
 }
 
 
@@ -22,7 +23,7 @@ void init_global_timer()
  */
 unsigned long getMinimumDelayPossibleInMicroSeconds()
 {
-    return 0;
+#error "Function not implemented."
 }
 
 
@@ -31,6 +32,7 @@ unsigned long getMinimumDelayPossibleInMicroSeconds()
  */
 void minimumDelay()
 {
+#error "Function not implemented."
 }
 
 
@@ -39,17 +41,18 @@ void minimumDelay()
  */
 unsigned long getCurrentTick()
 {
+#error "Function not implemented."
 }
 
 
 #if GSM_TIME_SYNC_PRESENT == 1
 /*
- * Returns the current-timestamp, the original of which was returned via GSM. *
+ * Returns the current-timestamp, the original of which was returned via GSM.
  * Returns 0 in case no informaton is received from GSM (yet).
  */
 unsigned long get_GSM_timestamp()
 {
-    return 0;
+#error "Function not implemented."
 }
 #endif
 
@@ -62,5 +65,5 @@ unsigned long get_GSM_timestamp()
  */
 int sync_system_clock(DateParams *dateParams)
 {
-    return FAILURE;
+    return SUCCESS;
 }

@@ -56,5 +56,4 @@ int get_next_record_from_persistent_storage(char *buffer, int maxLength)
  */
 void release_data_logger()
 {
-#error "release_data_logger() method not defined."
 }

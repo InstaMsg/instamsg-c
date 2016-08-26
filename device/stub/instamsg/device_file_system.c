@@ -9,6 +9,7 @@
  */
 void connect_underlying_file_system_medium_guaranteed(FileSystem* fs)
 {
+#error "Function not implemented."
 }
 
 
@@ -28,7 +29,7 @@ void connect_underlying_file_system_medium_guaranteed(FileSystem* fs)
  */
 int file_system_read(FileSystem *fs, unsigned char* buffer, int len, unsigned char guaranteed)
 {
-    return FAILURE;
+#error "Function not implemented."
 }
 
 
@@ -48,7 +49,7 @@ int file_system_read(FileSystem *fs, unsigned char* buffer, int len, unsigned ch
  */
 int file_system_write(FileSystem *fs, unsigned char* buffer, int len)
 {
-    return FAILURE;
+#error "Function not implemented."
 }
 
 
@@ -57,7 +58,7 @@ int file_system_write(FileSystem *fs, unsigned char* buffer, int len)
  */
 int renameFile(FileSystem *fs, const char *oldPath, const char *newPath)
 {
-    return FAILURE;
+#error "Function not implemented."
 }
 
 
@@ -67,7 +68,7 @@ int renameFile(FileSystem *fs, const char *oldPath, const char *newPath)
  */
 int copyFile(FileSystem *fs, const char *oldPath, const char *newPath)
 {
-    return FAILURE;
+#error "Function not implemented."
 }
 
 
@@ -76,7 +77,7 @@ int copyFile(FileSystem *fs, const char *oldPath, const char *newPath)
  */
 int deleteFile(FileSystem *fs, const char *filePath)
 {
-    return FAILURE;
+#error "Function not implemented."
 }
 
 
@@ -96,7 +97,7 @@ void getFileListing(FileSystem *fs, char *buf, int maxValueLenAllowed, const cha
  */
 long getFileSize(FileSystem *fs, const char *filepath)
 {
-    return 0;
+#error "Function not implemented."
 }
 
 
@@ -106,6 +107,7 @@ long getFileSize(FileSystem *fs, const char *filepath)
  */
 void release_underlying_file_system_medium_guaranteed(FileSystem* fs)
 {
+#error "Function not implemented."
 }
 
 #endif

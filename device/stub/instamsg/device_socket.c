@@ -16,6 +16,7 @@
  */
 void get_latest_sms_containing_substring(Socket *socket, char *buffer, const char *substring)
 {
+#error "Function not implemented."
 }
 #endif
 
@@ -30,6 +31,7 @@ void get_latest_sms_containing_substring(Socket *socket, char *buffer, const cha
  */
 void connect_underlying_socket_medium_try_once(Socket* socket)
 {
+#error "Function not implemented."
 }
 
 
@@ -83,7 +85,7 @@ void connect_underlying_socket_medium_try_once(Socket* socket)
  */
 int socket_read(Socket* socket, unsigned char* buffer, int len, unsigned char guaranteed)
 {
-    return FAILURE;
+#error "Function not implemented."
 }
 
 
@@ -103,7 +105,7 @@ int socket_read(Socket* socket, unsigned char* buffer, int len, unsigned char gu
  */
 int socket_write(Socket* socket, unsigned char* buffer, int len)
 {
-    return FAILURE;
+#error "Function not implemented."
 }
 
 
@@ -115,4 +117,5 @@ int socket_write(Socket* socket, unsigned char* buffer, int len)
  */
 void release_underlying_socket_medium_guaranteed(Socket* socket)
 {
+#error "Function not implemented."
 }
