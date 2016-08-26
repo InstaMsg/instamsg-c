@@ -10,7 +10,7 @@ struct Serial
 {
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
     SERIAL_DEVICE_TYPE deviceType;
-    const char *identifier;
+    char identifier[50];
     unsigned char assignedSerialNumber;
     int (*send_command_and_read_response_sync)(Serial *serial,
                                                unsigned char *commandBytes,
