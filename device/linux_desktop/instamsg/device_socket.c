@@ -18,9 +18,11 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "../driver/include/globals.h"
 #include "../driver/include/socket.h"
+#include "../driver/include/log.h"
 
 #if GSM_INTERFACE_ENABLED == 1
 /*

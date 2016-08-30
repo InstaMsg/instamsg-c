@@ -1,8 +1,11 @@
 #include "../../../common/instamsg/driver/include/globals.h"
+#include "../../../common/instamsg/driver/include/misc.h"
+#include "../../../common/instamsg/driver/include/log.h"
 
 #include <fcntl.h>
 #include <errno.h>
 #include <termios.h>
+#include <unistd.h>
 #include <string.h>
 
 

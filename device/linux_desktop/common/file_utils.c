@@ -3,7 +3,8 @@
 
 #include "../../../common/instamsg/driver/include/globals.h"
 #include "../../../common/instamsg/driver/include/log.h"
-#include "../../../common/instamsg/driver/include/file_utils.h"
+
+#include "./file_utils.h"
 
 
 void sg_readLine(FILE_STRUCT *fp, char *buffer, int maxBufferLength)

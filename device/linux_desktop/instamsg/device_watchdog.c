@@ -7,9 +7,12 @@
 
 #include <pthread.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "../driver/include/globals.h"
+
 #include "../../../common/instamsg/driver/include/watchdog.h"
+#include "../../../common/instamsg/driver/include/misc.h"
 
 
 static volatile unsigned char watchdog;

@@ -5,7 +5,8 @@
 #include "../../../common/instamsg/driver/include/globals.h"
 #include "../../../common/instamsg/driver/include/log.h"
 #include "../../../common/instamsg/driver/include/file_system.h"
-#include "../../../common/instamsg/driver/include/file_utils.h"
+
+#include "../common/file_utils.h"
 
 #define DATA_FILE_NAME      "data.txt"
 

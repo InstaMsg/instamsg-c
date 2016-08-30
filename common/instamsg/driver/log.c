@@ -14,6 +14,7 @@
 #include "./include/log.h"
 #include "./include/globals.h"
 #include "./include/sg_stdlib.h"
+#include "./include/file_system.h"
 
 
 #define EXPIRY_SECONDS "600"

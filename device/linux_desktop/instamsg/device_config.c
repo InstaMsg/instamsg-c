@@ -14,7 +14,8 @@
 #include "../../../common/instamsg/driver/include/json.h"
 #include "../../../common/instamsg/driver/include/sg_mem.h"
 #include "../../../common/instamsg/driver/include/file_system.h"
-#include "../../../common/instamsg/driver/include/file_utils.h"
+
+#include "../common/file_utils.h"
 
 
 static char tempBuffer[1024];

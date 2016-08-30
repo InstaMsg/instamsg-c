@@ -1,5 +1,7 @@
 #include "./device_file_system.h"
+
 #include "../../../common/instamsg/driver/include/globals.h"
+#include "../../../common/instamsg/driver/include/log.h"
 
 #if FILE_SYSTEM_ENABLED == 1
 
@@ -7,6 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <dirent.h>
+#include <unistd.h>
 #include <sys/stat.h>
 
 
