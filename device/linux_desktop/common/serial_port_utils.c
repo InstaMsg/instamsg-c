@@ -59,22 +59,21 @@ static int set_interface_attribs (int fd,
         {
             if(odd_parity == 1)
             {
-                tty.c_cflag &= (PARENB | PARODD);
+                tty.c_cflag |= (PARENB | PARODD);
             }
             else
             {
-                tty.c_cflag &= (PARENB | (~PARODD));
+                tty.c_cflag |= (PARENB & (~PARODD));
             }
         }
         else
         {
             tty.c_cflag &= ~(PARENB | PARODD);
         }
-        tty.c_cflag |= parity;
 
         if(two_stop_bits == 1)
         {
-            tty.c_cflag &= CSTOPB;
+            tty.c_cflag |= CSTOPB;
         }
         else
         {
@@ -83,7 +82,7 @@ static int set_interface_attribs (int fd,
 
         if(hardware_control == 1)
         {
-            tty.c_cflag &= CRTSCTS;
+            tty.c_cflag |= CRTSCTS;
         }
         else
         {
