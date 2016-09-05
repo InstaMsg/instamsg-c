@@ -116,7 +116,7 @@ void connect_serial_port(int *fd,
 {
     *fd = -1;
 
-    *fd = open(port_name, O_RDWR | O_NOCTTY | O_SYNC);
+    *fd = open(port_name, O_RDWR | O_NOCTTY | O_SYNC | O_NDELAY);
     if(*fd < 0)
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("error %u opening %s: %s"), errno, port_name, strerror (errno));
