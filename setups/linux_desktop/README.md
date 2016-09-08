@@ -100,7 +100,7 @@ sudo apt-get install gstreamer1.0*
 [COMMON]     
 
 sudo apt-get install git    
-cd ~
+cd ~    
 git clone https://github.com/InstaMsg/instamsg-c.git     
 cd instamsg-c/setups/linux_desktop    
 sh setup.sh /path/of/binary    
