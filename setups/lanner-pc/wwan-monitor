@@ -1,0 +1,242 @@
+#!/usr/bin/python
+
+import time
+import sys
+import commands
+import os
+
+SUCCESS = 0
+FAILURE = -1
+
+MODEM_BASE_PATH = '/org/freedesktop/ModemManager1/Modem/'
+SMS_BASE_PATH   = '/org/freedesktop/ModemManager1/SMS/'
+
+MODEM_ID = -1
+
+modem_resets_failed = 0
+compulsory_modem_reset_done = 0
+
+SG_APN      =   "sg_apn"
+SG_USER     =   "sg_user"
+SG_PASS     =   "sg_pass"
+SG_PIN      =   "sg_pin"
+PROV_PIN    =   "prov_pin"
+SG_TIME     =   "time"
+
+
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+def log(l):
+    print l
+    sys.stdout.flush()
+
+def get_cmd_output(cmd):
+    return commands.getstatusoutput(cmd)[1]
+
+def log_command(cmd):
+    log('\n\n' + bcolors.BOLD + cmd + bcolors.ENDC)
+
+def log_output(output):
+    log(output)
+
+def log_failure():
+    log(bcolors.FAIL + '[FAIL]' + bcolors.ENDC)
+
+def log_success():
+    log(bcolors.OKGREEN + '[OK]' + bcolors.ENDC)
+
+def run_command_and_check_validity(cmd, output_substrings):
+    log_command(cmd)
+
+    command_output = get_cmd_output(cmd)
+    log_output(command_output)
+
+    for output_substring in output_substrings:
+        if ((output_substring in command_output) == False):
+            log_failure()
+            return [command_output, FAILURE]
+
+    log_success()
+    return [command_output, SUCCESS]
+
+def header_task(header):
+    log('\n\n\n' + bcolors.HEADER + '===========    ' + header + '    ===========' + bcolors.ENDC)
+
+def reset_modem_state():
+    global modem_resets_failed
+
+    header_task('RESETTING MODEM')
+
+    [output, status] = run_command_and_check_validity('mmcli -m ' + MODEM_ID + ' -r', ['successfully reseted the modem'])
+    if status == FAILURE:
+        modem_resets_failed = modem_resets_failed + 1
+
+        if modem_resets_failed == 10:
+            log('Resetting the modem failed 10 consecutive times.. no option left but to restart the machine');
+            run_command_and_check_validity('reboot', 'does not matter, script will not live to see this')
+        else:
+            modem_resets_failed = 0
+
+    time.sleep(10)
+
+def get_latest_provisioning_json_dict(smsPaths):
+    latest_sms_dict = None
+    latest_time = 0
+
+    for line in smsPaths.split('\n'):
+        if((SMS_BASE_PATH in line) == True):
+            sms_path = line.split()[0]
+            [output, status] = run_command_and_check_validity('mmcli -s ' + sms_path + ' | grep text | cut -d\\\' -f 2', [])
+
+            if(SG_APN in output) == True:
+                temp_dict = eval(output)
+                temp_time = long(temp_dict[SG_TIME])
+
+                if(temp_time > latest_time):
+                    latest_time = temp_time
+                    latest_sms_dict = temp_dict
+
+    return latest_sms_dict
+
+
+while True:
+    while True:
+        header_task('CHECKING MODEM PRESENCE')
+
+        [output, status] = run_command_and_check_validity('mmcli -L', [MODEM_BASE_PATH])
+        if status == SUCCESS:
+            break
+        time.sleep(1)
+
+    for line in output.split('\n'):
+        if((MODEM_BASE_PATH in line) == True):
+
+            if ('Unknown' in line) == True:
+                # Sometimes the modem gets into unknown-state.
+                # So, we must reset the modem, and restart from the beginning.
+                reset_modem_state();
+                continue
+
+            MODEM_ID = line[line.index(MODEM_BASE_PATH):].split()[0][len(MODEM_BASE_PATH):]
+
+
+
+    if compulsory_modem_reset_done == 0:
+        reset_modem_state()
+        compulsory_modem_reset_done = 1
+        continue
+
+    header_task('ENABLING MODEM')
+    [output, status] = run_command_and_check_validity('mmcli -m ' + MODEM_ID + ' -e', ['successfully enabled the modem'])
+    if status == FAILURE:
+        reset_modem_state()
+        continue
+
+    [output, status] = run_command_and_check_validity('mmcli -m ' + MODEM_ID + ' --set-allowed-modes=\'2G\'', ['successfully set current modes in the modem'])
+    if status == FAILURE:
+        reset_modem_state()
+        continue
+
+
+
+
+
+    while True:
+        header_task('FETCHING LATEST SMS')
+
+        [output, status] = run_command_and_check_validity('mmcli -m ' + MODEM_ID + ' --messaging-list-sms', [])
+        if status == FAILURE:
+            break
+
+        latest_sms = get_latest_provisioning_json_dict(output)
+        if latest_sms is not None:
+            log('Latest SMS extracted =====> ' + str(latest_sms))
+            break
+        else:
+            log('No provisioning-sms received till now .... waiting ..')
+            time.sleep(1)
+
+
+
+
+    header_task('ESTABLISHING CONNECTION')
+
+    bearer_string = ' --create-bearer="apn=%s,user=%s,password=%s"' % (latest_sms[SG_APN], latest_sms[SG_USER], latest_sms[SG_PASS],)
+    [output, status] = run_command_and_check_validity('mmcli -m ' + MODEM_ID + bearer_string, ['Successfully created new bearer in modem:'])
+    if status == FAILURE:
+        reset_modem_state()
+        continue
+
+    connect_string = ' --simple-connect="apn=%s,user=%s,password=%s"' % (latest_sms[SG_APN], latest_sms[SG_USER], latest_sms[SG_PASS],)
+    [output, status] = run_command_and_check_validity('mmcli -m ' + MODEM_ID + connect_string, ['successfully connected the modem'])
+    if status == FAILURE:
+        reset_modem_state()
+        continue
+
+    [output, status] = run_command_and_check_validity('/sbin/dhclient -r wwan0', [])
+    if status == FAILURE:
+        reset_modem_state()
+        continue
+
+    [output, status] = run_command_and_check_validity('/sbin/dhclient wwan0', [])
+    if status == FAILURE:
+        reset_modem_state()
+        continue
+
+
+
+
+
+    while True:
+        header_task('CHECKING CONNECTION SANITY AT [' + time.ctime() + ']')
+
+        [output, status] = run_command_and_check_validity('/sbin/ifconfig | grep -A 2 wwan0 | grep "inet addr:"', ['inet addr:'])
+        if status == FAILURE:
+            reset_modem_state()
+            break
+
+        [output, status] = run_command_and_check_validity('mmcli -m ' + MODEM_ID + ' | grep "power state"', ['power state: \'on\''])
+        if status == FAILURE:
+            reset_modem_state()
+            break
+
+        [output, status] = run_command_and_check_validity('mmcli -m ' + MODEM_ID + ' | grep -v "power state" | grep state',
+                                                            ['state: \'connected\''])
+        if status == FAILURE:
+            reset_modem_state()
+            break
+
+        [output, status] = run_command_and_check_validity('mmcli -m ' + MODEM_ID + ' | grep allowed | grep "current:"',
+                                                            ['current: \'allowed: 2g; preferred: none\''])
+        if status == FAILURE:
+            reset_modem_state()
+            break
+
+        # Fetch the signal-quality, and persist it so that the user-application may use it.
+        [output, status] = run_command_and_check_validity('mmcli -m ' + MODEM_ID + ' | grep "signal quality"', ['signal quality'])
+        if status == FAILURE:
+            reset_modem_state()
+            break
+
+        TEMP_SIGNAL_FILE = '/tmp/signal'
+        IPC_SIGNAL_STRENGTH_FILE = '/home/sensegrow/signal'
+
+        f = open(TEMP_SIGNAL_FILE, 'w')
+        strength = int((int(output.split('\'')[1]) * 31) / 100)
+        f.write(str(strength))
+        f.close()
+
+        os.rename(TEMP_SIGNAL_FILE, IPC_SIGNAL_STRENGTH_FILE)
+
+
+        time.sleep(30)
+

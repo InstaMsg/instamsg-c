@@ -59,9 +59,8 @@ SOURCES=`echo                                                                   
 
 SOURCES=`echo ${SOURCES} | sed -e 's|VENDOR|'"${VENDOR}"'|g'`
 
-OUT_DIR="build/${APP}/${VENDOR}"
+OUT_DIR="setups/${VENDOR}"
 mkdir -p ${OUT_DIR}
-rm -f ${OUT_DIR}/*
 
 
 COMPILE_COMMAND="${COMPILE_COMMAND} ${APP_COMPILER_DIRECTIVES} "
