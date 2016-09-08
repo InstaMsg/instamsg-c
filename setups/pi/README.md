@@ -10,7 +10,7 @@ MAC-Address, as displayed by running the command “ifconfig” on the raspberry
 Provisioning on InstaMsg-Server
 ==================================
 
-1)
+1)    
 Enter test in (Re-)Activate Provisioning
 
 
