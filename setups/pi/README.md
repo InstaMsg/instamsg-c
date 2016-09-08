@@ -16,7 +16,7 @@ Enter test in (Re-)Activate Provisioning
 
 
 
-[ONLY FOR energy-meter BINARY] Setting up the modbus-serial port on /dev/ttyUSB0 
+[ONLY FOR energy-meter BINARY] Setting up the modbus-serial port on /dev/ttyUSB0
 ==================================================================================
 
 1)
@@ -26,7 +26,7 @@ lsusb
 
 Let the output be ::
 
-Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub    
 Bus 001 Device 010: ID 0403:6001 FTDI FT232 USB-Serial (UART) IC
 Bus 001 Device 005: ID 0402:5632 ALi Corp. USB 2.0 Host-to-Host Link
 
