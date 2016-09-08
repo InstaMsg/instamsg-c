@@ -80,6 +80,8 @@ int main(int argc, char** argv)
     logFilePath = NULL;
 #endif
 
+    strcpy(TOPIC, "listener_topic");
+
     globalSystemInit(logFilePath);
     start(onConnectOneTimeOperations, NULL, oneToOneMessageHandler, NULL, 1);
 }
