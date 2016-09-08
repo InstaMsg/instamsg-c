@@ -1,6 +1,5 @@
 #include "../../instamsg/driver/include/instamsg.h"
 #include "../../instamsg/driver/include/sg_mem.h"
-#include "../utils/publisher_subscriber_init.h"
 
 char TOPIC[100];
 
@@ -80,12 +79,6 @@ int main(int argc, char** argv)
 #else
     logFilePath = NULL;
 #endif
-
-    /*
-     * This method is only for the test publisher/subscriber apps.
-     * For real-world apps, this method will not be needed.
-     */
-    init_publisher_subscriber_params(argc, argv, &logFilePath);
 
     globalSystemInit(logFilePath);
     start(onConnectOneTimeOperations, NULL, oneToOneMessageHandler, NULL, 1);
