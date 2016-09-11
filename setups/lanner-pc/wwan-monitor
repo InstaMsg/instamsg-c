@@ -11,6 +11,8 @@ FAILURE = -1
 MODEM_BASE_PATH = '/org/freedesktop/ModemManager1/Modem/'
 SMS_BASE_PATH   = '/org/freedesktop/ModemManager1/SMS/'
 
+SMS_FILE        = '/home/sensegrow/sms.txt'
+
 MODEM_ID = -1
 
 modem_resets_failed = 0
@@ -104,6 +106,16 @@ def get_latest_provisioning_json_dict(smsPaths):
                 if(temp_time > latest_time):
                     latest_time = temp_time
                     latest_sms_dict = temp_dict
+
+    # If no sms could be read from SIM, try reading from backup-storage.
+    if latest_sms_dict is None:
+        try:
+            sms_file = open(SMS_FILE, 'r')
+            latest_sms_dict = eval(sms_file.readlines()[0].strip())
+            sms_file.close()
+        except:
+            log('Could not read any sms from backup-file [' + SMS_FILE + ']')
+
 
     return latest_sms_dict
 
