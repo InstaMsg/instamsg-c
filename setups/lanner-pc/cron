@@ -1,4 +1,3 @@
 */1 * * * * /home/sensegrow/monitor.sh
 */1 * * * * echo > /home/sensegrow/instamsg.log
 */1 * * * * echo > /home/sensegrow/wwan-monitor.log
-0   * * * * /sbin/ifconfig wwan0 down
