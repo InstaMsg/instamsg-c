@@ -8,7 +8,7 @@ add-apt-repository -y ppa:aleksander-m/modemmanager-trusty
 apt-get update
 apt-get install -y modemmanager
 
-echo SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"067b\", ATTRS{idProduct}==\"2303\", ATTRS{serial}==\"0000:00:14.0\", SYMLINK+=\"ttyUSB0\" > /etc/udev/rules.d/99-usb-serial.rules
+touch /etc/udev/rules.d/99-usb-serial.rules
 chmod 777 /etc/udev/rules.d/99-usb-serial.rules
 
 HOME_DIRECTORY="/home/sensegrow"
