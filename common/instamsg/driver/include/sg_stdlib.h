@@ -34,6 +34,8 @@
 int sg_atoi(const char *buf);
 char* sg_strnstr(const char *str1, const char *str2, int maxSize);
 void get_nth_token(char *original, char separator, int pos, char **res);
+void get_nth_token_thread_safe(char *original, char separator, int pos, char *res, unsigned char strip);
 void strip_leading_and_trailing_white_paces(char *buffer);
+int get_character_count(char *buffer, char c);
 
 #endif

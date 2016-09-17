@@ -32,12 +32,232 @@
 #include "../../../common/instamsg/driver/include/globals.h"
 #include "../../../common/instamsg/driver/include/misc.h"
 #include "../../../common/instamsg/driver/include/log.h"
+#include "../../../common/instamsg/driver/include/sg_stdlib.h"
+
 
 #include <fcntl.h>
 #include <errno.h>
 #include <termios.h>
 #include <unistd.h>
 #include <string.h>
+
+#include "./serial_port_utils.h"
+
+struct baud_struct
+{
+    char *user_baud_string;
+    char *baud_string;
+    int baud;
+};
+
+struct baud_struct BAUD_RATES[] =
+{
+    {
+        "1800",
+        "B1800",
+        B1800
+    },
+    {
+        "2400",
+        "B2400",
+        B2400
+    },
+    {
+        "4800",
+        "B4800",
+        B4800
+    },
+    {
+        "9600",
+        "B9600",
+        B9600
+    },
+    {
+        "19200",
+        "B19200",
+        B19200
+    },
+    {
+        "38400",
+        "B38400",
+        B38400
+    },
+    {
+        "57600",
+        "B57600",
+        B57600
+    },
+    {
+        "115200",
+        "B115200",
+        B115200
+    },
+    {
+        "230400",
+        "B230400",
+        B230400
+    },
+    {
+        NULL,
+        NULL,
+        0
+    }
+};
+
+
+struct char_struct
+{
+    char *user_chars_string;
+    char *chars_string;
+    int chars;
+};
+
+struct char_struct CHAR_COUNTS[] =
+{
+    {
+        "5",
+        "CS5",
+        CS5
+    },
+    {
+        "6",
+        "CS6",
+        CS6
+    },
+    {
+        "7",
+        "CS7",
+        CS7
+    },
+    {
+        "8",
+        "CS8",
+        CS8
+    }
+};
+
+
+
+void parse_serial_connection_params(char *params_string,
+                                    int *speed,
+                                    int *parity,
+                                    int *odd_parity,
+                                    int *chars,
+                                    int *blocking,
+                                    int *two_stop_bits,
+                                    int *hardware_control)
+
+{
+    char small[10];
+    int i = 0;
+
+    char *speed_string  = "";
+    char *chars_string  = "";
+
+    /*
+     * First, set the default values, equal to 9600 8N1 No-Flow-Control.
+     *                          B9600, 0, 0, CS8, 1, 0, 0
+     */
+    *speed              =   B9600;
+    speed_string        =   "B9600";
+
+    *parity             =   0;
+    *odd_parity         =   0;
+
+    *chars              =   CS8;
+    chars_string        =   "CS8";
+
+    *blocking           =   1;
+    *two_stop_bits      =   0;
+    *hardware_control   =   0;
+
+
+    {
+        int comma_count = get_character_count(params_string, ',');
+        if(comma_count != 6)
+        {
+            sg_sprintf(LOG_GLOBAL_BUFFER, "Number of commas in serial-params [%s] is wrong, using default values", params_string);
+            error_log(LOG_GLOBAL_BUFFER);
+
+            goto exit;
+        }
+    }
+
+
+    memset(small, 0, sizeof(small));
+    get_nth_token_thread_safe(params_string, ',', 1, small, 1);
+    i = 0;
+    while(1)
+    {
+        if(BAUD_RATES[i].user_baud_string == NULL)
+        {
+            break;
+        }
+
+        if(strcmp(BAUD_RATES[i].user_baud_string, small) == 0)
+        {
+            *speed = BAUD_RATES[i].baud;
+            speed_string = BAUD_RATES[i].baud_string;
+
+            break;
+        }
+    }
+
+    memset(small, 0, sizeof(small));
+    get_nth_token_thread_safe(params_string, ',', 2, small, 1);
+    *parity = sg_atoi(small);
+
+    memset(small, 0, sizeof(small));
+    get_nth_token_thread_safe(params_string, ',', 3, small, 1);
+    *odd_parity = sg_atoi(small);
+
+    memset(small, 0, sizeof(small));
+    get_nth_token_thread_safe(params_string, ',', 4, small, 1);
+    i = 0;
+    while(1)
+    {
+        if(CHAR_COUNTS[i].user_chars_string == NULL)
+        {
+            break;
+        }
+
+        if(strcmp(CHAR_COUNTS[i].user_chars_string, small) == 0)
+        {
+            *chars = CHAR_COUNTS[i].chars;
+            chars_string = CHAR_COUNTS[i].chars_string;
+
+            break;
+        }
+    }
+
+    memset(small, 0, sizeof(small));
+    get_nth_token_thread_safe(params_string, ',', 5, small, 1);
+    *blocking = sg_atoi(small);
+
+    memset(small, 0, sizeof(small));
+    get_nth_token_thread_safe(params_string, ',', 6, small, 1);
+    *two_stop_bits = sg_atoi(small);
+
+    memset(small, 0, sizeof(small));
+    get_nth_token_thread_safe(params_string, ',', 7, small, 1);
+    *hardware_control = sg_atoi(small);
+
+
+
+exit:
+    sg_sprintf(LOG_GLOBAL_BUFFER, "Extracted Serial-Params from [%s] :: \n\n"
+                                  "Speed        =   [%s]\n"
+                                  "Parity       =   [%u]\n"
+                                  "Odd-Parity   =   [%u]\n"
+                                  "Chars        =   [%s]\n"
+                                  "Blocking     =   [%u]\n"
+                                  "2-stop-bits  =   [%u]\n"
+                                  "HW-control   =   [%u]\n",
+               params_string, speed_string, *parity, *odd_parity, chars_string, *blocking, *two_stop_bits, *hardware_control);
+
+    info_log(LOG_GLOBAL_BUFFER);
+}
+
 
 
 static int set_interface_attribs (int fd,

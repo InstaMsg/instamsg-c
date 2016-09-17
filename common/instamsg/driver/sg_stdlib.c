@@ -31,6 +31,8 @@
 
 #include <string.h>
 
+#include "./include/sg_stdlib.h"
+
 int sg_atoi(const char *buf)
 {
     int result, len, i, exponent, k;
@@ -190,6 +192,75 @@ void get_nth_token(char *original, char separator, int pos, char **res)
 }
 
 
+void get_nth_token_thread_safe(char *original, char separator, int pos, char *res, unsigned char strip)
+{
+    int buffer_index = 0, num_separators_encountered = 0, token_start_pos = 0, tmp_index = 0;
+    int token_end_pos = -1;
+
+    while(1)
+    {
+    	if(buffer_index == strlen(original))
+    	{
+            if(num_separators_encountered > 0)
+            {
+                if(num_separators_encountered == (pos - 1))
+                {
+                    token_end_pos = buffer_index;
+                }
+            }
+    		break;
+    	}
+
+    	if(original[buffer_index] == separator)
+    	{
+    		num_separators_encountered++;
+
+    		if(num_separators_encountered == pos)
+    		{
+    			token_end_pos = buffer_index;
+    			break;
+    		}
+    		else
+    		{
+    			token_start_pos = buffer_index + 1;
+    		}
+    	}
+
+    	buffer_index++;
+    }
+
+
+    if(token_end_pos == -1)
+    {
+    	if(num_separators_encountered == 0)
+    	{
+    		/*
+    		 * If no separator found, this means that the whole original-string is the token.
+    		 */
+    		token_end_pos = strlen(original);
+    	}
+    	else
+    	{
+    		return;
+    	}
+    }
+
+    buffer_index = 0;
+    for(tmp_index = token_start_pos; tmp_index < token_end_pos; tmp_index++)
+    {
+    	res[buffer_index] = original[tmp_index];
+    	buffer_index++;
+    }
+
+    res[buffer_index] = 0;
+
+    if(strip == 1)
+    {
+        strip_leading_and_trailing_white_paces(res);
+    }
+}
+
+
 void strip_leading_and_trailing_white_paces(char *buffer)
 {
 	int i = 0;
@@ -222,16 +293,25 @@ void strip_leading_and_trailing_white_paces(char *buffer)
 }
 
 
+int get_character_count(char *buffer, char c)
+{
+    int res = 0, i = 0;
+    int len = strlen(buffer);
+
+    for(i = 0; i < len; i++)
+    {
+        if(buffer[i] == c)
+        {
+            res++;
+        }
+    }
+
+    return res;
+}
+
+
 #if 0
 int main()
 {
-    printf("%d\n", sg_atoi("   123    "));
-    printf("%d\n", sg_atoi(" ajay123  "));
-    printf("%d\n", sg_atoi("  123ajay  "));
-    printf("%d\n", sg_atoi("  ajay123ajay  "));
-    printf("%d\n", sg_atoi("  -123  "));
-    printf("%d\n", sg_atoi(" -ajay123  "));
-    printf("%d\n", sg_atoi("  -123ajay  "));
-    printf("%d\n", sg_atoi("  -ajay123ajay "));
 }
 #endif

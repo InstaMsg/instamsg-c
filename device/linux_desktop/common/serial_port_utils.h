@@ -32,6 +32,10 @@
 #ifndef COMMON_SERIAL_PORT_UTILS
 #define COMMON_SERIAL_PORT_UTILS
 
+#include <termios.h>
+
+
+
 void connect_serial_port(int *fd,
                          const char *port_name,
                          int speed,
