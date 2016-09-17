@@ -9,6 +9,8 @@ ${SSH_COMMAND} "sed -i 's/^[ :\t]*\/etc\/init.d\/event_sms start/#\/etc\/init.d\
 
 ${SSH_COMMAND} "sed -i 's/^[ :\t]*\/usr\/sbin\/event_sms.sh/#\/usr\/sbin\/event_sms.sh/g' /etc/init.d/event_sms"
 
+${SSH_COMMAND} "sed -i 's/^[ :\t]*exit 0/\/home\/sensegrow\/monitor.sh \&\nexit 0/g' /etc/rc.local"
+
 ${SSH_COMMAND} "killall instamsg"
 
 ${SSH_COMMAND} "mkdir -p ${HOME_DIRECTORY}"

@@ -18,6 +18,7 @@ chmod -R 777 "${HOME_DIRECTORY}"
 
 cp monitor.sh "${HOME_DIRECTORY}"
 chmod 777 "${HOME_DIRECTORY}/monitor.sh"
+sed -i 's/^[ :\t]*exit 0/\/home\/sensegrow\/monitor.sh \&\nexit 0/g' /etc/rc.local
 
 kill -9 `pgrep -x instamsg` || true
 cp $1 "${HOME_DIRECTORY}/instamsg"
