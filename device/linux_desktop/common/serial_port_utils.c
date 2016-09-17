@@ -155,17 +155,17 @@ void parse_serial_connection_params(char *params_string,
     char *chars_string  = "";
 
     /*
-     * First, set the default values, equal to 9600 8N1 No-Flow-Control.
-     *                          B9600, 0, 0, CS8, 1, 0, 0
+     * First, set the default values, equal to 230400 7N1 No-Flow-Control.
+     *                          B230400, 0, 0, CS7, 1, 0, 0
      */
-    *speed              =   B9600;
-    speed_string        =   "B9600";
+    *speed              =   B230400;
+    speed_string        =   "B230400";
 
     *parity             =   0;
     *odd_parity         =   0;
 
-    *chars              =   CS8;
-    chars_string        =   "CS8";
+    *chars              =   CS7;
+    chars_string        =   "CS7";
 
     *blocking           =   1;
     *two_stop_bits      =   0;
@@ -355,16 +355,11 @@ static int set_interface_attribs (int fd,
 }
 
 
-void connect_serial_port(int *fd,
-                         const char *port_name,
-                         int speed,
-                         int parity,
-                         int odd_parity,
-                         int chars,
-                         int blocking,
-                         int two_stop_bits,
-                         int hardware_control)
+void connect_serial_port(int *fd, const char *port_name, char *params_string)
 {
+    int speed = 0, parity = 0, odd_parity = 0, chars = 0, blocking = 0, two_stop_bits = 0, hardware_control = 0;
+    parse_serial_connection_params(params_string, &speed, &parity, &odd_parity, &chars, &blocking, &two_stop_bits, &hardware_control);
+
     *fd = -1;
 
     *fd = open(port_name, O_RDWR | O_NOCTTY | O_SYNC | O_NDELAY);

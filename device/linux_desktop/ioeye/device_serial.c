@@ -19,43 +19,6 @@ static int responseBytesSoFar;
 static int serial_fd;
 static unsigned char readResponse;
 
-void parse_serial_connection_params(char *params_string,
-                                    int *speed,
-                                    int *parity,
-                                    int *odd_parity,
-                                    int *chars,
-                                    int *blocking,
-                                    int *two_stop_bits,
-                                    int *hardware_control)
-
-{
-    char small[10];
-
-    char *speed_string  = "";
-    char *chars_string  = "";
-
-    /*
-     * First, set the default values, equal to 9600 8N1 No-Flow-Control.
-     *                          B9600, 0, 0, CS8, 1, 0, 0
-     */
-    *speed              =   B9600;
-    speed_string        =   "B9600";
-
-    *parity             =   0;
-    *odd_parity         =   0;
-
-    *chars              =   CS8;
-    chars_string        =   "CS8";
-
-    *blocking           =   1;
-    *two_stop_bits      =   0;
-    *hardware_control   =   0;
-
-    memset(small, 0, sizeof(small));
-    get_nth_token_thread_safe(params_string, ',', 1, small);
-
-    {
-        int comma_count = get_character_count(params_string, ',');
 static void* serial_poller_func(void *arg)
 {
     while(1)
@@ -90,7 +53,7 @@ void connect_underlying_serial_medium_guaranteed(Serial *serial)
         response_thread_started = 1;
     }
 
-    connect_serial_port(&(serial->fd), PORT_NAME, B9600, 0, 0, CS8, 1, 0, 0);
+    connect_serial_port(&(serial->fd), PORT_NAME, serial->serialParams);
 }
 
 
