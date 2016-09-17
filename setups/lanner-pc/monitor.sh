@@ -27,5 +27,5 @@ do
 	    echo "WWAN-Monitor Binary running fine"
     fi
 
-    sleep 10
+    sleep 60
 done
