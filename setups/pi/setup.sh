@@ -7,6 +7,7 @@ sudo chmod -R 777 "${HOME_DIRECTORY}"
 
 sudo cp monitor.sh "${HOME_DIRECTORY}"
 sudo chmod 777 "${HOME_DIRECTORY}/monitor.sh"
+sudo sed -i '/^[ :\t]*\/home\/sensegrow\/monitor.sh \&/d' /etc/rc.local
 sudo sed -i 's/^[ :\t]*exit 0/\/home\/sensegrow\/monitor.sh \&\nexit 0/g' /etc/rc.local
 
 sudo cp $1 "${HOME_DIRECTORY}/instamsg"
