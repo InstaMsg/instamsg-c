@@ -201,6 +201,8 @@ void parse_serial_connection_params(char *params_string,
 
             break;
         }
+
+        i++;
     }
 
     memset(small, 0, sizeof(small));
@@ -228,6 +230,8 @@ void parse_serial_connection_params(char *params_string,
 
             break;
         }
+
+        i++;
     }
 
     memset(small, 0, sizeof(small));

@@ -33,7 +33,7 @@
 #ifndef DEVICE_DEFINES
 #define DEVICE_DEFINES
 
-#define DEVICE_VERSION "2.50.0"
+#define DEVICE_VERSION "2.70.0"
 
 /*
  * We use the vanilla "sprintf" method for Linux.
