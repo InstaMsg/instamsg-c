@@ -1,3 +1,2 @@
-*/5 * * * * /home/sensegrow/monitor.sh
 */1 * * * * echo > /home/sensegrow/instamsg.log
 0   * * * * /usr/bin/killall instamsg

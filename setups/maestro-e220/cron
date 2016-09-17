@@ -1,2 +1,1 @@
-*/1 * * * * /overlay/home/sensegrow/monitor.sh
 */1 * * * * echo > /overlay/home/sensegrow/instamsg.log
