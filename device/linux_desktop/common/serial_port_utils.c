@@ -133,6 +133,11 @@ struct char_struct CHAR_COUNTS[] =
         "8",
         "CS8",
         CS8
+    },
+    {
+        NULL,
+        NULL,
+        0
     }
 };
 
