@@ -104,11 +104,12 @@ static void trim_buffer_to_contain_only_first_required_sentence_type(unsigned ch
 }
 
 
+static char t[100];
+
 #if GPS_TIME_SYNC_PRESENT == 1
 int fill_in_time_coordinates_from_sentence(char *buffer, int bufferLength, DateParams *dateParams, const char *sentenceType)
 {
     char *original = buffer;
-    char *t = NULL;
     unsigned int number;
     int tmp;
 
@@ -153,7 +154,8 @@ int fill_in_time_coordinates_from_sentence(char *buffer, int bufferLength, DateP
                 goto failure;
             }
 
-            get_nth_token(original, ',', 1, &t);
+            memset(t, 0, sizeof(t));
+            get_nth_token_thread_safe(original, ',', 1, t, 1);
             if(strcmp(t, "$GPRMC") != 0)
             {
                 sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFirst token is not $GPRMC in GPRMC-sentence [%s]."), GPS_ERROR, original);
@@ -162,7 +164,8 @@ int fill_in_time_coordinates_from_sentence(char *buffer, int bufferLength, DateP
                 goto failure;
             }
 
-            get_nth_token(original, ',', 3, &t);
+            memset(t, 0, sizeof(t));
+            get_nth_token_thread_safe(original, ',', 3, t, 1);
             if(strcmp(t, "A") != 0)
             {
                 sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sThird token [%s] indicates GPRMC-sentence [%s] is invalid."), GPS_ERROR, t, original);
@@ -171,7 +174,8 @@ int fill_in_time_coordinates_from_sentence(char *buffer, int bufferLength, DateP
                 goto failure;
             }
 
-            get_nth_token(original, ',', 2, &t);
+            memset(t, 0, sizeof(t));
+            get_nth_token_thread_safe(original, ',', 2, t, 1);
             for(tmp = 0; tmp < strlen(t); tmp++)
             {
         	    if(t[tmp] == '.')
@@ -199,7 +203,8 @@ int fill_in_time_coordinates_from_sentence(char *buffer, int bufferLength, DateP
 
                 dateParams->tm_hour = number;
 
-                get_nth_token(original, ',', 10, &t);
+                memset(t, 0, sizeof(t));
+                get_nth_token_thread_safe(original, ',', 10, t, 1);
                 number = sg_atoi(t);
                 if( (strlen(t) != 6) || (number < 1) )
                 {

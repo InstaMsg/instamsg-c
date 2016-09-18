@@ -130,68 +130,6 @@ char* sg_strnstr(const char *str1, const char *str2, int maxSize)
 }
 
 
-static char temp[100];
-void get_nth_token(char *original, char separator, int pos, char **res)
-{
-    int buffer_index = 0, num_separators_encountered = 0, token_start_pos = 0, tmp_index = 0;
-    int token_end_pos = -1;
-
-    memset(temp, 0, sizeof(temp));
-
-    while(1)
-    {
-    	if(buffer_index == strlen(original))
-    	{
-    		break;
-    	}
-
-    	if(original[buffer_index] == separator)
-    	{
-    		num_separators_encountered++;
-
-    		if(num_separators_encountered == pos)
-    		{
-    			token_end_pos = buffer_index;
-    			break;
-    		}
-    		else
-    		{
-    			token_start_pos = buffer_index + 1;
-    		}
-    	}
-
-    	buffer_index++;
-    }
-
-
-    if(token_end_pos == -1)
-    {
-    	if(num_separators_encountered == 0)
-    	{
-    		/*
-    		 * If no separator found, this means that the whole original-string is the token.
-    		 */
-    		token_end_pos = strlen(original);
-    	}
-    	else
-    	{
-    		*res = NULL;
-    		return;
-    	}
-    }
-
-    buffer_index = 0;
-    for(tmp_index = token_start_pos; tmp_index < token_end_pos; tmp_index++)
-    {
-    	temp[buffer_index] = original[tmp_index];
-    	buffer_index++;
-    }
-
-    temp[tmp_index] = 0;
-    *res = temp;
-}
-
-
 void get_nth_token_thread_safe(char *original, char separator, int pos, char *res, unsigned char strip)
 {
     int buffer_index = 0, num_separators_encountered = 0, token_start_pos = 0, tmp_index = 0;
