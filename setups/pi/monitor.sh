@@ -1,3 +1,5 @@
+#!/bin/sh
+
 while true
 do
     PID=`ps -aux | grep -v grep | grep -v tail | grep instamsg`

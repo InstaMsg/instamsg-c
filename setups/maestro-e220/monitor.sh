@@ -1,3 +1,5 @@
+#!/bin/sh
+
 while true
 do
     PID=`ps | grep instamsg | grep -v grep | grep -v tail | sed -e 's/^ *//g' | cut -d\  -f 1`
