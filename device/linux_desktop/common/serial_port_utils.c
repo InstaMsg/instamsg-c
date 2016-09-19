@@ -364,14 +364,20 @@ static int set_interface_attribs (int fd,
 }
 
 
-void connect_serial_port(int *fd, const char *port_name, char *params_string)
+void connect_serial_port(int *fd, const char *port_name, char *params_string, unsigned char use_ndelay_flag)
 {
     int speed = 0, parity = 0, odd_parity = 0, chars = 0, blocking = 0, two_stop_bits = 0, hardware_control = 0;
     parse_serial_connection_params(params_string, &speed, &parity, &odd_parity, &chars, &blocking, &two_stop_bits, &hardware_control);
 
     *fd = -1;
-
-    *fd = open(port_name, O_RDWR | O_NOCTTY | O_SYNC | O_NDELAY);
+    if(use_ndelay_flag == 1)
+    {
+        *fd = open(port_name, O_RDWR | O_NOCTTY | O_SYNC | O_NDELAY);
+    }
+    else
+    {
+        *fd = open(port_name, O_RDWR | O_NOCTTY | O_SYNC);
+    }
     if(*fd < 0)
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("error %u opening %s: %s"), errno, port_name, strerror (errno));

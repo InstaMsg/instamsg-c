@@ -34,7 +34,7 @@
 
 #include <termios.h>
 
-void connect_serial_port(int *fd, const char *port_name, char *params_string);
+void connect_serial_port(int *fd, const char *port_name, char *params_string, unsigned char use_ndelay_flag);
 int disconnect_serial_port(int fd);
 
 #endif
