@@ -1338,6 +1338,14 @@ void clearInstaMsg(InstaMsg *c)
 #endif
 
     c->connected = 0;
+
+#if MEDIA_STREAMING_ENABLED == 1
+    /*
+     * If we need to clear (most probably due to no network-connection, we must then restart if media-streaming is enabled.
+     * Else, the media-reply message will not be re-sent.
+     */
+    exitApp();
+#endif
 }
 
 
