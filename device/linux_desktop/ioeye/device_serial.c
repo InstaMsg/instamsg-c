@@ -53,7 +53,7 @@ void connect_underlying_serial_medium_guaranteed(Serial *serial)
         response_thread_started = 1;
     }
 
-    connect_serial_port(&(serial->fd), PORT_NAME, serial->serialParams);
+    connect_serial_port(&(serial->fd), PORT_NAME, serial->serialParams, 0);
 }
 
 
