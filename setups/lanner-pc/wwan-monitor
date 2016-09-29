@@ -12,6 +12,8 @@ MODEM_BASE_PATH = '/org/freedesktop/ModemManager1/Modem/'
 SMS_BASE_PATH   = '/org/freedesktop/ModemManager1/SMS/'
 
 SMS_FILE        = '/home/sensegrow/sms.txt'
+IMEI_FILE       = '/home/sensegrow/imei'
+IMSI_FILE       = '/home/sensegrow/imsi'
 
 MODEM_ID = -1
 
@@ -89,6 +91,16 @@ def reset_modem_state():
             modem_resets_failed = 0
 
     time.sleep(10)
+
+def update_modem_metainfo(key, file_path, extension_command):
+    [output, status] = run_command_and_check_validity('mmcli -m ' + MODEM_ID + ' ' + extension_command, [])
+    if status == SUCCESS:
+        try:
+            file_p = open(file_path, 'w')
+            file_p.write(output.strip())
+            file_p.close()
+        except:
+            log('Could not write [' + key + '] value to file [' + file_path + ']')
 
 def get_latest_provisioning_json_dict(smsPaths):
     latest_sms_dict = None
@@ -178,6 +190,9 @@ while True:
             time.sleep(1)
 
 
+
+    update_modem_metainfo('IMEI', IMEI_FILE, '--card-get-imei')
+    update_modem_metainfo('IMSI', IMSI_FILE, '--card-get-imsi')
 
 
     header_task('ESTABLISHING CONNECTION')
