@@ -1310,6 +1310,7 @@ static void removeExpiredOneToOneResponseHandlers(InstaMsg *c)
 }
 
 
+static void waitForPingResp();
 void sendPingReqToServer(InstaMsg *c)
 {
     int len;
@@ -1330,6 +1331,8 @@ void sendPingReqToServer(InstaMsg *c)
     {
         pingReqResponsePending = 1;
         sendPacket(c, &(c->ipstack), GLOBAL_BUFFER, len);
+
+        waitForPingResp();
     }
 }
 
@@ -2616,10 +2619,13 @@ static void waitForPingResp()
                         pingRespAttempts = pingRespAttempts + 1;
                         if(pingRespAttempts >= MAX_CYCLES_TO_WAIT_FOR_PINGRESP)
                         {
-                            sg_sprintf(LOG_GLOBAL_BUFFER, "Previous response for PINGREQ not received, so rebooting");
+                            pingRespAttempts = 0;
+
+                            sg_sprintf(LOG_GLOBAL_BUFFER, "Previous response for PINGREQ not received, device will be rebooted ..");
                             error_log(LOG_GLOBAL_BUFFER);
 
-                            exitApp();
+                            rebootPending = 1;
+                            break;
                         }
                     }
                     else
