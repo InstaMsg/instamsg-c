@@ -77,8 +77,11 @@ volatile unsigned char runBusinessLogicImmediately;
 
 
 #define MAX_CYCLES_TO_WAIT_FOR_PUBACK   10
+#define MAX_CYCLES_TO_WAIT_FOR_PINGRESP 10
+
 int pubAckMsgId;
 int pubAckRecvAttempts;
+int pingRespAttempts;
 unsigned char waitingForPuback;
 char *lastPubTopic;
 char *lastPubPayload;
@@ -149,7 +152,7 @@ static volatile unsigned long timestampFromGSM;
 #define DATA_LOG_TOPIC      PROSTR("topic")
 #define DATA_LOG_PAYLOAD    PROSTR("payload")
 
-static volatile unsigned char pingReqResponseRemaining;
+static volatile unsigned char pingReqResponsePending;
 
 static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
@@ -1311,14 +1314,6 @@ void sendPingReqToServer(InstaMsg *c)
 {
     int len;
 
-    if(pingReqResponseRemaining > 0)
-    {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Previous response for PINGREQ not received, so rebooting");
-        error_log(LOG_GLOBAL_BUFFER);
-
-        exitApp();
-    }
-
     RESET_GLOBAL_BUFFER;
     len = MQTTSerialize_pingreq(GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
 
@@ -1333,8 +1328,8 @@ void sendPingReqToServer(InstaMsg *c)
 
     if (len > 0)
     {
+        pingReqResponsePending = 1;
         sendPacket(c, &(c->ipstack), GLOBAL_BUFFER, len);
-        pingReqResponseRemaining = pingReqResponseRemaining + 1;
     }
 }
 
@@ -2344,7 +2339,7 @@ publish_exit:
                 sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("PINGRESP received... relations are intact !!\n"));
                 info_log(LOG_GLOBAL_BUFFER);
 
-                pingReqResponseRemaining = pingReqResponseRemaining - 1;
+                pingReqResponsePending = 0;
 
                 break;
             }
@@ -2592,6 +2587,39 @@ static void waitForPubAck()
                             saveFailedPublishedMessage();
 
                             break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+static void waitForPingResp()
+{
+    if(1)
+    {
+        if(1)
+        {
+            if(1)
+            {
+                while(1)
+                {
+                    readAndProcessIncomingMQTTPacketsIfAny(&instaMsg);
+                    if(pingReqResponsePending == 1)
+                    {
+                        pingRespAttempts = pingRespAttempts + 1;
+                        if(pingRespAttempts >= MAX_CYCLES_TO_WAIT_FOR_PINGRESP)
+                        {
+                            sg_sprintf(LOG_GLOBAL_BUFFER, "Previous response for PINGREQ not received, so rebooting");
+                            error_log(LOG_GLOBAL_BUFFER);
+
+                            exitApp();
                         }
                     }
                     else
