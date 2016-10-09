@@ -1582,16 +1582,13 @@ static void sync_time_through_NTP(InstaMsg *c)
     }
 
     /*
-     * Construct the sender-packet.
+     * Send the NTP-packet.
      */
     memset(ntpPacket, 0, sizeof(ntpPacket));
     ntpPacket[0] = 0x0b;
 
-    /*
-     * Send the packet.
-     */
-    sendPacketIrrespective = 1;
-    rc = sendPacket(c, &(c->timeSyncerSocket), ntpPacket, sizeof(ntpPacket));
+    watchdog_reset_and_enable(60, "sending-ntp-packet-to-ntp-server", 1);
+    rc = socket_write(&(c->timeSyncerSocket), ntpPacket, sizeof(ntpPacket));
     if(rc != SUCCESS)
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to send NTP-Packet."), CLOCK_ERROR);
@@ -1600,6 +1597,9 @@ static void sync_time_through_NTP(InstaMsg *c)
         goto failure_in_time_syncing;
     }
 
+    watchdog_disable(NULL, NULL);
+
+
     /*
      * Wait for response.
      */
@@ -1607,7 +1607,7 @@ static void sync_time_through_NTP(InstaMsg *c)
                               PROSTR("reading-ntp-packet-from-ntp-server"), 1);
 
     memset(messageBuffer, 0, sizeof(messageBuffer));
-    rc = (c->timeSyncerSocket).read(&(c->timeSyncerSocket), (unsigned char*) messageBuffer, 48, 1);
+    rc = socket_read(&(c->timeSyncerSocket), (unsigned char*) messageBuffer, 48, 1);
     if(rc != SUCCESS)
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to read NTP-Packet."), CLOCK_ERROR);
