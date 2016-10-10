@@ -154,6 +154,10 @@ static volatile unsigned long timestampFromGSM;
 
 static volatile unsigned char pingReqResponsePending;
 
+static int statsDisplayInterval;
+unsigned int bytes_sent_over_wire;
+unsigned int bytes_received_over_wire;
+
 static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
 }
@@ -1761,6 +1765,10 @@ static void check_if_all_required_compile_time_defines_are_present()
 #ifndef DATA_LOGGING_ENABLED
 #error "DATA_LOGGING_ENABLED compile-time-parameter undefined"
 #endif
+
+#ifndef SSL_ENABLED
+#error "SSL_ENABLED compile-time-parameter undefined"
+#endif
 }
 
 
@@ -2857,11 +2865,16 @@ void start(int (*onConnectOneTimeOperations)(),
     volatile unsigned long latestTick = getCurrentTick();
     unsigned long nextSocketTick = latestTick + NETWORK_INFO_INTERVAL;
     unsigned long nextPingReqTick = latestTick + pingRequestInterval;
+    unsigned long nextStatsDisplayTick = 0;
 #if SEND_GPS_LOCATION == 1
     unsigned long nextSendGpsLocationTick = latestTick + sendGpsLocationInterval;
 #endif
 
     unsigned long nextBusinessLogicTick;
+
+    statsDisplayInterval = 60;
+    nextStatsDisplayTick = latestTick + statsDisplayInterval;
+
     editableBusinessLogicInterval = businessLogicInterval;
     nextBusinessLogicTick = latestTick + editableBusinessLogicInterval;
 
@@ -3022,6 +3035,15 @@ void start(int (*onConnectOneTimeOperations)(),
                             nextSendGpsLocationTick = latestTick + sendGpsLocationInterval;
                         }
 #endif
+
+                        if((latestTick >= nextStatsDisplayTick) && (statsDisplayInterval != 0))
+                        {
+                            sg_sprintf(LOG_GLOBAL_BUFFER, "\n\n===== Bytes SENT = [%u], RECEIVED = [%u] =====\n\n",
+                                       bytes_sent_over_wire, bytes_received_over_wire);
+                            info_log(LOG_GLOBAL_BUFFER);
+
+                            nextStatsDisplayTick = latestTick + statsDisplayInterval;
+                        }
 
                         /*
                          * Time to run the business-logic !!

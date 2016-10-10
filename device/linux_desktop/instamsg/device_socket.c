@@ -47,6 +47,9 @@
 #include "../driver/include/socket.h"
 #include "../driver/include/log.h"
 
+extern unsigned int bytes_sent_over_wire;
+extern unsigned int bytes_received_over_wire;
+
 #if GSM_INTERFACE_ENABLED == 1
 /*
  * This method returns the *****LATEST****** sms, which contains the desired substring, while the following returns 1 ::
@@ -298,6 +301,7 @@ int socket_read(Socket* socket, unsigned char* buffer, int len, unsigned char gu
         }
 	}
 
+    bytes_received_over_wire = bytes_received_over_wire + len;
     return SUCCESS; /* Case a) and d) */
 }
 
@@ -368,6 +372,7 @@ int socket_write(Socket* socket, unsigned char* buffer, int len)
         }
 	}
 
+    bytes_sent_over_wire = bytes_sent_over_wire + len;
     return SUCCESS;
 }
 
