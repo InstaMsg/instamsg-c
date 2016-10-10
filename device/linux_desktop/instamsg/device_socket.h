@@ -36,6 +36,11 @@
 
 #include <string.h>
 
+#if SSL_ENABLED == 1
+#include <openssl/ssl.h>
+#include <openssl/bio.h>
+#endif
+
 typedef struct Socket Socket;
 
 struct Socket
@@ -46,6 +51,14 @@ struct Socket
     char *type;
 
     unsigned char socketCorrupted;
+
+#if SSL_ENABLED == 1
+    SSL *ssl;
+
+    BIO *ssl_bio;
+    BIO *inter_bio;
+    BIO *network_bio;
+#endif
 
 #if GSM_INTERFACE_ENABLED == 1
     char gsmApn[MAX_GSM_PROVISION_PARAM_SIZE];

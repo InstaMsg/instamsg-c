@@ -113,13 +113,477 @@ void store_sms_in_config(char *sms, char *smsConfigBuffer, int smsConfigBufferLe
 }
 #endif
 
-void init_socket(Socket *socket, const char *hostName, unsigned int port, const char *type)
-{
-    /* Register read-callback. */
-	socket->read = socket_read;
 
-    /* Register write-callback. */
-	socket->write = socket_write;
+#if SSL_ENABLED == 1
+SSL_CTX *solitary_ssl_ctx;
+
+static unsigned char ssl_init_try_once_done;
+static unsigned char ssl_init_successful;
+static unsigned char wire_buffer[5 * MAX_BUFFER_SIZE];
+
+/*
+ * Returns one of the following ::
+ *
+ *  SUCCESS   =>    if some bytes were sent over the network successfully.
+ *  FAILURE   =>    otherwise.
+ */
+static int write_pending_data_to_network(Socket* socket)
+{
+    int c = 0, rc = 0;
+
+    c = BIO_pending(socket->network_bio);
+    if(c > 0)
+    {
+        rc = BIO_read(socket->network_bio, wire_buffer, c);
+        if(rc != c)
+        {
+            /*
+             * Being bullet-proof in our checks always helps :)
+             */
+            sg_sprintf(LOG_GLOBAL_BUFFER, "%sExpected pending %d bytes to be read from network_bio, however %d bytes read",
+                                          SSL_ERROR, c, rc);
+
+            error_log(LOG_GLOBAL_BUFFER);
+            return FAILURE;
+        }
+
+
+        /*
+         * Remember, "socket_write" returns ::
+         *
+         *      SUCCESS, if bytes were sent successfully over the wire,
+         *      FAILURE, otherwise.
+         */
+        return socket_write(socket, wire_buffer, c);
+    }
+
+    /*
+     * We return FAILURE here, as this will provide good insights into openssl :P
+     */
+    sg_sprintf(LOG_GLOBAL_BUFFER, "%sExpected some bytes to be sent from network_bio over wire, however network_bio has nothing to offer :(",
+                                  SSL_ERROR);
+
+    error_log(LOG_GLOBAL_BUFFER);
+    return FAILURE;
+}
+
+
+/*
+ * Returns one of the following ::
+ *
+ *  SUCCESS                 =>    if some bytes were read successfully from the wire successfully.
+ *  SOCKET_READ_TIMEOUT     =>    if there is nothing available to be read from the wire.
+ *  FAILURE                 =>    otherwise.
+ */
+static int read_pending_data_from_network(Socket* socket, unsigned char must_read_some_bytes_from_wire)
+{
+    int c = 0, rc = 0;
+
+    c = BIO_get_read_request(socket->network_bio);
+    if( (c == 0) && (must_read_some_bytes_from_wire == 0) )
+    {
+        /*
+         * The network-bio is not in need of any bytes.
+         *
+         * But since we still landed on this method, is possible only if the application wants to read some
+         * "potentially available" bytes. Any such "potential" bytes might actually have been pushed by the server,
+         * or they may have been not.
+         *
+         * So, we just try to read 1 byte from the wire in a non-blocking way, and if we do get 1 byte, then we will push it into
+         * the network-bio. Thereafter, the ssl-bio (via its network-bio pair) will command reading of some bytes in the next cycle.
+         */
+        c = 1;
+    }
+
+    if(c > 0)
+    {
+        rc = socket_read(socket, wire_buffer, c, must_read_some_bytes_from_wire);
+        if(rc == SUCCESS)
+        {
+            rc = BIO_write(socket->network_bio, wire_buffer, c);
+            if(rc != c)
+            {
+                /*
+                 * Being bullet-proof in our checks always helps :)
+                 */
+                sg_sprintf(LOG_GLOBAL_BUFFER, "%sExpected %d bytes to be written into network_bio, however %d bytes written",
+                                              SSL_ERROR, c, rc);
+
+                error_log(LOG_GLOBAL_BUFFER);
+                return FAILURE;
+            }
+
+            return SUCCESS;
+        }
+        else
+        {
+            return rc;  /* Covers both cases of FAILURE or SOCKET_READ_TIMEOUT being returned from lower layer */
+        }
+    }
+    else
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, "%sSome unknown case hit in \"read_pending_data_from_network\" .. debug the code ..", SSL_ERROR);
+        error_log(LOG_GLOBAL_BUFFER);
+
+        return FAILURE;
+    }
+}
+
+
+#define HANDLE_NO_RETRY_CASE_IF_APPLICABLE(action)                                                                  \
+    if(BIO_should_retry(socket->ssl_bio) == 0)                                                                      \
+    {                                                                                                               \
+        sg_sprintf(LOG_GLOBAL_BUFFER, "%sBIO_%s from ssl_bio failed with %d error-code", SSL_ERROR, action, rc);    \
+        error_log(LOG_GLOBAL_BUFFER);                                                                               \
+                                                                                                                    \
+        return FAILURE;                                                                                             \
+    }
+
+
+#define HANDLE_SSL_NEED_FOR_WRITE_IF_APPLICABLE                                                                     \
+    if(reason == SSL_ERROR_WANT_WRITE)                                                                              \
+    {                                                                                                               \
+        rc = write_pending_data_to_network(socket);                                                                 \
+        if(rc == FAILURE)                                                                                           \
+        {                                                                                                           \
+            return FAILURE;                                                                                         \
+        }                                                                                                           \
+        else                                                                                                        \
+        {                                                                                                           \
+            continue;                                                                                               \
+        }                                                                                                           \
+    }
+
+
+#define HANDLE_UNEXPLORED_AREA_IF_APPLICABLE(action)                                                                \
+    else                                                                                                            \
+    {                                                                                                               \
+        sg_sprintf(LOG_GLOBAL_BUFFER, "\n\n%sSSL-%s has reached unexplored territories with failed-reason [%d]\n\n",\
+                                       SSL_ERROR, action, reason);                                                  \
+        error_log(LOG_GLOBAL_BUFFER);                                                                               \
+                                                                                                                    \
+        return FAILURE;                                                                                             \
+    }
+
+
+#define HANDLE_TWO_SSL_WRITE_READ_FROM_APP_CASES(action)                                                            \
+    else if(rc == 0)                                                                                                \
+    {                                                                                                               \
+        sg_sprintf(LOG_GLOBAL_BUFFER, "%sBIO_%s to ssl_bio failed with %d error-code", SSL_ERROR, action, rc);      \
+        error_log(LOG_GLOBAL_BUFFER);                                                                               \
+                                                                                                                    \
+        return FAILURE;                                                                                             \
+    }                                                                                                               \
+                                                                                                                    \
+    else if(rc != remaining_bytes)                                                                                  \
+    {                                                                                                               \
+        remaining_bytes = remaining_bytes - rc;                                                                     \
+        continue;                                                                                                   \
+    }
+
+
+static int get_retry_reason(Socket *socket)
+{
+    /*return BIO_get_retry_reason(BIO_get_retry_BIO(socket->ssl_bio, NULL));*/
+    return BIO_get_retry_reason(socket->ssl_bio);
+}
+
+
+/*
+ * This method reads "len" bytes from "ssl_bio" into "buffer".
+ *
+ * Exactly one of the cases must hold ::
+ *
+ * a)
+ * "guaranteed" is 1.
+ * So, this "read" must bahave as a blocking-read.
+ *
+ * Also, exactly "len" bytes are read successfully.
+ * So, SUCCESS must be returned.
+ *
+ *                      OR
+ *
+ * b)
+ * "guaranteed" is 1.
+ * So, this "read" must bahave as a blocking-read.
+ *
+ * However, an error occurs while reading.
+ * So, FAILURE must be returned immediately.
+ *
+ *                      OR
+ *
+ * c)
+ * "guaranteed" is 0.
+ * So, this "read" must behave as a non-blocking read.
+ *
+ * However, no bytes could be read, and neither did any error occur.
+ * So, SOCKET_READ_TIMEOUT must be returned immediately.
+ *
+ *                      OR
+ *
+ * d)
+ * "guaranteed" is 0.
+ * So, this "read" must behave as a non-blocking read.
+ *
+ * Also, exactly "len" bytes are successfully read.
+ * So, SUCCESS must be returned.
+ *
+ *                      OR
+ *
+ * e)
+ * "guaranteed" is 0.
+ * So, this "read" must behave as a non-blocking read.
+ *
+ * However, an error occurs while reading.
+ * So, FAILURE must be returned immediately.
+ */
+static int secure_socket_read(Socket* socket, unsigned char* buffer, int len, unsigned char guaranteed)
+{
+    int rc = FAILURE;
+    int remaining_bytes = len;
+
+    /*
+     * We write the app-payload-bytes to the going-in side of SSL-BIO.
+     */
+    while(1)
+    {
+        rc = BIO_read(socket->ssl_bio, buffer + len - remaining_bytes, remaining_bytes);
+
+        /* Case 1 */
+        if(rc < 0)
+        {
+            HANDLE_NO_RETRY_CASE_IF_APPLICABLE("read")
+            else
+            {
+                int reason = get_retry_reason(socket);
+
+                HANDLE_SSL_NEED_FOR_WRITE_IF_APPLICABLE
+                else if(reason == SSL_ERROR_WANT_READ)
+                {
+                    /*
+                     * Here, SSL_ERROR_WANT_READ might have been raised, as there may genuinely be no data to be read from socket.
+                     * So, we are not sure whether we need to read anything from socket or not in actuality.
+                     */
+                    rc = read_pending_data_from_network(socket, 0);
+                    if(rc == FAILURE)
+                    {
+                        /*
+                         * Failure will never be tolerated ..
+                         */
+                        return FAILURE;
+                    }
+                    else if(rc == SOCKET_READ_TIMEOUT)
+                    {
+                        if(guaranteed == 1)
+                        {
+                            /*
+                             * We must continue searching for bytes ...
+                             */
+                            continue;
+                        }
+                        else
+                        {
+                            /*
+                             * Nothing available, so we must return the same to app-layer.
+                             */
+                            return SOCKET_READ_TIMEOUT;
+                        }
+                    }
+                    else
+                    {
+                        /*
+                         * We fulfilled ssl_bio's need to read ... retry ..
+                         */
+                        continue;
+                    }
+                }
+                HANDLE_UNEXPLORED_AREA_IF_APPLICABLE("read")
+            }
+        }
+
+        HANDLE_TWO_SSL_WRITE_READ_FROM_APP_CASES("read")
+
+        else
+        {
+            return SUCCESS;
+        }
+    }
+
+    return FAILURE;
+}
+
+
+/*
+ * This method writes first "len" bytes from "buffer" into "ssl-bio".
+ *
+ * This is a blocking function. So, either of the following must hold true ::
+ *
+ * a)
+ * All "len" bytes are written.
+ * In this case, SUCCESS must be returned.
+ *
+ *                      OR
+ * b)
+ * An error occurred while writing.
+ * In this case, FAILURE must be returned immediately.
+ */
+static int secure_socket_write(Socket* socket, unsigned char* buffer, int len)
+{
+    int rc = FAILURE;
+    int remaining_bytes = len;
+
+    /*
+     * We write the app-payload-bytes to the going-in side of SSL-BIO.
+     */
+    while(1)
+    {
+        rc = BIO_write(socket->ssl_bio, buffer + len - remaining_bytes, remaining_bytes);
+
+        /* Case 1 */
+        if(rc < 0)
+        {
+            HANDLE_NO_RETRY_CASE_IF_APPLICABLE("write")
+            else
+            {
+                int reason = get_retry_reason(socket);
+
+                HANDLE_SSL_NEED_FOR_WRITE_IF_APPLICABLE
+                else if(reason == SSL_ERROR_WANT_READ)
+                {
+                    /*
+                     * Here, SSL wants to read some bytes from socket, before it can proceed.
+                     * Obviously, this is a MUST-READ-FROM-SOCKET scenario.
+                     */
+                    rc = read_pending_data_from_network(socket, 1);
+                    if(rc == FAILURE)
+                    {
+                        /*
+                         * Failure will never be tolerated ..
+                         */
+                        return FAILURE;
+                    }
+                    else
+                    {
+                        /*
+                         * We fulfilled ssl_bio's need to read ... retry ..
+                         */
+                        continue;
+                    }
+                }
+                HANDLE_UNEXPLORED_AREA_IF_APPLICABLE("write")
+            }
+        }
+
+        HANDLE_TWO_SSL_WRITE_READ_FROM_APP_CASES("write")
+
+        else
+        {
+            /*
+             * BIO_write to ssl-bio was successful.
+             *
+             * So, we send the encrypted-bytes (as emerging from network-bio) to network right-away.
+             * In this way, we save an extra if-retry-then-write-pending-data cycle in the next iteration.
+             */
+            return write_pending_data_to_network(socket);
+        }
+    }
+}
+
+
+#define HANDLE_CATASTROPHIC_INIT_ERROR(obj)                                                                     \
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("\n\n%sCould not create [%s], we are doomed ..\n\n"), SSL_ERROR, obj); \
+    error_log(LOG_GLOBAL_BUFFER);
+
+
+static void init_ssl()
+{
+    SSL_library_init();
+    OpenSSL_add_ssl_algorithms();
+    OpenSSL_add_all_algorithms();
+    SSL_load_error_strings();
+    ERR_load_crypto_strings();
+
+    solitary_ssl_ctx = SSL_CTX_new(SSLv23_client_method());
+    if(solitary_ssl_ctx == NULL)
+    {
+        HANDLE_CATASTROPHIC_INIT_ERROR("SSL-Context")
+        resetDevice();
+    }
+
+    if(!SSL_CTX_use_certificate_file(solitary_ssl_ctx, "/home/sensegrow/cert", SSL_FILETYPE_PEM))
+    {
+        HANDLE_CATASTROPHIC_INIT_ERROR("SSL-Context-Certificate")
+        resetDevice();
+    }
+
+    if(!SSL_CTX_use_PrivateKey_file(solitary_ssl_ctx, "/home/sensegrow/key", SSL_FILETYPE_PEM))
+    {
+        HANDLE_CATASTROPHIC_INIT_ERROR("SSL-Context-Key")
+        resetDevice();
+    }
+
+    ssl_init_successful = 1;
+}
+#endif
+
+
+void init_socket(Socket *socket, const char *hostName, unsigned int port, const char *type, unsigned char secure)
+{
+    socket->socketCorrupted = 1;
+
+#if SSL_ENABLED == 1
+    if(ssl_init_try_once_done == 0)
+    {
+        init_ssl();
+        ssl_init_try_once_done = 1;
+    }
+
+    if(ssl_init_successful == 0)
+    {
+        return;
+    }
+
+    socket->ssl = SSL_new(solitary_ssl_ctx);
+    if(socket->ssl == NULL)
+    {
+        HANDLE_CATASTROPHIC_INIT_ERROR("client-ssl")
+        return;
+    }
+
+    if (!BIO_new_bio_pair(&(socket->inter_bio), SSL_BUFFER_SIZE, &(socket->network_bio), SSL_BUFFER_SIZE))
+    {
+        HANDLE_CATASTROPHIC_INIT_ERROR("client-bio-pair")
+        return;
+    }
+
+    socket->ssl_bio = BIO_new(BIO_f_ssl());
+    if (!(socket->ssl_bio))
+    {
+        HANDLE_CATASTROPHIC_INIT_ERROR("client-ssl-bio")
+        return;
+    }
+
+    SSL_set_connect_state(socket->ssl);
+    SSL_set_bio(socket->ssl, socket->inter_bio, socket->inter_bio);
+    BIO_set_ssl(socket->ssl_bio, socket->ssl, BIO_NOCLOSE);
+#endif
+
+    if(secure == 1)
+    {
+#if SSL_ENABLED == 1
+	    socket->read = secure_socket_read;
+	    socket->write = secure_socket_write;
+#else
+        socket->read = socket_read;
+        socket->write = socket_write;
+#endif
+    }
+    else
+    {
+        socket->read = socket_read;
+        socket->write = socket_write;
+    }
+
 
     /* Keep a copy of connection-parameters, for easy book-keeping. */
     memset(socket->host, 0, sizeof(socket->host));
@@ -223,6 +687,7 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port, const 
 
     startAndCountdownTimer(3, 0);
 #endif
+
 
     /* Connect the medium (socket). */
     watchdog_reset_and_enable(SOCKET_CONNECTION_SOLITARY_ATTEMPT_MAX_ALLOWED_TIME_SECONDS, "TRYING-SOCKET-CONNECTION-SOLITARY-ATTEMPT", 1);

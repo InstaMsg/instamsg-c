@@ -380,5 +380,9 @@ int socket_write(Socket* socket, unsigned char* buffer, int len)
  */
 void release_underlying_socket_medium_guaranteed(Socket* socket)
 {
+#if SSL_ENABLED == 1
+    resetDevice();
+#else
     close(socket->socket);
+#endif
 }

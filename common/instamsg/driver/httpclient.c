@@ -254,7 +254,7 @@ void uploadFile(const char *url,
     memset(fourthLevel, 0, MAX_BUFFER_SIZE);
 
     socket.socketCorrupted = 1;
-	init_socket(&socket, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT, SOCKET_TCP);
+	init_socket(&socket, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT, SOCKET_TCP, 0);
     if(socket.socketCorrupted == 1)
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCould not initiate-socket for file-upload, not proceeding"), FILE_UPLOAD);
@@ -511,7 +511,7 @@ void downloadFile(const char *url,
     unsigned int numBytes = 0;
 
     socket.socketCorrupted = 1;
-	init_socket(&socket, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT, SOCKET_TCP);
+	init_socket(&socket, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT, SOCKET_TCP, 0);
     if(socket.socketCorrupted == 1)
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCould not initiate-socket for file-download, not proceeding"), FILE_DOWNLOAD);

@@ -1588,7 +1588,7 @@ static void sync_time_through_NTP(InstaMsg *c)
     ntpPacket[0] = 0x0b;
 
     watchdog_reset_and_enable(60, "sending-ntp-packet-to-ntp-server", 1);
-    rc = socket_write(&(c->timeSyncerSocket), ntpPacket, sizeof(ntpPacket));
+    rc = (c->timeSyncerSocket).write(&(c->timeSyncerSocket), ntpPacket, sizeof(ntpPacket));
     if(rc != SUCCESS)
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to send NTP-Packet."), CLOCK_ERROR);
@@ -1607,7 +1607,7 @@ static void sync_time_through_NTP(InstaMsg *c)
                               PROSTR("reading-ntp-packet-from-ntp-server"), 1);
 
     memset(messageBuffer, 0, sizeof(messageBuffer));
-    rc = socket_read(&(c->timeSyncerSocket), (unsigned char*) messageBuffer, 48, 1);
+    rc = (c->timeSyncerSocket).read(&(c->timeSyncerSocket), (unsigned char*) messageBuffer, 48, 1);
     if(rc != SUCCESS)
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to read NTP-Packet."), CLOCK_ERROR);
@@ -1799,7 +1799,7 @@ void initInstaMsg(InstaMsg* c,
 #endif
 
     (c->ipstack).socketCorrupted = 1;
-	init_socket(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT, SOCKET_TCP);
+	init_socket(&(c->ipstack), INSTAMSG_HOST, INSTAMSG_PORT, SOCKET_TCP, 1);
     if((c->ipstack).socketCorrupted ==1)
     {
         handleConnOrProvAckGeneric(c, 0, SIMULATED);

@@ -51,11 +51,14 @@
 #define SMS_FILE        PROSTR("/home/sensegrow/sms.txt")
 #define SMS_TEMP_FILE   PROSTR("/home/sensegrow/sms_temp.txt")
 
+#define SSL             PROSTR("[SSL] ")
+#define SSL_ERROR       PROSTR("[SSL_ERROR] ")
+
 
 /*
  * Global-functions callable.
  */
-void init_socket(Socket *socket, const char *hostName, unsigned int port, const char *type);
+void init_socket(Socket *socket, const char *hostName, unsigned int port, const char *type, unsigned char secure);
 void release_socket(Socket *socket);
 
 
