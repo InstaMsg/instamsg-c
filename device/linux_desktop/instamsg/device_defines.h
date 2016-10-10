@@ -82,7 +82,7 @@
 #define SSL_ENABLED                 1
 
 #if SSL_ENABLED == 1
-#define SSL_BUFFER_SIZE             (5 * MAX_BUFFER_SIZE)
+#define SSL_BUFFER_SIZE             MAX_BUFFER_SIZE
 #endif
 
 #define NTP_TIME_SYNC_PRESENT       0

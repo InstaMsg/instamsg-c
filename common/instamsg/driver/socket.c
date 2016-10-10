@@ -157,14 +157,7 @@ static int write_pending_data_to_network(Socket* socket)
         return socket_write(socket, wire_buffer, c);
     }
 
-    /*
-     * We return FAILURE here, as this will provide good insights into openssl :P
-     */
-    sg_sprintf(LOG_GLOBAL_BUFFER, "%sExpected some bytes to be sent from network_bio over wire, however network_bio has nothing to offer :(",
-                                  SSL_ERROR);
-
-    error_log(LOG_GLOBAL_BUFFER);
-    return FAILURE;
+    return SUCCESS;
 }
 
 
@@ -178,6 +171,11 @@ static int write_pending_data_to_network(Socket* socket)
 static int read_pending_data_from_network(Socket* socket, unsigned char must_read_some_bytes_from_wire)
 {
     int c = 0, rc = 0;
+
+    if(write_pending_data_to_network(socket) != SUCCESS)
+    {
+        return FAILURE;
+    }
 
     c = BIO_get_read_request(socket->network_bio);
     if( (c == 0) && (must_read_some_bytes_from_wire == 0) )
@@ -241,7 +239,7 @@ static int read_pending_data_from_network(Socket* socket, unsigned char must_rea
 
 
 #define HANDLE_SSL_NEED_FOR_WRITE_IF_APPLICABLE                                                                     \
-    if(reason == SSL_ERROR_WANT_WRITE)                                                                              \
+    else if(BIO_should_write(socket->ssl_bio) != 0)                                                                 \
     {                                                                                                               \
         rc = write_pending_data_to_network(socket);                                                                 \
         if(rc == FAILURE)                                                                                           \
@@ -258,8 +256,8 @@ static int read_pending_data_from_network(Socket* socket, unsigned char must_rea
 #define HANDLE_UNEXPLORED_AREA_IF_APPLICABLE(action)                                                                \
     else                                                                                                            \
     {                                                                                                               \
-        sg_sprintf(LOG_GLOBAL_BUFFER, "\n\n%sSSL-%s has reached unexplored territories with failed-reason [%d]\n\n",\
-                                       SSL_ERROR, action, reason);                                                  \
+        sg_sprintf(LOG_GLOBAL_BUFFER, "\n\n%sSSL-%s has reached unexplored territories.\n\n",                       \
+                                       SSL_ERROR, action);                                                          \
         error_log(LOG_GLOBAL_BUFFER);                                                                               \
                                                                                                                     \
         return FAILURE;                                                                                             \
@@ -280,13 +278,6 @@ static int read_pending_data_from_network(Socket* socket, unsigned char must_rea
         remaining_bytes = remaining_bytes - rc;                                                                     \
         continue;                                                                                                   \
     }
-
-
-static int get_retry_reason(Socket *socket)
-{
-    /*return BIO_get_retry_reason(BIO_get_retry_BIO(socket->ssl_bio, NULL));*/
-    return BIO_get_retry_reason(socket->ssl_bio);
-}
 
 
 /*
@@ -353,12 +344,10 @@ static int secure_socket_read(Socket* socket, unsigned char* buffer, int len, un
         if(rc < 0)
         {
             HANDLE_NO_RETRY_CASE_IF_APPLICABLE("read")
-            else
+            HANDLE_SSL_NEED_FOR_WRITE_IF_APPLICABLE
+            else if(BIO_should_read(socket->ssl_bio) != 0)
             {
-                int reason = get_retry_reason(socket);
-
-                HANDLE_SSL_NEED_FOR_WRITE_IF_APPLICABLE
-                else if(reason == SSL_ERROR_WANT_READ)
+                if(1)
                 {
                     /*
                      * Here, SSL_ERROR_WANT_READ might have been raised, as there may genuinely be no data to be read from socket.
@@ -397,8 +386,8 @@ static int secure_socket_read(Socket* socket, unsigned char* buffer, int len, un
                         continue;
                     }
                 }
-                HANDLE_UNEXPLORED_AREA_IF_APPLICABLE("read")
             }
+            HANDLE_UNEXPLORED_AREA_IF_APPLICABLE("read")
         }
 
         HANDLE_TWO_SSL_WRITE_READ_FROM_APP_CASES("read")
@@ -443,12 +432,10 @@ static int secure_socket_write(Socket* socket, unsigned char* buffer, int len)
         if(rc < 0)
         {
             HANDLE_NO_RETRY_CASE_IF_APPLICABLE("write")
-            else
+            HANDLE_SSL_NEED_FOR_WRITE_IF_APPLICABLE
+            else if(BIO_should_read(socket->ssl_bio) != 0)
             {
-                int reason = get_retry_reason(socket);
-
-                HANDLE_SSL_NEED_FOR_WRITE_IF_APPLICABLE
-                else if(reason == SSL_ERROR_WANT_READ)
+                if(1)
                 {
                     /*
                      * Here, SSL wants to read some bytes from socket, before it can proceed.
@@ -470,8 +457,8 @@ static int secure_socket_write(Socket* socket, unsigned char* buffer, int len)
                         continue;
                     }
                 }
-                HANDLE_UNEXPLORED_AREA_IF_APPLICABLE("write")
             }
+            HANDLE_UNEXPLORED_AREA_IF_APPLICABLE("write")
         }
 
         HANDLE_TWO_SSL_WRITE_READ_FROM_APP_CASES("write")
