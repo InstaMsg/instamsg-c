@@ -509,24 +509,8 @@ static int secure_socket_write(Socket* socket, unsigned char* buffer, int len)
 static char client_cert_buffer[2000];
 static char client_private_key_buffer[2000];
 
-
-static void init_ssl()
+static void loadClientCertificateAndKeyIfPresent()
 {
-    SSL_library_init();
-    OpenSSL_add_ssl_algorithms();
-    OpenSSL_add_all_algorithms();
-    SSL_load_error_strings();
-    ERR_load_crypto_strings();
-
-    wire_buffer = (unsigned char*) messageBuffer;
-    WIRE_BUFFER_SIZE = sizeof(messageBuffer);
-
-    solitary_ssl_ctx = SSL_CTX_new(SSLv23_client_method());
-    if(solitary_ssl_ctx == NULL)
-    {
-        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("SSL_CTX_new"), 1)
-    }
-
     memset(client_cert_buffer, 0, sizeof(client_cert_buffer));
     load_client_certificate_into_buffer(client_cert_buffer, sizeof(client_cert_buffer));
     if(strlen(client_cert_buffer) > 0)
@@ -546,16 +530,47 @@ static void init_ssl()
             HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("SSL_CTX_use_certificate"), 1)
         }
     }
-    else
+
+    memset(client_private_key_buffer, 0, sizeof(client_private_key_buffer));
+    load_client_private_key_into_buffer(client_private_key_buffer, sizeof(client_private_key_buffer));
+    if(strlen(client_private_key_buffer) > 0)
     {
-        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("SSL-Context-Certificate buffer empty from load_client_certificate_into_buffer"), 1);
+        BIO *key_bio = NULL;
+        RSA *rsa = NULL;
+
+        key_bio = BIO_new_mem_buf((void*)client_private_key_buffer, -1);
+        rsa = PEM_read_bio_RSAPrivateKey(key_bio, NULL, 0, NULL);
+        if(rsa == NULL)
+        {
+            HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("PEM_read_bio_RSAPrivateKey"), 1);
+        }
+
+        if(!SSL_CTX_use_RSAPrivateKey(solitary_ssl_ctx, rsa))
+        {
+            HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("SSL_CTX_use_RSAPrivateKey"), 1)
+        }
+    }
+}
+
+
+static void init_ssl()
+{
+    SSL_library_init();
+    OpenSSL_add_ssl_algorithms();
+    OpenSSL_add_all_algorithms();
+    SSL_load_error_strings();
+    ERR_load_crypto_strings();
+
+    wire_buffer = (unsigned char*) messageBuffer;
+    WIRE_BUFFER_SIZE = sizeof(messageBuffer);
+
+    solitary_ssl_ctx = SSL_CTX_new(SSLv23_client_method());
+    if(solitary_ssl_ctx == NULL)
+    {
+        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("SSL_CTX_new"), 1)
     }
 
-    if(!SSL_CTX_use_PrivateKey_file(solitary_ssl_ctx, "/home/sensegrow/key", SSL_FILETYPE_PEM))
-    {
-        HANDLE_CATASTROPHIC_INIT_ERROR("SSL-Context-Key", 1)
-    }
-
+    loadClientCertificateAndKeyIfPresent();
     ssl_init_successful = 1;
 }
 #endif
