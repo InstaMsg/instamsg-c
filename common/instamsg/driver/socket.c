@@ -119,7 +119,13 @@ SSL_CTX *solitary_ssl_ctx;
 
 static unsigned char ssl_init_try_once_done;
 static unsigned char ssl_init_successful;
-static unsigned char wire_buffer[5 * MAX_BUFFER_SIZE];
+
+/*
+ * Making use of already existing buffer (remembering that everything is synchronous and single-threaded).
+ */
+static unsigned char *wire_buffer;
+static int WIRE_BUFFER_SIZE;
+
 
 /*
  * Returns one of the following ::
@@ -147,6 +153,10 @@ static int write_pending_data_to_network(Socket* socket)
             return FAILURE;
         }
 
+#if 0
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Writing pending [%d] bytes", c);
+        info_log(LOG_GLOBAL_BUFFER);
+#endif
 
         /*
          * Remember, "socket_write" returns ::
@@ -195,6 +205,11 @@ static int read_pending_data_from_network(Socket* socket, unsigned char must_rea
 
     if(c > 0)
     {
+#if 0
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Reading pending [%d] bytes", c);
+        info_log(LOG_GLOBAL_BUFFER);
+#endif
+
         rc = socket_read(socket, wire_buffer, c, must_read_some_bytes_from_wire);
         if(rc == SUCCESS)
         {
@@ -477,9 +492,22 @@ static int secure_socket_write(Socket* socket, unsigned char* buffer, int len)
 }
 
 
-#define HANDLE_CATASTROPHIC_INIT_ERROR(obj)                                                                     \
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("\n\n%sCould not create [%s], we are doomed ..\n\n"), SSL_ERROR, obj); \
-    error_log(LOG_GLOBAL_BUFFER);
+#define HANDLE_CATASTROPHIC_INIT_ERROR(obj, reset)                                                              \
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("\n\n%sFAILED IN [%s], we are doomed ..\n\n"), SSL_ERROR, obj);        \
+    error_log(LOG_GLOBAL_BUFFER);                                                                               \
+                                                                                                                \
+    if(reset == 1)                                                                                              \
+    {                                                                                                           \
+        resetDevice();                                                                                          \
+    }                                                                                                           \
+    else                                                                                                        \
+    {                                                                                                           \
+        return;                                                                                                 \
+    }
+
+
+static char client_cert_buffer[2000];
+static char client_private_key_buffer[2000];
 
 
 static void init_ssl()
@@ -490,23 +518,42 @@ static void init_ssl()
     SSL_load_error_strings();
     ERR_load_crypto_strings();
 
+    wire_buffer = (unsigned char*) messageBuffer;
+    WIRE_BUFFER_SIZE = sizeof(messageBuffer);
+
     solitary_ssl_ctx = SSL_CTX_new(SSLv23_client_method());
     if(solitary_ssl_ctx == NULL)
     {
-        HANDLE_CATASTROPHIC_INIT_ERROR("SSL-Context")
-        resetDevice();
+        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("SSL_CTX_new"), 1)
     }
 
-    if(!SSL_CTX_use_certificate_file(solitary_ssl_ctx, "/home/sensegrow/cert", SSL_FILETYPE_PEM))
+    memset(client_cert_buffer, 0, sizeof(client_cert_buffer));
+    load_client_certificate_into_buffer(client_cert_buffer, sizeof(client_cert_buffer));
+    if(strlen(client_cert_buffer) > 0)
     {
-        HANDLE_CATASTROPHIC_INIT_ERROR("SSL-Context-Certificate")
-        resetDevice();
+        BIO *cert_bio = NULL;
+        X509 *cert = NULL;
+
+        cert_bio = BIO_new_mem_buf((void*)client_cert_buffer, -1);
+        cert = PEM_read_bio_X509(cert_bio, NULL, 0, NULL);
+        if(cert == NULL)
+        {
+            HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("PEM_read_bio_X509"), 1);
+        }
+
+        if(!SSL_CTX_use_certificate(solitary_ssl_ctx, cert))
+        {
+            HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("SSL_CTX_use_certificate"), 1)
+        }
+    }
+    else
+    {
+        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("SSL-Context-Certificate buffer empty from load_client_certificate_into_buffer"), 1);
     }
 
     if(!SSL_CTX_use_PrivateKey_file(solitary_ssl_ctx, "/home/sensegrow/key", SSL_FILETYPE_PEM))
     {
-        HANDLE_CATASTROPHIC_INIT_ERROR("SSL-Context-Key")
-        resetDevice();
+        HANDLE_CATASTROPHIC_INIT_ERROR("SSL-Context-Key", 1)
     }
 
     ssl_init_successful = 1;
@@ -533,21 +580,18 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port, const 
     socket->ssl = SSL_new(solitary_ssl_ctx);
     if(socket->ssl == NULL)
     {
-        HANDLE_CATASTROPHIC_INIT_ERROR("client-ssl")
-        return;
+        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("SSL_new"), 0)
     }
 
-    if (!BIO_new_bio_pair(&(socket->inter_bio), SSL_BUFFER_SIZE, &(socket->network_bio), SSL_BUFFER_SIZE))
+    if (!BIO_new_bio_pair(&(socket->inter_bio), WIRE_BUFFER_SIZE, &(socket->network_bio), WIRE_BUFFER_SIZE))
     {
-        HANDLE_CATASTROPHIC_INIT_ERROR("client-bio-pair")
-        return;
+        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("BIO_new_bio_pair"), 0)
     }
 
     socket->ssl_bio = BIO_new(BIO_f_ssl());
     if (!(socket->ssl_bio))
     {
-        HANDLE_CATASTROPHIC_INIT_ERROR("client-ssl-bio")
-        return;
+        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("BIO_new"), 0)
     }
 
     SSL_set_connect_state(socket->ssl);

@@ -81,10 +81,6 @@
 #define GSM_INTERFACE_ENABLED       0
 #define SSL_ENABLED                 1
 
-#if SSL_ENABLED == 1
-#define SSL_BUFFER_SIZE             MAX_BUFFER_SIZE
-#endif
-
 #define NTP_TIME_SYNC_PRESENT       0
 #define GPS_TIME_SYNC_PRESENT       0
 #define GSM_TIME_SYNC_PRESENT       0

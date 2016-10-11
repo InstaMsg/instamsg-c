@@ -391,3 +391,27 @@ void release_underlying_socket_medium_guaranteed(Socket* socket)
     close(socket->socket);
 #endif
 }
+
+
+#if SSL_ENABLED == 1
+
+#define CERT_FILE_NAME  "cert"
+#define KEY_FILE_NAME   "key"
+
+/*
+ * This method loads the client-certificate into buffer.
+ */
+void load_client_certificate_into_buffer(char *cert_buffer, int maxLength)
+{
+    sg_readFile(CERT_FILE_NAME, cert_buffer, maxLength);
+}
+
+
+/*
+ * This method loads the client-private-key into buffer.
+ */
+void load_client_private_key_into_buffer(char *private_key_buffer, int maxLength)
+{
+    sg_readFile(KEY_FILE_NAME, private_key_buffer, maxLength);
+}
+#endif

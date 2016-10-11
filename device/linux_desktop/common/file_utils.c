@@ -77,6 +77,39 @@ void sg_readLine(FILE_STRUCT *fp, char *buffer, int maxBufferLength)
 }
 
 
+void sg_readFile(const char *filePath, char *buffer, int maxBufferLength)
+{
+    FILE_STRUCT *fp = NULL;
+    int i = 0;
+    int ch;
+
+    fp = FILE_OPEN(filePath, "r");
+    if(fp != NULL)
+    {
+        memset(buffer, 0, maxBufferLength);
+        while(1)
+        {
+            ch = FILE_GETC(fp);
+            if(ch != FILE_END_ID)
+            {
+                buffer[i++] = (char)ch;
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+    else
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Could not open file %s in read-mode", filePath);
+        error_log(LOG_GLOBAL_BUFFER);
+
+        return;
+    }
+}
+
+
 int sg_appendLine(const char *filePath, const char *buffer)
 {
     int rc = FAILURE;

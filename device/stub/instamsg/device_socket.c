@@ -119,3 +119,23 @@ void release_underlying_socket_medium_guaranteed(Socket* socket)
 {
 #error "Function not implemented."
 }
+
+
+#if SSL_ENABLED == 1
+/*
+ * This method loads the client-certificate into buffer.
+ */
+void load_client_certificate_into_buffer(char *cert_buffer, int maxLength)
+{
+#error "Function not implemented."
+}
+
+
+/*
+ * This method loads the client-private-key into buffer.
+ */
+void load_client_private_key_into_buffer(char *private_key_buffer, int maxLength)
+{
+#error "Function not implemented."
+}
+#endif
