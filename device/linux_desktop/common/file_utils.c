@@ -99,10 +99,38 @@ void sg_readFile(const char *filePath, char *buffer, int maxBufferLength)
                 break;
             }
         }
+
+        FILE_CLOSE(fp);
     }
     else
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Could not open file %s in read-mode", filePath);
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Could not open file [%s] in read-mode", filePath);
+        error_log(LOG_GLOBAL_BUFFER);
+
+        return;
+    }
+}
+
+
+void sg_writeFile(const char *filePath, char *buffer)
+{
+    FILE_STRUCT *fp = NULL;
+    int i = 0;
+    int ch;
+
+    fp = FILE_OPEN(filePath, "w");
+    if(fp != NULL)
+    {
+        for(i = 0; i < strlen(buffer); i++)
+        {
+            FILE_PUTC(buffer[i], fp);
+        }
+
+        FILE_CLOSE(fp);
+    }
+    else
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Could not open file [%s] in write-mode", filePath);
         error_log(LOG_GLOBAL_BUFFER);
 
         return;

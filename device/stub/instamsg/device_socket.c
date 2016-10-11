@@ -132,9 +132,27 @@ void load_client_certificate_into_buffer(char *cert_buffer, int maxLength)
 
 
 /*
+ * This method saves the client-certificate onto the device in a persistent manner.
+ */
+void save_client_certificate_from_buffer(char *cert_buffer)
+{
+#error "Function not implemented."
+}
+
+
+/*
  * This method loads the client-private-key into buffer.
  */
 void load_client_private_key_into_buffer(char *private_key_buffer, int maxLength)
+{
+#error "Function not implemented."
+}
+
+
+/*
+ * This method saves the client-private-key onto the device in a persistent manner.
+ */
+void save_client_private_key_from_buffer(char *private_key_buffer)
 {
 #error "Function not implemented."
 }

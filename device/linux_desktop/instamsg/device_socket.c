@@ -408,10 +408,28 @@ void load_client_certificate_into_buffer(char *cert_buffer, int maxLength)
 
 
 /*
+ * This method saves the client-certificate onto the device in a persistent manner.
+ */
+void save_client_certificate_from_buffer(char *cert_buffer)
+{
+    sg_writeFile(CERT_FILE_NAME, cert_buffer);
+}
+
+
+/*
  * This method loads the client-private-key into buffer.
  */
 void load_client_private_key_into_buffer(char *private_key_buffer, int maxLength)
 {
     sg_readFile(KEY_FILE_NAME, private_key_buffer, maxLength);
+}
+
+
+/*
+ * This method saves the client-private-key onto the device in a persistent manner.
+ */
+void save_client_private_key_from_buffer(char *private_key_buffer)
+{
+    sg_writeFile(KEY_FILE_NAME, private_key_buffer);
 }
 #endif

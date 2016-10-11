@@ -502,10 +502,84 @@ static void handleConfigReceived(InstaMsg *c, MQTTMessage *msg)
 }
 
 
+static void saveClientAuthFieldInfoOntoDevice(char *payload, char *key, void (*func)(char *buffer))
+{
+    int sz = 2000;
+
+    char *temp = (char*) sg_malloc(sz);
+    if(temp == NULL)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Could not allocate memory in saveClientAuthFieldInfoOntoDevice");
+        error_log(LOG_GLOBAL_BUFFER);
+
+        exitApp();
+    }
+
+    memset(temp, 0, sz);
+    getJsonKeyValueIfPresent(payload, key, temp);
+    if(strlen(temp) > 0)
+    {
+        int i = 0, j = 0;
+        char *slower = temp;
+        char *faster = temp;
+
+        while( (*faster) && (*(faster + 1) ))
+        {
+            if( (*faster == '\\') && (*(faster + 1) == 'n') )
+            {
+                *slower = '\n';
+                faster = faster + 2;
+            }
+            else
+            {
+                *slower = *faster;
+                faster = faster + 1;
+            }
+
+            slower = slower + 1;
+        }
+
+        *slower = 0;
+        func(temp);
+    }
+
+    sg_free(temp);
+}
+
+
+static void processCertificateInfoIfAny(InstaMsg *c, char *payload)
+{
+    int sz = 2000;
+
+    char *temp = (char*) sg_malloc(sz);
+    if(temp == NULL)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Could not allocate memory in processCertificateInfoIfAny");
+        error_log(LOG_GLOBAL_BUFFER);
+
+        exitApp();
+    }
+
+    memset(temp, 0, sz);
+    getJsonKeyValueIfPresent(payload, "secure_ssl_certificate", temp);
+    if(strcmp(temp, "true") == 0)
+    {
+        sg_free(temp);
+
+        saveClientAuthFieldInfoOntoDevice(payload, "certificate", save_client_certificate_from_buffer);
+        saveClientAuthFieldInfoOntoDevice(payload, "key", save_client_private_key_from_buffer);
+    }
+}
+
+
 static void handleCertReceived(InstaMsg *c, MQTTMessage *msg)
 {
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sReceived the certificate-payload [%s] from server"), CONFIG, (char*)(msg->payload));
+    processCertificateInfoIfAny(c, (char*)(msg->payload));
+
+    sg_sprintf(LOG_GLOBAL_BUFFER, "Rebooting machine, as certificate has been updated.");
     info_log(LOG_GLOBAL_BUFFER);
+
+    exitApp();
 }
 
 
@@ -2101,6 +2175,24 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
 }
 
 
+static void process_received_client_id(InstaMsg *c, void *buf)
+{
+    memset(c->clientIdComplete, 0, sizeof(c->clientIdComplete));
+    memcpy(c->clientIdComplete, buf, 36);
+
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Received client-id from server via PROVACK [%s]"), c->clientIdComplete);
+    info_log(LOG_GLOBAL_BUFFER);
+}
+
+
+static void process_received_secret(InstaMsg *c)
+{
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Received client-secret from server via PROVACK [%s]"), c->password);
+    info_log(LOG_GLOBAL_BUFFER);
+}
+
+
+
 void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
 {
     int rc = FAILURE;
@@ -2151,9 +2243,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                             {
                                 memset(c->password, 0, sizeof(c->password));
                                 memcpy(c->password, (char*)msg.payload + 37, remainingPayloadLength - 1);
-
-                                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Received client-secret from server via PROVACK [%s]"), c->password);
-                                info_log(LOG_GLOBAL_BUFFER);
+                                process_received_secret(c);
 
                                 memset(messageBuffer, 0, sizeof(messageBuffer));
                                 generate_config_json(messageBuffer, SECRET, CONFIG_STRING, c->clientIdComplete, "");
@@ -2166,19 +2256,49 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                            }
                         }
 
-                        memset(c->clientIdComplete, 0, sizeof(c->clientIdComplete));
-                        memcpy(c->clientIdComplete, msg.payload, 36);
-                        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Received client-id from server via PROVACK [%s]"), c->clientIdComplete);
-                        info_log(LOG_GLOBAL_BUFFER);
-
+                        process_received_client_id(c, msg.payload);
                         exitApp();
                     }
                     else if(connack_rc == 0x06) /* Provision-Successful-With-Certificate */
                     {
-#if 1
+#if 0
                         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Received payload = [%s]"), (char*)(msg.payload));
                         info_log(LOG_GLOBAL_BUFFER);
 #endif
+                        char *temp = NULL;
+                        int sz = 2000;
+                        char bkp_c = 0;
+
+                        temp = (char*) sg_malloc(2000);
+                        if(temp == NULL)
+                        {
+                            sg_sprintf(LOG_GLOBAL_BUFFER, "Could not allocate memory for processing provisioning-response, bye ..");
+                            error_log(LOG_GLOBAL_BUFFER);
+
+                            exitApp();
+                        }
+
+                        memset(temp, 0, sz);
+                        getJsonKeyValueIfPresent(msg.payload, "client_id", temp);
+                        process_received_client_id(c, temp);
+
+                        memset(temp, 0, sz);
+                        getJsonKeyValueIfPresent(msg.payload, "auth_token", temp);
+                        memset(c->password, 0, sizeof(c->password));
+                        strcpy(c->password, temp);
+                        process_received_secret(c);
+
+                        memset(temp, 0, sz);
+                        strcat(temp, c->clientIdComplete);
+                        strcat(temp, "-");
+                        strcat(temp, c->password);
+                        memset(messageBuffer, 0, sizeof(messageBuffer));
+                        generate_config_json(messageBuffer, SECRET, CONFIG_STRING, temp, "");
+                        save_config_value_on_persistent_storage(SECRET, messageBuffer, 1);
+
+                        sg_free(temp);
+
+                        processCertificateInfoIfAny(c, (char*)(msg.payload));
                         exitApp();
                     }
 

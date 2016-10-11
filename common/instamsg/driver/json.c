@@ -35,6 +35,14 @@
 #include "include/log.h"
 #include "include/sg_mem.h"
 
+#if SSL_ENABLED == 1
+#define JSON_BUFFER_SIZE            4000
+#define JSON_VALUE_BUFFER_SIZE      2000
+#else
+#define JSON_BUFFER_SIZE            MAX_BUFFER_SIZE
+#define JSON_VALUE_BUFFER_SIZE      MAX_BUFFER_SIZE
+#endif
+
 
 /*
  * This is a very restricted version of json-parsing, that involves no malloc/free, and which involves only a python-dict.
@@ -51,18 +59,18 @@ void getJsonKeyValueIfPresent(char *json_original, const char *key, char *buf)
     char *parsedKeyToken = NULL, *parsedValueToken = NULL, *token = NULL;
     char *json = NULL, *newJsonBeginnerPointer = NULL;
 
-    json = (char*) sg_malloc(MAX_BUFFER_SIZE);
+    json = (char*) sg_malloc(JSON_BUFFER_SIZE);
     if(json == NULL)
     {
         error_log("Could not allocate mmeory for JSON");
         goto exit;
     }
-    memset(json, 0, MAX_BUFFER_SIZE);
+    memset(json, 0, JSON_BUFFER_SIZE);
     strcpy(json, json_original);
     newJsonBeginnerPointer = json;
 
     parsedKeyToken = (char *)sg_malloc(MAX_BUFFER_SIZE);
-    parsedValueToken = (char *)sg_malloc(MAX_BUFFER_SIZE);
+    parsedValueToken = (char *)sg_malloc(JSON_VALUE_BUFFER_SIZE);
     if((parsedKeyToken == NULL) || (parsedValueToken == NULL))
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Could not allocate memory in getJsonKeyValueIfPresent"));
@@ -71,7 +79,7 @@ void getJsonKeyValueIfPresent(char *json_original, const char *key, char *buf)
         goto exit;
     }
     memset(parsedKeyToken, 0, MAX_BUFFER_SIZE);
-    memset(parsedValueToken, 0, MAX_BUFFER_SIZE);
+    memset(parsedValueToken, 0, JSON_VALUE_BUFFER_SIZE);
 
     NOT_FOUND = ' ';
     keyWrapper = NOT_FOUND;
