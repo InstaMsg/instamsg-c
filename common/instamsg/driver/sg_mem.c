@@ -36,6 +36,16 @@
 
 #if USE_DEFAULT_MALLOC == 1
 
+#ifdef MAX_HEAP_SIZE
+#error "Remove MAX_HEAP_SIZE definition from device_defines.h"
+#endif
+
+#if SSL_ENABLED == 1
+#define MAX_HEAP_SIZE               (15 * (MAX_BUFFER_SIZE + HEADER_SIZE))
+#else
+#define MAX_HEAP_SIZE               (10 * (MAX_BUFFER_SIZE + HEADER_SIZE))
+#endif
+
 static char sg_heap[MAX_HEAP_SIZE];
 static unsigned int currentBytesUsed;
 

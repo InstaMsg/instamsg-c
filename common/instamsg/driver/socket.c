@@ -123,7 +123,7 @@ static unsigned char ssl_init_successful;
 /*
  * Making use of already existing buffer (remembering that everything is synchronous and single-threaded).
  */
-static unsigned char *wire_buffer;
+static unsigned char wire_buffer[SSL_WIRE_BUFFER_SIZE];
 static int WIRE_BUFFER_SIZE;
 
 
@@ -561,8 +561,7 @@ static void init_ssl()
     SSL_load_error_strings();
     ERR_load_crypto_strings();
 
-    wire_buffer = (unsigned char*) messageBuffer;
-    WIRE_BUFFER_SIZE = sizeof(messageBuffer);
+    WIRE_BUFFER_SIZE = sizeof(wire_buffer);
 
     solitary_ssl_ctx = SSL_CTX_new(SSLv23_client_method());
     if(solitary_ssl_ctx == NULL)

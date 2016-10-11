@@ -502,6 +502,13 @@ static void handleConfigReceived(InstaMsg *c, MQTTMessage *msg)
 }
 
 
+static void handleCertReceived(InstaMsg *c, MQTTMessage *msg)
+{
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sReceived the certificate-payload [%s] from server"), CONFIG, (char*)(msg->payload));
+    info_log(LOG_GLOBAL_BUFFER);
+}
+
+
 static int sendPacket(InstaMsg * c, Socket *s, unsigned char *buf, int length)
 {
     int rc = SUCCESS;
@@ -1404,9 +1411,10 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
              "\r\nENABLE_SERVER_LOGGING_TOPIC = [%s],"
              "\r\nSERVER_LOGS_TOPIC = [%s],"
              "\r\nFILE_UPLOAD_URL = [%s],"
-             "\r\nCONFIG_FROM_SERVER_TO_CLIENT = [%s]"),
+             "\r\nCONFIG_FROM_SERVER_TO_CLIENT = [%s],"
+             "\r\nUPDATE_CERT_TOPIC = [%s]"),
               c->filesTopic, c->rebootTopic, c->enableServerLoggingTopic,
-              c->serverLogsTopic, c->fileUploadUrl, c->receiveConfigTopic);
+              c->serverLogsTopic, c->fileUploadUrl, c->receiveConfigTopic, c->updateCertTopic);
     info_log(LOG_GLOBAL_BUFFER);
 
 #if MEDIA_STREAMING_ENABLED == 1
@@ -1962,7 +1970,7 @@ exit:
 
 static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *mode)
 {
-    if(connack_rc == 0x00)  /* Connection Accepted */
+    if((connack_rc == 0x00) || (connack_rc == 0x06))  /* Connection Accepted */
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s successfully to InstaMsg-Server."), mode);
         info_log(LOG_GLOBAL_BUFFER);
@@ -2086,7 +2094,7 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
     else
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Client-%s failed with code [%d]"), mode, connack_rc);
-        info_log(LOG_GLOBAL_BUFFER);
+        error_log(LOG_GLOBAL_BUFFER);
 
         exitApp();
     }
@@ -2133,7 +2141,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                                              c->readbuf,
                                              sizeof(c->readbuf)) == 1)
                 {
-                    if(connack_rc == 0x00)  /* Connection Accepted */
+                    if(connack_rc == 0x00)  /* Provision-Successful-Without-Certificate */
                     {
                         memcpy(c->clientIdComplete, msg.payload, msg.payloadlen);
 
@@ -2163,12 +2171,15 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Received client-id from server via PROVACK [%s]"), c->clientIdComplete);
                         info_log(LOG_GLOBAL_BUFFER);
 
-                        /*
-                         * Reboot the device, so that the next time the CONNECT-cycle takes place.
-                         */
                         exitApp();
-
-                        setValuesOfSpecialTopics(c);
+                    }
+                    else if(connack_rc == 0x06) /* Provision-Successful-With-Certificate */
+                    {
+#if 1
+                        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Received payload = [%s]"), (char*)(msg.payload));
+                        info_log(LOG_GLOBAL_BUFFER);
+#endif
+                        exitApp();
                     }
 
                     handleConnOrProvAckGeneric(c, connack_rc, PROVISIONED);
@@ -2284,6 +2295,10 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                     else if(strcmp(topicName, c->receiveConfigTopic) == 0)
                     {
                         handleConfigReceived(c, &msg);
+                    }
+                    else if(strcmp(topicName, c->updateCertTopic) == 0)
+                    {
+                        handleCertReceived(c, &msg);
                     }
 #if MEDIA_STREAMING_ENABLED == 1
                     else if(strcmp(topicName, c->mediaReplyTopic) == 0)

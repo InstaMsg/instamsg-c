@@ -62,7 +62,6 @@
 #define FILE_PUTC                   fputc
 
 #define MAX_BUFFER_SIZE 1000
-#define MAX_HEAP_SIZE (10 * (MAX_BUFFER_SIZE + HEADER_SIZE))
 
 #define DATA_LOGGING_ENABLED        1
 #define MAX_DATA_LOGGER_SIZE_BYTES  100000
@@ -80,6 +79,10 @@
 #define FILE_SYSTEM_ENABLED         1
 #define GSM_INTERFACE_ENABLED       0
 #define SSL_ENABLED                 1
+
+#if SSL_ENABLED == 1
+#define SSL_WIRE_BUFFER_SIZE        MAX_BUFFER_SIZE
+#endif
 
 #define NTP_TIME_SYNC_PRESENT       0
 #define GPS_TIME_SYNC_PRESENT       0
