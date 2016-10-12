@@ -4,6 +4,8 @@ set -e
 dpkg -i linux-headers-3.19*.deb linux-image-3.19*.deb
 update-grub
 
+apt-get update
+apt-get install software-properties-common
 add-apt-repository -y ppa:aleksander-m/modemmanager-trusty
 apt-get update
 apt-get install -y modemmanager
