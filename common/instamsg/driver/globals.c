@@ -477,6 +477,39 @@ void startAndCountdownTimer(int seconds, unsigned char showRunningStatus)
 }
 
 
+static void set_up_network_ports()
+{
+#if SSL_ENABLED == 1
+    int rc = get_config_value_from_persistent_storage(SSL_ACTUALLY_ENABLED, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
+
+    sslEnabled = 0;
+    if(rc == SUCCESS)
+    {
+        char small[3] = {0};
+        getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, small);
+
+        if(sg_atoi(small) == 1)
+        {
+            sslEnabled = 1;
+        }
+    }
+#else
+    sslEnabled = 0;
+#endif
+
+    if(sslEnabled == 0)
+    {
+        INSTAMSG_PORT = 1883;
+        INSTAMSG_HTTP_PORT = 80;
+    }
+    else
+    {
+        INSTAMSG_PORT = 8883;
+        INSTAMSG_HTTP_PORT = 443;
+    }
+}
+
+
 void globalSystemInit(char *logFilePath)
 {
     bootstrapInit();
@@ -493,6 +526,8 @@ void globalSystemInit(char *logFilePath)
 
     init_config();
     init_data_logger();
+
+    set_up_network_ports();
 
     sg_sprintf(LOG_GLOBAL_BUFFER, "\n\nInstamsg-Version ====> [%s]\n\n", INSTAMSG_VERSION);
     info_log(LOG_GLOBAL_BUFFER);
@@ -520,5 +555,7 @@ char USER_DEVICE_UUID[MAX_BUFFER_SIZE];
 #endif
 
 int editableBusinessLogicInterval;
-
+int INSTAMSG_PORT;
+int INSTAMSG_HTTP_PORT;
+unsigned char sslEnabled;
 

@@ -77,47 +77,24 @@ struct KeyValuePairs
 
 /****************************************************************************************/
 #if 1
-
-#define INSTAMSG_HOST       PROSTR("device.instamsg.io")
-
-#if  SSL_ENABLED == 1
-#define INSTAMSG_PORT       8883
+#define INSTAMSG_HOST           PROSTR("device.instamsg.io")
+#define INSTAMSG_HTTP_HOST      PROSTR("platform.instamsg.io")
 #else
-#define INSTAMSG_PORT       1883
-#endif
-
-#define INSTAMSG_HTTP_HOST  PROSTR("platform.instamsg.io")
-
-#if  SSL_ENABLED == 1
-#define INSTAMSG_HTTP_PORT  443
-#else
-#define INSTAMSG_HTTP_PORT  80
-#endif
-
-#define LOG_LEVEL           2
-
-#else
-
-#define INSTAMSG_HOST       PROSTR("localhost")
-
-#if  SSL_ENABLED == 1
-#define INSTAMSG_PORT       8883
-#else
-#define INSTAMSG_PORT       1883
-#endif
-
-#define INSTAMSG_HTTP_HOST  PROSTR("localhost")
-
-#if  SSL_ENABLED == 1
-#define INSTAMSG_HTTP_PORT  8601
-#else
-#define INSTAMSG_HTTP_PORT  8600
+#define INSTAMSG_HOST           PROSTR("localhost")
+#define INSTAMSG_HTTP_HOST      PROSTR("localhost")
 #endif
 
 #define LOG_LEVEL           2
 
 #endif
 
+#define SSL_ACTUALLY_ENABLED    PROSTR("SSL_ENABLED")
+
+#define LOG_LEVEL           2
+
+extern int INSTAMSG_PORT;
+extern INSTAMSG_HTTP_PORT;
+extern unsigned char sslEnabled;
 
 #define NTP_PORT            123
 

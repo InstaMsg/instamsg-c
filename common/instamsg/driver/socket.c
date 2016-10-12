@@ -579,6 +579,15 @@ static void init_ssl()
 
 void init_socket(Socket *socket, const char *hostName, unsigned int port, const char *type, unsigned char secure)
 {
+    if(port == 0)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, "port is 0 in init_socket.. bye ..");
+        error_log(LOG_GLOBAL_BUFFER);
+
+        resetDevice();
+    }
+
+
     socket->socketCorrupted = 1;
 
 #if SSL_ENABLED == 1
@@ -615,15 +624,10 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port, const 
     BIO_set_ssl(socket->ssl_bio, socket->ssl, BIO_NOCLOSE);
 #endif
 
-    if(secure == 1)
+    if((secure == 1) && (sslEnabled == 1))
     {
-#if SSL_ENABLED == 1
 	    socket->read = secure_socket_read;
 	    socket->write = secure_socket_write;
-#else
-        socket->read = socket_read;
-        socket->write = socket_write;
-#endif
     }
     else
     {

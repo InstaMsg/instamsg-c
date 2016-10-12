@@ -1453,6 +1453,9 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
     memset(c->enableServerLoggingTopic, 0, sizeof(c->enableServerLoggingTopic));
     sg_sprintf(c->enableServerLoggingTopic, PROSTR("instamsg/clients/%s/enableServerLogging"), c->clientIdComplete);
 
+    memset(c->updateCertTopic, 0, sizeof(c->updateCertTopic));
+    sg_sprintf(c->updateCertTopic, PROSTR("instamsg/clients/%s/updateCert"), c->clientIdComplete);
+
     memset(c->serverLogsTopic, 0, sizeof(c->serverLogsTopic));
     sg_sprintf(c->serverLogsTopic, PROSTR("instamsg/clients/%s/logs"), c->clientIdComplete);
 
@@ -2119,6 +2122,14 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
 #if SEND_GPS_LOCATION == 1
         registerEditableConfig(&sendGpsLocationInterval,
                                SEND_GPS_LOCATION_INTERVAL,
+                               CONFIG_INT,
+                               PROSTR("0"),
+                               PROSTR(""));
+#endif
+
+#if SSL_ENABLED == 1
+        registerEditableConfig(&sslEnabled,
+                               SSL_ACTUALLY_ENABLED,
                                CONFIG_INT,
                                PROSTR("0"),
                                PROSTR(""));
