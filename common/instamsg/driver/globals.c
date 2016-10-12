@@ -482,16 +482,13 @@ static void set_up_network_ports()
 #if SSL_ENABLED == 1
     int rc = get_config_value_from_persistent_storage(SSL_ACTUALLY_ENABLED, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
 
-    sslEnabled = 0;
+    sslEnabled = 1;
     if(rc == SUCCESS)
     {
         char small[3] = {0};
         getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, small);
 
-        if(sg_atoi(small) == 1)
-        {
-            sslEnabled = 1;
-        }
+        sslEnabled = sg_atoi(small);
     }
 #else
     sslEnabled = 0;
