@@ -120,9 +120,6 @@ SSL_CTX *solitary_ssl_ctx;
 static unsigned char ssl_init_try_once_done;
 static unsigned char ssl_init_successful;
 
-/*
- * Making use of already existing buffer (remembering that everything is synchronous and single-threaded).
- */
 static unsigned char wire_buffer[SSL_WIRE_BUFFER_SIZE];
 static int WIRE_BUFFER_SIZE;
 
@@ -506,19 +503,22 @@ static int secure_socket_write(Socket* socket, unsigned char* buffer, int len)
     }
 
 
-static char client_cert_buffer[2000];
-static char client_private_key_buffer[2000];
-
 static void loadClientCertificateAndKeyIfPresent()
 {
-    memset(client_cert_buffer, 0, sizeof(client_cert_buffer));
-    load_client_certificate_into_buffer(client_cert_buffer, sizeof(client_cert_buffer));
-    if(strlen(client_cert_buffer) > 0)
+    char *buf = (char*) sg_malloc(2000);
+    if(buf == NULL)
+    {
+        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("Memory allocation in loadClientCertificateAndKeyIfPresent"), 1);
+    }
+
+    memset(buf, 0, sizeof(buf));
+    load_client_certificate_into_buffer(buf, sizeof(buf));
+    if(strlen(buf) > 0)
     {
         BIO *cert_bio = NULL;
         X509 *cert = NULL;
 
-        cert_bio = BIO_new_mem_buf((void*)client_cert_buffer, -1);
+        cert_bio = BIO_new_mem_buf((void*)buf, -1);
         cert = PEM_read_bio_X509(cert_bio, NULL, 0, NULL);
         if(cert == NULL)
         {
@@ -531,14 +531,14 @@ static void loadClientCertificateAndKeyIfPresent()
         }
     }
 
-    memset(client_private_key_buffer, 0, sizeof(client_private_key_buffer));
-    load_client_private_key_into_buffer(client_private_key_buffer, sizeof(client_private_key_buffer));
-    if(strlen(client_private_key_buffer) > 0)
+    memset(buf, 0, sizeof(buf));
+    load_client_private_key_into_buffer(buf, sizeof(buf));
+    if(strlen(buf) > 0)
     {
         BIO *key_bio = NULL;
         RSA *rsa = NULL;
 
-        key_bio = BIO_new_mem_buf((void*)client_private_key_buffer, -1);
+        key_bio = BIO_new_mem_buf((void*)buf, -1);
         rsa = PEM_read_bio_RSAPrivateKey(key_bio, NULL, 0, NULL);
         if(rsa == NULL)
         {
@@ -550,6 +550,8 @@ static void loadClientCertificateAndKeyIfPresent()
             HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("SSL_CTX_use_RSAPrivateKey"), 1)
         }
     }
+
+    sg_free(buf);
 }
 
 
