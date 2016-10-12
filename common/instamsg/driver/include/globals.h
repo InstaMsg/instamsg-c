@@ -84,13 +84,8 @@ struct KeyValuePairs
 #define INSTAMSG_HTTP_HOST      PROSTR("localhost")
 #endif
 
-#define LOG_LEVEL           2
-
-#endif
-
 #define SSL_ACTUALLY_ENABLED    PROSTR("SSL_ENABLED")
-
-#define LOG_LEVEL           2
+#define LOG_LEVEL               2
 
 extern int INSTAMSG_PORT;
 extern INSTAMSG_HTTP_PORT;
