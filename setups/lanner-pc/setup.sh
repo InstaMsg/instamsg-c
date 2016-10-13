@@ -21,6 +21,8 @@ chmod 777 "${HOME_DIRECTORY}/monitor.sh"
 sed -i '/^[ :\t]*\/home\/sensegrow\/monitor.sh \&/d' /etc/rc.local
 sed -i 's/^[ :\t]*exit 0/\/home\/sensegrow\/monitor.sh \&\nexit 0/g' /etc/rc.local
 
+sed -i '/^[ :\t]*insmod \/lib\/modules\/3.19.8-031908-generic\/kernel\/drivers\/watchdog\/wd_drv.ko/d' /etc/rc.local
+sed -i 's/^[ :\t]*exit 0/insmod \/lib\/modules\/3.19.8-031908-generic\/kernel\/drivers\/watchdog\/wd_drv.ko\nexit 0/g' /etc/rc.local
 cp wd_drv.ko /lib/modules/3.19.8-031908-generic/kernel/drivers/watchdog
 chmod 644 /lib/modules/3.19.8-031908-generic/kernel/drivers/watchdog/wd_drv.ko
 sed -i '/^[ :\t]*wd_drv/d' /etc/modules
