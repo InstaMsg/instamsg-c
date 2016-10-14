@@ -37,8 +37,8 @@
 #include <string.h>
 
 #if SSL_ENABLED == 1
-#include <openssl/ssl.h>
-#include <openssl/bio.h>
+#include "../driver/include/sg_ssl.h"
+#include "../driver/include/sg_bio.h"
 #endif
 
 typedef struct Socket Socket;
