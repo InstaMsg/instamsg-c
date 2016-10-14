@@ -271,6 +271,12 @@ extern "C" {
 
 #endif /* DES_DEFAULT_OPTIONS */
 #endif /* HEADER_DES_LOCL_H */
+
+/*
+ * Sensegrow's custom-defines
+ */
+#define OPENSSL_NO_SHA512
+
 #ifdef  __cplusplus
 }
 #endif
