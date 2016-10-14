@@ -57,9 +57,9 @@
  */
 
 #ifndef HEADER_X509_H
-# include <openssl/x509.h>
+# include "./sg_x509.h"
 /*
- * openssl/x509.h ends up #include-ing this file at about the only
+ * ./sg_x509.h ends up #include-ing this file at about the only
  * appropriate moment.
  */
 #endif
@@ -67,13 +67,13 @@
 #ifndef HEADER_X509_VFY_H
 # define HEADER_X509_VFY_H
 
-# include <openssl/opensslconf.h>
+# include "./sg_opensslconf.h"
 # ifndef OPENSSL_NO_LHASH
-#  include <openssl/lhash.h>
+#  include "./sg_lhash.h"
 # endif
-# include <openssl/bio.h>
-# include <openssl/crypto.h>
-# include <openssl/symhacks.h>
+# include "./sg_bio.h"
+# include "./sg_crypto.h"
+# include "./sg_symhacks.h"
 
 #ifdef  __cplusplus
 extern "C" {

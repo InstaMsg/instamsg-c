@@ -125,20 +125,20 @@
 #  include <stdio.h>
 # endif
 
-# include <openssl/stack.h>
-# include <openssl/safestack.h>
-# include <openssl/opensslv.h>
-# include <openssl/ossl_typ.h>
+# include "./sg_stack.h"
+# include "./sg_safestack.h"
+# include "./sg_opensslv.h"
+# include "./sg_ossl_typ.h"
 
 # ifdef CHARSET_EBCDIC
-#  include <openssl/ebcdic.h>
+#  include "./sg_ebcdic.h"
 # endif
 
 /*
  * Resolve problems on some operating systems with symbol names that clash
  * one way or another
  */
-# include <openssl/symhacks.h>
+# include "./sg_symhacks.h"
 
 #ifdef  __cplusplus
 extern "C" {

@@ -578,8 +578,8 @@ struct pkcs8_priv_key_info_st {
 }
 #endif
 
-# include <openssl/x509_vfy.h>
-# include <openssl/pkcs7.h>
+# include "./sg_x509_vfy.h"
+# include "./sg_pkcs7.h"
 
 #ifdef  __cplusplus
 extern "C" {

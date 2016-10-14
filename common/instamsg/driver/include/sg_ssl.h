@@ -157,14 +157,14 @@
 #  endif
 #  include "./sg_crypto.h"
 #  include "./sg_lhash.h"
-#  include <openssl/buffer.h>
+#  include "./sg_buffer.h"
 # endif
-# include <openssl/pem.h>
-# include <openssl/hmac.h>
+# include "./sg_pem.h"
+# include "./sg_hmac.h"
 
-# include <openssl/kssl.h>
-# include <openssl/safestack.h>
-# include <openssl/symhacks.h>
+# include "./sg_kssl.h"
+# include "./sg_safestack.h"
+# include "./sg_symhacks.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -1693,12 +1693,12 @@ struct ssl_st {
 }
 #endif
 
-# include <openssl/ssl2.h>
-# include <openssl/ssl3.h>
-# include <openssl/tls1.h>      /* This is mostly sslv3 with a few tweaks */
-# include <openssl/dtls1.h>     /* Datagram TLS */
-# include <openssl/ssl23.h>
-# include <openssl/srtp.h>      /* Support for the use_srtp extension */
+# include "./sg_ssl2.h"
+# include "./sg_ssl3.h"
+# include "./sg_tls1.h"      /* This is mostly sslv3 with a few tweaks */
+# include "./sg_dtls1.h"     /* Datagram TLS */
+# include "./sg_ssl23.h"
+# include "./sg_srtp.h"      /* Support for the use_srtp extension */
 
 #ifdef  __cplusplus
 extern "C" {

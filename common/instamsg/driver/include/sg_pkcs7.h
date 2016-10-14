@@ -59,12 +59,12 @@
 #ifndef HEADER_PKCS7_H
 # define HEADER_PKCS7_H
 
-# include <openssl/asn1.h>
+# include "./sg_asn1.h"
 # include "./sg_bio.h"
 # include "./sg_e_os2.h"
 
-# include <openssl/symhacks.h>
-# include <openssl/ossl_typ.h>
+# include "./sg_symhacks.h"
+# include "./sg_ossl_typ.h"
 
 #ifdef  __cplusplus
 extern "C" {
