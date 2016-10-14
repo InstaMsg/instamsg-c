@@ -65,48 +65,48 @@
 # define HEADER_X509_H
 
 # include "./sg_e_os2.h"
-# include <openssl/symhacks.h>
+# include "./sg_symhacks.h"
 # ifndef OPENSSL_NO_BUFFER
-#  include <openssl/buffer.h>
+#  include "./sg_buffer.h"
 # endif
 # ifndef OPENSSL_NO_EVP
-#  include <openssl/evp.h>
+#  include "./sg_evp.h"
 # endif
 # ifndef OPENSSL_NO_BIO
 #  include "./sg_bio.h"
 # endif
-# include <openssl/stack.h>
-# include <openssl/asn1.h>
-# include <openssl/safestack.h>
+# include "./sg_stack.h"
+# include "./sg_asn1.h"
+# include "./sg_safestack.h"
 
 # ifndef OPENSSL_NO_EC
-#  include <openssl/ec.h>
+#  include "./sg_ec.h"
 # endif
 
 # ifndef OPENSSL_NO_ECDSA
-#  include <openssl/ecdsa.h>
+#  include "./sg_ecdsa.h"
 # endif
 
 # ifndef OPENSSL_NO_ECDH
-#  include <openssl/ecdh.h>
+#  include "./sg_ecdh.h"
 # endif
 
 # ifndef OPENSSL_NO_DEPRECATED
 #  ifndef OPENSSL_NO_RSA
-#   include <openssl/rsa.h>
+#   include "./sg_rsa.h"
 #  endif
 #  ifndef OPENSSL_NO_DSA
-#   include <openssl/dsa.h>
+#   include "./sg_dsa.h"
 #  endif
 #  ifndef OPENSSL_NO_DH
-#   include <openssl/dh.h>
+#   include "./sg_dh.h"
 #  endif
 # endif
 
 # ifndef OPENSSL_NO_SHA
-#  include <openssl/sha.h>
+#  include "./sg_sha.h"
 # endif
-# include <openssl/ossl_typ.h>
+# include "./sg_ossl_typ.h"
 
 #ifdef  __cplusplus
 extern "C" {
