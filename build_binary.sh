@@ -40,6 +40,10 @@ SOURCES=`echo                                                                   
         common/instamsg/openssl/ssl/t1_lib.c                                                    \
         common/instamsg/openssl/ssl/t1_ext.c                                                    \
         common/instamsg/openssl/ssl/s3_pkt.c                                                    \
+        common/instamsg/openssl/ssl/t1_enc.c                                                    \
+        common/instamsg/openssl/ssl/s3_lib.c                                                    \
+        common/instamsg/openssl/ssl/s3_enc.c                                                    \
+        common/instamsg/openssl/ssl/s3_cbc.c                                                    \
         common/instamsg/openssl/crypto/objects/obj_dat.c                                        \
         common/instamsg/openssl/crypto/mem.c                                                    \
         common/instamsg/openssl/crypto/mem_dbg.c                                                \
@@ -65,13 +69,22 @@ SOURCES=`echo                                                                   
         common/instamsg/openssl/crypto/buffer/buffer.c                                          \
         common/instamsg/openssl/crypto/buffer/buf_str.c                                         \
         common/instamsg/openssl/crypto/conf/conf_mod.c                                          \
+        common/instamsg/openssl/crypto/comp/comp_lib.c                                          \
+        common/instamsg/openssl/crypto/ec/ec_key.c                                              \
         common/instamsg/openssl/crypto/err/err.c                                                \
         common/instamsg/openssl/crypto/evp/evp_lib.c                                            \
         common/instamsg/openssl/crypto/evp/digest.c                                             \
         common/instamsg/openssl/crypto/evp/p_lib.c                                              \
+        common/instamsg/openssl/crypto/evp/e_aes_cbc_hmac_sha1.c                                \
+        common/instamsg/openssl/crypto/evp/e_aes_cbc_hmac_sha256.c                              \
+        common/instamsg/openssl/crypto/evp/evp_enc.c                                            \
+        common/instamsg/openssl/crypto/evp/pmeth_gn.c                                           \
+        common/instamsg/openssl/crypto/hmac/hmac.c                                              \
         common/instamsg/openssl/crypto/lhash/lhash.c                                            \
         common/instamsg/openssl/crypto/objects/obj_dat.c                                        \
         common/instamsg/openssl/crypto/pem/pem_lib.c                                            \
+        common/instamsg/openssl/crypto/rand/rand_lib.c                                          \
+        common/instamsg/openssl/crypto/rsa/rsa_asn1.c                                           \
         common/instamsg/openssl/crypto/stack/stack.c                                            \
         common/instamsg/openssl/crypto/x509/x509_cmp.c                                          \
         common/instamsg/openssl/crypto/x509/x509_lu.c                                           \
