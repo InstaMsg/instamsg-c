@@ -86,6 +86,7 @@ SOURCES=`echo                                                                   
         common/instamsg/openssl/crypto/x509v3/v3_bitst.c                                        \
         common/instamsg/openssl/crypto/x509v3/v3_pku.c                                          \
         common/instamsg/openssl/crypto/x509v3/v3_akey.c                                         \
+        common/instamsg/openssl/crypto/x509v3/v3_crld.c                                         \
                                                                                                 \
         common/instamsg/mqtt/src/MQTTFormat.c                                                   \
         common/instamsg/mqtt/src/MQTTPacket.c                                                   \
