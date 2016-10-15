@@ -44,11 +44,11 @@ SOURCES=`echo                                                                   
         common/instamsg/openssl/ssl/s3_lib.c                                                    \
         common/instamsg/openssl/ssl/s3_enc.c                                                    \
         common/instamsg/openssl/ssl/s3_cbc.c                                                    \
-        common/instamsg/openssl/crypto/objects/obj_dat.c                                        \
         common/instamsg/openssl/crypto/mem.c                                                    \
         common/instamsg/openssl/crypto/mem_dbg.c                                                \
         common/instamsg/openssl/crypto/cryptlib.c                                               \
         common/instamsg/openssl/crypto/ex_data.c                                                \
+        common/instamsg/openssl/crypto/o_init.c                                                 \
         common/instamsg/openssl/crypto/asn1/a_int.c                                             \
         common/instamsg/openssl/crypto/asn1/a_object.c                                          \
         common/instamsg/openssl/crypto/asn1/a_octet.c                                           \
@@ -66,9 +66,11 @@ SOURCES=`echo                                                                   
         common/instamsg/openssl/crypto/bio/b_print.c                                            \
         common/instamsg/openssl/crypto/bn/bn_lib.c                                              \
         common/instamsg/openssl/crypto/bn/bn_print.c                                            \
+        common/instamsg/openssl/crypto/bn/bn_word.c                                             \
         common/instamsg/openssl/crypto/buffer/buffer.c                                          \
         common/instamsg/openssl/crypto/buffer/buf_str.c                                         \
         common/instamsg/openssl/crypto/conf/conf_mod.c                                          \
+        common/instamsg/openssl/crypto/conf/conf_lib.c                                          \
         common/instamsg/openssl/crypto/comp/comp_lib.c                                          \
         common/instamsg/openssl/crypto/ec/ec_key.c                                              \
         common/instamsg/openssl/crypto/err/err.c                                                \

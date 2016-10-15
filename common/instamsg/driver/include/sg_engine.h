@@ -1,4 +1,4 @@
-/* openssl/engine.h */
+/* ./sg_engine.h */
 /*
  * Written by Geoff Thorpe (geoff@geoffthorpe.net) for the OpenSSL project
  * 2000.
@@ -65,38 +65,38 @@
 #ifndef HEADER_ENGINE_H
 # define HEADER_ENGINE_H
 
-# include <openssl/opensslconf.h>
+# include "./sg_opensslconf.h"
 
 # ifdef OPENSSL_NO_ENGINE
 #  error ENGINE is disabled.
 # endif
 
 # ifndef OPENSSL_NO_DEPRECATED
-#  include <openssl/bn.h>
+#  include "./sg_bn.h"
 #  ifndef OPENSSL_NO_RSA
-#   include <openssl/rsa.h>
+#   include "./sg_rsa.h"
 #  endif
 #  ifndef OPENSSL_NO_DSA
-#   include <openssl/dsa.h>
+#   include "./sg_dsa.h"
 #  endif
 #  ifndef OPENSSL_NO_DH
-#   include <openssl/dh.h>
+#   include "./sg_dh.h"
 #  endif
 #  ifndef OPENSSL_NO_ECDH
-#   include <openssl/ecdh.h>
+#   include "./sg_ecdh.h"
 #  endif
 #  ifndef OPENSSL_NO_ECDSA
-#   include <openssl/ecdsa.h>
+#   include "./sg_ecdsa.h"
 #  endif
-#  include <openssl/rand.h>
-#  include <openssl/ui.h>
-#  include <openssl/err.h>
+#  include "./sg_rand.h"
+#  include "./sg_ui.h"
+#  include "./sg_err.h"
 # endif
 
-# include <openssl/ossl_typ.h>
-# include <openssl/symhacks.h>
+# include "./sg_ossl_typ.h"
+# include "./sg_symhacks.h"
 
-# include <openssl/x509.h>
+# include "./sg_x509.h"
 
 #ifdef  __cplusplus
 extern "C" {
