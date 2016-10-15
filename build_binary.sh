@@ -34,6 +34,8 @@ SOURCES=`echo                                                                   
         common/instamsg/driver/misc.c                                                           \
                                                                                                 \
         common/instamsg/openssl/crypto/bio/bio_lib.c                                            \
+        common/instamsg/openssl/crypto/bio/bss_mem.c                                            \
+        common/instamsg/openssl/crypto/bio/bss_bio.c                                            \
                                                                                                 \
         common/instamsg/mqtt/src/MQTTFormat.c                                                   \
         common/instamsg/mqtt/src/MQTTPacket.c                                                   \

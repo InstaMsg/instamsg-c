@@ -56,6 +56,9 @@
  * [including the GNU Public Licence.]
  */
 
+#include "device_defines.h"
+#if SSL_ENABLED == 1
+
 #include <stdio.h>
 #include <errno.h>
 
@@ -595,3 +598,8 @@ unsigned long BIO_number_written(BIO *bio)
 }
 
 IMPLEMENT_STACK_OF(BIO)
+
+#else
+typedef int make_iso_compilers_happy;
+
+#endif
