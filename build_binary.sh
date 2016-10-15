@@ -40,11 +40,13 @@ SOURCES=`echo                                                                   
         common/instamsg/openssl/crypto/mem_dbg.c                                                \
         common/instamsg/openssl/crypto/cryptlib.c                                               \
         common/instamsg/openssl/crypto/ex_data.c                                                \
+        common/instamsg/openssl/crypto/asn1/a_int.c                                             \
         common/instamsg/openssl/crypto/asn1/a_object.c                                          \
         common/instamsg/openssl/crypto/asn1/a_octet.c                                           \
         common/instamsg/openssl/crypto/asn1/x_crl.c                                             \
         common/instamsg/openssl/crypto/asn1/tasn_new.c                                          \
         common/instamsg/openssl/crypto/asn1/tasn_fre.c                                          \
+        common/instamsg/openssl/crypto/asn1/tasn_utl.c                                          \
         common/instamsg/openssl/crypto/bio/bio_lib.c                                            \
         common/instamsg/openssl/crypto/bio/bss_mem.c                                            \
         common/instamsg/openssl/crypto/bio/bss_bio.c                                            \
@@ -55,15 +57,35 @@ SOURCES=`echo                                                                   
         common/instamsg/openssl/crypto/buffer/buf_str.c                                         \
         common/instamsg/openssl/crypto/conf/conf_mod.c                                          \
         common/instamsg/openssl/crypto/err/err.c                                                \
+        common/instamsg/openssl/crypto/evp/evp_lib.c                                            \
+        common/instamsg/openssl/crypto/evp/digest.c                                             \
+        common/instamsg/openssl/crypto/evp/p_lib.c                                              \
         common/instamsg/openssl/crypto/lhash/lhash.c                                            \
         common/instamsg/openssl/crypto/objects/obj_dat.c                                        \
         common/instamsg/openssl/crypto/stack/stack.c                                            \
         common/instamsg/openssl/crypto/x509/x509_cmp.c                                          \
         common/instamsg/openssl/crypto/x509/x509_lu.c                                           \
         common/instamsg/openssl/crypto/x509/x509name.c                                          \
+        common/instamsg/openssl/crypto/x509/x509_ext.c                                          \
         common/instamsg/openssl/crypto/x509/x509_vfy.c                                          \
         common/instamsg/openssl/crypto/x509/x509_vpm.c                                          \
+        common/instamsg/openssl/crypto/x509/x509_v3.c                                           \
+        common/instamsg/openssl/crypto/x509v3/v3_purp.c                                         \
+        common/instamsg/openssl/crypto/x509v3/v3_lib.c                                          \
         common/instamsg/openssl/crypto/x509v3/v3_utl.c                                          \
+        common/instamsg/openssl/crypto/x509v3/v3_conf.c                                         \
+        common/instamsg/openssl/crypto/x509v3/v3_sxnet.c                                        \
+        common/instamsg/openssl/crypto/x509v3/v3_enum.c                                         \
+        common/instamsg/openssl/crypto/x509v3/v3_cpols.c                                        \
+        common/instamsg/openssl/crypto/x509v3/v3_ocsp.c                                         \
+        common/instamsg/openssl/crypto/x509v3/v3_alt.c                                          \
+        common/instamsg/openssl/crypto/x509v3/v3_bcons.c                                        \
+        common/instamsg/openssl/crypto/x509v3/v3_skey.c                                         \
+        common/instamsg/openssl/crypto/x509v3/v3_info.c                                         \
+        common/instamsg/openssl/crypto/x509v3/v3_int.c                                          \
+        common/instamsg/openssl/crypto/x509v3/v3_bitst.c                                        \
+        common/instamsg/openssl/crypto/x509v3/v3_pku.c                                          \
+        common/instamsg/openssl/crypto/x509v3/v3_akey.c                                         \
                                                                                                 \
         common/instamsg/mqtt/src/MQTTFormat.c                                                   \
         common/instamsg/mqtt/src/MQTTPacket.c                                                   \
