@@ -36,6 +36,10 @@ SOURCES=`echo                                                                   
         common/instamsg/openssl/ssl/bio_ssl.c                                                   \
         common/instamsg/openssl/ssl/ssl_lib.c                                                   \
         common/instamsg/openssl/ssl/ssl_cert.c                                                  \
+        common/instamsg/openssl/ssl/ssl_sess.c                                                  \
+        common/instamsg/openssl/ssl/t1_lib.c                                                    \
+        common/instamsg/openssl/ssl/t1_ext.c                                                    \
+        common/instamsg/openssl/crypto/objects/obj_dat.c                                        \
         common/instamsg/openssl/crypto/mem.c                                                    \
         common/instamsg/openssl/crypto/mem_dbg.c                                                \
         common/instamsg/openssl/crypto/cryptlib.c                                               \
@@ -66,6 +70,7 @@ SOURCES=`echo                                                                   
         common/instamsg/openssl/crypto/evp/p_lib.c                                              \
         common/instamsg/openssl/crypto/lhash/lhash.c                                            \
         common/instamsg/openssl/crypto/objects/obj_dat.c                                        \
+        common/instamsg/openssl/crypto/pem/pem_lib.c                                            \
         common/instamsg/openssl/crypto/stack/stack.c                                            \
         common/instamsg/openssl/crypto/x509/x509_cmp.c                                          \
         common/instamsg/openssl/crypto/x509/x509_lu.c                                           \
