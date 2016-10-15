@@ -52,6 +52,7 @@ SOURCES=`echo                                                                   
         common/instamsg/openssl/crypto/asn1/a_int.c                                             \
         common/instamsg/openssl/crypto/asn1/a_object.c                                          \
         common/instamsg/openssl/crypto/asn1/a_octet.c                                           \
+        common/instamsg/openssl/crypto/asn1/asn1_gen.c                                          \
         common/instamsg/openssl/crypto/asn1/x_crl.c                                             \
         common/instamsg/openssl/crypto/asn1/asn1_lib.c                                          \
         common/instamsg/openssl/crypto/asn1/tasn_new.c                                          \
@@ -60,6 +61,10 @@ SOURCES=`echo                                                                   
         common/instamsg/openssl/crypto/asn1/tasn_typ.c                                          \
         common/instamsg/openssl/crypto/asn1/tasn_enc.c                                          \
         common/instamsg/openssl/crypto/asn1/tasn_dec.c                                          \
+        common/instamsg/openssl/crypto/asn1/t_x509.c                                            \
+        common/instamsg/openssl/crypto/asn1/a_strex.c                                           \
+        common/instamsg/openssl/crypto/asn1/a_bitstr.c                                          \
+        common/instamsg/openssl/crypto/asn1/a_mbstr.c                                           \
         common/instamsg/openssl/crypto/bio/bio_lib.c                                            \
         common/instamsg/openssl/crypto/bio/bss_mem.c                                            \
         common/instamsg/openssl/crypto/bio/bss_bio.c                                            \
@@ -81,6 +86,7 @@ SOURCES=`echo                                                                   
         common/instamsg/openssl/crypto/evp/e_aes_cbc_hmac_sha256.c                              \
         common/instamsg/openssl/crypto/evp/evp_enc.c                                            \
         common/instamsg/openssl/crypto/evp/pmeth_gn.c                                           \
+        common/instamsg/openssl/crypto/evp/encode.c                                             \
         common/instamsg/openssl/crypto/hmac/hmac.c                                              \
         common/instamsg/openssl/crypto/lhash/lhash.c                                            \
         common/instamsg/openssl/crypto/objects/obj_dat.c                                        \
@@ -95,6 +101,9 @@ SOURCES=`echo                                                                   
         common/instamsg/openssl/crypto/x509/x509_vfy.c                                          \
         common/instamsg/openssl/crypto/x509/x509_vpm.c                                          \
         common/instamsg/openssl/crypto/x509/x509_v3.c                                           \
+        common/instamsg/openssl/crypto/x509/x509_req.c                                          \
+        common/instamsg/openssl/crypto/x509/x509_def.c                                          \
+        common/instamsg/openssl/crypto/x509/x509_att.c                                          \
         common/instamsg/openssl/crypto/x509v3/v3_purp.c                                         \
         common/instamsg/openssl/crypto/x509v3/v3_lib.c                                          \
         common/instamsg/openssl/crypto/x509v3/v3_utl.c                                          \
