@@ -96,4 +96,6 @@
 #define ACQUIRE_LOG_MUTEX
 #define RELEASE_LOG_MUTEX
 
+#define I386_ONLY
+
 #endif

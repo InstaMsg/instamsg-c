@@ -119,9 +119,6 @@ extern "C" {
 
 /* crypto/opensslconf.h.in */
 
-/* Generate 80386 code? */
-#undef I386_ONLY
-
 #if !(defined(VMS) || defined(__VMS)) /* VMS uses logical names instead */
 #if defined(HEADER_CRYPTLIB_H) && !defined(OPENSSLDIR)
 #define ENGINESDIR "/usr/lib/i386-linux-gnu/openssl-1.0.0/engines"
