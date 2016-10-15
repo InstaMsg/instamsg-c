@@ -33,6 +33,8 @@ SOURCES=`echo                                                                   
         common/instamsg/driver/hex.c                                                            \
         common/instamsg/driver/misc.c                                                           \
                                                                                                 \
+        common/instamsg/openssl/crypto/bio/bio_lib.c                                            \
+                                                                                                \
         common/instamsg/mqtt/src/MQTTFormat.c                                                   \
         common/instamsg/mqtt/src/MQTTPacket.c                                                   \
         common/instamsg/mqtt/src/MQTTDeserializePublish.c                                       \
