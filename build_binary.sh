@@ -39,6 +39,7 @@ SOURCES=`echo                                                                   
         common/instamsg/openssl/ssl/ssl_sess.c                                                  \
         common/instamsg/openssl/ssl/t1_lib.c                                                    \
         common/instamsg/openssl/ssl/t1_ext.c                                                    \
+        common/instamsg/openssl/ssl/s3_pkt.c                                                    \
         common/instamsg/openssl/crypto/objects/obj_dat.c                                        \
         common/instamsg/openssl/crypto/mem.c                                                    \
         common/instamsg/openssl/crypto/mem_dbg.c                                                \
