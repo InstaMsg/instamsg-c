@@ -35,18 +35,35 @@ SOURCES=`echo                                                                   
                                                                                                 \
         common/instamsg/openssl/ssl/bio_ssl.c                                                   \
         common/instamsg/openssl/ssl/ssl_lib.c                                                   \
+        common/instamsg/openssl/ssl/ssl_cert.c                                                  \
         common/instamsg/openssl/crypto/mem.c                                                    \
         common/instamsg/openssl/crypto/mem_dbg.c                                                \
         common/instamsg/openssl/crypto/cryptlib.c                                               \
         common/instamsg/openssl/crypto/ex_data.c                                                \
+        common/instamsg/openssl/crypto/asn1/a_object.c                                          \
+        common/instamsg/openssl/crypto/asn1/a_octet.c                                           \
+        common/instamsg/openssl/crypto/asn1/x_crl.c                                             \
+        common/instamsg/openssl/crypto/asn1/tasn_new.c                                          \
+        common/instamsg/openssl/crypto/asn1/tasn_fre.c                                          \
         common/instamsg/openssl/crypto/bio/bio_lib.c                                            \
         common/instamsg/openssl/crypto/bio/bss_mem.c                                            \
         common/instamsg/openssl/crypto/bio/bss_bio.c                                            \
         common/instamsg/openssl/crypto/bio/b_print.c                                            \
+        common/instamsg/openssl/crypto/bn/bn_lib.c                                              \
+        common/instamsg/openssl/crypto/bn/bn_print.c                                            \
         common/instamsg/openssl/crypto/buffer/buffer.c                                          \
+        common/instamsg/openssl/crypto/buffer/buf_str.c                                         \
+        common/instamsg/openssl/crypto/conf/conf_mod.c                                          \
         common/instamsg/openssl/crypto/err/err.c                                                \
         common/instamsg/openssl/crypto/lhash/lhash.c                                            \
+        common/instamsg/openssl/crypto/objects/obj_dat.c                                        \
         common/instamsg/openssl/crypto/stack/stack.c                                            \
+        common/instamsg/openssl/crypto/x509/x509_cmp.c                                          \
+        common/instamsg/openssl/crypto/x509/x509_lu.c                                           \
+        common/instamsg/openssl/crypto/x509/x509name.c                                          \
+        common/instamsg/openssl/crypto/x509/x509_vfy.c                                          \
+        common/instamsg/openssl/crypto/x509/x509_vpm.c                                          \
+        common/instamsg/openssl/crypto/x509v3/v3_utl.c                                          \
                                                                                                 \
         common/instamsg/mqtt/src/MQTTFormat.c                                                   \
         common/instamsg/mqtt/src/MQTTPacket.c                                                   \
