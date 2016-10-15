@@ -97,5 +97,6 @@
 #define RELEASE_LOG_MUTEX
 
 #define I386_ONLY
+#define HAVE_LONG_LONG              0
 
 #endif

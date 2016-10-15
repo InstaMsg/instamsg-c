@@ -36,12 +36,17 @@ SOURCES=`echo                                                                   
         common/instamsg/openssl/ssl/bio_ssl.c                                                   \
         common/instamsg/openssl/ssl/ssl_lib.c                                                   \
         common/instamsg/openssl/crypto/mem.c                                                    \
+        common/instamsg/openssl/crypto/mem_dbg.c                                                \
         common/instamsg/openssl/crypto/cryptlib.c                                               \
         common/instamsg/openssl/crypto/ex_data.c                                                \
         common/instamsg/openssl/crypto/bio/bio_lib.c                                            \
         common/instamsg/openssl/crypto/bio/bss_mem.c                                            \
         common/instamsg/openssl/crypto/bio/bss_bio.c                                            \
+        common/instamsg/openssl/crypto/bio/b_print.c                                            \
+        common/instamsg/openssl/crypto/buffer/buffer.c                                          \
         common/instamsg/openssl/crypto/err/err.c                                                \
+        common/instamsg/openssl/crypto/lhash/lhash.c                                            \
+        common/instamsg/openssl/crypto/stack/stack.c                                            \
                                                                                                 \
         common/instamsg/mqtt/src/MQTTFormat.c                                                   \
         common/instamsg/mqtt/src/MQTTPacket.c                                                   \
