@@ -44,9 +44,13 @@ SOURCES=`echo                                                                   
         common/instamsg/openssl/crypto/asn1/a_object.c                                          \
         common/instamsg/openssl/crypto/asn1/a_octet.c                                           \
         common/instamsg/openssl/crypto/asn1/x_crl.c                                             \
+        common/instamsg/openssl/crypto/asn1/asn1_lib.c                                          \
         common/instamsg/openssl/crypto/asn1/tasn_new.c                                          \
         common/instamsg/openssl/crypto/asn1/tasn_fre.c                                          \
         common/instamsg/openssl/crypto/asn1/tasn_utl.c                                          \
+        common/instamsg/openssl/crypto/asn1/tasn_typ.c                                          \
+        common/instamsg/openssl/crypto/asn1/tasn_enc.c                                          \
+        common/instamsg/openssl/crypto/asn1/tasn_dec.c                                          \
         common/instamsg/openssl/crypto/bio/bio_lib.c                                            \
         common/instamsg/openssl/crypto/bio/bss_mem.c                                            \
         common/instamsg/openssl/crypto/bio/bss_bio.c                                            \
@@ -87,6 +91,12 @@ SOURCES=`echo                                                                   
         common/instamsg/openssl/crypto/x509v3/v3_pku.c                                          \
         common/instamsg/openssl/crypto/x509v3/v3_akey.c                                         \
         common/instamsg/openssl/crypto/x509v3/v3_crld.c                                         \
+        common/instamsg/openssl/crypto/x509v3/v3_extku.c                                        \
+        common/instamsg/openssl/crypto/x509v3/v3_pcons.c                                        \
+        common/instamsg/openssl/crypto/x509v3/v3_pci.c                                          \
+        common/instamsg/openssl/crypto/x509v3/v3_pmaps.c                                        \
+        common/instamsg/openssl/crypto/x509v3/v3_ia5.c                                          \
+        common/instamsg/openssl/crypto/x509v3/v3_ncons.c                                        \
                                                                                                 \
         common/instamsg/mqtt/src/MQTTFormat.c                                                   \
         common/instamsg/mqtt/src/MQTTPacket.c                                                   \
