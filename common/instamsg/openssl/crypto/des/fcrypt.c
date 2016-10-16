@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* NOCW */
 #include <stdio.h>
 #ifdef _OSD_POSIX
@@ -9,7 +6,7 @@
 # endif
 #endif
 #ifdef CHARSET_EBCDIC
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/ebcdic.h"
+# include <openssl/ebcdic.h>
 #endif
 
 /*
@@ -168,6 +165,3 @@ char *DES_fcrypt(const char *buf, const char *salt, char *ret)
     ret[13] = '\0';
     return (ret);
 }
-#else
-typedef int to_make_compiler_happy
-#endif

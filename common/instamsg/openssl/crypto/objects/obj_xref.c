@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/objects/obj_xref.c */
 /*
  * Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL project
@@ -60,7 +57,7 @@
  *
  */
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/objects.h"
+#include <openssl/objects.h>
 #include "obj_xref.h"
 
 DECLARE_STACK_OF(nid_triple)
@@ -222,7 +219,4 @@ main()
     }
 }
 
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

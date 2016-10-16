@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/objects/obj_dat.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -63,10 +60,10 @@
 #include <ctype.h>
 #include <limits.h>
 #include "cryptlib.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/lhash.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/asn1.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/objects.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
+#include <openssl/lhash.h>
+#include <openssl/asn1.h>
+#include <openssl/objects.h>
+#include <openssl/bn.h>
 
 /* obj_dat.h is generated from objects.h by obj_dat.pl */
 #ifndef OPENSSL_NO_OBJECT
@@ -802,6 +799,3 @@ int OBJ_create(const char *oid, const char *sn, const char *ln)
     OPENSSL_free(buf);
     return (ok);
 }
-#else
-typedef int to_make_compiler_happy
-#endif

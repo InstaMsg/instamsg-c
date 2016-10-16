@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/conf/conf.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -64,13 +61,13 @@
 #include <stdio.h>
 #include <string.h>
 #include "cryptlib.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/stack.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/lhash.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/conf.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/conf_api.h"
+#include <openssl/stack.h>
+#include <openssl/lhash.h>
+#include <openssl/conf.h>
+#include <openssl/conf_api.h>
 #include "conf_def.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/buffer.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+#include <openssl/buffer.h>
+#include <openssl/err.h>
 
 static char *eat_ws(CONF *conf, char *p);
 static char *eat_alpha_numeric(CONF *conf, char *p);
@@ -708,6 +705,3 @@ static int def_to_int(const CONF *conf, char c)
 {
     return c - '0';
 }
-#else
-typedef int to_make_compiler_happy
-#endif

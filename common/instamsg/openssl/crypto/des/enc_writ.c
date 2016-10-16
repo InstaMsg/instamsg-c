@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/des/enc_writ.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -64,7 +61,7 @@
 #include <stdio.h>
 #include "cryptlib.h"
 #include "des_locl.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
+#include <openssl/rand.h>
 
 /*-
  * WARNINGS:
@@ -183,6 +180,3 @@ int DES_enc_write(int fd, const void *_buf, int len,
     return (len);
 #endif                          /* OPENSSL_NO_POSIX_IO */
 }
-#else
-typedef int to_make_compiler_happy
-#endif

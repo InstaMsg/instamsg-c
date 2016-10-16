@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/bio/bf_buff.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -62,7 +59,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include "cryptlib.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
+#include <openssl/bio.h>
 
 static int buffer_write(BIO *h, const char *buf, int num);
 static int buffer_read(BIO *h, char *buf, int size);
@@ -518,6 +515,3 @@ static int buffer_puts(BIO *b, const char *str)
 {
     return (buffer_write(b, str, strlen(str)));
 }
-#else
-typedef int to_make_compiler_happy
-#endif

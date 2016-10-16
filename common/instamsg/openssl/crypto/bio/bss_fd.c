@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/bio/bss_fd.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -330,7 +327,4 @@ int BIO_fd_non_fatal_error(int err)
     }
     return (0);
 }
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

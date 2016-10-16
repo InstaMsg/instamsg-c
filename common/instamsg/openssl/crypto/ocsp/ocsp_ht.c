@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* ocsp_ht.c */
 /*
  * Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL project
@@ -65,10 +62,10 @@
 #include <ctype.h>
 #include <string.h>
 #include "e_os.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/asn1.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/ocsp.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/buffer.h"
+#include <openssl/asn1.h>
+#include <openssl/ocsp.h>
+#include <openssl/err.h>
+#include <openssl/buffer.h>
 #ifdef OPENSSL_SYS_SUNOS
 # define strtoul (unsigned long)strtol
 #endif                          /* OPENSSL_SYS_SUNOS */
@@ -556,6 +553,3 @@ OCSP_RESPONSE *OCSP_sendreq_bio(BIO *b, const char *path, OCSP_REQUEST *req)
 
     return NULL;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

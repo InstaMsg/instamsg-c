@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/lhash/lh_stats.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -69,9 +66,9 @@
 #include "cryptlib.h"
 
 #ifndef OPENSSL_NO_BIO
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
+# include <openssl/bio.h>
 #endif
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/lhash.h"
+#include <openssl/lhash.h>
 
 #ifdef OPENSSL_NO_BIO
 
@@ -246,7 +243,4 @@ void lh_node_usage_stats_bio(const _LHASH *lh, BIO *out)
                (int)(total / n_used), (int)((total % n_used) * 100 / n_used));
 }
 
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

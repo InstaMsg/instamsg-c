@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/bn/bn_mpi.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -129,6 +126,3 @@ BIGNUM *BN_mpi2bn(const unsigned char *d, int n, BIGNUM *a)
     bn_check_top(a);
     return (a);
 }
-#else
-typedef int to_make_compiler_happy
-#endif

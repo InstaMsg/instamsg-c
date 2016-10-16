@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/bf/bf_cbc.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -59,7 +56,7 @@
  * [including the GNU Public Licence.]
  */
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/blowfish.h"
+#include <openssl/blowfish.h>
 #include "bf_locl.h"
 
 void BF_cbc_encrypt(const unsigned char *in, unsigned char *out, long length,
@@ -136,6 +133,3 @@ void BF_cbc_encrypt(const unsigned char *in, unsigned char *out, long length,
     tin0 = tin1 = tout0 = tout1 = xor0 = xor1 = 0;
     tin[0] = tin[1] = 0;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

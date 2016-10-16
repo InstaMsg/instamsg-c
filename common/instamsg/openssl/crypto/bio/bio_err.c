@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/bio/bio_err.c */
 /* ====================================================================
  * Copyright (c) 1999-2015 The OpenSSL Project.  All rights reserved.
@@ -63,8 +60,8 @@
  */
 
 #include <stdio.h>
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
+#include <openssl/err.h>
+#include <openssl/bio.h>
 
 /* BEGIN ERROR CODES */
 #ifndef OPENSSL_NO_ERR
@@ -158,6 +155,3 @@ void ERR_load_BIO_strings(void)
     }
 #endif
 }
-#else
-typedef int to_make_compiler_happy
-#endif

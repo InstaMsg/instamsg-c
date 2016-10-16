@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/hmac/hmac.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -62,10 +59,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "cryptlib.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/hmac.h"
+#include <openssl/hmac.h>
 
 #ifdef OPENSSL_FIPS
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/fips.h"
+# include <openssl/fips.h>
 #endif
 
 int HMAC_Init_ex(HMAC_CTX *ctx, const void *key, int len,
@@ -269,6 +266,3 @@ void HMAC_CTX_set_flags(HMAC_CTX *ctx, unsigned long flags)
     EVP_MD_CTX_set_flags(&ctx->o_ctx, flags);
     EVP_MD_CTX_set_flags(&ctx->md_ctx, flags);
 }
-#else
-typedef int to_make_compiler_happy
-#endif

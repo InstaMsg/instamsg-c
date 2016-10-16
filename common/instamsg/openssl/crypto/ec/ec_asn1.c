@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/ec/ec_asn1.c */
 /*
  * Written by Nils Larsch for the OpenSSL project.
@@ -61,9 +58,9 @@
 
 #include <string.h>
 #include "ec_lcl.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/asn1t.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/objects.h"
+#include <openssl/err.h>
+#include <openssl/asn1t.h>
+#include <openssl/objects.h>
 
 int EC_GROUP_get_basis_type(const EC_GROUP *group)
 {
@@ -1323,6 +1320,3 @@ int i2o_ECPublicKey(EC_KEY *a, unsigned char **out)
         *out += buf_len;
     return buf_len;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/ecdh/ec_kdf.c */
 /*
  * Written by Stephen Henson for the OpenSSL project.
@@ -57,8 +54,8 @@
 #define OPENSSL_FIPSAPI
 
 #include <string.h>
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/ecdh.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/evp.h"
+#include <openssl/ecdh.h>
+#include <openssl/evp.h>
 
 /* Key derivation function from X9.62/SECG */
 /* Way more than we will ever need */
@@ -112,6 +109,3 @@ int ECDH_KDF_X9_62(unsigned char *out, size_t outlen,
     EVP_MD_CTX_cleanup(&mctx);
     return rv;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

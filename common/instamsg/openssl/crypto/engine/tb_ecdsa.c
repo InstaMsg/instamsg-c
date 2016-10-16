@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* ====================================================================
  * Copyright (c) 2000-2002 The OpenSSL Project.  All rights reserved.
  *
@@ -125,6 +122,3 @@ int ENGINE_set_ECDSA(ENGINE *e, const ECDSA_METHOD *ecdsa_meth)
     e->ecdsa_meth = ecdsa_meth;
     return 1;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

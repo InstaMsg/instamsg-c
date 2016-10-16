@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* ocsp_asn.c */
 /*
  * Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL project
@@ -59,9 +56,9 @@
  * Hudson (tjh@cryptsoft.com).
  *
  */
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/asn1.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/asn1t.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/ocsp.h"
+#include <openssl/asn1.h>
+#include <openssl/asn1t.h>
+#include <openssl/ocsp.h>
 
 ASN1_SEQUENCE(OCSP_SIGNATURE) = {
         ASN1_SIMPLE(OCSP_SIGNATURE, signatureAlgorithm, X509_ALGOR),
@@ -184,6 +181,3 @@ ASN1_SEQUENCE(OCSP_SERVICELOC) = {
 } ASN1_SEQUENCE_END(OCSP_SERVICELOC)
 
 IMPLEMENT_ASN1_FUNCTIONS(OCSP_SERVICELOC)
-#else
-typedef int to_make_compiler_happy
-#endif

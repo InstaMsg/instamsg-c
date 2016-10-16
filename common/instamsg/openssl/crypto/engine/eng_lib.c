@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/engine/eng_lib.c */
 /*
  * Written by Geoff Thorpe (geoff@geoffthorpe.net) for the OpenSSL project
@@ -61,7 +58,7 @@
  */
 
 #include "eng_int.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
+#include <openssl/rand.h>
 
 /* The "new"/"free" stuff first */
 
@@ -348,6 +345,3 @@ void *ENGINE_get_static_state(void)
 {
     return &internal_static_hack;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

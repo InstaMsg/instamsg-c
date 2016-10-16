@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* ====================================================================
  * Copyright (c) 2000 The OpenSSL Project.  All rights reserved.
  *
@@ -125,6 +122,3 @@ int ENGINE_set_RAND(ENGINE *e, const RAND_METHOD *rand_meth)
     e->rand_meth = rand_meth;
     return 1;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

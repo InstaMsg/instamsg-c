@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* dso_win32.c -*- mode:C; c-file-style: "eay" -*- */
 /*
  * Written by Geoff Thorpe (geoff@geoffthorpe.net) for the OpenSSL project
@@ -63,7 +60,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "cryptlib.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/dso.h"
+#include <openssl/dso.h>
 
 #if !defined(DSO_WIN32)
 DSO_METHOD *DSO_METHOD_win32(void)
@@ -789,6 +786,3 @@ static void *win32_globallookup(const char *name)
     return NULL;
 }
 #endif                          /* DSO_WIN32 */
-#else
-typedef int to_make_compiler_happy
-#endif

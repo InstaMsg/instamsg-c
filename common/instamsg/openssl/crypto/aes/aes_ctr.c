@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/aes/aes_ctr.c -*- mode:C; c-file-style: "eay" -*- */
 /* ====================================================================
  * Copyright (c) 1998-2002 The OpenSSL Project.  All rights reserved.
@@ -52,8 +49,8 @@
  *
  */
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/aes.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/modes.h"
+#include <openssl/aes.h>
+#include <openssl/modes.h>
 
 void AES_ctr128_encrypt(const unsigned char *in, unsigned char *out,
                         size_t length, const AES_KEY *key,
@@ -64,6 +61,3 @@ void AES_ctr128_encrypt(const unsigned char *in, unsigned char *out,
     CRYPTO_ctr128_encrypt(in, out, length, key, ivec, ecount_buf, num,
                           (block128_f) AES_encrypt);
 }
-#else
-typedef int to_make_compiler_happy
-#endif

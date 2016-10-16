@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* dso_beos.c */
 /*
  * Written by Marcin Konicki (ahwayakchih@neoni.net) for the OpenSSL project
@@ -63,7 +60,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "cryptlib.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/dso.h"
+#include <openssl/dso.h>
 
 #if !defined(OPENSSL_SYS_BEOS)
 DSO_METHOD *DSO_METHOD_beos(void)
@@ -253,7 +250,4 @@ static char *beos_name_converter(DSO *dso, const char *filename)
     return (translated);
 }
 
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

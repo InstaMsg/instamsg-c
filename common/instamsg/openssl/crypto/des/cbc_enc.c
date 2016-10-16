@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/des/cbc_enc.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -62,6 +59,3 @@
 #define CBC_ENC_C__DONT_UPDATE_IV
 
 #include "ncbc_enc.c"           /* des_cbc_encrypt */
-#else
-typedef int to_make_compiler_happy
-#endif

@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* conf_api.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -69,8 +66,8 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/conf.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/conf_api.h"
+#include <openssl/conf.h>
+#include <openssl/conf_api.h>
 #include "e_os.h"
 
 static void value_free_hash_doall_arg(CONF_VALUE *a,
@@ -306,6 +303,3 @@ CONF_VALUE *_CONF_new_section(CONF *conf, const char *section)
 }
 
 IMPLEMENT_STACK_OF(CONF_VALUE)
-#else
-typedef int to_make_compiler_happy
-#endif

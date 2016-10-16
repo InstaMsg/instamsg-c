@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/ecdsa/ecs_lib.c */
 /* ====================================================================
  * Copyright (c) 1998-2005 The OpenSSL Project.  All rights reserved.
@@ -59,12 +56,12 @@
 #include <string.h>
 #include "ecs_locl.h"
 #ifndef OPENSSL_NO_ENGINE
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/engine.h"
+# include <openssl/engine.h>
 #endif
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
+#include <openssl/err.h>
+#include <openssl/bn.h>
 #ifdef OPENSSL_FIPS
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/fips.h"
+# include <openssl/fips.h>
 #endif
 
 const char ECDSA_version[] = "ECDSA" OPENSSL_VERSION_PTEXT;
@@ -355,6 +352,3 @@ void *ECDSA_METHOD_get_app_data(ECDSA_METHOD *ecdsa_method)
 {
     return ecdsa_method->app_data;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

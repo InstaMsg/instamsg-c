@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/bio/bss_null.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -62,7 +59,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include "cryptlib.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
+#include <openssl/bio.h>
 
 static int null_write(BIO *h, const char *buf, int num);
 static int null_read(BIO *h, char *buf, int size);
@@ -150,6 +147,3 @@ static int null_puts(BIO *bp, const char *str)
         return (0);
     return (strlen(str));
 }
-#else
-typedef int to_make_compiler_happy
-#endif

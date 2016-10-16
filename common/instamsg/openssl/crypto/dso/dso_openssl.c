@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* dso_openssl.c */
 /*
  * Written by Geoff Thorpe (geoff@geoffthorpe.net) for the OpenSSL project
@@ -62,7 +59,7 @@
 
 #include <stdio.h>
 #include "cryptlib.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/dso.h"
+#include <openssl/dso.h>
 
 /* We just pinch the method from an appropriate "default" method. */
 
@@ -84,6 +81,3 @@ DSO_METHOD *DSO_METHOD_openssl(void)
     return (DSO_METHOD_null());
 #endif
 }
-#else
-typedef int to_make_compiler_happy
-#endif

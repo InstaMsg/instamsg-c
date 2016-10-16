@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* ====================================================================
  * Copyright (c) 2000 The OpenSSL Project.  All rights reserved.
  *
@@ -125,6 +122,3 @@ int ENGINE_set_RSA(ENGINE *e, const RSA_METHOD *rsa_meth)
     e->rsa_meth = rsa_meth;
     return 1;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

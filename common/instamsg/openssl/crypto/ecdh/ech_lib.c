@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/ecdh/ech_lib.c */
 /* ====================================================================
  * Copyright 2002 Sun Microsystems, Inc. ALL RIGHTS RESERVED.
@@ -73,11 +70,11 @@
 #include "ech_locl.h"
 #include <string.h>
 #ifndef OPENSSL_NO_ENGINE
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/engine.h"
+# include <openssl/engine.h>
 #endif
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+#include <openssl/err.h>
 #ifdef OPENSSL_FIPS
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/fips.h"
+# include <openssl/fips.h>
 #endif
 
 const char ECDH_version[] = "ECDH" OPENSSL_VERSION_PTEXT;
@@ -266,6 +263,3 @@ void *ECDH_get_ex_data(EC_KEY *d, int idx)
         return NULL;
     return (CRYPTO_get_ex_data(&ecdh->ex_data, idx));
 }
-#else
-typedef int to_make_compiler_happy
-#endif

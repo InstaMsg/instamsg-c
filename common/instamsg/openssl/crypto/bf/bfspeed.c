@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/bf/bfspeed.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -68,7 +65,7 @@
 
 #include <stdio.h>
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"
+#include <openssl/e_os2.h>
 #include OPENSSL_UNISTD_IO
 OPENSSL_DECLARE_EXIT
 #ifndef OPENSSL_SYS_NETWARE
@@ -98,7 +95,7 @@ OPENSSL_DECLARE_EXIT
 # include <limits.h>
 # include <sys/param.h>
 #endif
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/blowfish.h"
+#include <openssl/blowfish.h>
 /* The following if from times(3) man page.  It may need to be changed */
 #ifndef HZ
 # ifndef CLK_TCK
@@ -266,6 +263,3 @@ int main(int argc, char **argv)
     return (0);
 #endif
 }
-#else
-typedef int to_make_compiler_happy
-#endif

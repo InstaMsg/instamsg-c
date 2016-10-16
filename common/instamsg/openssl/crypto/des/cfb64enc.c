@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/des/cfb64enc.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -123,6 +120,3 @@ void DES_cfb64_encrypt(const unsigned char *in, unsigned char *out,
     v0 = v1 = ti[0] = ti[1] = c = cc = 0;
     *num = n;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

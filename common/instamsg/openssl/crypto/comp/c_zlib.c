@@ -1,12 +1,9 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/objects.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/comp.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+#include <openssl/objects.h>
+#include <openssl/comp.h>
+#include <openssl/err.h>
 
 COMP_METHOD *COMP_zlib(void);
 
@@ -98,7 +95,7 @@ static COMP_METHOD zlib_stateful_method = {
                                  * OPENSSL_SYS_WIN32) */
 
 # ifdef ZLIB_SHARED
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/dso.h"
+#  include <openssl/dso.h>
 
 /* Function pointers */
 typedef int (*compress_ft) (Bytef *dest, uLongf * destLen,
@@ -762,7 +759,4 @@ static long bio_zlib_callback_ctrl(BIO *b, int cmd, bio_info_cb *fp)
     return BIO_callback_ctrl(b->next_bio, cmd, fp);
 }
 
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

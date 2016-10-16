@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/aes/aes_misc.c -*- mode:C; c-file-style: "eay" -*- */
 /* ====================================================================
  * Copyright (c) 1998-2002 The OpenSSL Project.  All rights reserved.
@@ -52,9 +49,9 @@
  *
  */
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslv.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/aes.h"
+#include <openssl/opensslv.h>
+#include <openssl/crypto.h>
+#include <openssl/aes.h>
 #include "aes_locl.h"
 
 const char AES_version[] = "AES" OPENSSL_VERSION_PTEXT;
@@ -87,6 +84,3 @@ int AES_set_decrypt_key(const unsigned char *userKey, const int bits,
 #endif
     return private_AES_set_decrypt_key(userKey, bits, key);
 }
-#else
-typedef int to_make_compiler_happy
-#endif

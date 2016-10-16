@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/ec/ec_cvt.c */
 /*
  * Originally written by Bodo Moeller for the OpenSSL project.
@@ -72,11 +69,11 @@
  *
  */
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+#include <openssl/err.h>
 #include "ec_lcl.h"
 
 #ifdef OPENSSL_FIPS
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/fips.h"
+# include <openssl/fips.h>
 #endif
 
 EC_GROUP *EC_GROUP_new_curve_GFp(const BIGNUM *p, const BIGNUM *a,
@@ -180,7 +177,4 @@ EC_GROUP *EC_GROUP_new_curve_GF2m(const BIGNUM *p, const BIGNUM *a,
 
     return ret;
 }
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

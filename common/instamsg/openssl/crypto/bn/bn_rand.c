@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/bn/bn_rand.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -116,7 +113,7 @@
 #include <time.h>
 #include "cryptlib.h"
 #include "bn_lcl.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
+#include <openssl/rand.h>
 
 static int bnrand(int pseudorand, BIGNUM *rnd, int bits, int top, int bottom)
 {
@@ -296,6 +293,3 @@ int BN_pseudo_rand_range(BIGNUM *r, const BIGNUM *range)
 {
     return bn_rand_range(1, r, range);
 }
-#else
-typedef int to_make_compiler_happy
-#endif

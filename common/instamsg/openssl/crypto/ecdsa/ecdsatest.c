@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/ecdsa/ecdsatest.c */
 /*
  * Written by Nils Larsch for the OpenSSL project.
@@ -76,7 +73,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h" /* To see if OPENSSL_NO_ECDSA is defined */
+#include <openssl/opensslconf.h> /* To see if OPENSSL_NO_ECDSA is defined */
 
 #ifdef OPENSSL_NO_ECDSA
 int main(int argc, char *argv[])
@@ -86,16 +83,16 @@ int main(int argc, char *argv[])
 }
 #else
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/evp.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/ecdsa.h"
+# include <openssl/crypto.h>
+# include <openssl/bio.h>
+# include <openssl/evp.h>
+# include <openssl/bn.h>
+# include <openssl/ecdsa.h>
 # ifndef OPENSSL_NO_ENGINE
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/engine.h"
+#  include <openssl/engine.h>
 # endif
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
+# include <openssl/err.h>
+# include <openssl/rand.h>
 
 static const char rnd_seed[] = "string to make the random number generator "
     "think it has entropy";
@@ -556,7 +553,4 @@ int main(void)
         BIO_free(out);
     return ret;
 }
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

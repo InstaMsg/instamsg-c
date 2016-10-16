@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/stack/stack.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -71,8 +68,8 @@
  */
 #include <stdio.h>
 #include "cryptlib.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/stack.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/objects.h"
+#include <openssl/stack.h>
+#include <openssl/objects.h>
 
 #undef MIN_NODES
 #define MIN_NODES       4
@@ -385,6 +382,3 @@ int sk_is_sorted(const _STACK *st)
         return 1;
     return st->sorted;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

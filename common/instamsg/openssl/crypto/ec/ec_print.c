@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/ec/ec_print.c */
 /* ====================================================================
  * Copyright (c) 1998-2002 The OpenSSL Project.  All rights reserved.
@@ -56,7 +53,7 @@
  *
  */
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
+#include <openssl/crypto.h>
 #include "ec_lcl.h"
 
 BIGNUM *EC_POINT_point2bn(const EC_GROUP *group,
@@ -180,6 +177,3 @@ EC_POINT *EC_POINT_hex2point(const EC_GROUP *group,
 
     return ret;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

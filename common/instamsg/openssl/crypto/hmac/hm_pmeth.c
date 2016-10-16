@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /*
  * Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL project
  * 2007.
@@ -61,10 +58,10 @@
 
 #include <stdio.h>
 #include "cryptlib.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/x509.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/x509v3.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/evp.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/hmac.h"
+#include <openssl/x509.h>
+#include <openssl/x509v3.h>
+#include <openssl/evp.h>
+#include <openssl/hmac.h>
 #include "evp_locl.h"
 
 /* HMAC pkey context structure */
@@ -263,6 +260,3 @@ const EVP_PKEY_METHOD hmac_pkey_meth = {
     pkey_hmac_ctrl,
     pkey_hmac_ctrl_str
 };
-#else
-typedef int to_make_compiler_happy
-#endif

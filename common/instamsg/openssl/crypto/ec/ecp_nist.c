@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/ec/ecp_nist.c */
 /*
  * Written by Nils Larsch for the OpenSSL project.
@@ -66,12 +63,12 @@
 
 #include <limits.h>
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/obj_mac.h"
+#include <openssl/err.h>
+#include <openssl/obj_mac.h>
 #include "ec_lcl.h"
 
 #ifdef OPENSSL_FIPS
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/fips.h"
+# include <openssl/fips.h>
 #endif
 
 const EC_METHOD *EC_GFp_nist_method(void)
@@ -221,6 +218,3 @@ int ec_GFp_nist_field_sqr(const EC_GROUP *group, BIGNUM *r, const BIGNUM *a,
         BN_CTX_free(ctx_new);
     return ret;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/aes/aes_wrap.c */
 /*
  * Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL
@@ -56,8 +53,8 @@
  */
 
 #include "cryptlib.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/aes.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/modes.h"
+#include <openssl/aes.h>
+#include <openssl/modes.h>
 
 int AES_wrap_key(AES_KEY *key, const unsigned char *iv,
                  unsigned char *out,
@@ -73,6 +70,3 @@ int AES_unwrap_key(AES_KEY *key, const unsigned char *iv,
     return CRYPTO_128_unwrap(key, iv, out, in, inlen,
                              (block128_f) AES_decrypt);
 }
-#else
-typedef int to_make_compiler_happy
-#endif

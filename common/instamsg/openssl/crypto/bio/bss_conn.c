@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/bio/bss_conn.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -63,7 +60,7 @@
 #include <errno.h>
 #define USE_SOCKETS
 #include "cryptlib.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
+#include <openssl/bio.h>
 
 #ifndef OPENSSL_NO_SOCK
 
@@ -603,7 +600,4 @@ BIO *BIO_new_connect(const char *str)
     }
 }
 
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

@@ -1,11 +1,8 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/objects.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/comp.h"
+#include <openssl/objects.h>
+#include <openssl/comp.h>
 
 COMP_CTX *COMP_CTX_new(COMP_METHOD *meth)
 {
@@ -67,6 +64,3 @@ int COMP_expand_block(COMP_CTX *ctx, unsigned char *out, int olen,
     }
     return (ret);
 }
-#else
-typedef int to_make_compiler_happy
-#endif

@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/bio/bss_sock.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -66,7 +63,7 @@
 
 #ifndef OPENSSL_NO_SOCK
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
+# include <openssl/bio.h>
 
 # ifdef WATT32
 #  define sock_write SockWrite  /* Watt-32 uses same names */
@@ -288,6 +285,3 @@ int BIO_sock_non_fatal_error(int err)
 }
 
 #endif                          /* #ifndef OPENSSL_NO_SOCK */
-#else
-typedef int to_make_compiler_happy
-#endif

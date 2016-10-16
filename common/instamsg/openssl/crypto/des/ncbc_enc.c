@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/des/ncbc_enc.c */
 /*-
  * #included by:
@@ -155,6 +152,3 @@ void DES_ncbc_encrypt(const unsigned char *in, unsigned char *out,
     tin0 = tin1 = tout0 = tout1 = xor0 = xor1 = 0;
     tin[0] = tin[1] = 0;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

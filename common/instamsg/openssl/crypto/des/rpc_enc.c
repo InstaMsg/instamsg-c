@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/des/rpc_enc.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -101,6 +98,3 @@ int _des_crypt(char *buf, int len, struct desparams *desp)
     }
     return (1);
 }
-#else
-typedef int to_make_compiler_happy
-#endif

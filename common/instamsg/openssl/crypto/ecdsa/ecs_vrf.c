@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/ecdsa/ecdsa_vrf.c */
 /*
  * Written by Nils Larsch for the OpenSSL project
@@ -62,7 +59,7 @@
 #include "ecs_locl.h"
 #include <string.h>
 #ifndef OPENSSL_NO_ENGINE
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/engine.h"
+# include <openssl/engine.h>
 #endif
 
 /*-
@@ -113,6 +110,3 @@ int ECDSA_verify(int type, const unsigned char *dgst, int dgst_len,
     ECDSA_SIG_free(s);
     return (ret);
 }
-#else
-typedef int to_make_compiler_happy
-#endif

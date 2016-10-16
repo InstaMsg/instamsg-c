@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/engine/eng_openssl.c */
 /*
  * Written by Geoff Thorpe (geoff@geoffthorpe.net) for the OpenSSL project
@@ -66,21 +63,21 @@
  */
 
 #include <stdio.h>
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
+#include <openssl/crypto.h>
 #include "cryptlib.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/engine.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/dso.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/pem.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/evp.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
+#include <openssl/engine.h>
+#include <openssl/dso.h>
+#include <openssl/pem.h>
+#include <openssl/evp.h>
+#include <openssl/rand.h>
 #ifndef OPENSSL_NO_RSA
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/rsa.h"
+# include <openssl/rsa.h>
 #endif
 #ifndef OPENSSL_NO_DSA
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/dsa.h"
+# include <openssl/dsa.h>
 #endif
 #ifndef OPENSSL_NO_DH
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/dh.h"
+# include <openssl/dh.h>
 #endif
 
 /*
@@ -233,7 +230,7 @@ IMPLEMENT_DYNAMIC_CHECK_FN()
  *        the "init_key" handler is called.
  *    TEST_ENG_OPENSSL_RC4_P_CIPHER - ditto for the "cipher" handler.
  */
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/rc4.h"
+# include <openssl/rc4.h>
 # define TEST_RC4_KEY_SIZE               16
 static int test_cipher_nids[] = { NID_rc4, NID_rc4_40 };
 
@@ -320,7 +317,7 @@ static int openssl_ciphers(ENGINE *e, const EVP_CIPHER **cipher,
 
 #ifdef TEST_ENG_OPENSSL_SHA
 /* Much the same sort of comment as for TEST_ENG_OPENSSL_RC4 */
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/sha.h"
+# include <openssl/sha.h>
 static int test_digest_nids[] = { NID_sha1 };
 
 static int test_digest_nids_number = 1;
@@ -402,7 +399,4 @@ static EVP_PKEY *openssl_load_privkey(ENGINE *eng, const char *key_id,
     BIO_free(in);
     return key;
 }
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

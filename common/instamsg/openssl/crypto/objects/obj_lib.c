@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/objects/obj_lib.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -61,9 +58,9 @@
 
 #include <stdio.h>
 #include "cryptlib.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/lhash.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/objects.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/buffer.h"
+#include <openssl/lhash.h>
+#include <openssl/objects.h>
+#include <openssl/buffer.h>
 
 ASN1_OBJECT *OBJ_dup(const ASN1_OBJECT *o)
 {
@@ -136,6 +133,3 @@ int OBJ_cmp(const ASN1_OBJECT *a, const ASN1_OBJECT *b)
         return (ret);
     return (memcmp(a->data, b->data, a->length));
 }
-#else
-typedef int to_make_compiler_happy
-#endif

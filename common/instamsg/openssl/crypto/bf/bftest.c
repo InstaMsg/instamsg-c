@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/bf/bftest.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -67,7 +64,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h" /* To see if OPENSSL_NO_BF is defined */
+#include <openssl/opensslconf.h> /* To see if OPENSSL_NO_BF is defined */
 
 #include "../e_os.h"
 
@@ -78,10 +75,10 @@ int main(int argc, char *argv[])
     return (0);
 }
 #else
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/blowfish.h"
+# include <openssl/blowfish.h>
 
 # ifdef CHARSET_EBCDIC
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/ebcdic.h"
+#  include <openssl/ebcdic.h>
 # endif
 
 static char *bf_key[2] = {
@@ -538,7 +535,4 @@ static int test(void)
 
     return (err);
 }
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

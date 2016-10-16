@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/ecdh/ecdh_key.c */
 /* ====================================================================
  * Copyright 2002 Sun Microsystems, Inc. ALL RIGHTS RESERVED.
@@ -82,6 +79,3 @@ int ECDH_compute_key(void *out, size_t outlen, const EC_POINT *pub_key,
         return 0;
     return ecdh->meth->compute_key(out, outlen, pub_key, eckey, KDF);
 }
-#else
-typedef int to_make_compiler_happy
-#endif

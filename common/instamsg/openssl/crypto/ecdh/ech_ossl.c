@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/ecdh/ech_ossl.c */
 /* ====================================================================
  * Copyright 2002 Sun Microsystems, Inc. ALL RIGHTS RESERVED.
@@ -76,10 +73,10 @@
 #include "cryptlib.h"
 
 #include "ech_locl.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/sha.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/obj_mac.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
+#include <openssl/err.h>
+#include <openssl/sha.h>
+#include <openssl/obj_mac.h>
+#include <openssl/bn.h>
 
 static int ecdh_compute_key(void *out, size_t len, const EC_POINT *pub_key,
                             EC_KEY *ecdh,
@@ -219,6 +216,3 @@ static int ecdh_compute_key(void *out, size_t outlen, const EC_POINT *pub_key,
         OPENSSL_free(buf);
     return (ret);
 }
-#else
-typedef int to_make_compiler_happy
-#endif

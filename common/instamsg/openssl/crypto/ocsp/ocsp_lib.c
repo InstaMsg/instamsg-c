@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* ocsp_lib.c */
 /*
  * Written by Tom Titchener <Tom_Titchener@groove.net> for the OpenSSL
@@ -69,13 +66,13 @@
 
 #include <stdio.h>
 #include <cryptlib.h>
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/objects.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/x509.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/pem.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/x509v3.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/ocsp.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/asn1t.h"
+#include <openssl/objects.h>
+#include <openssl/rand.h>
+#include <openssl/x509.h>
+#include <openssl/pem.h>
+#include <openssl/x509v3.h>
+#include <openssl/ocsp.h>
+#include <openssl/asn1t.h>
 
 /* Convert a certificate and its issuer to an OCSP_CERTID */
 
@@ -291,6 +288,3 @@ int OCSP_parse_url(const char *url, char **phost, char **pport, char **ppath,
 }
 
 IMPLEMENT_ASN1_DUP_FUNCTION(OCSP_CERTID)
-#else
-typedef int to_make_compiler_happy
-#endif

@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/lhash/lh_test.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -62,7 +59,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/lhash.h"
+#include <openssl/lhash.h>
 
 main()
 {
@@ -89,6 +86,3 @@ main()
     lh_node_usage_stats(conf, stdout);
     exit(0);
 }
-#else
-typedef int to_make_compiler_happy
-#endif

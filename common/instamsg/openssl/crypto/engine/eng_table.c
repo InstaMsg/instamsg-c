@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* ====================================================================
  * Copyright (c) 2001 The OpenSSL Project.  All rights reserved.
  *
@@ -56,8 +53,8 @@
  */
 
 #include "cryptlib.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/evp.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/lhash.h"
+#include <openssl/evp.h>
+#include <openssl/lhash.h>
 #include "eng_int.h"
 
 /* The type of the items in the table */
@@ -359,6 +356,3 @@ void engine_table_doall(ENGINE_TABLE *table, engine_table_doall_cb *cb,
                                  LHASH_DOALL_ARG_FN(int_cb),
                                  ENGINE_PILE_DOALL, &dall);
 }
-#else
-typedef int to_make_compiler_happy
-#endif

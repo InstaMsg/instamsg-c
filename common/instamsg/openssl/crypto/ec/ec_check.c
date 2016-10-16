@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/ec/ec_check.c */
 /* ====================================================================
  * Copyright (c) 1998-2002 The OpenSSL Project.  All rights reserved.
@@ -57,7 +54,7 @@
  */
 
 #include "ec_lcl.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+#include <openssl/err.h>
 
 int EC_GROUP_check(const EC_GROUP *group, BN_CTX *ctx)
 {
@@ -121,6 +118,3 @@ int EC_GROUP_check(const EC_GROUP *group, BN_CTX *ctx)
         EC_POINT_free(point);
     return ret;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

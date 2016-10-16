@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /*
  * This is the precomputed constant time access table for the code in
  * ecp_montp256.c, for the default generator. The table consists of 37
@@ -9534,6 +9531,3 @@ static const BN_ULONG ecp_nistz256_precomputed[37][64 *
      TOBN(0xd6baef61, 0x3f714aa1), TOBN(0xf51865ad, 0xeb78795e),
      TOBN(0xd3e21fce, 0xe6a9d694), TOBN(0x82ceb1dd, 0x8a37b527)}
 };
-#else
-typedef int to_make_compiler_happy
-#endif

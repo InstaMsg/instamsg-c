@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* ====================================================================
  * Copyright (c) 2008 The OpenSSL Project.  All rights reserved.
  *
@@ -51,7 +48,7 @@
  *
  */
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
+#include <openssl/crypto.h>
 #include "modes_lcl.h"
 #include <string.h>
 
@@ -208,6 +205,3 @@ void CRYPTO_cbc128_decrypt(const unsigned char *in, unsigned char *out,
         out += 16;
     }
 }
-#else
-typedef int to_make_compiler_happy
-#endif

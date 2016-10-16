@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/engine/tb_ecdh.c */
 /* ====================================================================
  * Copyright 2002 Sun Microsystems, Inc. ALL RIGHTS RESERVED.
@@ -140,6 +137,3 @@ int ENGINE_set_ECDH(ENGINE *e, const ECDH_METHOD *ecdh_meth)
     e->ecdh_meth = ecdh_meth;
     return 1;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

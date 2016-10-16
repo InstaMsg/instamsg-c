@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/des/enc_read.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -236,6 +233,3 @@ int DES_enc_read(int fd, void *buf, int len, DES_key_schedule *sched,
     return num;
 #endif                          /* OPENSSL_NO_POSIX_IO */
 }
-#else
-typedef int to_make_compiler_happy
-#endif

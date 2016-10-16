@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/ec/ecp_nistputil.c */
 /*
  * Written by Bodo Moeller for the OpenSSL project.
@@ -21,7 +18,7 @@
  *  limitations under the License.
  */
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h"
+#include <openssl/opensslconf.h>
 #ifndef OPENSSL_NO_EC_NISTP_64_GCC_128
 
 /*
@@ -218,7 +215,4 @@ void ec_GFp_nistp_recode_scalar_bits(unsigned char *sign,
 }
 #else
 static void *dummy = &dummy;
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

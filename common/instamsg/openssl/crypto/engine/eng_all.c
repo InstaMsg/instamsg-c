@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/engine/eng_all.c -*- mode: C; c-file-style: "eay" -*- */
 /*
  * Written by Richard Levitte <richard@levitte.org> for the OpenSSL project
@@ -136,7 +133,4 @@ void ENGINE_setup_bsd_cryptodev(void)
     }
     bsd_cryptodev_default_loaded = 1;
 }
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

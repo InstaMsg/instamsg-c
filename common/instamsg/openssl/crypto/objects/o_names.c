@@ -1,15 +1,12 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/lhash.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/objects.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/safestack.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"
+#include <openssl/err.h>
+#include <openssl/lhash.h>
+#include <openssl/objects.h>
+#include <openssl/safestack.h>
+#include <openssl/e_os2.h>
 
 /*
  * Later versions of DEC C has started to add lnkage information to certain
@@ -367,6 +364,3 @@ void OBJ_NAME_cleanup(int type)
     } else
         lh_OBJ_NAME_down_load(names_lh) = down_load;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

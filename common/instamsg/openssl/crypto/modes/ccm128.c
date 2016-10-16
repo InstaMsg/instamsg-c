@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* ====================================================================
  * Copyright (c) 2011 The OpenSSL Project.  All rights reserved.
  *
@@ -50,7 +47,7 @@
  * ====================================================================
  */
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
+#include <openssl/crypto.h>
 #include "modes_lcl.h"
 #include <string.h>
 
@@ -480,6 +477,3 @@ size_t CRYPTO_ccm128_tag(CCM128_CONTEXT *ctx, unsigned char *tag, size_t len)
     memcpy(tag, ctx->cmac.c, M);
     return M;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

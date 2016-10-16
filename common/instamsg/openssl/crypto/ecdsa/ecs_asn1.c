@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/ecdsa/ecs_asn1.c */
 /* ====================================================================
  * Copyright (c) 2000-2002 The OpenSSL Project.  All rights reserved.
@@ -57,8 +54,8 @@
  */
 
 #include "ecs_locl.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/asn1t.h"
+#include <openssl/err.h>
+#include <openssl/asn1t.h>
 
 ASN1_SEQUENCE(ECDSA_SIG) = {
         ASN1_SIMPLE(ECDSA_SIG, r, CBIGNUM),
@@ -68,6 +65,3 @@ ASN1_SEQUENCE(ECDSA_SIG) = {
 DECLARE_ASN1_FUNCTIONS_const(ECDSA_SIG)
 DECLARE_ASN1_ENCODE_FUNCTIONS_const(ECDSA_SIG, ECDSA_SIG)
 IMPLEMENT_ASN1_FUNCTIONS_const(ECDSA_SIG)
-#else
-typedef int to_make_compiler_happy
-#endif

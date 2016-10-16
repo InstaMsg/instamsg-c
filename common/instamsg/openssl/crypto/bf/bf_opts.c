@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/bf/bf_opts.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -70,7 +67,7 @@
 
 #include <stdio.h>
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"
+#include <openssl/e_os2.h>
 #include OPENSSL_UNISTD_IO
 OPENSSL_DECLARE_EXIT
 #ifndef OPENSSL_SYS_NETWARE
@@ -100,7 +97,7 @@ OPENSSL_DECLARE_EXIT
 # include <limits.h>
 # include <sys/param.h>
 #endif
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/blowfish.h"
+#include <openssl/blowfish.h>
 #define BF_DEFAULT_OPTIONS
 #undef BF_ENC
 #define BF_encrypt  BF_encrypt_normal
@@ -325,6 +322,3 @@ int main(int argc, char **argv)
     return (0);
 #endif
 }
-#else
-typedef int to_make_compiler_happy
-#endif

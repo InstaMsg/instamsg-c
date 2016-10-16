@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/engine/eng_list.c */
 /*
  * Written by Geoff Thorpe (geoff@geoffthorpe.net) for the OpenSSL project
@@ -405,6 +402,3 @@ int ENGINE_up_ref(ENGINE *e)
     CRYPTO_add(&e->struct_ref, 1, CRYPTO_LOCK_ENGINE);
     return 1;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

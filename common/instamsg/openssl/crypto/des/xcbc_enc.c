@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/des/xcbc_enc.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -217,6 +214,3 @@ void DES_xcbc_encrypt(const unsigned char *in, unsigned char *out,
     inW0 = inW1 = outW0 = outW1 = 0;
     tin[0] = tin[1] = 0;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

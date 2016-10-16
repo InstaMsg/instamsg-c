@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/ec/ec2_smpl.c */
 /* ====================================================================
  * Copyright 2002 Sun Microsystems, Inc. ALL RIGHTS RESERVED.
@@ -70,14 +67,14 @@
  *
  */
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+#include <openssl/err.h>
 
 #include "ec_lcl.h"
 
 #ifndef OPENSSL_NO_EC2M
 
 # ifdef OPENSSL_FIPS
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/fips.h"
+#  include <openssl/fips.h>
 # endif
 
 const EC_METHOD *EC_GF2m_simple_method(void)
@@ -797,7 +794,4 @@ int ec_GF2m_simple_field_div(const EC_GROUP *group, BIGNUM *r,
     return BN_GF2m_mod_div(r, a, b, &group->field, ctx);
 }
 
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

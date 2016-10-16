@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/ecdh/ecdhtest.c */
 /* ====================================================================
  * Copyright 2002 Sun Microsystems, Inc. ALL RIGHTS RESERVED.
@@ -76,14 +73,14 @@
 
 #include "../e_os.h"
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h" /* for OPENSSL_NO_ECDH */
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/objects.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/sha.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+#include <openssl/opensslconf.h> /* for OPENSSL_NO_ECDH */
+#include <openssl/crypto.h>
+#include <openssl/bio.h>
+#include <openssl/bn.h>
+#include <openssl/objects.h>
+#include <openssl/rand.h>
+#include <openssl/sha.h>
+#include <openssl/err.h>
 
 #ifdef OPENSSL_NO_ECDH
 int main(int argc, char *argv[])
@@ -92,8 +89,8 @@ int main(int argc, char *argv[])
     return (0);
 }
 #else
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/ec.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/ecdh.h"
+# include <openssl/ec.h>
+# include <openssl/ecdh.h>
 
 # ifdef OPENSSL_SYS_WIN16
 #  define MS_CALLBACK     _far _loadds
@@ -580,7 +577,4 @@ static void MS_CALLBACK cb(int p, int n, void *arg)
 #  endif
 }
 # endif
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

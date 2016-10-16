@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/bio/bf_nbio.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -62,8 +59,8 @@
 #include <stdio.h>
 #include <errno.h>
 #include "cryptlib.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
+#include <openssl/rand.h>
+#include <openssl/bio.h>
 
 /*
  * BIO_put and BIO_get both add to the digest, BIO_gets returns the digest
@@ -254,6 +251,3 @@ static int nbiof_puts(BIO *bp, const char *str)
         return (0);
     return (BIO_puts(bp->next_bio, str));
 }
-#else
-typedef int to_make_compiler_happy
-#endif

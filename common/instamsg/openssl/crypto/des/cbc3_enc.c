@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/des/cbc3_enc.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -96,6 +93,3 @@ void DES_3cbc_encrypt(DES_cblock *input, DES_cblock *output, long length,
     memcpy(*iv1, niv1, sizeof(DES_cblock));
     memcpy(*iv2, niv2, sizeof(DES_cblock));
 }
-#else
-typedef int to_make_compiler_happy
-#endif

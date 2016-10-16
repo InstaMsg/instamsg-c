@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/bio/b_dump.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -210,6 +207,3 @@ int BIO_hex_string(BIO *out, int indent, int width, unsigned char *data,
     BIO_printf(out, "%02X", data[datalen - 1]);
     return 1;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

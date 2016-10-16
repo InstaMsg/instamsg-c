@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/des/destest.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -62,7 +59,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"
+#include <openssl/e_os2.h>
 #if defined(OPENSSL_SYS_WIN32) || defined(OPENSSL_SYS_WIN16) || defined(OPENSSL_SYS_WINDOWS)
 # ifndef OPENSSL_SYS_MSDOS
 #  define OPENSSL_SYS_MSDOS
@@ -85,7 +82,7 @@ int main(int argc, char *argv[])
     return (0);
 }
 #else
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/des.h"
+# include <openssl/des.h>
 
 # define crypt(c,s) (DES_crypt((c),(s)))
 
@@ -929,7 +926,4 @@ static int ede_cfb64_test(unsigned char *cfb_cipher)
 }
 
 # endif
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/des/des.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -62,7 +59,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h"
+#include <openssl/opensslconf.h>
 #ifndef OPENSSL_SYS_MSDOS
 # ifndef OPENSSL_SYS_VMS
 #  include OPENSSL_UNISTD
@@ -89,9 +86,9 @@
 # endif
 # include <sys/stat.h>
 #endif
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/des.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/ui_compat.h"
+#include <openssl/des.h>
+#include <openssl/rand.h>
+#include <openssl/ui_compat.h>
 
 void usage(void);
 void doencryption(void);
@@ -869,6 +866,3 @@ int uudecode(unsigned char *in, int num, unsigned char *out)
     w = x = y = z = 0;
     return (n);
 }
-#else
-typedef int to_make_compiler_happy
-#endif

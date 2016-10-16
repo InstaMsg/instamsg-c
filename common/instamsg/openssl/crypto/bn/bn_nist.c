@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/bn/bn_nist.c */
 /*
  * Written by Nils Larsch for the OpenSSL project
@@ -1263,6 +1260,3 @@ int BN_nist_mod_521(BIGNUM *r, const BIGNUM *a, const BIGNUM *field,
 
     return 1;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

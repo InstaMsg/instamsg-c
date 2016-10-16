@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/bn/exptest.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -65,10 +62,10 @@
 
 #include "../e_os.h"
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+#include <openssl/bio.h>
+#include <openssl/bn.h>
+#include <openssl/rand.h>
+#include <openssl/err.h>
 
 #define NUM_BITS        (BN_BITS*2)
 
@@ -250,6 +247,3 @@ int main(int argc, char *argv[])
     EXIT(1);
     return (1);
 }
-#else
-typedef int to_make_compiler_happy
-#endif

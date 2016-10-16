@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* ====================================================================
  * Copyright (c) 2003 The OpenSSL Project.  All rights reserved.
  *
@@ -130,6 +127,3 @@ int ENGINE_set_STORE(ENGINE *e, const STORE_METHOD *store_meth)
     e->store_meth = store_meth;
     return 1;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

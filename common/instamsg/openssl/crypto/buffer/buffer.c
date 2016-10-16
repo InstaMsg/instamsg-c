@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/buffer/buffer.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -61,7 +58,7 @@
 
 #include <stdio.h>
 #include "cryptlib.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/buffer.h"
+#include <openssl/buffer.h>
 
 /*
  * LIMIT_BEFORE_EXPANSION is the maximum n such that (n+3)/3*4 < 2**31. That
@@ -188,6 +185,3 @@ void BUF_reverse(unsigned char *out, const unsigned char *in, size_t size)
         }
     }
 }
-#else
-typedef int to_make_compiler_happy
-#endif

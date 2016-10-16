@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/bn/bn_div.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -60,7 +57,7 @@
  */
 
 #include <stdio.h>
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
+#include <openssl/bn.h>
 #include "cryptlib.h"
 #include "bn_lcl.h"
 
@@ -477,7 +474,4 @@ X) -> 0x%08X\n", n0, n1, d0, q);
     BN_CTX_end(ctx);
     return (0);
 }
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

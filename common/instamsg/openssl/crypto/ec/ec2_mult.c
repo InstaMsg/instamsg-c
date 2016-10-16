@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/ec/ec2_mult.c */
 /* ====================================================================
  * Copyright 2002 Sun Microsystems, Inc. ALL RIGHTS RESERVED.
@@ -70,7 +67,7 @@
  *
  */
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+#include <openssl/err.h>
 
 #include "ec_lcl.h"
 
@@ -463,7 +460,4 @@ int ec_GF2m_have_precompute_mult(const EC_GROUP *group)
     return ec_wNAF_have_precompute_mult(group);
 }
 
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

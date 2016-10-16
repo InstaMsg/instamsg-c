@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/des/read_pwd.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -59,7 +56,7 @@
  * [including the GNU Public Licence.]
  */
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"
+#include <openssl/e_os2.h>
 #if !defined(OPENSSL_SYS_MSDOS) && !defined(OPENSSL_SYS_VMS) && !defined(OPENSSL_SYS_WIN32)
 # ifdef OPENSSL_UNISTD
 #  include OPENSSL_UNISTD
@@ -534,6 +531,3 @@ static int noecho_fgets(char *buf, int size, FILE *tty)
 }
 # endif
 #endif                          /* !OPENSSL_SYS_WINCE && !WIN16 */
-#else
-typedef int to_make_compiler_happy
-#endif

@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/aes/aes_ecb.c -*- mode:C; c-file-style: "eay" -*- */
 /* ====================================================================
  * Copyright (c) 1998-2002 The OpenSSL Project.  All rights reserved.
@@ -59,7 +56,7 @@
 #endif
 #include <assert.h>
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/aes.h"
+#include <openssl/aes.h>
 #include "aes_locl.h"
 
 void AES_ecb_encrypt(const unsigned char *in, unsigned char *out,
@@ -74,6 +71,3 @@ void AES_ecb_encrypt(const unsigned char *in, unsigned char *out,
     else
         AES_decrypt(in, out, key);
 }
-#else
-typedef int to_make_compiler_happy
-#endif

@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/bf/bf_ecb.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -59,9 +56,9 @@
  * [including the GNU Public Licence.]
  */
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/blowfish.h"
+#include <openssl/blowfish.h>
 #include "bf_locl.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslv.h"
+#include <openssl/opensslv.h>
 
 /*
  * Blowfish as implemented from 'Blowfish: Springer-Verlag paper' (From
@@ -101,6 +98,3 @@ void BF_ecb_encrypt(const unsigned char *in, unsigned char *out,
     l2n(l, out);
     l = d[0] = d[1] = 0;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

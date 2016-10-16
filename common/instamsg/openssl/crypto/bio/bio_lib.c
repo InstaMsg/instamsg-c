@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/bio/bio_lib.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -61,10 +58,10 @@
 
 #include <stdio.h>
 #include <errno.h>
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
+#include <openssl/crypto.h>
 #include "cryptlib.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/stack.h"
+#include <openssl/bio.h>
+#include <openssl/stack.h>
 
 BIO *BIO_new(BIO_METHOD *method)
 {
@@ -597,6 +594,3 @@ unsigned long BIO_number_written(BIO *bio)
 }
 
 IMPLEMENT_STACK_OF(BIO)
-#else
-typedef int to_make_compiler_happy
-#endif

@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/bio/bio_dgram.c */
 /*
  * DTLS implementation written by Nagendra Modadugu
@@ -65,7 +62,7 @@
 #define USE_SOCKETS
 #include "cryptlib.h"
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
+#include <openssl/bio.h>
 #ifndef OPENSSL_NO_DGRAM
 
 # if defined(OPENSSL_SYS_VMS)
@@ -2083,7 +2080,4 @@ static void get_current_time(struct timeval *t)
 # endif
 }
 
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

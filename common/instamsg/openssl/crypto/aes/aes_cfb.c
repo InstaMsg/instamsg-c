@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/aes/aes_cfb.c -*- mode:C; c-file-style: "eay" -*- */
 /* ====================================================================
  * Copyright (c) 2002-2006 The OpenSSL Project.  All rights reserved.
@@ -52,8 +49,8 @@
  *
  */
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/aes.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/modes.h"
+#include <openssl/aes.h>
+#include <openssl/modes.h>
 
 /*
  * The input and output encrypted as though 128bit cfb mode is being used.
@@ -86,6 +83,3 @@ void AES_cfb8_encrypt(const unsigned char *in, unsigned char *out,
     CRYPTO_cfb128_8_encrypt(in, out, length, key, ivec, num, enc,
                             (block128_f) AES_encrypt);
 }
-#else
-typedef int to_make_compiler_happy
-#endif

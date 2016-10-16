@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/des/set_key.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -67,7 +64,7 @@
  * 1.1 added norm_expand_bits
  * 1.0 First working version
  */
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
+#include <openssl/crypto.h>
 #include "des_locl.h"
 
 OPENSSL_IMPLEMENT_GLOBAL(int, DES_check_key, 0)
@@ -448,6 +445,3 @@ void des_fixup_key_parity(des_cblock *key)
         des_set_odd_parity(key);
         }
 */
-#else
-typedef int to_make_compiler_happy
-#endif

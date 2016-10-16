@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* dso_dl.c -*- mode:C; c-file-style: "eay" -*- */
 /*
  * Written by Richard Levitte (richard@levitte.org) for the OpenSSL project
@@ -62,7 +59,7 @@
 
 #include <stdio.h>
 #include "cryptlib.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/dso.h"
+#include <openssl/dso.h>
 
 #ifndef DSO_DL
 DSO_METHOD *DSO_METHOD_dl(void)
@@ -381,6 +378,3 @@ static void *dl_globallookup(const char *name)
     return shl_findsym(&h, name, TYPE_UNDEFINED, &ret) ? NULL : ret;
 }
 #endif                          /* DSO_DL */
-#else
-typedef int to_make_compiler_happy
-#endif

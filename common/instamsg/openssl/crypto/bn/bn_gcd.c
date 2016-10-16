@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/bn/bn_gcd.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -701,6 +698,3 @@ static BIGNUM *BN_mod_inverse_no_branch(BIGNUM *in,
     bn_check_top(ret);
     return (ret);
 }
-#else
-typedef int to_make_compiler_happy
-#endif

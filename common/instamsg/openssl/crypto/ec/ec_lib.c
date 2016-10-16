@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/ec/ec_lib.c */
 /*
  * Originally written by Bodo Moeller for the OpenSSL project.
@@ -66,8 +63,8 @@
 
 #include <string.h>
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslv.h"
+#include <openssl/err.h>
+#include <openssl/opensslv.h>
 
 #include "ec_lcl.h"
 
@@ -1135,6 +1132,3 @@ int ec_precompute_mont_data(EC_GROUP *group)
         BN_CTX_free(ctx);
     return ret;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

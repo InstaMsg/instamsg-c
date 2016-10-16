@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/ec/ecp_nistp224.c */
 /*
  * Written by Emilia Kasper (Google) for the OpenSSL project.
@@ -28,7 +25,7 @@
  * and Adam Langley's public domain 64-bit C implementation of curve25519
  */
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h"
+#include <openssl/opensslconf.h>
 #ifndef OPENSSL_NO_EC_NISTP_64_GCC_128
 
 # ifndef OPENSSL_SYS_VMS
@@ -38,7 +35,7 @@
 # endif
 
 # include <string.h>
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+# include <openssl/err.h>
 # include "ec_lcl.h"
 
 # if defined(__GNUC__) && (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 1))
@@ -1769,7 +1766,4 @@ int ec_GFp_nistp224_have_precompute_mult(const EC_GROUP *group)
 
 #else
 static void *dummy = &dummy;
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

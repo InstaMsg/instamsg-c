@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/des/des_opts.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -70,7 +67,7 @@
 
 #include <stdio.h>
 #ifndef OPENSSL_SYS_MSDOS
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"
+# include <openssl/e_os2.h>
 # include OPENSSL_UNISTD
 #else
 # include <io.h>
@@ -109,7 +106,7 @@ extern void exit();
 # include <sys/param.h>
 #endif
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/des.h"
+#include <openssl/des.h>
 #include "spr.h"
 
 #define DES_DEFAULT_OPTIONS
@@ -642,6 +639,3 @@ int main(int argc, char **argv)
     return (0);
 #endif
 }
-#else
-typedef int to_make_compiler_happy
-#endif

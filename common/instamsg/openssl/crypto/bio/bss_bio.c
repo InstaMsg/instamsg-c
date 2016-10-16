@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/bio/bss_bio.c  -*- Mode: C; c-file-style: "eay" -*- */
 /* ====================================================================
  * Copyright (c) 1998-2003 The OpenSSL Project.  All rights reserved.
@@ -83,9 +80,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
+#include <openssl/bio.h>
+#include <openssl/err.h>
+#include <openssl/crypto.h>
 
 #include "e_os.h"
 
@@ -887,6 +884,3 @@ int BIO_nwrite(BIO *bio, char **buf, int num)
         bio->num_write += ret;
     return ret;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

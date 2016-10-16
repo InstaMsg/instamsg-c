@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* ocsp_srv.c */
 /*
  * Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL project
@@ -62,12 +59,12 @@
 
 #include <stdio.h>
 #include <cryptlib.h>
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/objects.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/x509.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/pem.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/x509v3.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/ocsp.h"
+#include <openssl/objects.h>
+#include <openssl/rand.h>
+#include <openssl/x509.h>
+#include <openssl/pem.h>
+#include <openssl/x509v3.h>
+#include <openssl/ocsp.h>
 
 /*
  * Utility functions related to sending OCSP responses and extracting
@@ -272,6 +269,3 @@ int OCSP_basic_sign(OCSP_BASICRESP *brsp,
  err:
     return 0;
 }
-#else
-typedef int to_make_compiler_happy
-#endif

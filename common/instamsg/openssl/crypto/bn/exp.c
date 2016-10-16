@@ -1,10 +1,7 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* unused */
 
 #include <stdio.h>
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/tmdiff.h"
+#include <openssl/tmdiff.h>
 #include "bn_lcl.h"
 
 #define SIZE    256
@@ -62,6 +59,3 @@ char *argv[];
     }
 
 }
-#else
-typedef int to_make_compiler_happy
-#endif

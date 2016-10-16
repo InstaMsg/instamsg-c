@@ -1,11 +1,8 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/objects.h"
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/comp.h"
+#include <openssl/objects.h>
+#include <openssl/comp.h>
 
 static int rle_compress_block(COMP_CTX *ctx, unsigned char *out,
                               unsigned int olen, unsigned char *in,
@@ -63,6 +60,3 @@ static int rle_expand_block(COMP_CTX *ctx, unsigned char *out,
     }
     return (ilen - 1);
 }
-#else
-typedef int to_make_compiler_happy
-#endif

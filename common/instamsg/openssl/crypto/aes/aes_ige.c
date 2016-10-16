@@ -1,6 +1,3 @@
-#include "device_defines.h"
-
-#if SSL_ENABLED == 1
 /* crypto/aes/aes_ige.c -*- mode:C; c-file-style: "eay" -*- */
 /* ====================================================================
  * Copyright (c) 2006 The OpenSSL Project.  All rights reserved.
@@ -54,7 +51,7 @@
 
 #include "cryptlib.h"
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/aes.h"
+#include <openssl/aes.h>
 #include "aes_locl.h"
 
 #define N_WORDS (AES_BLOCK_SIZE / sizeof(unsigned long))
@@ -324,6 +321,3 @@ void AES_bi_ige_encrypt(const unsigned char *in, unsigned char *out,
         }
     }
 }
-#else
-typedef int to_make_compiler_happy
-#endif
