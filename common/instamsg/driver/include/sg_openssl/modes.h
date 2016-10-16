@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* ====================================================================
  * Copyright (c) 2008 The OpenSSL Project. All rights reserved.
  *
@@ -161,7 +160,4 @@ size_t CRYPTO_128_unwrap(void *key, const unsigned char *iv,
 
 #ifdef  __cplusplus
 }
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

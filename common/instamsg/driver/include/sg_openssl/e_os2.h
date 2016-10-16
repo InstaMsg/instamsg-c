@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* e_os2.h */
 /* ====================================================================
  * Copyright (c) 1998-2000 The OpenSSL Project.  All rights reserved.
@@ -54,7 +53,7 @@
  *
  */
 
-#include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h"
+#include <openssl/opensslconf.h>
 
 #ifndef HEADER_E_OS2_H
 # define HEADER_E_OS2_H
@@ -326,7 +325,4 @@ extern "C" {
 #ifdef  __cplusplus
 }
 #endif
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

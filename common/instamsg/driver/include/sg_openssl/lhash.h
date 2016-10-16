@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* crypto/lhash/lhash.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -64,13 +63,13 @@
 #ifndef HEADER_LHASH_H
 # define HEADER_LHASH_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"
+# include <openssl/e_os2.h>
 # ifndef OPENSSL_NO_FP_API
 #  include <stdio.h>
 # endif
 
 # ifndef OPENSSL_NO_BIO
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
+#  include <openssl/bio.h>
 # endif
 
 #ifdef  __cplusplus
@@ -238,7 +237,4 @@ DECLARE_LHASH_OF(OPENSSL_CSTRING);
 }
 #endif
 
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

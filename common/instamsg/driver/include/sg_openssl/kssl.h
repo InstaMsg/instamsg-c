@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* ssl/kssl.h -*- mode: C; c-file-style: "eay" -*- */
 /*
  * Written by Vern Staats <staatsvr@asc.hpc.mil> for the OpenSSL project
@@ -65,7 +64,7 @@
 #ifndef KSSL_H
 # define KSSL_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h"
+# include <openssl/opensslconf.h>
 
 # ifndef OPENSSL_NO_KRB5
 
@@ -196,6 +195,3 @@ char *kssl_ctx_get0_client_princ(KSSL_CTX *kctx);
 #endif
 # endif                         /* OPENSSL_NO_KRB5 */
 #endif                          /* KSSL_H */
-#else
-typedef int to_make_compiler_happy
-#endif

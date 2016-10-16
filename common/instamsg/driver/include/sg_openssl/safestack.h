@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* ====================================================================
  * Copyright (c) 1999 The OpenSSL Project.  All rights reserved.
  *
@@ -56,7 +55,7 @@
 #ifndef HEADER_SAFESTACK_H
 # define HEADER_SAFESTACK_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/stack.h"
+# include <openssl/stack.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -2671,6 +2670,3 @@ DECLARE_SPECIAL_STACK_OF(OPENSSL_BLOCK, void)
 }
 #endif
 #endif                          /* !defined HEADER_SAFESTACK_H */
-#else
-typedef int to_make_compiler_happy
-#endif

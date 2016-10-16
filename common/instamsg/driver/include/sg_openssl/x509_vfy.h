@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* crypto/x509/x509_vfy.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -58,7 +57,7 @@
  */
 
 #ifndef HEADER_X509_H
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/x509.h"
+# include <openssl/x509.h>
 /*
  * openssl/x509.h ends up #include-ing this file at about the only
  * appropriate moment.
@@ -68,13 +67,13 @@
 #ifndef HEADER_X509_VFY_H
 # define HEADER_X509_VFY_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h"
+# include <openssl/opensslconf.h>
 # ifndef OPENSSL_NO_LHASH
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/lhash.h"
+#  include <openssl/lhash.h>
 # endif
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/symhacks.h"
+# include <openssl/bio.h>
+# include <openssl/crypto.h>
+# include <openssl/symhacks.h>
 
 #ifdef  __cplusplus
 extern "C" {
@@ -645,7 +644,4 @@ const X509_POLICY_NODE *X509_policy_node_get0_parent(const X509_POLICY_NODE
 #ifdef  __cplusplus
 }
 #endif
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

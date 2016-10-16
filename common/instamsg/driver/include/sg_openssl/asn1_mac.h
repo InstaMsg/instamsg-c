@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* crypto/asn1/asn1_mac.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -60,7 +59,7 @@
 #ifndef HEADER_ASN1_MAC_H
 # define HEADER_ASN1_MAC_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/asn1.h"
+# include <openssl/asn1.h>
 
 #ifdef  __cplusplus
 extern "C" {
@@ -577,7 +576,4 @@ void asn1_add_error(const unsigned char *address, int offset);
 }
 #endif
 
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

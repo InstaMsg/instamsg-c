@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* crypto/objects/obj_mac.h */
 
 /*
@@ -4193,6 +4192,3 @@
 #define LN_jurisdictionCountryName              "jurisdictionCountryName"
 #define NID_jurisdictionCountryName             957
 #define OBJ_jurisdictionCountryName             1L,3L,6L,1L,4L,1L,311L,60L,2L,1L,3L
-#else
-typedef int to_make_compiler_happy
-#endif

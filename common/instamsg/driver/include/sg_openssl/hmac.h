@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* crypto/hmac/hmac.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -59,13 +58,13 @@
 #ifndef HEADER_HMAC_H
 # define HEADER_HMAC_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h"
+# include <openssl/opensslconf.h>
 
 # ifdef OPENSSL_NO_HMAC
 #  error HMAC is disabled.
 # endif
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/evp.h"
+# include <openssl/evp.h>
 
 # define HMAC_MAX_MD_CBLOCK      128/* largest known is SHA512 */
 
@@ -107,7 +106,4 @@ void HMAC_CTX_set_flags(HMAC_CTX *ctx, unsigned long flags);
 }
 #endif
 
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

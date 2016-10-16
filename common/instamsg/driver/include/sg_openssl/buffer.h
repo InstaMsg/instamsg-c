@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* crypto/buffer/buffer.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -60,7 +59,7 @@
 #ifndef HEADER_BUFFER_H
 # define HEADER_BUFFER_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/ossl_typ.h"
+# include <openssl/ossl_typ.h>
 
 #ifdef  __cplusplus
 extern "C" {
@@ -117,7 +116,4 @@ void ERR_load_BUF_strings(void);
 #ifdef  __cplusplus
 }
 #endif
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

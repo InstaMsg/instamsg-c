@@ -1,9 +1,8 @@
-#if SSL_ENABLED == 1
 
 #ifndef HEADER_COMP_H
 # define HEADER_COMP_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
+# include <openssl/crypto.h>
 
 #ifdef  __cplusplus
 extern "C" {
@@ -77,7 +76,4 @@ void ERR_load_COMP_strings(void);
 #ifdef  __cplusplus
 }
 #endif
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

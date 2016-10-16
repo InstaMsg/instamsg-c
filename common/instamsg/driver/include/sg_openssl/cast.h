@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* crypto/cast/cast.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -64,7 +63,7 @@
 extern "C" {
 #endif
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h"
+# include <openssl/opensslconf.h>
 
 # ifdef OPENSSL_NO_CAST
 #  error CAST is disabled.
@@ -105,7 +104,4 @@ void CAST_ofb64_encrypt(const unsigned char *in, unsigned char *out,
 }
 #endif
 
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

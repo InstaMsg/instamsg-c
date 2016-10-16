@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* crypto/camellia/camellia.h -*- mode:C; c-file-style: "eay" -*- */
 /* ====================================================================
  * Copyright (c) 2006 The OpenSSL Project.  All rights reserved.
@@ -53,7 +52,7 @@
 #ifndef HEADER_CAMELLIA_H
 # define HEADER_CAMELLIA_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h"
+# include <openssl/opensslconf.h>
 
 # ifdef OPENSSL_NO_CAMELLIA
 #  error CAMELLIA is disabled.
@@ -131,6 +130,3 @@ void Camellia_ctr128_encrypt(const unsigned char *in, unsigned char *out,
 #endif
 
 #endif                          /* !HEADER_Camellia_H */
-#else
-typedef int to_make_compiler_happy
-#endif

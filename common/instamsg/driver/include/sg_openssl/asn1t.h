@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* asn1t.h */
 /*
  * Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL project
@@ -61,8 +60,8 @@
 # define HEADER_ASN1T_H
 
 # include <stddef.h>
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/asn1.h"
+# include <openssl/e_os2.h>
+# include <openssl/asn1.h>
 
 # ifdef OPENSSL_BUILD_SHLIBCRYPTO
 #  undef OPENSSL_EXTERN
@@ -971,7 +970,4 @@ int asn1_enc_save(ASN1_VALUE **pval, const unsigned char *in, int inlen,
 #ifdef  __cplusplus
 }
 #endif
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

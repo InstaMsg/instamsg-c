@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* crypto/ec/ec.h */
 /*
  * Originally written by Bodo Moeller for the OpenSSL project.
@@ -77,16 +76,16 @@
 #ifndef HEADER_EC_H
 # define HEADER_EC_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h"
+# include <openssl/opensslconf.h>
 
 # ifdef OPENSSL_NO_EC
 #  error EC is disabled.
 # endif
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/asn1.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/symhacks.h"
+# include <openssl/asn1.h>
+# include <openssl/symhacks.h>
 # ifndef OPENSSL_NO_DEPRECATED
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
+#  include <openssl/bn.h>
 # endif
 
 # ifdef  __cplusplus
@@ -1280,7 +1279,4 @@ void ERR_load_EC_strings(void);
 #ifdef  __cplusplus
 }
 #endif
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

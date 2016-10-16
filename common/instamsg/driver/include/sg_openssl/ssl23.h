@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* ssl/ssl23.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -82,7 +81,4 @@ extern "C" {
 #ifdef  __cplusplus
 }
 #endif
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

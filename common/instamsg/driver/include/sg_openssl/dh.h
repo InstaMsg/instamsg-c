@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* crypto/dh/dh.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -60,18 +59,18 @@
 #ifndef HEADER_DH_H
 # define HEADER_DH_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"
+# include <openssl/e_os2.h>
 
 # ifdef OPENSSL_NO_DH
 #  error DH is disabled.
 # endif
 
 # ifndef OPENSSL_NO_BIO
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
+#  include <openssl/bio.h>
 # endif
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/ossl_typ.h"
+# include <openssl/ossl_typ.h>
 # ifndef OPENSSL_NO_DEPRECATED
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
+#  include <openssl/bn.h>
 # endif
 
 # ifndef OPENSSL_DH_MAX_MODULUS_BITS
@@ -390,7 +389,4 @@ void ERR_load_DH_strings(void);
 #ifdef  __cplusplus
 }
 #endif
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

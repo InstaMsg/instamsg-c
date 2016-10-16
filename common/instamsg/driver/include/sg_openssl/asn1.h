@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* crypto/asn1/asn1.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -61,18 +60,18 @@
 # define HEADER_ASN1_H
 
 # include <time.h>
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"
+# include <openssl/e_os2.h>
 # ifndef OPENSSL_NO_BIO
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
+#  include <openssl/bio.h>
 # endif
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/stack.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/safestack.h"
+# include <openssl/stack.h>
+# include <openssl/safestack.h>
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/symhacks.h"
+# include <openssl/symhacks.h>
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/ossl_typ.h"
+# include <openssl/ossl_typ.h>
 # ifndef OPENSSL_NO_DEPRECATED
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
+#  include <openssl/bn.h>
 # endif
 
 # ifdef OPENSSL_BUILD_SHLIBCRYPTO
@@ -1417,7 +1416,4 @@ void ERR_load_ASN1_strings(void);
 #ifdef  __cplusplus
 }
 #endif
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* crypto/bn/bn.h */
 /* Copyright (C) 1995-1997 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -126,12 +125,12 @@
 #ifndef HEADER_BN_H
 # define HEADER_BN_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"
+# include <openssl/e_os2.h>
 # ifndef OPENSSL_NO_FP_API
 #  include <stdio.h>            /* FILE */
 # endif
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/ossl_typ.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
+# include <openssl/ossl_typ.h>
+# include <openssl/crypto.h>
 
 #ifdef  __cplusplus
 extern "C" {
@@ -937,7 +936,4 @@ void ERR_load_BN_strings(void);
 #ifdef  __cplusplus
 }
 #endif
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

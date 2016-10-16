@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* ssl/srtp.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -118,7 +117,7 @@
 #ifndef HEADER_D1_SRTP_H
 # define HEADER_D1_SRTP_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/ssl.h"
+# include <openssl/ssl.h>
 
 #ifdef  __cplusplus
 extern "C" {
@@ -145,7 +144,4 @@ SRTP_PROTECTION_PROFILE *SSL_get_selected_srtp_profile(SSL *s);
 }
 #endif
 
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

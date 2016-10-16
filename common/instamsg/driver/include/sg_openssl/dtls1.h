@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* ssl/dtls1.h */
 /*
  * DTLS implementation written by Nagendra Modadugu
@@ -61,8 +60,8 @@
 #ifndef HEADER_DTLS1_H
 # define HEADER_DTLS1_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/buffer.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/pqueue.h"
+# include <openssl/buffer.h>
+# include <openssl/pqueue.h>
 # ifdef OPENSSL_SYS_VMS
 #  include <resource.h>
 #  include <sys/timeb.h>
@@ -270,7 +269,4 @@ typedef struct dtls1_record_data_st {
 #ifdef  __cplusplus
 }
 #endif
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

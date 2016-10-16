@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* crypto/rc4/rc4.h */
 /* Copyright (C) 1995-1997 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -60,7 +59,7 @@
 #ifndef HEADER_RC4_H
 # define HEADER_RC4_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h"/* OPENSSL_NO_RC4, RC4_INT */
+# include <openssl/opensslconf.h>/* OPENSSL_NO_RC4, RC4_INT */
 # ifdef OPENSSL_NO_RC4
 #  error RC4 is disabled.
 # endif
@@ -86,7 +85,4 @@ void RC4(RC4_KEY *key, size_t len, const unsigned char *indata,
 }
 #endif
 
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

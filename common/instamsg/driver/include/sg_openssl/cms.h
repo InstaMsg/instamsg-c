@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* crypto/cms/cms.h */
 /*
  * Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL
@@ -56,7 +55,7 @@
 #ifndef HEADER_CMS_H
 # define HEADER_CMS_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/x509.h"
+# include <openssl/x509.h>
 
 # ifdef OPENSSL_NO_CMS
 #  error CMS is disabled.
@@ -553,7 +552,4 @@ void ERR_load_CMS_strings(void);
 #ifdef  __cplusplus
 }
 #endif
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

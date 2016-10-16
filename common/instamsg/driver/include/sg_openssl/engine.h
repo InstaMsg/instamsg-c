@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* openssl/engine.h */
 /*
  * Written by Geoff Thorpe (geoff@geoffthorpe.net) for the OpenSSL project
@@ -66,38 +65,38 @@
 #ifndef HEADER_ENGINE_H
 # define HEADER_ENGINE_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h"
+# include <openssl/opensslconf.h>
 
 # ifdef OPENSSL_NO_ENGINE
 #  error ENGINE is disabled.
 # endif
 
 # ifndef OPENSSL_NO_DEPRECATED
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
+#  include <openssl/bn.h>
 #  ifndef OPENSSL_NO_RSA
-#   include "../../../../.././common/instamsg/driver/include/sg_openssl/rsa.h"
+#   include <openssl/rsa.h>
 #  endif
 #  ifndef OPENSSL_NO_DSA
-#   include "../../../../.././common/instamsg/driver/include/sg_openssl/dsa.h"
+#   include <openssl/dsa.h>
 #  endif
 #  ifndef OPENSSL_NO_DH
-#   include "../../../../.././common/instamsg/driver/include/sg_openssl/dh.h"
+#   include <openssl/dh.h>
 #  endif
 #  ifndef OPENSSL_NO_ECDH
-#   include "../../../../.././common/instamsg/driver/include/sg_openssl/ecdh.h"
+#   include <openssl/ecdh.h>
 #  endif
 #  ifndef OPENSSL_NO_ECDSA
-#   include "../../../../.././common/instamsg/driver/include/sg_openssl/ecdsa.h"
+#   include <openssl/ecdsa.h>
 #  endif
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/ui.h"
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+#  include <openssl/rand.h>
+#  include <openssl/ui.h>
+#  include <openssl/err.h>
 # endif
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/ossl_typ.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/symhacks.h"
+# include <openssl/ossl_typ.h>
+# include <openssl/symhacks.h>
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/x509.h"
+# include <openssl/x509.h>
 
 #ifdef  __cplusplus
 extern "C" {
@@ -958,7 +957,4 @@ void ERR_load_ENGINE_strings(void);
 #ifdef  __cplusplus
 }
 #endif
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

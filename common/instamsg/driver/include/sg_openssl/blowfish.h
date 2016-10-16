@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* crypto/bf/blowfish.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -60,7 +59,7 @@
 #ifndef HEADER_BLOWFISH_H
 # define HEADER_BLOWFISH_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"
+# include <openssl/e_os2.h>
 
 #ifdef  __cplusplus
 extern "C" {
@@ -128,7 +127,4 @@ const char *BF_options(void);
 }
 #endif
 
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

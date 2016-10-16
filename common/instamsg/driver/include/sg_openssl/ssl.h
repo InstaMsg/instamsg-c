@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* ssl/ssl.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -144,28 +143,28 @@
 #ifndef HEADER_SSL_H
 # define HEADER_SSL_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"
+# include <openssl/e_os2.h>
 
 # ifndef OPENSSL_NO_COMP
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/comp.h"
+#  include <openssl/comp.h>
 # endif
 # ifndef OPENSSL_NO_BIO
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
+#  include <openssl/bio.h>
 # endif
 # ifndef OPENSSL_NO_DEPRECATED
 #  ifndef OPENSSL_NO_X509
-#   include "../../../../.././common/instamsg/driver/include/sg_openssl/x509.h"
+#   include <openssl/x509.h>
 #  endif
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/lhash.h"
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/buffer.h"
+#  include <openssl/crypto.h>
+#  include <openssl/lhash.h>
+#  include <openssl/buffer.h>
 # endif
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/pem.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/hmac.h"
+# include <openssl/pem.h>
+# include <openssl/hmac.h>
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/kssl.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/safestack.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/symhacks.h"
+# include <openssl/kssl.h>
+# include <openssl/safestack.h>
+# include <openssl/symhacks.h>
 
 #ifdef  __cplusplus
 extern "C" {
@@ -1694,12 +1693,12 @@ struct ssl_st {
 }
 #endif
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/ssl2.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/ssl3.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/tls1.h"      /* This is mostly sslv3 with a few tweaks */
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/dtls1.h"     /* Datagram TLS */
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/ssl23.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/srtp.h"      /* Support for the use_srtp extension */
+# include <openssl/ssl2.h>
+# include <openssl/ssl3.h>
+# include <openssl/tls1.h>      /* This is mostly sslv3 with a few tweaks */
+# include <openssl/dtls1.h>     /* Datagram TLS */
+# include <openssl/ssl23.h>
+# include <openssl/srtp.h>      /* Support for the use_srtp extension */
 
 #ifdef  __cplusplus
 extern "C" {
@@ -3162,7 +3161,4 @@ void ERR_load_SSL_strings(void);
 #ifdef  __cplusplus
 }
 #endif
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

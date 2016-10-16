@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* crypto/ecdsa/ecdsa.h */
 /**
  * \file   crypto/ecdsa/ecdsa.h Include file for the OpenSSL ECDSA functions
@@ -60,16 +59,16 @@
 #ifndef HEADER_ECDSA_H
 # define HEADER_ECDSA_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h"
+# include <openssl/opensslconf.h>
 
 # ifdef OPENSSL_NO_ECDSA
 #  error ECDSA is disabled.
 # endif
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/ec.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/ossl_typ.h"
+# include <openssl/ec.h>
+# include <openssl/ossl_typ.h>
 # ifndef OPENSSL_NO_DEPRECATED
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
+#  include <openssl/bn.h>
 # endif
 
 #ifdef __cplusplus
@@ -333,7 +332,4 @@ void ERR_load_ECDSA_strings(void);
 #ifdef  __cplusplus
 }
 #endif
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

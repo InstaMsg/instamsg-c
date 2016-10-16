@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* crypto/sha/sha.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -60,7 +59,7 @@
 #ifndef HEADER_SHA_H
 # define HEADER_SHA_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"
+# include <openssl/e_os2.h>
 # include <stddef.h>
 
 #ifdef  __cplusplus
@@ -212,7 +211,4 @@ void SHA512_Transform(SHA512_CTX *c, const unsigned char *data);
 }
 #endif
 
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

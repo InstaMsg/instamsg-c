@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* ssl/tls1.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -152,7 +151,7 @@
 #ifndef HEADER_TLS1_H
 # define HEADER_TLS1_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/buffer.h"
+# include <openssl/buffer.h>
 
 #ifdef  __cplusplus
 extern "C" {
@@ -811,7 +810,4 @@ struct tls_session_ticket_ext_st {
 #ifdef  __cplusplus
 }
 #endif
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* crypto/ecdh/ecdh.h */
 /* ====================================================================
  * Copyright 2002 Sun Microsystems, Inc. ALL RIGHTS RESERVED.
@@ -70,16 +69,16 @@
 #ifndef HEADER_ECDH_H
 # define HEADER_ECDH_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h"
+# include <openssl/opensslconf.h>
 
 # ifdef OPENSSL_NO_ECDH
 #  error ECDH is disabled.
 # endif
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/ec.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/ossl_typ.h"
+# include <openssl/ec.h>
+# include <openssl/ossl_typ.h>
 # ifndef OPENSSL_NO_DEPRECATED
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
+#  include <openssl/bn.h>
 # endif
 
 #ifdef __cplusplus
@@ -132,7 +131,4 @@ void ERR_load_ECDH_strings(void);
 #ifdef  __cplusplus
 }
 #endif
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif

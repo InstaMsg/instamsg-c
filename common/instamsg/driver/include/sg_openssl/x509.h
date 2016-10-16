@@ -1,4 +1,3 @@
-#if SSL_ENABLED == 1
 /* crypto/x509/x509.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -65,49 +64,49 @@
 #ifndef HEADER_X509_H
 # define HEADER_X509_H
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/symhacks.h"
+# include <openssl/e_os2.h>
+# include <openssl/symhacks.h>
 # ifndef OPENSSL_NO_BUFFER
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/buffer.h"
+#  include <openssl/buffer.h>
 # endif
 # ifndef OPENSSL_NO_EVP
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/evp.h"
+#  include <openssl/evp.h>
 # endif
 # ifndef OPENSSL_NO_BIO
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
+#  include <openssl/bio.h>
 # endif
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/stack.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/asn1.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/safestack.h"
+# include <openssl/stack.h>
+# include <openssl/asn1.h>
+# include <openssl/safestack.h>
 
 # ifndef OPENSSL_NO_EC
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/ec.h"
+#  include <openssl/ec.h>
 # endif
 
 # ifndef OPENSSL_NO_ECDSA
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/ecdsa.h"
+#  include <openssl/ecdsa.h>
 # endif
 
 # ifndef OPENSSL_NO_ECDH
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/ecdh.h"
+#  include <openssl/ecdh.h>
 # endif
 
 # ifndef OPENSSL_NO_DEPRECATED
 #  ifndef OPENSSL_NO_RSA
-#   include "../../../../.././common/instamsg/driver/include/sg_openssl/rsa.h"
+#   include <openssl/rsa.h>
 #  endif
 #  ifndef OPENSSL_NO_DSA
-#   include "../../../../.././common/instamsg/driver/include/sg_openssl/dsa.h"
+#   include <openssl/dsa.h>
 #  endif
 #  ifndef OPENSSL_NO_DH
-#   include "../../../../.././common/instamsg/driver/include/sg_openssl/dh.h"
+#   include <openssl/dh.h>
 #  endif
 # endif
 
 # ifndef OPENSSL_NO_SHA
-#  include "../../../../.././common/instamsg/driver/include/sg_openssl/sha.h"
+#  include <openssl/sha.h>
 # endif
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/ossl_typ.h"
+# include <openssl/ossl_typ.h>
 
 #ifdef  __cplusplus
 extern "C" {
@@ -579,8 +578,8 @@ struct pkcs8_priv_key_info_st {
 }
 #endif
 
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/x509_vfy.h"
-# include "../../../../.././common/instamsg/driver/include/sg_openssl/pkcs7.h"
+# include <openssl/x509_vfy.h>
+# include <openssl/pkcs7.h>
 
 #ifdef  __cplusplus
 extern "C" {
@@ -1325,7 +1324,4 @@ void ERR_load_X509_strings(void);
 #ifdef  __cplusplus
 }
 #endif
-#endif
-#else
-typedef int to_make_compiler_happy
 #endif
