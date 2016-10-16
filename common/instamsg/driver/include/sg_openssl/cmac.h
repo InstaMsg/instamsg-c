@@ -1,3 +1,4 @@
+#if SSL_ENABLED == 1
 /* crypto/cmac/cmac.h */
 /*
  * Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL
@@ -59,7 +60,7 @@
 extern "C" {
 #endif
 
-# include <openssl/evp.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/evp.h"
 
 /* Opaque */
 typedef struct CMAC_CTX_st CMAC_CTX;
@@ -79,4 +80,7 @@ int CMAC_resume(CMAC_CTX *ctx);
 #ifdef  __cplusplus
 }
 #endif
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

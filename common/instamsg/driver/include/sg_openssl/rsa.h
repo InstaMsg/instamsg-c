@@ -1,3 +1,4 @@
+#if SSL_ENABLED == 1
 /* crypto/rsa/rsa.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -59,15 +60,15 @@
 #ifndef HEADER_RSA_H
 # define HEADER_RSA_H
 
-# include <openssl/asn1.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/asn1.h"
 
 # ifndef OPENSSL_NO_BIO
-#  include <openssl/bio.h>
+#  include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
 # endif
-# include <openssl/crypto.h>
-# include <openssl/ossl_typ.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/ossl_typ.h"
 # ifndef OPENSSL_NO_DEPRECATED
-#  include <openssl/bn.h>
+#  include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
 # endif
 
 # ifdef OPENSSL_NO_RSA
@@ -661,4 +662,7 @@ void ERR_load_RSA_strings(void);
 #ifdef  __cplusplus
 }
 #endif
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

@@ -1,3 +1,4 @@
+#if SSL_ENABLED == 1
 /* crypto/conf/conf.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -59,13 +60,13 @@
 #ifndef  HEADER_CONF_H
 # define HEADER_CONF_H
 
-# include <openssl/bio.h>
-# include <openssl/lhash.h>
-# include <openssl/stack.h>
-# include <openssl/safestack.h>
-# include <openssl/e_os2.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/lhash.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/stack.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/safestack.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"
 
-# include <openssl/ossl_typ.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/ossl_typ.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -264,4 +265,7 @@ void ERR_load_CONF_strings(void);
 #ifdef  __cplusplus
 }
 #endif
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

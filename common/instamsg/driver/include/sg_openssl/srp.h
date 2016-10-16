@@ -1,3 +1,4 @@
+#if SSL_ENABLED == 1
 /* crypto/srp/srp.h */
 /*
  * Written by Christophe Renou (christophe.renou@edelweb.fr) with the
@@ -69,9 +70,9 @@
 extern "C" {
 #endif
 
-#  include <openssl/safestack.h>
-#  include <openssl/bn.h>
-#  include <openssl/crypto.h>
+#  include "../../../../.././common/instamsg/driver/include/sg_openssl/safestack.h"
+#  include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
+#  include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
 
 typedef struct SRP_gN_cache_st {
     char *b64_bn;
@@ -166,4 +167,7 @@ int SRP_Verify_B_mod_N(BIGNUM *B, BIGNUM *N);
 #endif
 
 # endif
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

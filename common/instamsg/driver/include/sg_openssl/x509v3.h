@@ -1,3 +1,4 @@
+#if SSL_ENABLED == 1
 /* x509v3.h */
 /*
  * Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL project
@@ -59,9 +60,9 @@
 #ifndef HEADER_X509V3_H
 # define HEADER_X509V3_H
 
-# include <openssl/bio.h>
-# include <openssl/x509.h>
-# include <openssl/conf.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/x509.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/conf.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -1052,4 +1053,7 @@ void ERR_load_X509V3_strings(void);
 #ifdef  __cplusplus
 }
 #endif
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

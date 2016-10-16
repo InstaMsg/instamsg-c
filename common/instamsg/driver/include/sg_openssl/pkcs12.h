@@ -1,3 +1,4 @@
+#if SSL_ENABLED == 1
 /* pkcs12.h */
 /*
  * Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL project
@@ -60,8 +61,8 @@
 #ifndef HEADER_PKCS12_H
 # define HEADER_PKCS12_H
 
-# include <openssl/bio.h>
-# include <openssl/x509.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/x509.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -339,4 +340,7 @@ void ERR_load_PKCS12_strings(void);
 #ifdef  __cplusplus
 }
 #endif
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

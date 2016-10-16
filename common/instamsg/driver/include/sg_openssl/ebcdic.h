@@ -1,3 +1,4 @@
+#if SSL_ENABLED == 1
 /* crypto/ebcdic.h */
 
 #ifndef HEADER_EBCDIC_H
@@ -23,4 +24,7 @@ void *ascii2ebcdic(void *dest, const void *srce, size_t count);
 #ifdef  __cplusplus
 }
 #endif
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

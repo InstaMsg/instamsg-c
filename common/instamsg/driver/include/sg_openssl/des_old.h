@@ -1,3 +1,4 @@
+#if SSL_ENABLED == 1
 /* crypto/des/des_old.h -*- mode:C; c-file-style: "eay" -*- */
 
 /*-
@@ -93,7 +94,7 @@
 #ifndef HEADER_DES_H
 # define HEADER_DES_H
 
-# include <openssl/e_os2.h>     /* OPENSSL_EXTERN, OPENSSL_NO_DES, DES_LONG */
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"     /* OPENSSL_EXTERN, OPENSSL_NO_DES, DES_LONG */
 
 # ifdef OPENSSL_NO_DES
 #  error DES is disabled.
@@ -104,10 +105,10 @@
 # endif
 
 # ifdef _KERBEROS_DES_H
-#  error <openssl/des_old.h> replaces <kerberos/des.h>.
+#  error "../../../../.././common/instamsg/driver/include/sg_openssl/des_old.h" replaces <kerberos/des.h".
 # endif
 
-# include <openssl/symhacks.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/symhacks.h"
 
 # ifdef OPENSSL_BUILD_SHLIBCRYPTO
 #  undef OPENSSL_EXTERN
@@ -492,6 +493,9 @@ void _ossl_096_des_random_seed(des_cblock *key);
 #endif
 
 /* for DES_read_pw_string et al */
-# include <openssl/ui_compat.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/ui_compat.h"
 
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

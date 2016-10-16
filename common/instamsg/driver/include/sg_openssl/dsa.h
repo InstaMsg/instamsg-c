@@ -1,3 +1,4 @@
+#if SSL_ENABLED == 1
 /* crypto/dsa/dsa.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -65,22 +66,22 @@
 #ifndef HEADER_DSA_H
 # define HEADER_DSA_H
 
-# include <openssl/e_os2.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"
 
 # ifdef OPENSSL_NO_DSA
 #  error DSA is disabled.
 # endif
 
 # ifndef OPENSSL_NO_BIO
-#  include <openssl/bio.h>
+#  include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
 # endif
-# include <openssl/crypto.h>
-# include <openssl/ossl_typ.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/ossl_typ.h"
 
 # ifndef OPENSSL_NO_DEPRECATED
-#  include <openssl/bn.h>
+#  include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
 #  ifndef OPENSSL_NO_DH
-#   include <openssl/dh.h>
+#   include "../../../../.././common/instamsg/driver/include/sg_openssl/dh.h"
 #  endif
 # endif
 
@@ -329,4 +330,7 @@ void ERR_load_DSA_strings(void);
 #ifdef  __cplusplus
 }
 #endif
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

@@ -1,7 +1,8 @@
+#if SSL_ENABLED == 1
 #ifndef HEADER_WHRLPOOL_H
 # define HEADER_WHRLPOOL_H
 
-# include <openssl/e_os2.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"
 # include <stddef.h>
 
 #ifdef __cplusplus
@@ -38,4 +39,7 @@ unsigned char *WHIRLPOOL(const void *inp, size_t bytes, unsigned char *md);
 }
 #endif
 
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

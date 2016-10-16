@@ -1,3 +1,4 @@
+#if SSL_ENABLED == 1
 /* crypto/des/des.h */
 /* Copyright (C) 1995-1997 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -59,7 +60,7 @@
 #ifndef HEADER_NEW_DES_H
 # define HEADER_NEW_DES_H
 
-# include <openssl/e_os2.h>     /* OPENSSL_EXTERN, OPENSSL_NO_DES, DES_LONG
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"     /* OPENSSL_EXTERN, OPENSSL_NO_DES, DES_LONG
                                  * (via openssl/opensslconf.h */
 
 # ifdef OPENSSL_NO_DES
@@ -99,7 +100,7 @@ typedef struct DES_ks {
 # endif
 
 # ifdef OPENSSL_ENABLE_OLD_DES_SUPPORT
-#  include <openssl/des_old.h>
+#  include "../../../../.././common/instamsg/driver/include/sg_openssl/des_old.h"
 # endif
 
 # define DES_KEY_SZ      (sizeof(DES_cblock))
@@ -254,4 +255,7 @@ int DES_read_2passwords(DES_cblock *key1, DES_cblock *key2,
 }
 #endif
 
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

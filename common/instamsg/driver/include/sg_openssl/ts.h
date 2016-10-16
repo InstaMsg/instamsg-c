@@ -1,3 +1,4 @@
+#if SSL_ENABLED == 1
 /* crypto/ts/ts.h */
 /*
  * Written by Zoltan Glozik (zglozik@opentsa.org) for the OpenSSL project
@@ -60,31 +61,31 @@
 #ifndef HEADER_TS_H
 # define HEADER_TS_H
 
-# include <openssl/opensslconf.h>
-# include <openssl/symhacks.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/symhacks.h"
 # ifndef OPENSSL_NO_BUFFER
-#  include <openssl/buffer.h>
+#  include "../../../../.././common/instamsg/driver/include/sg_openssl/buffer.h"
 # endif
 # ifndef OPENSSL_NO_EVP
-#  include <openssl/evp.h>
+#  include "../../../../.././common/instamsg/driver/include/sg_openssl/evp.h"
 # endif
 # ifndef OPENSSL_NO_BIO
-#  include <openssl/bio.h>
+#  include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
 # endif
-# include <openssl/stack.h>
-# include <openssl/asn1.h>
-# include <openssl/safestack.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/stack.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/asn1.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/safestack.h"
 
 # ifndef OPENSSL_NO_RSA
-#  include <openssl/rsa.h>
+#  include "../../../../.././common/instamsg/driver/include/sg_openssl/rsa.h"
 # endif
 
 # ifndef OPENSSL_NO_DSA
-#  include <openssl/dsa.h>
+#  include "../../../../.././common/instamsg/driver/include/sg_openssl/dsa.h"
 # endif
 
 # ifndef OPENSSL_NO_DH
-#  include <openssl/dh.h>
+#  include "../../../../.././common/instamsg/driver/include/sg_openssl/dh.h"
 # endif
 
 #ifdef  __cplusplus
@@ -96,8 +97,8 @@ extern "C" {
 #  undef X509_NAME
 # endif
 
-# include <openssl/x509.h>
-# include <openssl/x509v3.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/x509.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/x509v3.h"
 
 /*-
 MessageImprint ::= SEQUENCE  {
@@ -859,4 +860,7 @@ void ERR_load_TS_strings(void);
 #ifdef  __cplusplus
 }
 #endif
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

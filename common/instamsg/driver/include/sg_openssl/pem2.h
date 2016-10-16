@@ -1,3 +1,4 @@
+#if SSL_ENABLED == 1
 /* ====================================================================
  * Copyright (c) 1999 The OpenSSL Project.  All rights reserved.
  *
@@ -67,4 +68,7 @@ void ERR_load_PEM_strings(void);
 
 #ifdef __cplusplus
 }
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

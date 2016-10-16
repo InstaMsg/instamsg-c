@@ -1,3 +1,4 @@
+#if SSL_ENABLED == 1
 /* krb5_asn.h */
 /*
  * Written by Vern Staats <staatsvr@asc.hpc.mil> for the OpenSSL project, **
@@ -64,7 +65,7 @@
 /*
  * #include <krb5.h>
  */
-# include <openssl/safestack.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/safestack.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -237,4 +238,7 @@ DECLARE_ASN1_FUNCTIONS(KRB5_AUTHENT)
 #ifdef  __cplusplus
 }
 #endif
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

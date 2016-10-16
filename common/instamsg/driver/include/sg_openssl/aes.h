@@ -1,3 +1,4 @@
+#if SSL_ENABLED == 1
 /* crypto/aes/aes.h -*- mode:C; c-file-style: "eay" -*- */
 /* ====================================================================
  * Copyright (c) 1998-2002 The OpenSSL Project.  All rights reserved.
@@ -52,7 +53,7 @@
 #ifndef HEADER_AES_H
 # define HEADER_AES_H
 
-# include <openssl/opensslconf.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h"
 
 # ifdef OPENSSL_NO_AES
 #  error AES is disabled.
@@ -147,3 +148,6 @@ int AES_unwrap_key(AES_KEY *key, const unsigned char *iv,
 #endif
 
 #endif                          /* !HEADER_AES_H */
+#else
+typedef int to_make_compiler_happy
+#endif

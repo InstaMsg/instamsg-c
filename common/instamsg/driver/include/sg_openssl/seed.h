@@ -1,3 +1,4 @@
+#if SSL_ENABLED == 1
 /*
  * Copyright (c) 2007 KISA(Korea Information Security Agency). All rights reserved.
  *
@@ -80,9 +81,9 @@
 #ifndef HEADER_SEED_H
 # define HEADER_SEED_H
 
-# include <openssl/opensslconf.h>
-# include <openssl/e_os2.h>
-# include <openssl/crypto.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
 
 # ifdef OPENSSL_NO_SEED
 #  error SEED is disabled.
@@ -147,3 +148,6 @@ void SEED_ofb128_encrypt(const unsigned char *in, unsigned char *out,
 #endif
 
 #endif                          /* HEADER_SEED_H */
+#else
+typedef int to_make_compiler_happy
+#endif

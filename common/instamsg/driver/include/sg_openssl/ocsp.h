@@ -1,3 +1,4 @@
+#if SSL_ENABLED == 1
 /* ocsp.h */
 /*
  * Written by Tom Titchener <Tom_Titchener@groove.net> for the OpenSSL
@@ -67,10 +68,10 @@
 #ifndef HEADER_OCSP_H
 # define HEADER_OCSP_H
 
-# include <openssl/ossl_typ.h>
-# include <openssl/x509.h>
-# include <openssl/x509v3.h>
-# include <openssl/safestack.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/ossl_typ.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/x509.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/x509v3.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/safestack.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -634,4 +635,7 @@ void ERR_load_OCSP_strings(void);
 #ifdef  __cplusplus
 }
 #endif
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

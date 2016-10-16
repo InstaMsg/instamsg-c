@@ -1,3 +1,4 @@
+#if SSL_ENABLED == 1
 /* crypto/evp/evp.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -60,19 +61,19 @@
 # define HEADER_ENVELOPE_H
 
 # ifdef OPENSSL_ALGORITHM_DEFINES
-#  include <openssl/opensslconf.h>
+#  include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h"
 # else
 #  define OPENSSL_ALGORITHM_DEFINES
-#  include <openssl/opensslconf.h>
+#  include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h"
 #  undef OPENSSL_ALGORITHM_DEFINES
 # endif
 
-# include <openssl/ossl_typ.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/ossl_typ.h"
 
-# include <openssl/symhacks.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/symhacks.h"
 
 # ifndef OPENSSL_NO_BIO
-#  include <openssl/bio.h>
+#  include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
 # endif
 
 /*-
@@ -91,7 +92,7 @@
 /* Default PKCS#5 iteration count */
 # define PKCS5_DEFAULT_ITER              2048
 
-# include <openssl/objects.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/objects.h"
 
 # define EVP_PK_RSA      0x0001
 # define EVP_PK_DSA      0x0002
@@ -1531,4 +1532,7 @@ void ERR_load_EVP_strings(void);
 #ifdef  __cplusplus
 }
 #endif
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

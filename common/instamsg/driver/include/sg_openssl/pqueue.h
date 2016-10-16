@@ -1,3 +1,4 @@
+#if SSL_ENABLED == 1
 /* crypto/pqueue/pqueue.h */
 /*
  * DTLS implementation written by Nagendra Modadugu
@@ -97,3 +98,6 @@ int pqueue_size(pqueue pq);
 }
 #endif
 #endif                          /* ! HEADER_PQUEUE_H */
+#else
+typedef int to_make_compiler_happy
+#endif

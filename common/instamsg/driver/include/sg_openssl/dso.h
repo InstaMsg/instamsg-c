@@ -1,3 +1,4 @@
+#if SSL_ENABLED == 1
 /* dso.h -*- mode:C; c-file-style: "eay" -*- */
 /*
  * Written by Geoff Thorpe (geoff@geoffthorpe.net) for the OpenSSL project
@@ -60,7 +61,7 @@
 #ifndef HEADER_DSO_H
 # define HEADER_DSO_H
 
-# include <openssl/crypto.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -448,4 +449,7 @@ void ERR_load_DSO_strings(void);
 #ifdef  __cplusplus
 }
 #endif
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

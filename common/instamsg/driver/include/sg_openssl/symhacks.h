@@ -1,3 +1,4 @@
+#if SSL_ENABLED == 1
 /* ====================================================================
  * Copyright (c) 1999 The OpenSSL Project.  All rights reserved.
  *
@@ -55,7 +56,7 @@
 #ifndef HEADER_SYMHACKS_H
 # define HEADER_SYMHACKS_H
 
-# include <openssl/e_os2.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"
 
 /*
  * Hacks to solve the problem with linkers incapable of handling very long
@@ -514,3 +515,6 @@
 # endif
 
 #endif                          /* ! defined HEADER_VMS_IDHACKS_H */
+#else
+typedef int to_make_compiler_happy
+#endif

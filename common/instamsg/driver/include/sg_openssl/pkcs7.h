@@ -1,3 +1,4 @@
+#if SSL_ENABLED == 1
 /* crypto/pkcs7/pkcs7.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -59,12 +60,12 @@
 #ifndef HEADER_PKCS7_H
 # define HEADER_PKCS7_H
 
-# include <openssl/asn1.h>
-# include <openssl/bio.h>
-# include <openssl/e_os2.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/asn1.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"
 
-# include <openssl/symhacks.h>
-# include <openssl/ossl_typ.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/symhacks.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/ossl_typ.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -478,4 +479,7 @@ void ERR_load_PKCS7_strings(void);
 #ifdef  __cplusplus
 }
 #endif
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif
