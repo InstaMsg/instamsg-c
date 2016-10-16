@@ -30,7 +30,7 @@ COMPILE_COMMAND="gcc -nostdinc -pedantic -pthread "
 
 # Any final libraries that need to be linked.
 #
-POST_LINKED_LIBS=" -lgstreamer-1.0 -lgobject-2.0 -lglib-2.0 "
+POST_LINKED_LIBS=" -lgstreamer-1.0 -lgobject-2.0 -lglib-2.0 -lssl -lcrypto "
 
 
 # Any final commands that need to be run.
