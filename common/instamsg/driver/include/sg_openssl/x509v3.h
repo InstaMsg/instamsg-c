@@ -1,5 +1,3 @@
-#include "device_defines.h"
-
 #if SSL_ENABLED == 1
 /* x509v3.h */
 /*

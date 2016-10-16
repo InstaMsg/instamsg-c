@@ -1,5 +1,3 @@
-#include "device_defines.h"
-
 #if SSL_ENABLED == 1
 /* crypto/buffer/buffer.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)

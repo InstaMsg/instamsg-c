@@ -251,6 +251,9 @@ extern "C" {
 #endif /* DES_DEFAULT_OPTIONS */
 #endif /* HEADER_DES_LOCL_H */
 
+#define OPENSSL_NO_SHA512
+#define I386_ONLY
+#define HAVE_LONG_LONG              0
 
 #ifdef  __cplusplus
 }

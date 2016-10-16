@@ -1,5 +1,3 @@
-#include "device_defines.h"
-
 #if SSL_ENABLED == 1
 /* ssl/dtls1.h */
 /*
