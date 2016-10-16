@@ -62,7 +62,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "cryptlib.h"
+#include "../cryptlib.h"
 #include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
 #include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
 

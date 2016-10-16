@@ -62,7 +62,7 @@
 #include <stdio.h>
 #include <errno.h>
 #define USE_SOCKETS
-#include "cryptlib.h"
+#include "../cryptlib.h"
 
 #if defined(OPENSSL_NO_POSIX_IO)
 /*

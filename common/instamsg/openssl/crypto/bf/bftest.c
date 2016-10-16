@@ -69,7 +69,7 @@
 #include <stdlib.h>
 #include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h" /* To see if OPENSSL_NO_BF is defined */
 
-#include "../e_os.h"
+#include ../../e_os.h
 
 #ifdef OPENSSL_NO_BF
 int main(int argc, char *argv[])
