@@ -63,7 +63,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #define USE_SOCKETS
-#include "../cryptlib.h"
+#include "cryptlib.h"
 #include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
 #if defined(OPENSSL_SYS_NETWARE) && defined(NETWARE_BSDSOCK)
 # include <netdb.h>

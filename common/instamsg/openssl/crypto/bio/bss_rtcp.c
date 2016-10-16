@@ -69,7 +69,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include "../cryptlib.h"
+#include "cryptlib.h"
 #include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
 
 #include <iodef.h>              /* VMS IO$_ definitions */
