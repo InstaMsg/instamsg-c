@@ -101,6 +101,9 @@ extern "C" {
 
 /* crypto/opensslconf.h.in */
 
+/* Generate 80386 code? */
+#undef I386_ONLY
+
 #if !(defined(VMS) || defined(__VMS)) /* VMS uses logical names instead */
 #if defined(HEADER_CRYPTLIB_H) && !defined(OPENSSLDIR)
 #define ENGINESDIR "/usr/local/ssl/lib/engines"
@@ -250,11 +253,6 @@ extern "C" {
 
 #endif /* DES_DEFAULT_OPTIONS */
 #endif /* HEADER_DES_LOCL_H */
-
-#define OPENSSL_NO_SHA512
-#define I386_ONLY
-#define HAVE_LONG_LONG              0
-
 #ifdef  __cplusplus
 }
 #endif
