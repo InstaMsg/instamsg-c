@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* bn_x931p.c */
 /*
  * Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL project
@@ -58,7 +61,7 @@
  */
 
 #include <stdio.h>
-#include <openssl/bn.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
 
 /* X9.31 routines for prime derivation */
 
@@ -272,3 +275,6 @@ int BN_X931_generate_prime_ex(BIGNUM *p, BIGNUM *p1, BIGNUM *p2,
     return ret;
 
 }
+#else
+typedef int to_make_compiler_happy
+#endif

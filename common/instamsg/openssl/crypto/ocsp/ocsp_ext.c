@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* ocsp_ext.c */
 /*
  * Written by Tom Titchener <Tom_Titchener@groove.net> for the OpenSSL
@@ -66,11 +69,11 @@
 
 #include <stdio.h>
 #include <cryptlib.h>
-#include <openssl/objects.h>
-#include <openssl/x509.h>
-#include <openssl/ocsp.h>
-#include <openssl/rand.h>
-#include <openssl/x509v3.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/objects.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/x509.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/ocsp.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/x509v3.h"
 
 /* Standard wrapper functions for extensions */
 
@@ -564,3 +567,6 @@ X509_EXTENSION *OCSP_url_svcloc_new(X509_NAME *issuer, char **urls)
         OCSP_SERVICELOC_free(sloc);
     return x;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

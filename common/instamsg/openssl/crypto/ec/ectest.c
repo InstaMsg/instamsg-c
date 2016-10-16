@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/ec/ectest.c */
 /*
  * Originally written by Bodo Moeller for the OpenSSL project.
@@ -87,16 +90,16 @@ int main(int argc, char *argv[])
 }
 #else
 
-# include <openssl/ec.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/ec.h"
 # ifndef OPENSSL_NO_ENGINE
-#  include <openssl/engine.h>
+#  include "../../../../.././common/instamsg/driver/include/sg_openssl/engine.h"
 # endif
-# include <openssl/err.h>
-# include <openssl/obj_mac.h>
-# include <openssl/objects.h>
-# include <openssl/rand.h>
-# include <openssl/bn.h>
-# include <openssl/opensslconf.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/obj_mac.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/objects.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h"
 
 # if defined(_MSC_VER) && defined(_MIPS_) && (_MSC_VER/100==12)
 /* suppress "too big too optimize" warning */
@@ -1858,4 +1861,7 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

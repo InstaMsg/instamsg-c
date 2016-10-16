@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/bio/bss_mem.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -59,7 +62,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include "cryptlib.h"
-#include <openssl/bio.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
 
 static int mem_write(BIO *h, const char *buf, int num);
 static int mem_read(BIO *h, char *buf, int size);
@@ -309,3 +312,6 @@ static int mem_puts(BIO *bp, const char *str)
     /* memory semantics is that it will always work */
     return (ret);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* dso_dlfcn.c -*- mode:C; c-file-style: "eay" -*- */
 /*
  * Written by Geoff Thorpe (geoff@geoffthorpe.net) for the OpenSSL project
@@ -68,7 +71,7 @@
 
 #include <stdio.h>
 #include "cryptlib.h"
-#include <openssl/dso.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/dso.h"
 
 #ifndef DSO_DLFCN
 DSO_METHOD *DSO_METHOD_dlfcn(void)
@@ -463,3 +466,6 @@ static void *dlfcn_globallookup(const char *name)
     return ret;
 }
 #endif                          /* DSO_DLFCN */
+#else
+typedef int to_make_compiler_happy
+#endif

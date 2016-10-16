@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/aes/aes_core.c -*- mode:C; c-file-style: "eay" -*- */
 /**
  * rijndael-alg-fst.c
@@ -43,7 +46,7 @@
 #include <assert.h>
 
 #include <stdlib.h>
-#include <openssl/aes.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/aes.h"
 #include "aes_locl.h"
 
 /*
@@ -1070,3 +1073,6 @@ void AES_decrypt(const unsigned char *in, unsigned char *out,
         ((u32)Td4[(s0 >> 24)       ] << 24) ^
         rk[3];
 }
+#else
+typedef int to_make_compiler_happy
+#endif

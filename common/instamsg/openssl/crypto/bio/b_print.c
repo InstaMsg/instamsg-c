@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/bio/b_print.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -76,8 +79,8 @@
 #ifndef NO_SYS_TYPES_H
 # include <sys/types.h>
 #endif
-#include <openssl/bn.h>         /* To get BN_LLONG properly defined */
-#include <openssl/bio.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"         /* To get BN_LLONG properly defined */
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
 
 #if defined(BN_LLONG) || defined(SIXTY_FOUR_BIT)
 # ifndef HAVE_LONG_LONG
@@ -816,3 +819,6 @@ int BIO_vsnprintf(char *buf, size_t n, const char *format, va_list args)
     else
         return (retlen <= INT_MAX) ? (int)retlen : -1;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

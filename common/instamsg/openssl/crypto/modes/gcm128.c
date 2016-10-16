@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* ====================================================================
  * Copyright (c) 2010 The OpenSSL Project.  All rights reserved.
  *
@@ -49,7 +52,7 @@
 
 #define OPENSSL_FIPSAPI
 
-#include <openssl/crypto.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
 #include "modes_lcl.h"
 #include <string.h>
 
@@ -1736,7 +1739,7 @@ void CRYPTO_gcm128_release(GCM128_CONTEXT *ctx)
 
 #if defined(SELFTEST)
 # include <stdio.h>
-# include <openssl/aes.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/aes.h"
 
 /* Test Case 1 */
 static const u8 K1[16], *P1 = NULL, *A1 = NULL, IV1[12], *C1 = NULL;
@@ -2368,4 +2371,7 @@ int main()
 
     return ret;
 }
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

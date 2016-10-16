@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/des/ecb_enc.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -58,8 +61,8 @@
 
 #include "des_locl.h"
 #include "des_ver.h"
-#include <openssl/opensslv.h>
-#include <openssl/bio.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslv.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
 
 OPENSSL_GLOBAL const char libdes_version[] = "libdes" OPENSSL_VERSION_PTEXT;
 OPENSSL_GLOBAL const char DES_version[] = "DES" OPENSSL_VERSION_PTEXT;
@@ -122,3 +125,6 @@ void DES_ecb_encrypt(const_DES_cblock *input, DES_cblock *output,
     l2c(l, out);
     l = ll[0] = ll[1] = 0;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

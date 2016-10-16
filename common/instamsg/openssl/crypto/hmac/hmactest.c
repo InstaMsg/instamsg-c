@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/hmac/hmactest.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -69,13 +72,13 @@ int main(int argc, char *argv[])
     return (0);
 }
 #else
-# include <openssl/hmac.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/hmac.h"
 # ifndef OPENSSL_NO_MD5
-#  include <openssl/md5.h>
+#  include "../../../../.././common/instamsg/driver/include/sg_openssl/md5.h"
 # endif
 
 # ifdef CHARSET_EBCDIC
-#  include <openssl/ebcdic.h>
+#  include "../../../../.././common/instamsg/driver/include/sg_openssl/ebcdic.h"
 # endif
 
 # ifndef OPENSSL_NO_MD5
@@ -332,4 +335,7 @@ static char *pt(unsigned char *md, unsigned int len)
     return (buf);
 }
 # endif
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

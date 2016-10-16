@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/des/read2pwd.c */
 /* ====================================================================
  * Copyright (c) 2001-2002 The OpenSSL Project.  All rights reserved.
@@ -110,9 +113,9 @@
  */
 
 #include <string.h>
-#include <openssl/des.h>
-#include <openssl/ui.h>
-#include <openssl/crypto.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/des.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/ui.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
 
 int DES_read_password(DES_cblock *key, const char *prompt, int verify)
 {
@@ -138,3 +141,6 @@ int DES_read_2passwords(DES_cblock *key1, DES_cblock *key2,
     OPENSSL_cleanse(buff, BUFSIZ);
     return (ok);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

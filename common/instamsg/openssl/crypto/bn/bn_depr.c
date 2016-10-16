@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/bn/bn_depr.c */
 /* ====================================================================
  * Copyright (c) 1998-2002 The OpenSSL Project.  All rights reserved.
@@ -62,7 +65,7 @@
 #include <time.h>
 #include "cryptlib.h"
 #include "bn_lcl.h"
-#include <openssl/rand.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
 
 static void *dummy = &dummy;
 
@@ -112,4 +115,7 @@ int BN_is_prime_fasttest(const BIGNUM *a, int checks,
     return BN_is_prime_fasttest_ex(a, checks, ctx_passed,
                                    do_trial_division, &cb);
 }
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

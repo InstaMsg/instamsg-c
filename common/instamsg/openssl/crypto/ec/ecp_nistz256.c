@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /******************************************************************************
  *                                                                            *
  * Copyright 2014 Intel Corporation                                           *
@@ -28,9 +31,9 @@
 
 #include <string.h>
 
-#include <openssl/bn.h>
-#include <openssl/err.h>
-#include <openssl/ec.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/ec.h"
 #include "cryptlib.h"
 
 #include "ec_lcl.h"
@@ -1519,3 +1522,6 @@ const EC_METHOD *EC_GFp_nistz256_method(void)
 
     return &ret;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

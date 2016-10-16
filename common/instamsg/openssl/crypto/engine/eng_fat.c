@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/engine/eng_fat.c */
 /* ====================================================================
  * Copyright (c) 1999-2001 The OpenSSL Project.  All rights reserved.
@@ -59,7 +62,7 @@
  */
 
 #include "eng_int.h"
-#include <openssl/conf.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/conf.h"
 
 int ENGINE_set_default(ENGINE *e, unsigned int flags)
 {
@@ -179,3 +182,6 @@ int ENGINE_register_all_complete(void)
             ENGINE_register_complete(e);
     return 1;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

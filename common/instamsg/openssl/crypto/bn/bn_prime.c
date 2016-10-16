@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/bn/bn_prime.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -113,7 +116,7 @@
 #include <time.h>
 #include "cryptlib.h"
 #include "bn_lcl.h"
-#include <openssl/rand.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
 
 /*
  * NB: these functions have been "upgraded", the deprecated versions (which
@@ -513,3 +516,6 @@ static int probable_prime_dh_safe(BIGNUM *p, int bits, const BIGNUM *padd,
     bn_check_top(p);
     return (ret);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

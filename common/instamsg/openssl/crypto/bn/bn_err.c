@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/bn/bn_err.c */
 /* ====================================================================
  * Copyright (c) 1999-2015 The OpenSSL Project.  All rights reserved.
@@ -60,8 +63,8 @@
  */
 
 #include <stdio.h>
-#include <openssl/err.h>
-#include <openssl/bn.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
 
 /* BEGIN ERROR CODES */
 #ifndef OPENSSL_NO_ERR
@@ -152,3 +155,6 @@ void ERR_load_BN_strings(void)
     }
 #endif
 }
+#else
+typedef int to_make_compiler_happy
+#endif

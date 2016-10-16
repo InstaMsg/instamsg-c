@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/bf/bf_ofb64.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -56,7 +59,7 @@
  * [including the GNU Public Licence.]
  */
 
-#include <openssl/blowfish.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/blowfish.h"
 #include "bf_locl.h"
 
 /*
@@ -108,3 +111,6 @@ void BF_ofb64_encrypt(const unsigned char *in, unsigned char *out,
     t = v0 = v1 = ti[0] = ti[1] = 0;
     *num = n;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

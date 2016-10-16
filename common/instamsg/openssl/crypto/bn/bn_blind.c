@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/bn/bn_blind.c */
 /* ====================================================================
  * Copyright (c) 1998-2006 The OpenSSL Project.  All rights reserved.
@@ -383,3 +386,6 @@ BN_BLINDING *BN_BLINDING_create_param(BN_BLINDING *b,
 
     return ret;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* dso_null.c */
 /*
  * Written by Geoff Thorpe (geoff@geoffthorpe.net) for the OpenSSL project
@@ -64,7 +67,7 @@
 
 #include <stdio.h>
 #include "cryptlib.h"
-#include <openssl/dso.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/dso.h"
 
 static DSO_METHOD dso_meth_null = {
     "NULL shared library method",
@@ -90,3 +93,6 @@ DSO_METHOD *DSO_METHOD_null(void)
 {
     return (&dso_meth_null);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* vms-helper.c */
 /* ====================================================================
  * Copyright (c) 1999 The OpenSSL Project.  All rights reserved.
@@ -66,3 +69,6 @@ bn_div_words_abort(int i)
     abort();
 #endif
 }
+#else
+typedef int to_make_compiler_happy
+#endif

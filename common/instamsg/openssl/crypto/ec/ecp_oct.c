@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/ec/ecp_oct.c */
 /*
  * Includes code written by Lenka Fibikova <fibikova@exp-math.uni-essen.de>
@@ -63,8 +66,8 @@
  * and contributed to the OpenSSL project.
  */
 
-#include <openssl/err.h>
-#include <openssl/symhacks.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/symhacks.h"
 
 #include "ec_lcl.h"
 
@@ -426,3 +429,6 @@ int ec_GFp_simple_oct2point(const EC_GROUP *group, EC_POINT *point,
         BN_CTX_free(new_ctx);
     return ret;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

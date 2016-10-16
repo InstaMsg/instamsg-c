@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /*
  * Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL project
  * 2006.
@@ -58,13 +61,13 @@
 
 #include <stdio.h>
 #include "cryptlib.h"
-#include <openssl/x509.h>
-#include <openssl/ec.h>
-#include <openssl/bn.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/x509.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/ec.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
 #ifndef OPENSSL_NO_CMS
-# include <openssl/cms.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/cms.h"
 #endif
-#include <openssl/asn1t.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/asn1t.h"
 #include "asn1_locl.h"
 
 static int ecdh_cms_decrypt(CMS_RecipientInfo *ri);
@@ -962,4 +965,7 @@ static int ecdh_cms_encrypt(CMS_RecipientInfo *ri)
     return rv;
 }
 
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

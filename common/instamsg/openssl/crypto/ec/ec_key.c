@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/ec/ec_key.c */
 /*
  * Written by Nils Larsch for the OpenSSL project.
@@ -63,9 +66,9 @@
 
 #include <string.h>
 #include "ec_lcl.h"
-#include <openssl/err.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
 #ifdef OPENSSL_FIPS
-# include <openssl/fips.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/fips.h"
 #endif
 
 EC_KEY *EC_KEY_new(void)
@@ -557,3 +560,6 @@ void EC_KEY_clear_flags(EC_KEY *key, int flags)
 {
     key->flags &= ~flags;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

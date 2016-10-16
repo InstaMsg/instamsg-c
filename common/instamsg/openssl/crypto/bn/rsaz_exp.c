@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /*****************************************************************************
 *                                                                            *
 *  Copyright (c) 2012, Intel Corporation                                     *
@@ -343,4 +346,7 @@ void RSAZ_512_mod_exp(BN_ULONG result[8],
 static void *dummy = &dummy;
 # endif
 
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

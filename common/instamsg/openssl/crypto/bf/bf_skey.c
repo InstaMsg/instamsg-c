@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/bf/bf_skey.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -58,8 +61,8 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <openssl/crypto.h>
-#include <openssl/blowfish.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/blowfish.h"
 #include "bf_locl.h"
 #include "bf_pi.h"
 
@@ -123,3 +126,6 @@ void private_BF_set_key(BF_KEY *key, int len, const unsigned char *data)
         p[i + 1] = in[1];
     }
 }
+#else
+typedef int to_make_compiler_happy
+#endif

@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/des/des_old.c -*- mode:C; c-file-style: "eay" -*- */
 
 /*-
@@ -75,8 +78,8 @@
  */
 
 #define OPENSSL_DES_LIBDES_COMPATIBILITY
-#include <openssl/des.h>
-#include <openssl/rand.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/des.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
 
 const char *_ossl_old_des_options(void)
 {
@@ -343,3 +346,6 @@ void _ossl_old_des_ofb64_encrypt(unsigned char *in, unsigned char *out,
     DES_ofb64_encrypt(in, out, length, (DES_key_schedule *)schedule,
                       ivec, num);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

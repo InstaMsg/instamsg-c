@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/conf/test.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -58,8 +61,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <openssl/conf.h>
-#include <openssl/err.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/conf.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
 
 main()
 {
@@ -95,3 +98,6 @@ main()
 
     exit(0);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/engine/eng_pkey.c */
 /* ====================================================================
  * Copyright (c) 1999-2001 The OpenSSL Project.  All rights reserved.
@@ -184,3 +187,6 @@ int ENGINE_load_ssl_client_cert(ENGINE *e, SSL *s,
     return e->load_ssl_client_cert(e, s, ca_dn, pcert, ppkey, pother,
                                    ui_method, callback_data);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

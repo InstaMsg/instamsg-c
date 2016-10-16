@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/conf/conf_err.c */
 /* ====================================================================
  * Copyright (c) 1999-2007 The OpenSSL Project.  All rights reserved.
@@ -60,8 +63,8 @@
  */
 
 #include <stdio.h>
-#include <openssl/err.h>
-#include <openssl/conf.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/conf.h"
 
 /* BEGIN ERROR CODES */
 #ifndef OPENSSL_NO_ERR
@@ -131,3 +134,6 @@ void ERR_load_CONF_strings(void)
     }
 #endif
 }
+#else
+typedef int to_make_compiler_happy
+#endif

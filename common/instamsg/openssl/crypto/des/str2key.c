@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/des/str2key.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -56,7 +59,7 @@
  * [including the GNU Public Licence.]
  */
 
-#include <openssl/crypto.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
 #include "des_locl.h"
 
 void DES_string_to_key(const char *str, DES_cblock *key)
@@ -162,3 +165,6 @@ void DES_string_to_2keys(const char *str, DES_cblock *key1, DES_cblock *key2)
     DES_set_odd_parity(key1);
     DES_set_odd_parity(key2);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

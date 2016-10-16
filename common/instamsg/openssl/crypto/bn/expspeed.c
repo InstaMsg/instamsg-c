@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* unused */
 
 /* crypto/bn/expspeed.c */
@@ -93,9 +96,9 @@ static void genprime_cb(int p, int n, void *arg);
 #include <stdlib.h>
 #include <signal.h>
 #include <string.h>
-#include <openssl/crypto.h>
-#include <openssl/err.h>
-#include <openssl/rand.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
 
 #if !defined(OPENSSL_SYS_MSDOS) && (!defined(OPENSSL_SYS_VMS) || defined(__DECC)) && !defined(OPENSSL_SYS_MACOSX)
 # define TIMES
@@ -129,8 +132,8 @@ static void genprime_cb(int p, int n, void *arg);
 # include <sys/param.h>
 #endif
 
-#include <openssl/bn.h>
-#include <openssl/x509.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/x509.h"
 
 /* The following if from times(3) man page.  It may need to be changed */
 #ifndef HZ
@@ -378,4 +381,7 @@ static void genprime_cb(int p, int n, void *arg)
     (void)n;
     (void)arg;
 }
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

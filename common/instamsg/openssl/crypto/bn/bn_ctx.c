@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/bn/bn_ctx.c */
 /* Written by Ulf Moeller for the OpenSSL project. */
 /* ====================================================================
@@ -446,3 +449,6 @@ static void BN_POOL_release(BN_POOL *p, unsigned int num)
             offset--;
     }
 }
+#else
+typedef int to_make_compiler_happy
+#endif

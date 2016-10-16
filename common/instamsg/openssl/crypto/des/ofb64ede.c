@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/des/ofb64ede.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -120,4 +123,7 @@ void DES_ede2_ofb64_encrypt(register unsigned char *in,
 {
     DES_ede3_ofb64_encrypt(in, out, length, k1, k2, k1, ivec, num);
 }
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

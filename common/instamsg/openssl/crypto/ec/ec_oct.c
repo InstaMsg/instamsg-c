@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/ec/ec_lib.c */
 /*
  * Originally written by Bodo Moeller for the OpenSSL project.
@@ -63,8 +66,8 @@
 
 #include <string.h>
 
-#include <openssl/err.h>
-#include <openssl/opensslv.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslv.h"
 
 #include "ec_lcl.h"
 
@@ -190,3 +193,6 @@ int EC_POINT_oct2point(const EC_GROUP *group, EC_POINT *point,
     }
     return group->meth->oct2point(group, point, buf, len, ctx);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

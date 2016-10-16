@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/des/rand_key.c */
 /* ====================================================================
  * Copyright (c) 1998-2000 The OpenSSL Project.  All rights reserved.
@@ -53,8 +56,8 @@
  *
  */
 
-#include <openssl/des.h>
-#include <openssl/rand.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/des.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
 
 int DES_random_key(DES_cblock *ret)
 {
@@ -65,3 +68,6 @@ int DES_random_key(DES_cblock *ret)
     DES_set_odd_parity(ret);
     return (1);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

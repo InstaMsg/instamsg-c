@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/ecdsa/ecdsa_sign.c */
 /* ====================================================================
  * Copyright (c) 1998-2002 The OpenSSL Project.  All rights reserved.
@@ -55,9 +58,9 @@
 
 #include "ecs_locl.h"
 #ifndef OPENSSL_NO_ENGINE
-# include <openssl/engine.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/engine.h"
 #endif
-#include <openssl/rand.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
 
 ECDSA_SIG *ECDSA_do_sign(const unsigned char *dgst, int dlen, EC_KEY *eckey)
 {
@@ -104,3 +107,6 @@ int ECDSA_sign_setup(EC_KEY *eckey, BN_CTX *ctx_in, BIGNUM **kinvp,
         return 0;
     return ecdsa->meth->ecdsa_sign_setup(eckey, ctx_in, kinvp, rp);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

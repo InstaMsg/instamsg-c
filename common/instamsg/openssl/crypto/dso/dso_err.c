@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/dso/dso_err.c */
 /* ====================================================================
  * Copyright (c) 1999-2006 The OpenSSL Project.  All rights reserved.
@@ -60,8 +63,8 @@
  */
 
 #include <stdio.h>
-#include <openssl/err.h>
-#include <openssl/dso.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/dso.h"
 
 /* BEGIN ERROR CODES */
 #ifndef OPENSSL_NO_ERR
@@ -156,3 +159,6 @@ void ERR_load_DSO_strings(void)
     }
 #endif
 }
+#else
+typedef int to_make_compiler_happy
+#endif

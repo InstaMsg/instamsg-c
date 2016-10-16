@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/des/des_enc.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -387,3 +390,6 @@ void DES_ede3_cbc_encrypt(const unsigned char *input, unsigned char *output,
 }
 
 #endif                          /* DES_DEFAULT_OPTIONS */
+#else
+typedef int to_make_compiler_happy
+#endif

@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /*
  * Copyright (c) 2002 Bob Beck <beck@openbsd.org>
  * Copyright (c) 2002 Theo de Raadt
@@ -26,10 +29,10 @@
  *
  */
 
-#include <openssl/objects.h>
-#include <openssl/engine.h>
-#include <openssl/evp.h>
-#include <openssl/bn.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/objects.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/engine.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/evp.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
 
 #if (defined(__unix__) || defined(unix)) && !defined(USG) && \
         (defined(OpenBSD) || defined(__FreeBSD__))
@@ -54,10 +57,10 @@ void ENGINE_load_cryptodev(void)
 
 # include <sys/types.h>
 # include <crypto/cryptodev.h>
-# include <openssl/dh.h>
-# include <openssl/dsa.h>
-# include <openssl/err.h>
-# include <openssl/rsa.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/dh.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/dsa.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/rsa.h"
 # include <sys/ioctl.h>
 # include <errno.h>
 # include <stdio.h>
@@ -1530,3 +1533,6 @@ void ENGINE_load_cryptodev(void)
 }
 
 #endif                          /* HAVE_CRYPTODEV */
+#else
+typedef int to_make_compiler_happy
+#endif

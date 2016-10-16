@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* ====================================================================
  * Copyright (c) 2011 The OpenSSL Project.  All rights reserved.
  *
@@ -47,13 +50,13 @@
  * ====================================================================
  */
 
-#include <openssl/opensslconf.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h"
 
 #include <stdio.h>
 #include <string.h>
-#include <openssl/engine.h>
-#include <openssl/rand.h>
-#include <openssl/err.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/engine.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
 
 #if (defined(__i386)   || defined(__i386__)   || defined(_M_IX86) || \
      defined(__x86_64) || defined(__x86_64__) || \
@@ -146,4 +149,7 @@ void ENGINE_load_rdrand(void)
 void ENGINE_load_rdrand(void)
 {
 }
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

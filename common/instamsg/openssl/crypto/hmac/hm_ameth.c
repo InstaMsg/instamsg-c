@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /*
  * Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL project
  * 2007.
@@ -58,7 +61,7 @@
 
 #include <stdio.h>
 #include "cryptlib.h"
-#include <openssl/evp.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/evp.h"
 #include "asn1_locl.h"
 
 #define HMAC_TEST_PRIVATE_KEY_FORMAT
@@ -160,3 +163,6 @@ const EVP_PKEY_ASN1_METHOD hmac_asn1_meth = {
     0, 0
 #endif
 };
+#else
+typedef int to_make_compiler_happy
+#endif

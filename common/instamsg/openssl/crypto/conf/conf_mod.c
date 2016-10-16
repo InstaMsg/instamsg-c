@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* conf_mod.c */
 /*
  * Written by Stephen Henson (steve@openssl.org) for the OpenSSL project
@@ -59,11 +62,11 @@
 
 #include <stdio.h>
 #include <ctype.h>
-#include <openssl/crypto.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
 #include "cryptlib.h"
-#include <openssl/conf.h>
-#include <openssl/dso.h>
-#include <openssl/x509.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/conf.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/dso.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/x509.h"
 
 #define DSO_mod_init_name "OPENSSL_init"
 #define DSO_mod_finish_name "OPENSSL_finish"
@@ -595,3 +598,6 @@ int CONF_parse_list(const char *list_, int sep, int nospc,
         lstart = p + 1;
     }
 }
+#else
+typedef int to_make_compiler_happy
+#endif

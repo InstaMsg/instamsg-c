@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/bio/b_sock.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -61,7 +64,7 @@
 #include <errno.h>
 #define USE_SOCKETS
 #include "cryptlib.h"
-#include <openssl/bio.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
 #if defined(OPENSSL_SYS_NETWARE) && defined(NETWARE_BSDSOCK)
 # include <netdb.h>
 # if defined(NETWARE_CLIB)
@@ -70,7 +73,7 @@ NETDB_DEFINE_CONTEXT
 # endif
 #endif
 #ifndef OPENSSL_NO_SOCK
-# include <openssl/dso.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/dso.h"
 # define SOCKET_PROTOCOL IPPROTO_TCP
 # ifdef SO_MAXCONN
 #  define MAX_LISTEN  SO_MAXCONN
@@ -959,4 +962,7 @@ int BIO_socket_nbio(int s, int mode)
 # endif
     return (ret == 0);
 }
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

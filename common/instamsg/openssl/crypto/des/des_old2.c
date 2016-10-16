@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/des/des_old.c -*- mode:C; c-file-style: "eay" -*- */
 
 /*
@@ -71,10 +74,13 @@
  */
 
 #undef OPENSSL_DES_LIBDES_COMPATIBILITY
-#include <openssl/des.h>
-#include <openssl/rand.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/des.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
 
 void _ossl_096_des_random_seed(DES_cblock *key)
 {
     RAND_seed(key, sizeof(DES_cblock));
 }
+#else
+typedef int to_make_compiler_happy
+#endif

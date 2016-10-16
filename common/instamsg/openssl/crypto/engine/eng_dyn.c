@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/engine/eng_dyn.c */
 /*
  * Written by Geoff Thorpe (geoff@geoffthorpe.net) for the OpenSSL project
@@ -58,7 +61,7 @@
  */
 
 #include "eng_int.h"
-#include <openssl/dso.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/dso.h"
 
 /*
  * Shared libraries implementing ENGINEs for use by the "dynamic" ENGINE
@@ -566,3 +569,6 @@ static int dynamic_load(ENGINE *e, dynamic_data_ctx *ctx)
     }
     return 1;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

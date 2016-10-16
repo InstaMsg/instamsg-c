@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* ocsp_prn.c */
 /*
  * Written by Tom Titchener <Tom_Titchener@groove.net> for the OpenSSL
@@ -64,10 +67,10 @@
  *
  */
 
-#include <openssl/bio.h>
-#include <openssl/err.h>
-#include <openssl/ocsp.h>
-#include <openssl/pem.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/ocsp.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/pem.h"
 
 static int ocsp_certid_print(BIO *bp, OCSP_CERTID *a, int indent)
 {
@@ -298,3 +301,6 @@ int OCSP_RESPONSE_print(BIO *bp, OCSP_RESPONSE *o, unsigned long flags)
     OCSP_BASICRESP_free(br);
     return ret;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

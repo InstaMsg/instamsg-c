@@ -1,5 +1,8 @@
-#include <openssl/bn.h>
-#include <openssl/rand.h>
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
 
 static int Rand(n)
 {
@@ -40,3 +43,6 @@ main()
             bug("mismatch", a, b);
     }
 }
+#else
+typedef int to_make_compiler_happy
+#endif

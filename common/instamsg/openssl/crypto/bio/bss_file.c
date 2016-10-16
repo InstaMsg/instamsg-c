@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/bio/bss_file.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -87,7 +90,7 @@
 # include <errno.h>
 # include "cryptlib.h"
 # include "bio_lcl.h"
-# include <openssl/err.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
 
 # if defined(OPENSSL_SYS_NETWARE) && defined(NETWARE_CLIB)
 #  include <nwfileio.h>
@@ -463,3 +466,6 @@ static int MS_CALLBACK file_puts(BIO *bp, const char *str)
 # endif                         /* OPENSSL_NO_STDIO */
 
 #endif                          /* HEADER_BSS_FILE_C */
+#else
+typedef int to_make_compiler_happy
+#endif

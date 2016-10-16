@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* conf_lib.c */
 /*
  * Written by Richard Levitte (richard@levitte.org) for the OpenSSL project
@@ -58,11 +61,11 @@
  */
 
 #include <stdio.h>
-#include <openssl/crypto.h>
-#include <openssl/err.h>
-#include <openssl/conf.h>
-#include <openssl/conf_api.h>
-#include <openssl/lhash.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/conf.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/conf_api.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/lhash.h"
 
 const char CONF_version[] = "CONF" OPENSSL_VERSION_PTEXT;
 
@@ -388,4 +391,7 @@ long NCONF_get_number(CONF *conf, char *group, char *name)
     }
     return ret;
 }
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

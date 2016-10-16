@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/des/ecb3_enc.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -80,3 +83,6 @@ void DES_ecb3_encrypt(const_DES_cblock *input, DES_cblock *output,
     l2c(l0, out);
     l2c(l1, out);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

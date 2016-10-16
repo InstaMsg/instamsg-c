@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/des/cbc_cksm.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -101,3 +104,6 @@ DES_LONG DES_cbc_cksum(const unsigned char *in, DES_cblock *output,
         | ((tout1 << 24L) & 0xFF000000);
     return (tout1);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

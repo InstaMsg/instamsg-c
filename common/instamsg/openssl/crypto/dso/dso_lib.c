@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* dso_lib.c -*- mode:C; c-file-style: "eay" -*- */
 /*
  * Written by Geoff Thorpe (geoff@geoffthorpe.net) for the OpenSSL project
@@ -58,9 +61,9 @@
  */
 
 #include <stdio.h>
-#include <openssl/crypto.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
 #include "cryptlib.h"
-#include <openssl/dso.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/dso.h"
 
 static DSO_METHOD *default_DSO_meth = NULL;
 
@@ -445,3 +448,6 @@ void *DSO_global_lookup(const char *name)
     }
     return (*meth->globallookup) (name);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

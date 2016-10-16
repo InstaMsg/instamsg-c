@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/bn/bn_print.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -59,7 +62,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include "cryptlib.h"
-#include <openssl/buffer.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/buffer.h"
 #include "bn_lcl.h"
 
 static const char Hex[] = "0123456789ABCDEF";
@@ -386,3 +389,6 @@ char *BN_options(void)
     }
     return (data);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

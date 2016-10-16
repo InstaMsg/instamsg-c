@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/ec/ec_mult.c */
 /*
  * Originally written by Bodo Moeller and Nils Larsch for the OpenSSL project.
@@ -63,7 +66,7 @@
 
 #include <string.h>
 
-#include <openssl/err.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
 
 #include "ec_lcl.h"
 
@@ -911,3 +914,6 @@ int ec_wNAF_have_precompute_mult(const EC_GROUP *group)
     else
         return 0;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

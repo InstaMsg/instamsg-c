@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/engine/eng_init.c */
 /* ====================================================================
  * Copyright (c) 1999-2001 The OpenSSL Project.  All rights reserved.
@@ -155,3 +158,6 @@ int ENGINE_finish(ENGINE *e)
     }
     return to_return;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* dso_vms.c -*- mode:C; c-file-style: "eay" -*- */
 /*
  * Written by Richard Levitte (richard@levitte.org) for the OpenSSL project
@@ -61,7 +64,7 @@
 #include <string.h>
 #include <errno.h>
 #include "cryptlib.h"
-#include <openssl/dso.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/dso.h"
 
 #ifndef OPENSSL_SYS_VMS
 DSO_METHOD *DSO_METHOD_vms(void)
@@ -545,3 +548,6 @@ static char *vms_name_converter(DSO *dso, const char *filename)
 }
 
 #endif                          /* OPENSSL_SYS_VMS */
+#else
+typedef int to_make_compiler_happy
+#endif

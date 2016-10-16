@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* ede_cbcm_enc.c */
 /*
  * Written by Ben Laurie <ben@algroup.co.uk> for the OpenSSL project 13 Feb
@@ -69,7 +72,7 @@
  *
  */
 
-#include <openssl/opensslconf.h> /* To see if OPENSSL_NO_DESCBCM is defined */
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h" /* To see if OPENSSL_NO_DESCBCM is defined */
 
 #ifndef OPENSSL_NO_DESCBCM
 # include "des_locl.h"
@@ -186,4 +189,7 @@ void DES_ede3_cbcm_encrypt(const unsigned char *in, unsigned char *out,
     tin0 = tin1 = tout0 = tout1 = xor0 = xor1 = 0;
     tin[0] = tin[1] = 0;
 }
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

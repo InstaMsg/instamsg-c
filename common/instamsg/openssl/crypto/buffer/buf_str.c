@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/buffer/buffer.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -58,7 +61,7 @@
 
 #include <stdio.h>
 #include "cryptlib.h"
-#include <openssl/buffer.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/buffer.h"
 
 size_t BUF_strnlen(const char *str, size_t maxlen)
 {
@@ -128,3 +131,6 @@ size_t BUF_strlcat(char *dst, const char *src, size_t size)
         l++;
     return l + BUF_strlcpy(dst, src, size);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

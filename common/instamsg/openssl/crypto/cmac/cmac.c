@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/cmac/cmac.c */
 /*
  * Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL
@@ -56,10 +59,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "cryptlib.h"
-#include <openssl/cmac.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/cmac.h"
 
 #ifdef OPENSSL_FIPS
-# include <openssl/fips.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/fips.h"
 #endif
 
 struct CMAC_CTX_st {
@@ -296,3 +299,6 @@ int CMAC_resume(CMAC_CTX *ctx)
      */
     return EVP_EncryptInit_ex(&ctx->cctx, NULL, NULL, NULL, ctx->tbl);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

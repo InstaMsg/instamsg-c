@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/des/qud_cksm.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -141,3 +144,6 @@ DES_LONG DES_quad_cksum(const unsigned char *input, DES_cblock output[],
     }
     return (z0);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/des/rpw.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -57,7 +60,7 @@
  */
 
 #include <stdio.h>
-#include <openssl/des.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/des.h"
 
 int main(int argc, char *argv[])
 {
@@ -92,3 +95,6 @@ int main(int argc, char *argv[])
     return (0);
 #endif
 }
+#else
+typedef int to_make_compiler_happy
+#endif

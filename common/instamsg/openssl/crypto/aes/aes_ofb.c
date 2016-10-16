@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/aes/aes_ofb.c -*- mode:C; c-file-style: "eay" -*- */
 /* ====================================================================
  * Copyright (c) 2002-2006 The OpenSSL Project.  All rights reserved.
@@ -49,8 +52,8 @@
  *
  */
 
-#include <openssl/aes.h>
-#include <openssl/modes.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/aes.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/modes.h"
 
 void AES_ofb128_encrypt(const unsigned char *in, unsigned char *out,
                         size_t length, const AES_KEY *key,
@@ -59,3 +62,6 @@ void AES_ofb128_encrypt(const unsigned char *in, unsigned char *out,
     CRYPTO_ofb128_encrypt(in, out, length, key, ivec, num,
                           (block128_f) AES_encrypt);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* ocsp_vfy.c */
 /*
  * Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL project
@@ -57,8 +60,8 @@
  *
  */
 
-#include <openssl/ocsp.h>
-#include <openssl/err.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/ocsp.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
 #include <string.h>
 
 static int ocsp_find_signer(X509 **psigner, OCSP_BASICRESP *bs,
@@ -452,3 +455,6 @@ static int ocsp_req_find_signer(X509 **psigner, OCSP_REQUEST *req,
     }
     return 0;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

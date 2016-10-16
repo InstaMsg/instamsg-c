@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/bn/bn_sqrt.c */
 /*
  * Written by Lenka Fibikova <fibikova@exp-math.uni-essen.de> and Bodo
@@ -407,3 +410,6 @@ BIGNUM *BN_mod_sqrt(BIGNUM *in, const BIGNUM *a, const BIGNUM *p, BN_CTX *ctx)
     bn_check_top(ret);
     return ret;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

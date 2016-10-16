@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* unused */
 
 /* crypto/bn/bnspeed.c */
@@ -68,8 +71,8 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <string.h>
-#include <openssl/crypto.h>
-#include <openssl/err.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
 
 #if !defined(OPENSSL_SYS_MSDOS) && (!defined(OPENSSL_SYS_VMS) || defined(__DECC)) && !defined(OPENSSL_SYS_MACOSX)
 # define TIMES
@@ -103,8 +106,8 @@
 # include <sys/param.h>
 #endif
 
-#include <openssl/bn.h>
-#include <openssl/x509.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/x509.h"
 
 /* The following if from times(3) man page.  It may need to be changed */
 #ifndef HZ
@@ -230,3 +233,6 @@ void do_mul(BIGNUM *r, BIGNUM *a, BIGNUM *b, BN_CTX *ctx)
         }
     }
 }
+#else
+typedef int to_make_compiler_happy
+#endif

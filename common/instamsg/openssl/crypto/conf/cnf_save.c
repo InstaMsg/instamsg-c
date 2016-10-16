@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/conf/cnf_save.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -57,7 +60,7 @@
  */
 
 #include <stdio.h>
-#include <openssl/conf.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/conf.h"
 
 static void print_conf(CONF_VALUE *cv);
 static IMPLEMENT_LHASH_DOALL_FN(print_conf, CONF_VALUE *);
@@ -102,3 +105,6 @@ static void print_conf(CONF_VALUE *cv)
     }
     printf("\n");
 }
+#else
+typedef int to_make_compiler_happy
+#endif

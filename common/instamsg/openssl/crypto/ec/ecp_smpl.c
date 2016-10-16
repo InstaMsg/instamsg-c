@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/ec/ecp_smpl.c */
 /*
  * Includes code written by Lenka Fibikova <fibikova@exp-math.uni-essen.de>
@@ -63,11 +66,11 @@
  * and contributed to the OpenSSL project.
  */
 
-#include <openssl/err.h>
-#include <openssl/symhacks.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/symhacks.h"
 
 #ifdef OPENSSL_FIPS
-# include <openssl/fips.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/fips.h"
 #endif
 
 #include "ec_lcl.h"
@@ -1416,3 +1419,6 @@ int ec_GFp_simple_field_sqr(const EC_GROUP *group, BIGNUM *r, const BIGNUM *a,
 {
     return BN_mod_sqr(r, a, &group->field, ctx);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

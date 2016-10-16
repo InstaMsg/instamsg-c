@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* ====================================================================
  * Copyright (c) 2006 The OpenSSL Project.  All rights reserved.
  *
@@ -54,7 +57,7 @@
 
 #include "eng_int.h"
 #include "asn1_locl.h"
-#include <openssl/evp.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/evp.h"
 
 /*
  * If this symbol is defined then ENGINE_get_pkey_asn1_meth_engine(), the
@@ -244,3 +247,6 @@ const EVP_PKEY_ASN1_METHOD *ENGINE_pkey_asn1_find_str(ENGINE **pe,
     CRYPTO_w_unlock(CRYPTO_LOCK_ENGINE);
     return fstr.ameth;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

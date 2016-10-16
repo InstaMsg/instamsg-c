@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/bn/bn_shift.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -222,3 +225,6 @@ int BN_rshift(BIGNUM *r, const BIGNUM *a, int n)
     bn_check_top(r);
     return (1);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

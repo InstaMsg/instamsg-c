@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/ec/ec_curve.c */
 /*
  * Written by Nils Larsch for the OpenSSL project.
@@ -71,12 +74,12 @@
 
 #include <string.h>
 #include "ec_lcl.h"
-#include <openssl/err.h>
-#include <openssl/obj_mac.h>
-#include <openssl/opensslconf.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/obj_mac.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/opensslconf.h"
 
 #ifdef OPENSSL_FIPS
-# include <openssl/fips.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/fips.h"
 #endif
 
 typedef struct {
@@ -3246,3 +3249,6 @@ int EC_curve_nist2nid(const char *name)
     }
     return NID_undef;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/ec/eck_prn.c */
 /*
  * Written by Nils Larsch for the OpenSSL project.
@@ -63,9 +66,9 @@
 
 #include <stdio.h>
 #include "cryptlib.h"
-#include <openssl/evp.h>
-#include <openssl/ec.h>
-#include <openssl/bn.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/evp.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/ec.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
 
 #ifndef OPENSSL_NO_FP_API
 int ECPKParameters_print_fp(FILE *fp, const EC_GROUP *x, int off)
@@ -375,3 +378,6 @@ static int print_bin(BIO *fp, const char *name, const unsigned char *buf,
 
     return 1;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

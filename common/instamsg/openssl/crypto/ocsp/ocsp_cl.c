@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* ocsp_cl.c */
 /*
  * Written by Tom Titchener <Tom_Titchener@groove.net> for the OpenSSL
@@ -67,12 +70,12 @@
 #include <stdio.h>
 #include <time.h>
 #include <cryptlib.h>
-#include <openssl/objects.h>
-#include <openssl/rand.h>
-#include <openssl/x509.h>
-#include <openssl/pem.h>
-#include <openssl/x509v3.h>
-#include <openssl/ocsp.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/objects.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/x509.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/pem.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/x509v3.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/ocsp.h"
 
 /*
  * Utility functions related to sending OCSP requests and extracting relevant
@@ -381,3 +384,6 @@ int OCSP_check_validity(ASN1_GENERALIZEDTIME *thisupd,
 
     return ret;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/ec/ecp_mont.c */
 /*
  * Originally written by Bodo Moeller for the OpenSSL project.
@@ -61,10 +64,10 @@
  * and contributed to the OpenSSL project.
  */
 
-#include <openssl/err.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
 
 #ifdef OPENSSL_FIPS
-# include <openssl/fips.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/fips.h"
 #endif
 
 #include "ec_lcl.h"
@@ -306,3 +309,6 @@ int ec_GFp_mont_field_set_to_one(const EC_GROUP *group, BIGNUM *r,
         return 0;
     return 1;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

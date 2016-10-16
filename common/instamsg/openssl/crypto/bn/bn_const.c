@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/bn/knownprimes.c */
 /* Insert boilerplate */
 
@@ -545,3 +548,6 @@ BIGNUM *get_rfc3526_prime_8192(BIGNUM *bn)
     };
     return BN_bin2bn(RFC3526_PRIME_8192, sizeof(RFC3526_PRIME_8192), bn);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

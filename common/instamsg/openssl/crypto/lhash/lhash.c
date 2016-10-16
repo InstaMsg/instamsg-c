@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/lhash/lhash.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -98,8 +101,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <openssl/crypto.h>
-#include <openssl/lhash.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/lhash.h"
 
 const char lh_version[] = "lhash" OPENSSL_VERSION_PTEXT;
 
@@ -456,3 +459,6 @@ unsigned long lh_num_items(const _LHASH *lh)
 {
     return lh ? lh->num_items : 0;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

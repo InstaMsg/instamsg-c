@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/engine/enginetest.c */
 /*
  * Written by Geoff Thorpe (geoff@geoffthorpe.net) for the OpenSSL project
@@ -59,7 +62,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <openssl/e_os2.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/e_os2.h"
 
 #ifdef OPENSSL_NO_ENGINE
 int main(int argc, char *argv[])
@@ -68,10 +71,10 @@ int main(int argc, char *argv[])
     return (0);
 }
 #else
-# include <openssl/buffer.h>
-# include <openssl/crypto.h>
-# include <openssl/engine.h>
-# include <openssl/err.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/buffer.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/engine.h"
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
 
 static void display_engine_list(void)
 {
@@ -266,4 +269,7 @@ int main(int argc, char *argv[])
     CRYPTO_mem_leaks_fp(stderr);
     return to_return;
 }
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

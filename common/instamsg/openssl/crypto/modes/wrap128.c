@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/modes/wrap128.c */
 /*
  * Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL
@@ -53,7 +56,7 @@
  */
 
 #include "cryptlib.h"
-#include <openssl/modes.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/modes.h"
 
 static const unsigned char default_iv[] = {
     0xA6, 0xA6, 0xA6, 0xA6, 0xA6, 0xA6, 0xA6, 0xA6,
@@ -136,3 +139,6 @@ size_t CRYPTO_128_unwrap(void *key, const unsigned char *iv,
     }
     return inlen;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

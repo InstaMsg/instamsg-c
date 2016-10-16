@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/des/pcbc_enc.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -113,3 +116,6 @@ void DES_pcbc_encrypt(const unsigned char *input, unsigned char *output,
     tin[0] = tin[1] = 0;
     sin0 = sin1 = xor0 = xor1 = tout0 = tout1 = 0;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

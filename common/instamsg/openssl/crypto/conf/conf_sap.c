@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* conf_sap.c */
 /*
  * Written by Stephen Henson (steve@openssl.org) for the OpenSSL project
@@ -58,14 +61,14 @@
  */
 
 #include <stdio.h>
-#include <openssl/crypto.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
 #include "cryptlib.h"
-#include <openssl/conf.h>
-#include <openssl/dso.h>
-#include <openssl/x509.h>
-#include <openssl/asn1.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/conf.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/dso.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/x509.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/asn1.h"
 #ifndef OPENSSL_NO_ENGINE
-# include <openssl/engine.h>
+# include "../../../../.././common/instamsg/driver/include/sg_openssl/engine.h"
 #endif
 
 /*
@@ -96,3 +99,6 @@ void OPENSSL_no_config()
 {
     openssl_configured = 1;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

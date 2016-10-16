@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/bio/bio_cb.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -60,8 +63,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include "cryptlib.h"
-#include <openssl/bio.h>
-#include <openssl/err.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
 
 long MS_CALLBACK BIO_debug_callback(BIO *bio, int cmd, const char *argp,
                                     int argi, long argl, long ret)
@@ -143,3 +146,6 @@ long MS_CALLBACK BIO_debug_callback(BIO *bio, int cmd, const char *argp,
 #endif
     return (r);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

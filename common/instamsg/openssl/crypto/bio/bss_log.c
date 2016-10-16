@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/bio/bss_log.c */
 /* ====================================================================
  * Copyright (c) 1999 The OpenSSL Project.  All rights reserved.
@@ -92,8 +95,8 @@ void *_malloc32(__size_t);
 # include <syslog.h>
 #endif
 
-#include <openssl/buffer.h>
-#include <openssl/err.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/buffer.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
 
 #ifndef NO_SYSLOG
 
@@ -451,3 +454,6 @@ static void xcloselog(BIO *bp)
 # endif                         /* Unix */
 
 #endif                          /* NO_SYSLOG */
+#else
+typedef int to_make_compiler_happy
+#endif

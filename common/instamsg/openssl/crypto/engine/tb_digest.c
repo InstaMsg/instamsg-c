@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* ====================================================================
  * Copyright (c) 2000 The OpenSSL Project.  All rights reserved.
  *
@@ -141,3 +144,6 @@ int ENGINE_set_digests(ENGINE *e, ENGINE_DIGESTS_PTR f)
     e->digests = f;
     return 1;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

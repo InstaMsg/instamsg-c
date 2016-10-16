@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* ====================================================================
  * Copyright (c) 2008 The OpenSSL Project.  All rights reserved.
  *
@@ -48,7 +51,7 @@
  *
  */
 
-#include <openssl/crypto.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/crypto.h"
 #include "modes_lcl.h"
 #include <string.h>
 
@@ -252,3 +255,6 @@ void CRYPTO_cfb128_8_encrypt(const unsigned char *in, unsigned char *out,
     for (n = 0; n < length; ++n)
         cfbr_encrypt_block(&in[n], &out[n], 8, key, ivec, enc, block);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

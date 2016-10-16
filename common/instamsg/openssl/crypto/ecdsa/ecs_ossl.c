@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/ecdsa/ecs_ossl.c */
 /*
  * Written by Nils Larsch for the OpenSSL project
@@ -57,9 +60,9 @@
  */
 
 #include "ecs_locl.h"
-#include <openssl/err.h>
-#include <openssl/obj_mac.h>
-#include <openssl/bn.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/obj_mac.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
 
 static ECDSA_SIG *ecdsa_do_sign(const unsigned char *dgst, int dlen,
                                 const BIGNUM *, const BIGNUM *,
@@ -462,3 +465,6 @@ static int ecdsa_do_verify(const unsigned char *dgst, int dgst_len,
         EC_POINT_free(point);
     return ret;
 }
+#else
+typedef int to_make_compiler_happy
+#endif

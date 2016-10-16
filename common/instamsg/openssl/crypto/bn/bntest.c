@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/bn/bntest.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -83,11 +86,11 @@
 
 #include "e_os.h"
 
-#include <openssl/bio.h>
-#include <openssl/bn.h>
-#include <openssl/rand.h>
-#include <openssl/x509.h>
-#include <openssl/err.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/bn.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/rand.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/x509.h"
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/err.h"
 
 const int num0 = 100;           /* number of tests */
 const int num1 = 50;            /* additional tests for some functions */
@@ -2082,3 +2085,6 @@ int rand_neg(void)
 
     return (sign[(neg++) % 8]);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

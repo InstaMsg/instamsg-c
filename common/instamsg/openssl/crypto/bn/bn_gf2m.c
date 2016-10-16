@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/bn/bn_gf2m.c */
 /* ====================================================================
  * Copyright 2002 Sun Microsystems, Inc. ALL RIGHTS RESERVED.
@@ -1294,4 +1297,7 @@ int BN_GF2m_arr2poly(const int p[], BIGNUM *a)
     return 1;
 }
 
+#endif
+#else
+typedef int to_make_compiler_happy
 #endif

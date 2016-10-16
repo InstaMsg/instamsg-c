@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* crypto/bio/bss_rtcp.c */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -67,7 +70,7 @@
 #include <string.h>
 #include <errno.h>
 #include "cryptlib.h"
-#include <openssl/bio.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/bio.h"
 
 #include <iodef.h>              /* VMS IO$_ definitions */
 #include <starlet.h>
@@ -317,3 +320,6 @@ static int rtcp_puts(BIO *bp, const char *str)
         return (0);
     return rtcp_write(bp, str, length);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

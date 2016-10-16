@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* eng_cnf.c */
 /*
  * Written by Stephen Henson (steve@openssl.org) for the OpenSSL project
@@ -58,7 +61,7 @@
  */
 
 #include "eng_int.h"
-#include <openssl/conf.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/conf.h"
 
 /* #define ENGINE_CONF_DEBUG */
 
@@ -240,3 +243,6 @@ void ENGINE_add_conf_module(void)
     CONF_module_add("engines",
                     int_engine_module_init, int_engine_module_finish);
 }
+#else
+typedef int to_make_compiler_happy
+#endif

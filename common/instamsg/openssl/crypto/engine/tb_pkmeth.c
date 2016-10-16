@@ -1,3 +1,6 @@
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 /* ====================================================================
  * Copyright (c) 2006 The OpenSSL Project.  All rights reserved.
  *
@@ -53,7 +56,7 @@
  */
 
 #include "eng_int.h"
-#include <openssl/evp.h>
+#include "../../../../.././common/instamsg/driver/include/sg_openssl/evp.h"
 
 /*
  * If this symbol is defined then ENGINE_get_pkey_meth_engine(), the function
@@ -164,3 +167,6 @@ void engine_pkey_meths_free(ENGINE *e)
         }
     }
 }
+#else
+typedef int to_make_compiler_happy
+#endif
