@@ -1,3 +1,5 @@
+#include "device_defines.h"
+
 #if SSL_ENABLED == 1
 #ifndef HEADER_WHRLPOOL_H
 # define HEADER_WHRLPOOL_H

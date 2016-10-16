@@ -1,3 +1,5 @@
+#include "device_defines.h"
+
 #if SSL_ENABLED == 1
 /* ====================================================================
  * Copyright (c) 1998-2001 The OpenSSL Project.  All rights reserved.

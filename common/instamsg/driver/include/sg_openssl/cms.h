@@ -1,3 +1,5 @@
+#include "device_defines.h"
+
 #if SSL_ENABLED == 1
 /* crypto/cms/cms.h */
 /*

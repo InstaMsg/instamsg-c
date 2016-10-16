@@ -1,3 +1,5 @@
+#include "device_defines.h"
+
 #if SSL_ENABLED == 1
 /* conf_api.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)

@@ -1,3 +1,5 @@
+#include "device_defines.h"
+
 #if SSL_ENABLED == 1
 /* crypto/rc4/rc4.h */
 /* Copyright (C) 1995-1997 Eric Young (eay@cryptsoft.com)

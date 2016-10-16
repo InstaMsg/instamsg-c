@@ -1,3 +1,5 @@
+#include "device_defines.h"
+
 #if SSL_ENABLED == 1
 /* crypto/des/des_old.h -*- mode:C; c-file-style: "eay" -*- */
 

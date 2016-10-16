@@ -1,3 +1,5 @@
+#include "device_defines.h"
+
 #if SSL_ENABLED == 1
 /*
  * Copyright (c) 2007 KISA(Korea Information Security Agency). All rights reserved.
