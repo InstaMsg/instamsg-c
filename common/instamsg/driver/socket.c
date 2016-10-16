@@ -626,8 +626,13 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port, const 
 
     if((secure == 1) && (sslEnabled == 1))
     {
+#if SSL_ENABLED == 1
 	    socket->read = secure_socket_read;
 	    socket->write = secure_socket_write;
+#else
+        socket->read = socket_read;
+        socket->write = socket_write;
+#endif
     }
     else
     {

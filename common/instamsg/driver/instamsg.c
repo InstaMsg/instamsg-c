@@ -549,6 +549,7 @@ static void saveClientAuthFieldInfoOntoDevice(char *payload, char *key, void (*f
 
 static void processCertificateInfoIfAny(InstaMsg *c, char *payload)
 {
+#if SSL_ENABLED == 1
     int sz = 2000;
 
     char *temp = (char*) sg_malloc(sz);
@@ -569,6 +570,7 @@ static void processCertificateInfoIfAny(InstaMsg *c, char *payload)
         saveClientAuthFieldInfoOntoDevice(payload, "certificate", save_client_certificate_from_buffer);
         saveClientAuthFieldInfoOntoDevice(payload, "key", save_client_private_key_from_buffer);
     }
+#endif
 }
 
 
