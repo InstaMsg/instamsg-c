@@ -5,6 +5,7 @@ move_file()
     mv /overlay/home/sensegrow/at_temp /overlay/home/sensegrow/$1
 }
 
+counter=0
 
 while true
 do
@@ -32,4 +33,14 @@ do
     move_file "imsi"
 
     sleep 60
+
+    counter=$(($counter+60))
+    if [ "$counter" -gt "3600" ]
+    then
+        reboot
+        sleep 2
+        reboot
+        sleep 2
+        reboot
+    fi
 done
