@@ -37,7 +37,6 @@ client/tiva_build
 
 # Generated-Files while setting up the embedded-environment
 third_party/ti-compiler-environment
-third_party/openwrt
 third_party/openat
 
 subscriber.sh
