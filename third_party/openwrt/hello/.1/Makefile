@@ -1,0 +1,26 @@
+.SUFFIXES: .tar.gz .c 
+PKG_RELEASE:=1 
+PKG_VERSION:=0 
+PKG_NAME = hello
+SOURCES = hello.c
+OBJECTS = $(SOURCES:.c=.o) 
+LDFLAGS += -lpthread 
+
+$(PKG_NAME): $(OBJECTS)
+	@echo "dekho " $(CC)
+	$(CC) $(CFLAGS) $(LIBS) $(OBJECTS) -o $(PKG_NAME) $(LDFLAGS) -lm
+
+copy:
+	mkdir -p ./$(PKG_NAME)-$(PKG_VERSION).$(PKG_RELEASE) 
+	cp -rf $(SOURCES) Makefile ./$(PKG_NAME)-$(PKG_VERSION).$(PKG_RELEASE) 
+	tar -cz -f $(PKG_NAME).tar.gz ./$(PKG_NAME)-$(PKG_VERSION).$(PKG_RELEASE) 
+	cp ./$(PKG_NAME).tar.gz ../dl/
+
+ 
+$(all):$(PKG_NAME) $(PKG_NAME).tar.gz 
+
+# Objects 
+%.o: %.c 
+	$(CC) -c $(CFLAGS) $< -o $@ 
+clean: 
+	rm -rf *.tar* $(PKG_NAME) *~
