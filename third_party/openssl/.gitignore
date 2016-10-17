@@ -138,4 +138,5 @@ crypto/x509/Makefile
 engines/Makefile
 ssl/Makefile
 test/Makefile
+apps/Makefile
 crypto/x509v3/Makefile
