@@ -1,0 +1,1 @@
+Before installing, put "libcrypto.a" and "libssl.a" in /usr/lib/i386-linux-gnu
