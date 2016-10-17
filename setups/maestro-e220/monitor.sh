@@ -37,10 +37,10 @@ do
     counter=$(($counter+60))
     if [ "$counter" -gt "3600" ]
     then
-        reboot
+        /sbin/reboot
         sleep 2
-        reboot
+        /sbin/reboot
         sleep 2
-        reboot
+        /sbin/reboot
     fi
 done
