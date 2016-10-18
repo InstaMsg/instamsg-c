@@ -11,6 +11,7 @@ FAILURE = -1
 MODEM_BASE_PATH = '/org/freedesktop/ModemManager1/Modem/'
 SMS_BASE_PATH   = '/org/freedesktop/ModemManager1/SMS/'
 
+TEMP_FILE       = '/home/sensegrow/wwan_temp'
 SMS_FILE        = '/home/sensegrow/sms.txt'
 IMEI_FILE       = '/home/sensegrow/imei'
 IMSI_FILE       = '/home/sensegrow/imsi'
@@ -96,9 +97,11 @@ def update_modem_metainfo(key, file_path, command):
     [output, status] = run_command_and_check_validity(command, [])
     if status == SUCCESS:
         try:
-            file_p = open(file_path, 'w')
+            file_p = open(TEMP_FILE, 'w')
             file_p.write(output.strip())
             file_p.close()
+
+            os.rename(TEMP_FILE, file_path)
         except:
             log('Could not write [' + key + '] value to file [' + file_path + ']')
 
@@ -252,15 +255,14 @@ while True:
             reset_modem_state()
             break
 
-        TEMP_SIGNAL_FILE = '/tmp/signal'
         IPC_SIGNAL_STRENGTH_FILE = '/home/sensegrow/signal'
 
-        f = open(TEMP_SIGNAL_FILE, 'w')
+        f = open(TEMP_FILE, 'w')
         strength = int((int(output.split('\'')[1]) * 31) / 100)
         f.write(str(strength))
         f.close()
 
-        os.rename(TEMP_SIGNAL_FILE, IPC_SIGNAL_STRENGTH_FILE)
+        os.renaFILEE, IPC_SIGNAL_STRENGTH_FILE)
 
 
         time.sleep(30)
