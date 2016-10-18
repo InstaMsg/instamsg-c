@@ -262,7 +262,7 @@ while True:
         f.write(str(strength))
         f.close()
 
-        os.renaFILEE, IPC_SIGNAL_STRENGTH_FILE)
+        os.rename(TEMP_FILE, IPC_SIGNAL_STRENGTH_FILE)
 
 
         time.sleep(30)
