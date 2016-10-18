@@ -12,6 +12,8 @@ MODEM_BASE_PATH = '/org/freedesktop/ModemManager1/Modem/'
 SMS_BASE_PATH   = '/org/freedesktop/ModemManager1/SMS/'
 
 SMS_FILE        = '/home/sensegrow/sms.txt'
+IMEI_FILE       = '/home/sensegrow/imei'
+IMSI_FILE       = '/home/sensegrow/imsi'
 
 MODEM_ID = -1
 
@@ -90,6 +92,16 @@ def reset_modem_state():
 
     time.sleep(10)
 
+def update_modem_metainfo(key, file_path, command):
+    [output, status] = run_command_and_check_validity(command, [])
+    if status == SUCCESS:
+        try:
+            file_p = open(file_path, 'w')
+            file_p.write(output.strip())
+            file_p.close()
+        except:
+            log('Could not write [' + key + '] value to file [' + file_path + ']')
+
 def get_latest_provisioning_json_dict(smsPaths):
     latest_sms_dict = None
     latest_time = 0
@@ -159,7 +171,8 @@ while True:
         continue
 
 
-
+    update_modem_metainfo('IMEI', IMEI_FILE, 'mmcli -m ' + MODEM_ID + ' | grep imei | cut -d: -f 2 | cut -d\\\' -f 2')
+    update_modem_metainfo('IMSI', IMSI_FILE, 'mmcli -i ' + MODEM_ID + ' | grep imsi | cut -d: -f 2 | cut -d\\\' -f 2')
 
 
     while True:
