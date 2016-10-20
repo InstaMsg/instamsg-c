@@ -134,6 +134,17 @@ def get_latest_provisioning_json_dict(smsPaths):
 
     return latest_sms_dict
 
+def add_to_gprs_params_string(str_obj, dict_obj, key_dict, key_str):
+    if dict_obj is not None:
+        if key_dict in dict_obj:
+            value = dict_obj[key_dict]
+            if(len(value) > 0):
+                if(len(str_obj) > 0):
+                    str_obj = str_obj + ','
+                str_obj = str_obj + key_str + '=' + value
+
+    return str_obj
+
 
 while True:
     while True:
@@ -198,13 +209,18 @@ while True:
 
     header_task('ESTABLISHING CONNECTION')
 
-    bearer_string = ' --create-bearer="apn=%s,user=%s,password=%s"' % (latest_sms[SG_APN], latest_sms[SG_USER], latest_sms[SG_PASS],)
+    params_str = ''
+    params_str = add_to_gprs_params_string(params_str, latest_sms, SG_APN, 'apn')
+    params_str = add_to_gprs_params_string(params_str, latest_sms, SG_USER, 'user')
+    params_str = add_to_gprs_params_string(params_str, latest_sms, SG_PASS, 'password')
+
+    bearer_string = ' --create-bearer="%s"' % (params_str,)
     [output, status] = run_command_and_check_validity('mmcli -m ' + MODEM_ID + bearer_string, ['Successfully created new bearer in modem:'])
     if status == FAILURE:
         reset_modem_state()
         continue
 
-    connect_string = ' --simple-connect="apn=%s,user=%s,password=%s"' % (latest_sms[SG_APN], latest_sms[SG_USER], latest_sms[SG_PASS],)
+    connect_string = ' --simple-connect="%s"' % (params_str,)
     [output, status] = run_command_and_check_validity('mmcli -m ' + MODEM_ID + connect_string, ['successfully connected the modem'])
     if status == FAILURE:
         reset_modem_state()
