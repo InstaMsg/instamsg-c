@@ -45,8 +45,21 @@ static char tempBuffer[1024];
 #define CONFIG_FILE_NAME "config.txt"
 
 
+static void make_the_switch()
+{
+    if(1)
+    {
+        if(renameFile(NULL, SYSTEM_WIDE_TEMP_FILE, CONFIG_FILE_NAME) != 0)
+        {
+            sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not move file from [%s] to [%s]", CONFIG_ERROR, SYSTEM_WIDE_TEMP_FILE, CONFIG_FILE_NAME);
+            error_log(LOG_GLOBAL_BUFFER);
+        }
+    }
+}
+
+
 static int get_config_value_from_persistent_storage_and_delete_if_asked(const char *key, char *buffer, int maxBufferLength,
-                                                                        unsigned char deleteConfig)
+                                                                        unsigned char deleteConfig, unsigned char moveFileRightAway)
 {
     int rc = FAILURE;
 
@@ -141,20 +154,16 @@ exit:
     /*
      * Move the file, if we were in delete-mode.
      */
-    if(deleteConfig == 1)
+    if(moveFileRightAway == 1)
     {
-        if(renameFile(NULL, SYSTEM_WIDE_TEMP_FILE, CONFIG_FILE_NAME) != 0)
-        {
-            sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not move file from [%s] to [%s]", CONFIG_ERROR, SYSTEM_WIDE_TEMP_FILE, CONFIG_FILE_NAME);
-            error_log(LOG_GLOBAL_BUFFER);
-        }
+        make_the_switch();
     }
 
     return rc;
 }
 
 
-static int do_delete_config_value_from_persistent_storage(const char *key, unsigned char acquireMutex)
+static int do_delete_config_value_from_persistent_storage(const char *key, unsigned char acquireMutex, unsigned char moveFileRightAway)
 {
 	int rc = FAILURE;
 	if(acquireMutex == 1)
@@ -162,7 +171,7 @@ static int do_delete_config_value_from_persistent_storage(const char *key, unsig
 		ACQUIRE_THREAD_MUTEX
 	}
 
-    rc = get_config_value_from_persistent_storage_and_delete_if_asked(key, NULL, 0, 1);
+    rc = get_config_value_from_persistent_storage_and_delete_if_asked(key, NULL, 0, 1, moveFileRightAway);
 
     if(acquireMutex == 1)
     {
@@ -194,7 +203,7 @@ int get_config_value_from_persistent_storage(const char *key, char *buffer, int 
 	int rc = FAILURE;
 	ACQUIRE_THREAD_MUTEX
 
-    rc =  get_config_value_from_persistent_storage_and_delete_if_asked(key, buffer, maxBufferLength, 0);
+    rc =  get_config_value_from_persistent_storage_and_delete_if_asked(key, buffer, maxBufferLength, 0, 0);
 
     RELEASE_THREAD_MUTEX
     return rc;
@@ -223,8 +232,9 @@ int save_config_value_on_persistent_storage(const char *key, const char *value, 
 	int rc = FAILURE;
 	ACQUIRE_THREAD_MUTEX
 
-	do_delete_config_value_from_persistent_storage(key, 0);
-    rc = sg_appendLine(CONFIG_FILE_NAME, value);
+	do_delete_config_value_from_persistent_storage(key, 0, 0);
+    rc = sg_appendLine(SYSTEM_WIDE_TEMP_FILE, value);
+    make_the_switch();
 
     RELEASE_THREAD_MUTEX
 	return rc;
@@ -241,7 +251,7 @@ int save_config_value_on_persistent_storage(const char *key, const char *value, 
  */
 int delete_config_value_from_persistent_storage(const char *key)
 {
-	return do_delete_config_value_from_persistent_storage(key, 1);
+	return do_delete_config_value_from_persistent_storage(key, 1, 1);
 }
 
 
