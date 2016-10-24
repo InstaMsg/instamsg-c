@@ -37,8 +37,8 @@
 #include <string.h>
 
 #if SSL_ENABLED == 1
-#include <openssl/ssl.h>
-#include <openssl/bio.h>
+#include "../../../common/instamsg/driver/include/sg_openssl/ssl.h"
+#include "../../../common/instamsg/driver/include/sg_openssl/bio.h"
 #endif
 
 typedef struct Socket Socket;
