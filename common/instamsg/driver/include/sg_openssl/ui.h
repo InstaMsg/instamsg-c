@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* crypto/ui/ui.h -*- mode:C; c-file-style: "eay" -*- */
 /*
  * Written by Richard Levitte (richard@levitte.org) for the OpenSSL project
@@ -61,10 +63,10 @@
 # define HEADER_UI_H
 
 # ifndef OPENSSL_NO_DEPRECATED
-#  include <openssl/crypto.h>
+#  include "./crypto.h"
 # endif
-# include <openssl/safestack.h>
-# include <openssl/ossl_typ.h>
+# include "./safestack.h"
+# include "./ossl_typ.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -412,4 +414,9 @@ void ERR_load_UI_strings(void);
 #ifdef  __cplusplus
 }
 #endif
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
+
 #endif

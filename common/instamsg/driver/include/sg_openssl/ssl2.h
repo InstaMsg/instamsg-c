@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* ssl/ssl2.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -262,4 +264,9 @@ typedef struct ssl2_state_st {
 #ifdef  __cplusplus
 }
 #endif
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
+
 #endif

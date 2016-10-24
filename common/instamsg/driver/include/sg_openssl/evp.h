@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* crypto/evp/evp.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -60,19 +62,19 @@
 # define HEADER_ENVELOPE_H
 
 # ifdef OPENSSL_ALGORITHM_DEFINES
-#  include <openssl/opensslconf.h>
+#  include "./opensslconf.h"
 # else
 #  define OPENSSL_ALGORITHM_DEFINES
-#  include <openssl/opensslconf.h>
+#  include "./opensslconf.h"
 #  undef OPENSSL_ALGORITHM_DEFINES
 # endif
 
-# include <openssl/ossl_typ.h>
+# include "./ossl_typ.h"
 
-# include <openssl/symhacks.h>
+# include "./symhacks.h"
 
 # ifndef OPENSSL_NO_BIO
-#  include <openssl/bio.h>
+#  include "./bio.h"
 # endif
 
 /*-
@@ -91,7 +93,7 @@
 /* Default PKCS#5 iteration count */
 # define PKCS5_DEFAULT_ITER              2048
 
-# include <openssl/objects.h>
+# include "./objects.h"
 
 # define EVP_PK_RSA      0x0001
 # define EVP_PK_DSA      0x0002
@@ -1531,4 +1533,9 @@ void ERR_load_EVP_strings(void);
 #ifdef  __cplusplus
 }
 #endif
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
+
 #endif

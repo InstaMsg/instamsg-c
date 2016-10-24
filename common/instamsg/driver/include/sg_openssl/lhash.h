@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* crypto/lhash/lhash.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -63,13 +65,13 @@
 #ifndef HEADER_LHASH_H
 # define HEADER_LHASH_H
 
-# include <openssl/e_os2.h>
+# include "./e_os2.h"
 # ifndef OPENSSL_NO_FP_API
 #  include <stdio.h>
 # endif
 
 # ifndef OPENSSL_NO_BIO
-#  include <openssl/bio.h>
+#  include "./bio.h"
 # endif
 
 #ifdef  __cplusplus
@@ -236,5 +238,10 @@ DECLARE_LHASH_OF(OPENSSL_CSTRING);
 #ifdef  __cplusplus
 }
 #endif
+
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
 
 #endif

@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* crypto/hmac/hmac.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -58,13 +60,13 @@
 #ifndef HEADER_HMAC_H
 # define HEADER_HMAC_H
 
-# include <openssl/opensslconf.h>
+# include "./opensslconf.h"
 
 # ifdef OPENSSL_NO_HMAC
 #  error HMAC is disabled.
 # endif
 
-# include <openssl/evp.h>
+# include "./evp.h"
 
 # define HMAC_MAX_MD_CBLOCK      128/* largest known is SHA512 */
 
@@ -105,5 +107,10 @@ void HMAC_CTX_set_flags(HMAC_CTX *ctx, unsigned long flags);
 #ifdef  __cplusplus
 }
 #endif
+
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
 
 #endif

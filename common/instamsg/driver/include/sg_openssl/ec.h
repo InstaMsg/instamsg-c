@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* crypto/ec/ec.h */
 /*
  * Originally written by Bodo Moeller for the OpenSSL project.
@@ -76,16 +78,16 @@
 #ifndef HEADER_EC_H
 # define HEADER_EC_H
 
-# include <openssl/opensslconf.h>
+# include "./opensslconf.h"
 
 # ifdef OPENSSL_NO_EC
 #  error EC is disabled.
 # endif
 
-# include <openssl/asn1.h>
-# include <openssl/symhacks.h>
+# include "./asn1.h"
+# include "./symhacks.h"
 # ifndef OPENSSL_NO_DEPRECATED
-#  include <openssl/bn.h>
+#  include "./bn.h"
 # endif
 
 # ifdef  __cplusplus
@@ -1279,4 +1281,9 @@ void ERR_load_EC_strings(void);
 #ifdef  __cplusplus
 }
 #endif
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
+
 #endif

@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* crypto/stack/stack.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -103,5 +105,10 @@ int sk_is_sorted(const _STACK *st);
 #ifdef  __cplusplus
 }
 #endif
+
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
 
 #endif

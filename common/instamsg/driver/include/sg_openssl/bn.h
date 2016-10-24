@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* crypto/bn/bn.h */
 /* Copyright (C) 1995-1997 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -125,12 +127,12 @@
 #ifndef HEADER_BN_H
 # define HEADER_BN_H
 
-# include <openssl/e_os2.h>
+# include "./e_os2.h"
 # ifndef OPENSSL_NO_FP_API
 #  include <stdio.h>            /* FILE */
 # endif
-# include <openssl/ossl_typ.h>
-# include <openssl/crypto.h>
+# include "./ossl_typ.h"
+# include "./crypto.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -936,4 +938,9 @@ void ERR_load_BN_strings(void);
 #ifdef  __cplusplus
 }
 #endif
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
+
 #endif

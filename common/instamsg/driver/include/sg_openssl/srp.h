@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* crypto/srp/srp.h */
 /*
  * Written by Christophe Renou (christophe.renou@edelweb.fr) with the
@@ -69,9 +71,9 @@
 extern "C" {
 #endif
 
-#  include <openssl/safestack.h>
-#  include <openssl/bn.h>
-#  include <openssl/crypto.h>
+#  include "./safestack.h"
+#  include "./bn.h"
+#  include "./crypto.h"
 
 typedef struct SRP_gN_cache_st {
     char *b64_bn;
@@ -166,4 +168,9 @@ int SRP_Verify_B_mod_N(BIGNUM *B, BIGNUM *N);
 #endif
 
 # endif
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
+
 #endif

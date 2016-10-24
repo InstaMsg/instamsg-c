@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* crypto/dsa/dsa.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -65,22 +67,22 @@
 #ifndef HEADER_DSA_H
 # define HEADER_DSA_H
 
-# include <openssl/e_os2.h>
+# include "./e_os2.h"
 
 # ifdef OPENSSL_NO_DSA
 #  error DSA is disabled.
 # endif
 
 # ifndef OPENSSL_NO_BIO
-#  include <openssl/bio.h>
+#  include "./bio.h"
 # endif
-# include <openssl/crypto.h>
-# include <openssl/ossl_typ.h>
+# include "./crypto.h"
+# include "./ossl_typ.h"
 
 # ifndef OPENSSL_NO_DEPRECATED
-#  include <openssl/bn.h>
+#  include "./bn.h"
 #  ifndef OPENSSL_NO_DH
-#   include <openssl/dh.h>
+#   include "./dh.h"
 #  endif
 # endif
 
@@ -329,4 +331,9 @@ void ERR_load_DSA_strings(void);
 #ifdef  __cplusplus
 }
 #endif
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
+
 #endif

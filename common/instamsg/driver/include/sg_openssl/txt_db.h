@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* crypto/txt_db/txt_db.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -59,12 +61,12 @@
 #ifndef HEADER_TXT_DB_H
 # define HEADER_TXT_DB_H
 
-# include <openssl/opensslconf.h>
+# include "./opensslconf.h"
 # ifndef OPENSSL_NO_BIO
-#  include <openssl/bio.h>
+#  include "./bio.h"
 # endif
-# include <openssl/stack.h>
-# include <openssl/lhash.h>
+# include "./stack.h"
+# include "./lhash.h"
 
 # define DB_ERROR_OK                     0
 # define DB_ERROR_MALLOC                 1
@@ -108,5 +110,10 @@ int TXT_DB_insert(TXT_DB *db, OPENSSL_STRING *value);
 #ifdef  __cplusplus
 }
 #endif
+
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
 
 #endif

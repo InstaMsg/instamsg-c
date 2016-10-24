@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* crypto/rand/rand.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -60,8 +62,8 @@
 # define HEADER_RAND_H
 
 # include <stdlib.h>
-# include <openssl/ossl_typ.h>
-# include <openssl/e_os2.h>
+# include "./ossl_typ.h"
+# include "./e_os2.h"
 
 # if defined(OPENSSL_SYS_WINDOWS)
 #  include <windows.h>
@@ -147,4 +149,9 @@ void ERR_load_RAND_strings(void);
 #ifdef  __cplusplus
 }
 #endif
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
+
 #endif

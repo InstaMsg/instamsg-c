@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* ====================================================================
  * Copyright (c) 1998-2001 The OpenSSL Project.  All rights reserved.
  *
@@ -59,7 +61,7 @@
 extern "C" {
 #endif
 
-# include <openssl/e_os2.h>
+# include "./e_os2.h"
 
 # ifdef NO_ASN1_TYPEDEFS
 #  define ASN1_INTEGER            ASN1_STRING
@@ -209,3 +211,8 @@ typedef struct ocsp_responder_id_st OCSP_RESPID;
 }
 #endif
 #endif                          /* def HEADER_OPENSSL_TYPES_H */
+
+#else
+typedef int just_to_make_compiler_happy
+
+#endif

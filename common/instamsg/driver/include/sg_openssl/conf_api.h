@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* conf_api.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -59,8 +61,8 @@
 #ifndef  HEADER_CONF_API_H
 # define HEADER_CONF_API_H
 
-# include <openssl/lhash.h>
-# include <openssl/conf.h>
+# include "./lhash.h"
+# include "./conf.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -86,4 +88,9 @@ void _CONF_free_data(CONF *conf);
 #ifdef  __cplusplus
 }
 #endif
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
+
 #endif

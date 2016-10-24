@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* ssl/ssl3.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -118,11 +120,11 @@
 # define HEADER_SSL3_H
 
 # ifndef OPENSSL_NO_COMP
-#  include <openssl/comp.h>
+#  include "./comp.h"
 # endif
-# include <openssl/buffer.h>
-# include <openssl/evp.h>
-# include <openssl/ssl.h>
+# include "./buffer.h"
+# include "./evp.h"
+# include "./ssl.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -771,4 +773,9 @@ typedef struct ssl3_state_st {
 #ifdef  __cplusplus
 }
 #endif
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
+
 #endif

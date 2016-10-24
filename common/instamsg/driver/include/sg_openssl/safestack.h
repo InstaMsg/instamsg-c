@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* ====================================================================
  * Copyright (c) 1999 The OpenSSL Project.  All rights reserved.
  *
@@ -55,7 +57,7 @@
 #ifndef HEADER_SAFESTACK_H
 # define HEADER_SAFESTACK_H
 
-# include <openssl/stack.h>
+# include "./stack.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -2670,3 +2672,8 @@ DECLARE_SPECIAL_STACK_OF(OPENSSL_BLOCK, void)
 }
 #endif
 #endif                          /* !defined HEADER_SAFESTACK_H */
+
+#else
+typedef int just_to_make_compiler_happy
+
+#endif

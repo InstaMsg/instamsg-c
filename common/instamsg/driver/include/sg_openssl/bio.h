@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* crypto/bio/bio.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -59,14 +61,14 @@
 #ifndef HEADER_BIO_H
 # define HEADER_BIO_H
 
-# include <openssl/e_os2.h>
+# include "./e_os2.h"
 
 # ifndef OPENSSL_NO_FP_API
 #  include <stdio.h>
 # endif
 # include <stdarg.h>
 
-# include <openssl/crypto.h>
+# include "./crypto.h"
 
 # ifndef OPENSSL_NO_SCTP
 #  ifndef OPENSSL_SYS_VMS
@@ -876,4 +878,9 @@ void ERR_load_BIO_strings(void);
 #ifdef  __cplusplus
 }
 #endif
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
+
 #endif

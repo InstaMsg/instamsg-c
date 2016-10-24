@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* crypto/asn1/asn1.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -60,18 +62,18 @@
 # define HEADER_ASN1_H
 
 # include <time.h>
-# include <openssl/e_os2.h>
+# include "./e_os2.h"
 # ifndef OPENSSL_NO_BIO
-#  include <openssl/bio.h>
+#  include "./bio.h"
 # endif
-# include <openssl/stack.h>
-# include <openssl/safestack.h>
+# include "./stack.h"
+# include "./safestack.h"
 
-# include <openssl/symhacks.h>
+# include "./symhacks.h"
 
-# include <openssl/ossl_typ.h>
+# include "./ossl_typ.h"
 # ifndef OPENSSL_NO_DEPRECATED
-#  include <openssl/bn.h>
+#  include "./bn.h"
 # endif
 
 # ifdef OPENSSL_BUILD_SHLIBCRYPTO
@@ -1416,4 +1418,9 @@ void ERR_load_ASN1_strings(void);
 #ifdef  __cplusplus
 }
 #endif
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
+
 #endif

@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* crypto/md5/md5.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -59,7 +61,7 @@
 #ifndef HEADER_MD5_H
 # define HEADER_MD5_H
 
-# include <openssl/e_os2.h>
+# include "./e_os2.h"
 # include <stddef.h>
 
 #ifdef  __cplusplus
@@ -115,5 +117,10 @@ void MD5_Transform(MD5_CTX *c, const unsigned char *b);
 #ifdef  __cplusplus
 }
 #endif
+
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
 
 #endif

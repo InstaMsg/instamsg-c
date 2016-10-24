@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* crypto/rc2/rc2.h */
 /* Copyright (C) 1995-1997 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -59,7 +61,7 @@
 #ifndef HEADER_RC2_H
 # define HEADER_RC2_H
 
-# include <openssl/opensslconf.h>/* OPENSSL_NO_RC2, RC2_INT */
+# include "./opensslconf.h"/* OPENSSL_NO_RC2, RC2_INT */
 # ifdef OPENSSL_NO_RC2
 #  error RC2 is disabled.
 # endif
@@ -99,5 +101,10 @@ void RC2_ofb64_encrypt(const unsigned char *in, unsigned char *out,
 #ifdef  __cplusplus
 }
 #endif
+
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
 
 #endif

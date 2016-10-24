@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* ssl/tls1.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -151,7 +153,7 @@
 #ifndef HEADER_TLS1_H
 # define HEADER_TLS1_H
 
-# include <openssl/buffer.h>
+# include "./buffer.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -810,4 +812,9 @@ struct tls_session_ticket_ext_st {
 #ifdef  __cplusplus
 }
 #endif
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
+
 #endif

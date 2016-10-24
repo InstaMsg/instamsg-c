@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 #ifndef HEADER_OPENSSLV_H
 # define HEADER_OPENSSLV_H
 
@@ -95,3 +97,8 @@ extern "C" {
 }
 #endif
 #endif                          /* HEADER_OPENSSLV_H */
+
+#else
+typedef int just_to_make_compiler_happy
+
+#endif

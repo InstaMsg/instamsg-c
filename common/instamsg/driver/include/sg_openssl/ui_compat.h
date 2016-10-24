@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* crypto/ui/ui.h -*- mode:C; c-file-style: "eay" -*- */
 /*
  * Written by Richard Levitte (richard@levitte.org) for the OpenSSL project
@@ -60,8 +62,8 @@
 #ifndef HEADER_UI_COMPAT_H
 # define HEADER_UI_COMPAT_H
 
-# include <openssl/opensslconf.h>
-# include <openssl/ui.h>
+# include "./opensslconf.h"
+# include "./ui.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -85,4 +87,9 @@ int _ossl_old_des_read_pw(char *buf, char *buff, int size, const char *prompt,
 #ifdef  __cplusplus
 }
 #endif
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
+
 #endif

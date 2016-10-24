@@ -1,8 +1,10 @@
+#if SSL_ENABLED == 1
+
 
 #ifndef HEADER_COMP_H
 # define HEADER_COMP_H
 
-# include <openssl/crypto.h>
+# include "./crypto.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -76,4 +78,9 @@ void ERR_load_COMP_strings(void);
 #ifdef  __cplusplus
 }
 #endif
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
+
 #endif

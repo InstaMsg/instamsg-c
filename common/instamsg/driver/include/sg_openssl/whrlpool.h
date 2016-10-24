@@ -1,7 +1,9 @@
+#if SSL_ENABLED == 1
+
 #ifndef HEADER_WHRLPOOL_H
 # define HEADER_WHRLPOOL_H
 
-# include <openssl/e_os2.h>
+# include "./e_os2.h"
 # include <stddef.h>
 
 #ifdef __cplusplus
@@ -37,5 +39,10 @@ unsigned char *WHIRLPOOL(const void *inp, size_t bytes, unsigned char *md);
 #ifdef __cplusplus
 }
 #endif
+
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
 
 #endif

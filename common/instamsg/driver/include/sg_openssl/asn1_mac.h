@@ -1,3 +1,5 @@
+#if SSL_ENABLED == 1
+
 /* crypto/asn1/asn1_mac.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
@@ -59,7 +61,7 @@
 #ifndef HEADER_ASN1_MAC_H
 # define HEADER_ASN1_MAC_H
 
-# include <openssl/asn1.h>
+# include "./asn1.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -575,5 +577,10 @@ void asn1_add_error(const unsigned char *address, int offset);
 #ifdef  __cplusplus
 }
 #endif
+
+#endif
+
+#else
+typedef int just_to_make_compiler_happy
 
 #endif
