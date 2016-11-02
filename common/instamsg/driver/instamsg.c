@@ -502,6 +502,7 @@ static void handleConfigReceived(InstaMsg *c, MQTTMessage *msg)
 }
 
 
+#if SSL_ENABLED == 1
 static void saveClientAuthFieldInfoOntoDevice(char *payload, char *key, void (*func)(char *buffer))
 {
     int sz = 2000;
@@ -519,7 +520,6 @@ static void saveClientAuthFieldInfoOntoDevice(char *payload, char *key, void (*f
     getJsonKeyValueIfPresent(payload, key, temp);
     if(strlen(temp) > 0)
     {
-        int i = 0, j = 0;
         char *slower = temp;
         char *faster = temp;
 
@@ -545,6 +545,7 @@ static void saveClientAuthFieldInfoOntoDevice(char *payload, char *key, void (*f
 
     sg_free(temp);
 }
+#endif
 
 
 static void processCertificateInfoIfAny(InstaMsg *c, char *payload)
@@ -1666,7 +1667,7 @@ static void sync_time_through_NTP(InstaMsg *c)
 
     (c->timeSyncerSocket).socketCorrupted = 1;
 
-	init_socket(&(c->timeSyncerSocket), ntpServer, NTP_PORT, SOCKET_UDP);
+	init_socket(&(c->timeSyncerSocket), ntpServer, NTP_PORT, SOCKET_UDP, 0);
     if((c->timeSyncerSocket).socketCorrupted == 1)
     {
         goto failure_in_time_syncing;
@@ -2280,7 +2281,6 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
 #endif
                         char *temp = NULL;
                         int sz = 2000;
-                        char bkp_c = 0;
 
                         temp = (char*) sg_malloc(2000);
                         if(temp == NULL)

@@ -116,7 +116,6 @@ void sg_writeFile(const char *filePath, char *buffer)
 {
     FILE_STRUCT *fp = NULL;
     int i = 0;
-    int ch;
 
     fp = FILE_OPEN(filePath, "w");
     if(fp != NULL)

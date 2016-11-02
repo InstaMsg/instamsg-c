@@ -88,7 +88,7 @@ struct KeyValuePairs
 #define LOG_LEVEL               2
 
 extern int INSTAMSG_PORT;
-extern INSTAMSG_HTTP_PORT;
+extern int INSTAMSG_HTTP_PORT;
 extern unsigned char sslEnabled;
 
 #define NTP_PORT            123

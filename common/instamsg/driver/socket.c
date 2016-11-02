@@ -35,6 +35,7 @@
 #include "./include/json.h"
 #include "./include/watchdog.h"
 #include "./include/config.h"
+#include "./include/misc.h"
 
 #define SMS     PROSTR("SMS")
 
