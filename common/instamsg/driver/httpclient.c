@@ -64,11 +64,10 @@ static int getNextLine(Socket *socket, char *buf, int *responseCode)
         {
             if(strncmp(buf, HTTP_RESPONSE_STATUS_PREFIX, strlen(HTTP_RESPONSE_STATUS_PREFIX)) == 0)
             {
-                char *saveptr;
-                char *firstToken = strtok_r(buf, " ", &saveptr);
+                char *firstToken = strtok(buf, " ");
                 if(firstToken != NULL)
                 {
-                    char *secondToken = strtok_r(NULL, " ", &saveptr);
+                    char *secondToken = strtok(NULL, " ");
                     *responseCode = sg_atoi(secondToken);
 
                     if(*responseCode != HTTP_FILE_DOWNLOAD_SUCCESS)
@@ -178,9 +177,8 @@ static long getBytesIfContentLengthBytes(char *line)
 {
     unsigned long numBytes = 0;
 
-    char *saveptr;
-    char *headerKey = strtok_r(line, ":", &saveptr);
-    char *headerValue = strtok_r(NULL, ":", &saveptr);
+    char *headerKey = strtok(line, ":");
+    char *headerValue = strtok(NULL, ":");
 
     if(headerKey && headerValue)
     {
