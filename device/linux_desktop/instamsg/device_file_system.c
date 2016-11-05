@@ -119,7 +119,32 @@ int renameFile(FileSystem *fs, const char *oldPath, const char *newPath)
  */
 int copyFile(FileSystem *fs, const char *oldPath, const char *newPath)
 {
-    return link(oldPath, newPath);
+    FILE_STRUCT *fpr = NULL, *fpw = NULL;
+    int ch = 0;
+
+    /*
+     * We assume that that the "oldPath" always exists.
+     */
+    fpr = FILE_OPEN(oldPath, "r");
+    fpw = FILE_OPEN(newPath, "w");
+
+    while(1)
+    {
+        ch = FILE_GETC(fpr);
+        if(ch != FILE_END_ID)
+        {
+            FILE_PUTC(ch, fpw);
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    FILE_CLOSE(fpr);
+    FILE_CLOSE(fpw);
+
+    return 0;
 }
 
 
