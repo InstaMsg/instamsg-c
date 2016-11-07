@@ -131,7 +131,7 @@ static int WIRE_BUFFER_SIZE;
  *  SUCCESS   =>    if some bytes were sent over the network successfully.
  *  FAILURE   =>    otherwise.
  */
-static int write_pending_data_to_network(Socket* socket)
+static int write_pending_data_to_network(SG_Socket* socket)
 {
     int c = 0, rc = 0;
 
@@ -176,7 +176,7 @@ static int write_pending_data_to_network(Socket* socket)
  *  SOCKET_READ_TIMEOUT     =>    if there is nothing available to be read from the wire.
  *  FAILURE                 =>    otherwise.
  */
-static int read_pending_data_from_network(Socket* socket, unsigned char must_read_some_bytes_from_wire)
+static int read_pending_data_from_network(SG_Socket* socket, unsigned char must_read_some_bytes_from_wire)
 {
     int c = 0, rc = 0;
 
@@ -341,7 +341,7 @@ static int read_pending_data_from_network(Socket* socket, unsigned char must_rea
  * However, an error occurs while reading.
  * So, FAILURE must be returned immediately.
  */
-static int secure_socket_read(Socket* socket, unsigned char* buffer, int len, unsigned char guaranteed)
+static int secure_socket_read(SG_Socket* socket, unsigned char* buffer, int len, unsigned char guaranteed)
 {
     int rc = FAILURE;
     int remaining_bytes = len;
@@ -429,7 +429,7 @@ static int secure_socket_read(Socket* socket, unsigned char* buffer, int len, un
  * An error occurred while writing.
  * In this case, FAILURE must be returned immediately.
  */
-static int secure_socket_write(Socket* socket, unsigned char* buffer, int len)
+static int secure_socket_write(SG_Socket* socket, unsigned char* buffer, int len)
 {
     int rc = FAILURE;
     int remaining_bytes = len;
@@ -578,7 +578,7 @@ static void init_ssl()
 #endif
 
 
-void init_socket(Socket *socket, const char *hostName, unsigned int port, const char *type, unsigned char secure)
+void init_socket(SG_Socket *socket, const char *hostName, unsigned int port, const char *type, unsigned char secure)
 {
     if(port == 0)
     {
@@ -753,7 +753,7 @@ void init_socket(Socket *socket, const char *hostName, unsigned int port, const 
 }
 
 
-void release_socket(Socket *socket)
+void release_socket(SG_Socket *socket)
 {
     release_underlying_socket_medium_guaranteed(socket);
 

@@ -62,7 +62,7 @@ extern unsigned int bytes_received_over_wire;
  * Please note that this method is called by Instamsg-application, *****BEFORE***** calling
  * "connect_underlying_socket_medium_try_once".
  */
-void get_latest_sms_containing_substring(Socket *socket, char *buffer, const char *substring)
+void get_latest_sms_containing_substring(SG_Socket *socket, char *buffer, const char *substring)
 {
     read_singular_line_from_file(SMS_FILE, "latest-sms", buffer, 200);
     strip_leading_and_trailing_white_paces(buffer);
@@ -78,7 +78,7 @@ void get_latest_sms_containing_substring(Socket *socket, char *buffer, const cha
  *
  * Setting the above value will let InstaMsg know that the connection can be used fine for writing/reading.
  */
-void connect_underlying_socket_medium_try_once(Socket* s)
+void connect_underlying_socket_medium_try_once(SG_Socket* s)
 {
 	int type = -1;
 	struct sockaddr_in address;
@@ -212,7 +212,7 @@ void connect_underlying_socket_medium_try_once(Socket* s)
  * However, an error occurs while reading.
  * So, FAILURE must be returned immediately (i.e. no socket-reinstantiation must be done in this method).
  */
-int socket_read(Socket* socket, unsigned char* buffer, int len, unsigned char guaranteed)
+int socket_read(SG_Socket* socket, unsigned char* buffer, int len, unsigned char guaranteed)
 {
 	int bytes = 0;
     int rc = 0;
@@ -320,7 +320,7 @@ int socket_read(Socket* socket, unsigned char* buffer, int len, unsigned char gu
  * An error occurred while writing.
  * In this case, FAILURE must be returned immediately (i.e. no socket-reinstantiation must be done in this method).
  */
-int socket_write(Socket* socket, unsigned char* buffer, int len)
+int socket_write(SG_Socket* socket, unsigned char* buffer, int len)
 {
     int bytes = 0;
     int rc = 0;
@@ -383,7 +383,7 @@ int socket_write(Socket* socket, unsigned char* buffer, int len)
  *
  * Note that this method MUST DO """ONLY""" per-socket level cleanup, NO GLOBAL-LEVEL CLEANING/REINIT MUST BE DONE.
  */
-void release_underlying_socket_medium_guaranteed(Socket* socket)
+void release_underlying_socket_medium_guaranteed(SG_Socket* socket)
 {
 #if SSL_ENABLED == 1
     resetDevice();

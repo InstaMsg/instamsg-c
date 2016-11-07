@@ -47,9 +47,9 @@
 #define HTTP_RESPONSE_STATUS_PREFIX "HTTP/"
 
 HTTPResponse httpResponse;
-static Socket socket;
+static SG_Socket socket;
 
-static int getNextLine(Socket *socket, char *buf, int *responseCode)
+static int getNextLine(SG_Socket *socket, char *buf, int *responseCode)
 {
     while(1)
     {

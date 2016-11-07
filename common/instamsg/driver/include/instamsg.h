@@ -115,8 +115,8 @@ struct InstaMsg {
 
     unsigned char serverLoggingEnabled;
 
-    Socket timeSyncerSocket;
-    Socket ipstack;
+    SG_Socket timeSyncerSocket;
+    SG_Socket ipstack;
 #if FILE_SYSTEM_ENABLED == 1
     FileSystem singletonUtilityFs;
 #endif

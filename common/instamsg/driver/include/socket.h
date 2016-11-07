@@ -58,8 +58,8 @@
 /*
  * Global-functions callable.
  */
-void init_socket(Socket *socket, const char *hostName, unsigned int port, const char *type, unsigned char secure);
-void release_socket(Socket *socket);
+void init_socket(SG_Socket *socket, const char *hostName, unsigned int port, const char *type, unsigned char secure);
+void release_socket(SG_Socket *socket);
 
 
 /*
@@ -69,8 +69,8 @@ void release_socket(Socket *socket);
  *      socket->read
  *      socket->write
  */
-int socket_read(Socket *socket, unsigned char* buffer, int len, unsigned char guaranteed);
-int socket_write(Socket *socket, unsigned char* buffer, int len);
+int socket_read(SG_Socket *socket, unsigned char* buffer, int len, unsigned char guaranteed);
+int socket_write(SG_Socket *socket, unsigned char* buffer, int len);
 
 
 /*
@@ -79,10 +79,10 @@ int socket_write(Socket *socket, unsigned char* buffer, int len);
  */
 #if GSM_INTERFACE_ENABLED == 1
 void store_sms_in_config(char *sms, char *smsConfigBuffer, int smsConfigBufferLength);
-void get_latest_sms_containing_substring(Socket *socket, char *buffer, const char *prefix);
+void get_latest_sms_containing_substring(SG_Socket *socket, char *buffer, const char *prefix);
 #endif
-void connect_underlying_socket_medium_try_once(Socket* socket);
-void release_underlying_socket_medium_guaranteed(Socket* socket);
+void connect_underlying_socket_medium_try_once(SG_Socket* socket);
+void release_underlying_socket_medium_guaranteed(SG_Socket* socket);
 
 #if SSL_ENABLED == 1
 void load_client_certificate_into_buffer(char *cert_buffer, int maxLength);

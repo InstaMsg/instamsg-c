@@ -586,7 +586,7 @@ static void handleCertReceived(InstaMsg *c, MQTTMessage *msg)
 }
 
 
-static int sendPacket(InstaMsg * c, Socket *s, unsigned char *buf, int length)
+static int sendPacket(InstaMsg * c, SG_Socket *s, unsigned char *buf, int length)
 {
     int rc = SUCCESS;
 

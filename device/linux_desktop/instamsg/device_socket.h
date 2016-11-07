@@ -41,9 +41,9 @@
 #include "../../../common/instamsg/driver/include/sg_openssl/bio.h"
 #endif
 
-typedef struct Socket Socket;
+typedef struct SG_Socket SG_Socket;
 
-struct Socket
+struct SG_Socket
 {
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
     char host[MAX_BUFFER_SIZE];
@@ -68,8 +68,8 @@ struct Socket
     char provPin[MAX_GSM_PROVISION_PARAM_SIZE];
 #endif
 
-    int (*read) (Socket *socket, unsigned char* buffer, int len, unsigned char guaranteed);
-    int (*write)(Socket *socket, unsigned char* buffer, int len);
+    int (*read) (SG_Socket *socket, unsigned char* buffer, int len, unsigned char guaranteed);
+    int (*write)(SG_Socket *socket, unsigned char* buffer, int len);
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
 
 
