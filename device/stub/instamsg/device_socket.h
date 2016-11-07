@@ -16,6 +16,14 @@ struct Socket
 
     unsigned char socketCorrupted;
 
+#if SSL_ENABLED == 1
+    SSL *ssl;
+
+    BIO *ssl_bio;
+    BIO *inter_bio;
+    BIO *network_bio;
+#endif
+
 #if GSM_INTERFACE_ENABLED == 1
     char gsmApn[MAX_GSM_PROVISION_PARAM_SIZE];
     char gsmUser[MAX_GSM_PROVISION_PARAM_SIZE];
