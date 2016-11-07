@@ -60,6 +60,7 @@ device/maestro-e220
 device/maestro-m100-3g
 device/pi
 device/lanner-pc
+device/windows-embedded
 device/test_device
 
 common/apps/atoll-gms
