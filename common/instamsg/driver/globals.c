@@ -34,6 +34,8 @@
 #include "./include/time.h"
 #include "./include/watchdog.h"
 #include "./include/misc.h"
+#include "./include/json.h"
+#include "./include/sg_stdlib.h"
 #include "./include/config.h"
 #include "./include/data_logger.h"
 
@@ -151,7 +153,7 @@ again:
                     /*
                      * Print out the character.
                      */
-                    *out = ulValue;
+                    *out = (char)ulValue;
                     out++;
 
                     /*

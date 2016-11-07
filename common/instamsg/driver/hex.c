@@ -69,7 +69,7 @@ int getIntValueOfHexChar(char c)
 
 void getByteStreamFromHexString(const char *hexString, unsigned char *buffer)
 {
-    int i, j;
+    unsigned int i, j;
 
     for(i = 0, j = 0; i < strlen(hexString); i = i + 2, j++)
     {
