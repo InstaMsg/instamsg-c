@@ -51,8 +51,8 @@
 #define SMS_FILE        PROSTR("/home/sensegrow/sms.txt")
 #define SMS_TEMP_FILE   PROSTR("/home/sensegrow/sms_temp.txt")
 
-#define SSL             PROSTR("[SSL] ")
-#define SSL_ERROR       PROSTR("[SSL_ERROR] ")
+#define SSL_STR         PROSTR("[SSL] ")
+#define SSL_ERROR_STR   PROSTR("[SSL_ERROR] ")
 
 
 /*

@@ -37,6 +37,9 @@
 #include "./include/config.h"
 #include "./include/misc.h"
 
+#include "./include/sg_openssl/ssl.h"
+#include "./include/sg_openssl/bio.h"
+
 #define SMS     PROSTR("SMS")
 
 #if GSM_INTERFACE_ENABLED == 1
@@ -145,7 +148,7 @@ static int write_pending_data_to_network(SG_Socket* socket)
              * Being bullet-proof in our checks always helps :)
              */
             sg_sprintf(LOG_GLOBAL_BUFFER, "%sExpected pending %d bytes to be read from network_bio, however %d bytes read",
-                                          SSL_ERROR, c, rc);
+                                          SSL_ERROR_STR, c, rc);
 
             error_log(LOG_GLOBAL_BUFFER);
             return FAILURE;
@@ -218,7 +221,7 @@ static int read_pending_data_from_network(SG_Socket* socket, unsigned char must_
                  * Being bullet-proof in our checks always helps :)
                  */
                 sg_sprintf(LOG_GLOBAL_BUFFER, "%sExpected %d bytes to be written into network_bio, however %d bytes written",
-                                              SSL_ERROR, c, rc);
+                                              SSL_ERROR_STR, c, rc);
 
                 error_log(LOG_GLOBAL_BUFFER);
                 return FAILURE;
@@ -233,7 +236,8 @@ static int read_pending_data_from_network(SG_Socket* socket, unsigned char must_
     }
     else
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "%sSome unknown case hit in \"read_pending_data_from_network\" .. debug the code ..", SSL_ERROR);
+        sg_sprintf(LOG_GLOBAL_BUFFER, "%sSome unknown case hit in \"read_pending_data_from_network\" .. debug the code ..", 
+			                           SSL_ERROR_STR);
         error_log(LOG_GLOBAL_BUFFER);
 
         return FAILURE;
@@ -244,7 +248,7 @@ static int read_pending_data_from_network(SG_Socket* socket, unsigned char must_
 #define HANDLE_NO_RETRY_CASE_IF_APPLICABLE(action)                                                                  \
     if(BIO_should_retry(socket->ssl_bio) == 0)                                                                      \
     {                                                                                                               \
-        sg_sprintf(LOG_GLOBAL_BUFFER, "%sBIO_%s from ssl_bio failed with %d error-code", SSL_ERROR, action, rc);    \
+        sg_sprintf(LOG_GLOBAL_BUFFER, "%sBIO_%s from ssl_bio failed with %d error-code", SSL_ERROR_STR, action, rc);\
         error_log(LOG_GLOBAL_BUFFER);                                                                               \
                                                                                                                     \
         return FAILURE;                                                                                             \
@@ -270,7 +274,7 @@ static int read_pending_data_from_network(SG_Socket* socket, unsigned char must_
     else                                                                                                            \
     {                                                                                                               \
         sg_sprintf(LOG_GLOBAL_BUFFER, "\n\n%sSSL-%s has reached unexplored territories.\n\n",                       \
-                                       SSL_ERROR, action);                                                          \
+                                       SSL_ERROR_STR, action);                                                      \
         error_log(LOG_GLOBAL_BUFFER);                                                                               \
                                                                                                                     \
         return FAILURE;                                                                                             \
@@ -280,7 +284,7 @@ static int read_pending_data_from_network(SG_Socket* socket, unsigned char must_
 #define HANDLE_TWO_SSL_WRITE_READ_FROM_APP_CASES(action)                                                            \
     else if(rc == 0)                                                                                                \
     {                                                                                                               \
-        sg_sprintf(LOG_GLOBAL_BUFFER, "%sBIO_%s to ssl_bio failed with %d error-code", SSL_ERROR, action, rc);      \
+        sg_sprintf(LOG_GLOBAL_BUFFER, "%sBIO_%s to ssl_bio failed with %d error-code", SSL_ERROR_STR, action, rc);  \
         error_log(LOG_GLOBAL_BUFFER);                                                                               \
                                                                                                                     \
         return FAILURE;                                                                                             \
@@ -491,7 +495,7 @@ static int secure_socket_write(SG_Socket* socket, unsigned char* buffer, int len
 
 
 #define HANDLE_CATASTROPHIC_INIT_ERROR(obj, reset)                                                              \
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("\n\n%sFAILED IN [%s], we are doomed ..\n\n"), SSL_ERROR, obj);        \
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("\n\n%sFAILED IN [%s], we are doomed ..\n\n"), SSL_ERROR_STR, obj);    \
     error_log(LOG_GLOBAL_BUFFER);                                                                               \
                                                                                                                 \
     if(reset == 1)                                                                                              \
