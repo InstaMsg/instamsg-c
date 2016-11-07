@@ -47,7 +47,7 @@
 #define HTTP_RESPONSE_STATUS_PREFIX "HTTP/"
 
 HTTPResponse httpResponse;
-static SG_Socket socket;
+static SG_Socket httpSocket;
 
 static int getNextLine(SG_Socket *socket, char *buf, int *responseCode)
 {
@@ -251,9 +251,9 @@ void uploadFile(const char *url,
     memset(secondLevel, 0, MAX_BUFFER_SIZE);
     memset(fourthLevel, 0, MAX_BUFFER_SIZE);
 
-    socket.socketCorrupted = 1;
-	init_socket(&socket, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT, SOCKET_TCP, 1);
-    if(socket.socketCorrupted == 1)
+    httpSocket.socketCorrupted = 1;
+	init_socket(&httpSocket, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT, SOCKET_TCP, 1);
+    if(httpSocket.socketCorrupted == 1)
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCould not initiate-socket for file-upload, not proceeding"), FILE_UPLOAD);
         error_log(LOG_GLOBAL_BUFFER);
@@ -307,7 +307,7 @@ void uploadFile(const char *url,
         info_log(LOG_GLOBAL_BUFFER);
     }
 
-    if(socket.write(&socket, (unsigned char*)request, strlen(request)) == FAILURE)
+    if(httpSocket.write(&httpSocket, (unsigned char*)request, strlen(request)) == FAILURE)
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sError occurred while uploading POST data (FIRST LEVEL) for [%s]"), FILE_UPLOAD, filename);
         error_log(LOG_GLOBAL_BUFFER);
@@ -315,7 +315,7 @@ void uploadFile(const char *url,
         goto exit;
     }
 
-    if(socket.write(&socket, (unsigned char*)secondLevel, strlen(secondLevel)) == FAILURE)
+    if(httpSocket.write(&httpSocket, (unsigned char*)secondLevel, strlen(secondLevel)) == FAILURE)
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sError occurred while uploading POST data (SECOND LEVEL) for [%s]"), FILE_UPLOAD, filename);
         error_log(LOG_GLOBAL_BUFFER);
@@ -333,7 +333,7 @@ void uploadFile(const char *url,
         char ch[2] = {0};
 
         fs.read(&fs, (unsigned char*)ch, 1, 1);
-        if(socket.write(&socket, (unsigned char*)ch, 1) == FAILURE)
+        if(httpSocket.write(&httpSocket, (unsigned char*)ch, 1) == FAILURE)
         {
             sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sError occurred while uploading POST data (THIRD LEVEL) for [%s]"), FILE_UPLOAD, filename);
             error_log(LOG_GLOBAL_BUFFER);
@@ -359,7 +359,7 @@ void uploadFile(const char *url,
     info_log(LOG_GLOBAL_BUFFER);
 
     release_file_system(&fs);
-    if(socket.write(&socket, (unsigned char*)fourthLevel, strlen(fourthLevel)) == FAILURE)
+    if(httpSocket.write(&httpSocket, (unsigned char*)fourthLevel, strlen(fourthLevel)) == FAILURE)
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sError occurred while uploading POST data (FOURTH LEVEL) for [%s]"), FILE_UPLOAD, filename);
         error_log(LOG_GLOBAL_BUFFER);
@@ -379,7 +379,7 @@ void uploadFile(const char *url,
         newLine = (char*)GLOBAL_BUFFER;
         strcpy(newLine, "");
 
-        if(getNextLine(&socket, newLine, &(httpResponse->status)) == FAILURE)
+        if(getNextLine(&httpSocket, newLine, &(httpResponse->status)) == FAILURE)
         {
             sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sSocket error while reading URL-payload for uploaded file [%s] (stage 1)"),
                                           FILE_UPLOAD, filename);
@@ -404,7 +404,7 @@ void uploadFile(const char *url,
 
         if(beginPayloadDownload == 1)
         {
-            if(socket.read(&socket, (unsigned char*)(httpResponse->body), numBytes, 1) == FAILURE) /* Pseudo-Blocking Call */
+            if(httpSocket.read(&httpSocket, (unsigned char*)(httpResponse->body), numBytes, 1) == FAILURE) /* Pseudo-Blocking Call */
             {
                 sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sSocket error while reading URL-payload for uploaded file [%s] (stage 2)"),
                                               FILE_UPLOAD, filename);
@@ -424,7 +424,7 @@ void uploadFile(const char *url,
     }
 
 exit:
-    release_socket(&socket);
+    release_socket(&httpSocket);
 
 exit2:
     if(fourthLevel)
@@ -508,9 +508,9 @@ void downloadFile(const char *url,
 {
     unsigned int numBytes = 0;
 
-    socket.socketCorrupted = 1;
-	init_socket(&socket, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT, SOCKET_TCP, 1);
-    if(socket.socketCorrupted == 1)
+    httpSocket.socketCorrupted = 1;
+	init_socket(&httpSocket, INSTAMSG_HTTP_HOST, INSTAMSG_HTTP_PORT, SOCKET_TCP, 1);
+    if(httpSocket.socketCorrupted == 1)
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCould not initiate-socket for file-download, not proceeding"), FILE_DOWNLOAD);
         error_log(LOG_GLOBAL_BUFFER);
@@ -532,7 +532,7 @@ void downloadFile(const char *url,
         /*
         * Fire the request-bytes over the socket-medium.
         */
-        if(socket.write(&socket, (unsigned char*)urlComplete, strlen(urlComplete)) == FAILURE)
+        if(httpSocket.write(&httpSocket, (unsigned char*)urlComplete, strlen(urlComplete)) == FAILURE)
         {
             goto exit;
         }
@@ -550,7 +550,7 @@ void downloadFile(const char *url,
             newLine = (char*)GLOBAL_BUFFER;
 
             strcpy(newLine, "");
-            if(getNextLine(&socket, newLine, &(httpResponse->status)) == FAILURE)
+            if(getNextLine(&httpSocket, newLine, &(httpResponse->status)) == FAILURE)
             {
                 sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sError downloading file-metadata"), FILE_DOWNLOAD);
                 info_log(LOG_GLOBAL_BUFFER);
@@ -595,7 +595,7 @@ void downloadFile(const char *url,
                     char ch[2] = {0};
                     for(j = i; j < numBytes; j++)
                     {
-                        if(socket.read(&socket, (unsigned char*)ch, 1, 1) == FAILURE) /* Pseudo-Blocking Call */
+                        if(httpSocket.read(&httpSocket, (unsigned char*)ch, 1, 1) == FAILURE) /* Pseudo-Blocking Call */
                         {
                             tear_down_binary_download();
                             goto exit;
@@ -607,7 +607,7 @@ void downloadFile(const char *url,
                 else
                 {
                     char ch[OTA_BUFFER_SIZE + 1] = {0};
-                    if(socket.read(&socket, (unsigned char*)ch, OTA_BUFFER_SIZE, 1) == FAILURE) /* Pseudo-Blocking Call */
+                    if(httpSocket.read(&httpSocket, (unsigned char*)ch, OTA_BUFFER_SIZE, 1) == FAILURE) /* Pseudo-Blocking Call */
                     {
                         tear_down_binary_download();
                         goto exit;
@@ -634,7 +634,7 @@ void downloadFile(const char *url,
             info_log(LOG_GLOBAL_BUFFER);
 
 exit:
-            release_socket(&socket);
+            release_socket(&httpSocket);
 
 exit2:
             sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sHTTP-Response Status = [%d]"), FILE_DOWNLOAD, httpResponse->status);
