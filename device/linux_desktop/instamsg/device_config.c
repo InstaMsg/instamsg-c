@@ -104,7 +104,7 @@ static int get_config_value_from_persistent_storage_and_delete_if_asked(const ch
            {
                if(deleteConfig == 0)
                {
-                   int i;
+                   unsigned int i;
                    for(i = 0; i < strlen(tempBuffer); i++)
                    {
                        buffer[i] = tempBuffer[i];

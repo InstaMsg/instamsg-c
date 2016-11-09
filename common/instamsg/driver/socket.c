@@ -39,6 +39,7 @@
 
 #include "./include/sg_openssl/ssl.h"
 #include "./include/sg_openssl/bio.h"
+#include "./include/sg_openssl/err.h"
 
 #define SMS     PROSTR("SMS")
 

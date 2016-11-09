@@ -115,7 +115,7 @@ void sg_readFile(const char *filePath, char *buffer, int maxBufferLength)
 void sg_writeFile(const char *filePath, char *buffer)
 {
     FILE_STRUCT *fp = NULL;
-    int i = 0;
+    unsigned int i = 0;
 
     fp = FILE_OPEN(filePath, "w");
     if(fp != NULL)
@@ -142,7 +142,7 @@ int sg_appendLine(const char *filePath, const char *buffer)
     int rc = FAILURE;
 
     FILE_STRUCT *fp = NULL;
-    int i;
+    unsigned int i;
 
     fp = FILE_OPEN(filePath, "a+");
     if(fp != NULL)
@@ -210,7 +210,7 @@ int write_singular_line_into_file(const char *filePath, const char *buffer)
     int rc = FAILURE;
 
     FILE_STRUCT *fp = NULL;
-    int i;
+    unsigned int i;
 
     fp = FILE_OPEN(filePath, "w");
     if(fp != NULL)

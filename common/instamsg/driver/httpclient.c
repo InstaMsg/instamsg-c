@@ -228,7 +228,7 @@ void uploadFile(const char *url,
                 HTTPResponse *httpResponse)
 {
 
-    int i = 0;
+    unsigned int i = 0;
     unsigned int numBytes = 0;
 
     FileSystem fs;
@@ -574,7 +574,7 @@ void downloadFile(const char *url,
 
         if(beginPayloadDownload == 1)
         {
-            int i = 0, j = 0;
+            unsigned int i = 0, j = 0;
 
             prepare_for_new_binary_download();
 

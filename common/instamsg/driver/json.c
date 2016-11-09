@@ -89,7 +89,7 @@ void getJsonKeyValueIfPresent(char *json_original, const char *key, char *buf)
      * Replace all \r and \n with NOT_FOUND.
      */
     {
-        int i;
+		unsigned int i;
         for(i = 0; i < strlen(json); i++)
         {
             if((json[i] == '\r') || (json[i] == '\n'))
@@ -143,11 +143,7 @@ void getJsonKeyValueIfPresent(char *json_original, const char *key, char *buf)
                 if(strcmp(parsedKeyToken, key) == 0)
                 {
                     strcat(buf, parsedValueToken);
-
-                    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Found key [%s] and value [%s] in json [%s]"), parsedKeyToken, buf, json_original);
-                    debug_log(LOG_GLOBAL_BUFFER);
-
-                    goto exit;
+					goto exit;
                 }
 
                 /* We have parsed current key-value pair. So, reset the token-buffers. */
