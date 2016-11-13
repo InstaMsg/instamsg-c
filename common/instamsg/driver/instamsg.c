@@ -1759,6 +1759,7 @@ failure_in_time_syncing:
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to sync-time through NTP."), CLOCK_ERROR);
         error_log(LOG_GLOBAL_BUFFER);
 
+#if (GSM_TIME_SYNC_PRESENT == 1) || (GPS_TIME_SYNC_PRESENT == 1)
         if(gpsGsmTimeSyncFeatureEnabled == 0)
         {
             sg_sprintf(LOG_GLOBAL_BUFFER,
@@ -1767,6 +1768,7 @@ failure_in_time_syncing:
 
             exitApp();
         }
+#endif
 }
 #endif
 
