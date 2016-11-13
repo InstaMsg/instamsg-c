@@ -601,7 +601,7 @@ void downloadFile(const char *url,
                             goto exit;
                         }
 
-                        handleDownloadedBytesBatch(ch, 1, &i, numBytes);
+                        handleDownloadedBytesBatch(ch, 1, (int*)&i, numBytes);
                     }
                 }
                 else
@@ -613,7 +613,7 @@ void downloadFile(const char *url,
                         goto exit;
                     }
 
-                    handleDownloadedBytesBatch(ch, OTA_BUFFER_SIZE, &i, numBytes);
+                    handleDownloadedBytesBatch(ch, OTA_BUFFER_SIZE, (int*)&i, numBytes);
                 }
             }
 
