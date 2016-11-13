@@ -33,6 +33,7 @@
 
 #include <time.h>
 #include <unistd.h>
+#include <errno.h>
 
 
 
@@ -89,7 +90,43 @@ unsigned long get_GSM_timestamp()
  * Returns SUCCESS on successful-syncing.
  * Else returns FAILURE.
  */
-int sync_system_clock(DateParams *dateParams)
+int sync_system_clock(DateParams *dateParams, unsigned long seconds)
 {
+    struct timeval now;
+    int rc;
+    int errBackup;
+    char *error_str;
+
+    now.tv_sec = seconds;
+    now.tv_usec = 0;
+
+    rc = settimeofday(&now, NULL);
+    errBackup = errno;
+    if(rc == 0)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, "%sTime-synced successfully at system.", CLOCK);
+        info_log(LOG_GLOBAL_BUFFER);
+    }
+    else
+    {
+        if(errBackup == EFAULT)
+        {
+            error_str = "EFAULT";
+        }
+        else if(errBackup == EINVAL)
+        {
+            error_str = "EINVAL";
+        }
+        else if(errBackup == EPERM)
+        {
+            error_str = "EPERM";
+        }
+
+        sg_sprintf(LOG_GLOBAL_BUFFER, "%sTime-sync FAILED at system with errno-code [%s].", CLOCK_ERROR, error_str);
+        error_log(LOG_GLOBAL_BUFFER);
+
+        resetDevice();
+    }
+
     return SUCCESS;
 }

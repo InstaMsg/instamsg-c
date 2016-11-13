@@ -63,7 +63,7 @@ unsigned long get_GSM_timestamp()
  * Returns SUCCESS on successful-syncing.
  * Else returns FAILURE.
  */
-int sync_system_clock(DateParams *dateParams)
+int sync_system_clock(DateParams *dateParams, unsigned long seconds)
 {
     return SUCCESS;
 }

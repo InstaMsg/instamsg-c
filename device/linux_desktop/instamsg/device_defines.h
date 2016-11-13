@@ -84,7 +84,7 @@
 #define SSL_WIRE_BUFFER_SIZE        MAX_BUFFER_SIZE
 #endif
 
-#define NTP_TIME_SYNC_PRESENT       0
+#define NTP_TIME_SYNC_PRESENT       1
 #define GPS_TIME_SYNC_PRESENT       0
 #define GSM_TIME_SYNC_PRESENT       0
 

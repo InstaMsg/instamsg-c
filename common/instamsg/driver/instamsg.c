@@ -1572,7 +1572,7 @@ static void sync_time_through_GPS_or_GSM_interleaved(InstaMsg *c)
                 goto try_syncing_with_gsm;
             }
 
-            rc = sync_system_clock(&dateParams);
+            rc = sync_system_clock(&dateParams, 0);
             if(rc != SUCCESS)
             {
                 sg_sprintf(LOG_GLOBAL_BUFFER,
@@ -1734,7 +1734,7 @@ static void sync_time_through_NTP(InstaMsg *c)
 
     extract_date_params(seconds1900 - seconds1970, &dateParams, "NTP");
 
-    rc = sync_system_clock(&dateParams);
+    rc = sync_system_clock(&dateParams, seconds1900 - seconds1970);
     if(rc != SUCCESS)
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed in last step to sync time with system-clock."), CLOCK_ERROR);
