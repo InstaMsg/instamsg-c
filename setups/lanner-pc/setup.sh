@@ -28,9 +28,6 @@ chmod 644 /lib/modules/3.19.8-031908-generic/kernel/drivers/watchdog/wd_drv.ko
 sed -i '/^[ :\t]*wd_drv/d' /etc/modules
 echo wd_drv >> /etc/modules
 
-kill -9 `pgrep -x instamsg` || true
-cp $1 "${HOME_DIRECTORY}/instamsg"
-chmod 777 "${HOME_DIRECTORY}/instamsg"
 
 touch "${HOME_DIRECTORY}/data.txt"
 chmod 777 "${HOME_DIRECTORY}/data.txt"
@@ -42,6 +39,13 @@ chmod 777 "${HOME_DIRECTORY}/wwan-monitor"
 echo test > ${HOME_DIRECTORY}/prov.txt
 
 crontab < cron
+
+sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash intel_idle.max_cstate=1"/g' /etc/default/grub
+update-grub
+
+kill -9 `pgrep -x instamsg` || true
+cp $1 "${HOME_DIRECTORY}/instamsg"
+chmod 777 "${HOME_DIRECTORY}/instamsg"
 
 echo
 echo
