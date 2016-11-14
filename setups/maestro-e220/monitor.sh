@@ -14,7 +14,7 @@ do
     if [ -z "${PID}" ]
     then
 	    echo "Binary not running"
-        cd /home/sensegrow
+        cd /overlay/home/sensegrow
         chmod 777 instamsg
 
         sleep 3

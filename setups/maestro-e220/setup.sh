@@ -14,11 +14,9 @@ ${SSH_COMMAND} "sed -i 's/^[ :\t]*exit 0/\/home\/sensegrow\/monitor.sh \&\nexit 
 
 ${SSH_COMMAND} "sed -i 's/HL8548/HL85/g' /lib/netifd/proto/3g.sh"
 
-${SSH_COMMAND} "killall instamsg"
 
 ${SSH_COMMAND} "mkdir -p ${HOME_DIRECTORY}"
 ${SSH_COMMAND} "chmod -R 777 ${HOME_DIRECTORY}"
-scp $1  ${LOGIN}:${HOME_DIRECTORY}/instamsg
 
 scp monitor.sh  ${LOGIN}:${HOME_DIRECTORY}
 ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/monitor.sh"
@@ -33,3 +31,6 @@ ${SSH_COMMAND} touch ${HOME_DIRECTORY}/data.txt
 ${SSH_COMMAND} chmod 777 ${HOME_DIRECTORY}/data.txt
 
 ${SSH_COMMAND} "echo test > ${HOME_DIRECTORY}/prov.txt"
+
+${SSH_COMMAND} "killall instamsg"
+scp $1  ${LOGIN}:${HOME_DIRECTORY}/instamsg
