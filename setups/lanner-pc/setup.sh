@@ -40,7 +40,7 @@ echo test > ${HOME_DIRECTORY}/prov.txt
 
 crontab < cron
 
-sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash intel_idle.max_cstate=0 processor.max_cstate=0 idle=poll"/g' /etc/default/grub
+sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"/g' /etc/default/grub
 update-grub
 
 kill -9 `pgrep -x instamsg` || true
