@@ -40,7 +40,6 @@
 #include "./time.h"
 
 #define MAX_PACKET_ID 10000
-#define MAX_MESSAGE_HANDLERS 5
 #define KEEP_ALIVE_INTERVAL_SECS 10
 #define MQTT_RESULT_HANDLER_TIMEOUT 10
 
