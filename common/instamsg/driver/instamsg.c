@@ -120,10 +120,17 @@ static int actuallyEnsureGuaranteeWhereRequired;
 
 static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *mode);
 
+#if NTP_TIME_SYNC_PRESENT == 1
 static unsigned char ntpPacket[48];
-static DateParams dateParams;
+#endif
 
+#if (NTP_TIME_SYNC_PRESENT == 1) || (GPS_TIME_SYNC_PRESENT == 1) || (GSM_TIME_SYNC_PRESENT == 1)
+static DateParams dateParams;
+#endif
+
+#if (GPS_TIME_SYNC_PRESENT == 1) || (GSM_TIME_SYNC_PRESENT == 1)
 static unsigned char gpsGsmTimeSyncFeatureEnabled;
+#endif
 
 static volatile unsigned char timeSyncedViaExternalResources;
 
@@ -1775,7 +1782,9 @@ failure_in_time_syncing:
 
 static void check_if_conditional_features_are_enabled()
 {
+#if (NTP_TIME_SYNC_PRESENT == 1) || (GPS_TIME_SYNC_PRESENT == 1) || (GSM_TIME_SYNC_PRESENT == 1)
     int rc = FAILURE;
+#endif
 
 #if NTP_TIME_SYNC_PRESENT == 1
     RESET_GLOBAL_BUFFER;

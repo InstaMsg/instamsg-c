@@ -27,6 +27,7 @@
 *.i*86
 *.x86_64
 *.hex
+*.lst
 
 # Debug files
 *.dSYM/
@@ -38,6 +39,7 @@ client/tiva_build
 # Generated-Files while setting up the embedded-environment
 third_party/ti-compiler-environment
 third_party/openat
+third_party/stm32f0-environment/stlink
 
 subscriber.sh
 filetester.sh

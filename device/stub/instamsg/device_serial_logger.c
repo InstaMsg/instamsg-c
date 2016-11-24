@@ -31,6 +31,7 @@ void init_serial_logger()
  */
 int serial_logger_write(unsigned char* buffer, int len)
 {
+#error "Function not implemented."
 }
 
 

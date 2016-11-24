@@ -104,9 +104,10 @@ static void trim_buffer_to_contain_only_first_required_sentence_type(unsigned ch
 }
 
 
-static char t[100];
 
 #if GPS_TIME_SYNC_PRESENT == 1
+static char t[100];
+
 int fill_in_time_coordinates_from_sentence(char *buffer, int bufferLength, DateParams *dateParams, const char *sentenceType)
 {
     char *original = buffer;
