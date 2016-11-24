@@ -64,6 +64,7 @@ device/pi
 device/lanner-pc
 device/windows-embedded
 device/test_device
+device/philips-gateway
 
 common/apps/atoll-gms
 common/apps/energy-meter
