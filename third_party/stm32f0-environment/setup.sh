@@ -1,7 +1,6 @@
-set -e
-
 sudo rm -r stlink
 
+set -e
 unzip stlink.zip -d .
 cd stlink
 make
