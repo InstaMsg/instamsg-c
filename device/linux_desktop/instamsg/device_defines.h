@@ -99,4 +99,6 @@
 #define I386_ONLY
 #define HAVE_LONG_LONG              0
 
+#define MAX_MESSAGE_HANDLERS        50
+
 #endif

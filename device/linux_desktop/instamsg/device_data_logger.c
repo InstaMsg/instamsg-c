@@ -42,6 +42,19 @@
 
 static char tempBuffer[1024];
 
+static void make_the_switch()
+{
+    if(1)
+    {
+        if(renameFile(NULL, SYSTEM_WIDE_TEMP_FILE, DATA_FILE_NAME) != 0)
+        {
+            sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not move file from [%s] to [%s]", DATA_LOGGING_ERROR, SYSTEM_WIDE_TEMP_FILE, DATA_FILE_NAME);
+            error_log(LOG_GLOBAL_BUFFER);
+        }
+    }
+}
+
+
 /*
  * This method initializes the data-logger-interface for the device.
  */
@@ -114,7 +127,9 @@ void save_record_to_persistent_storage(char *record)
         }
     }
 
-    sg_appendLine(DATA_FILE_NAME, record);
+    copyFile(NULL, DATA_FILE_NAME, SYSTEM_WIDE_TEMP_FILE);
+    sg_appendLine(SYSTEM_WIDE_TEMP_FILE, record);
+    make_the_switch();
 }
 
 
