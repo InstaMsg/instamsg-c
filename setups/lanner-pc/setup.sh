@@ -43,6 +43,8 @@ crontab < cron
 sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash intel_idle.max_cstate=0 processor.max_cstate=0 idle=poll"/g' /etc/default/grub
 update-grub
 
+apt-get remove pm-utils
+
 kill -9 `pgrep -x instamsg` || true
 cp $1 "${HOME_DIRECTORY}/instamsg"
 chmod 777 "${HOME_DIRECTORY}/instamsg"
