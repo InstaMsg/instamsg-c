@@ -5,8 +5,6 @@ move_file()
     mv /overlay/home/sensegrow/at_temp /overlay/home/sensegrow/$1
 }
 
-counter=0
-
 while true
 do
     PID=`ps | grep instamsg | grep -v grep | grep -v tail | sed -e 's/^ *//g' | cut -d\  -f 1`
@@ -33,14 +31,4 @@ do
     move_file "imsi"
 
     sleep 60
-
-    counter=$(($counter+60))
-    if [ "$counter" -gt "3600" ]
-    then
-        /sbin/reboot
-        sleep 2
-        /sbin/reboot
-        sleep 2
-        /sbin/reboot
-    fi
 done

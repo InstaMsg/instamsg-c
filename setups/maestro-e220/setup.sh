@@ -28,6 +28,8 @@ ${SSH_COMMAND} "cat ${HOME_DIRECTORY}/cron | crontab -"
 ${SSH_COMMAND} rm ${HOME_DIRECTORY}/cron
 
 ${SSH_COMMAND} touch ${HOME_DIRECTORY}/data.txt
+${SSH_COMMAND} rm ${HOME_DIRECTORY}/data.txt
+${SSH_COMMAND} touch ${HOME_DIRECTORY}/data.txt
 ${SSH_COMMAND} chmod 777 ${HOME_DIRECTORY}/data.txt
 
 ${SSH_COMMAND} "echo test > ${HOME_DIRECTORY}/prov.txt"
