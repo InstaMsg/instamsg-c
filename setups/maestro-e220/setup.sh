@@ -34,5 +34,8 @@ ${SSH_COMMAND} chmod 777 ${HOME_DIRECTORY}/data.txt
 
 ${SSH_COMMAND} "echo test > ${HOME_DIRECTORY}/prov.txt"
 
+scp reboot.sh  ${LOGIN}:${HOME_DIRECTORY}
+${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/reboot.sh"
+
 ${SSH_COMMAND} "killall instamsg"
 scp $1  ${LOGIN}:${HOME_DIRECTORY}/instamsg

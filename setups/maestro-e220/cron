@@ -1,2 +1,2 @@
 */1 * * * * echo > /overlay/home/sensegrow/instamsg.log
-0 * * * * /sbin/reboot
+0 * * * * /overlay/home/sensegrow/reboot.sh
