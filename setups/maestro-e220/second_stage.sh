@@ -6,10 +6,6 @@ HOME_DIRECTORY="/overlay/home/sensegrow"
 ${SSH_COMMAND} "mkdir -p ${HOME_DIRECTORY}"
 ${SSH_COMMAND} "chmod -R 777 ${HOME_DIRECTORY}"
 
-scp maestro-e220-updatedkernel  ${LOGIN}:${HOME_DIRECTORY}
-${SSH_COMMAND} "/sbin/mtd write ${HOME_DIRECTORY}/maestro-e220-updatedkernel /dev/mtd3"
-${SSH_COMMAND} "/sbin/mtd erase /dev/mtd5"
-
 ${SSH_COMMAND} "sed -i 's/^[ :\t]*\/etc\/init.d\/event_sms reload/#\/etc\/init.d\/event_sms reload/g' /usr/sbin/eventtrack.sh"
 ${SSH_COMMAND} "sed -i 's/^[ :\t]*\/etc\/init.d\/event_sms stop/#\/etc\/init.d\/event_sms stop/g' /usr/sbin/eventtrack.sh"
 ${SSH_COMMAND} "sed -i 's/^[ :\t]*\/etc\/init.d\/event_sms start/#\/etc\/init.d\/event_sms start/g' /usr/sbin/eventtrack.sh"
