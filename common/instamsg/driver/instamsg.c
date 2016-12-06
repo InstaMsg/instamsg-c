@@ -1614,7 +1614,7 @@ try_syncing_with_gsm:
 
             extract_date_params(timestampFromGSM, &dateParams, "GSM");
 
-            rc = sync_system_clock(&dateParams);
+            rc = sync_system_clock(&dateParams, 0);
             if(rc != SUCCESS)
             {
                 sg_sprintf(LOG_GLOBAL_BUFFER,
