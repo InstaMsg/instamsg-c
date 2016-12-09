@@ -14,7 +14,7 @@
  * Please note that this method is called by Instamsg-application, *****BEFORE***** calling
  * "connect_underlying_socket_medium_try_once".
  */
-void get_latest_sms_containing_substring(Socket *socket, char *buffer, const char *substring)
+void get_latest_sms_containing_substring(SG_Socket *socket, char *buffer, const char *substring)
 {
 #error "Function not implemented."
 }
@@ -29,9 +29,8 @@ void get_latest_sms_containing_substring(Socket *socket, char *buffer, const cha
  *
  * Setting the above value will let InstaMsg know that the connection can be used fine for writing/reading.
  */
-void connect_underlying_socket_medium_try_once(Socket* socket)
+void connect_underlying_socket_medium_try_once(SG_Socket* socket)
 {
-#error "Function not implemented."
 }
 
 
@@ -83,9 +82,9 @@ void connect_underlying_socket_medium_try_once(Socket* socket)
  * However, an error occurs while reading.
  * So, FAILURE must be returned immediately (i.e. no socket-reinstantiation must be done in this method).
  */
-int socket_read(Socket* socket, unsigned char* buffer, int len, unsigned char guaranteed)
+int socket_read(SG_Socket* socket, unsigned char* buffer, int len, unsigned char guaranteed)
 {
-#error "Function not implemented."
+    return FAILURE;
 }
 
 
@@ -103,9 +102,9 @@ int socket_read(Socket* socket, unsigned char* buffer, int len, unsigned char gu
  * An error occurred while writing.
  * In this case, FAILURE must be returned immediately (i.e. no socket-reinstantiation must be done in this method).
  */
-int socket_write(Socket* socket, unsigned char* buffer, int len)
+int socket_write(SG_Socket* socket, unsigned char* buffer, int len)
 {
-#error "Function not implemented."
+    return FAILURE;
 }
 
 
@@ -115,9 +114,8 @@ int socket_write(Socket* socket, unsigned char* buffer, int len)
  *
  * Note that this method MUST DO """ONLY""" per-socket level cleanup, NO GLOBAL-LEVEL CLEANING/REINIT MUST BE DONE.
  */
-void release_underlying_socket_medium_guaranteed(Socket* socket)
+void release_underlying_socket_medium_guaranteed(SG_Socket* socket)
 {
-#error "Function not implemented."
 }
 
 
