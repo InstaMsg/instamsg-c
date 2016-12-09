@@ -1,12 +1,12 @@
 #include "./include/at.h"
 #include "./include/watchdog.h"
 #include "./include/sg_stdlib.h"
+#include "./include/log.h"
 
 #include <string.h>
 
-unsigned char showCommandOutput;
-
-void run_simple_at_command_and_get_output(const char *command, char *usefulOutput, int maxBufferLimit, const char *delimiter)
+void run_simple_at_command_and_get_output(const char *command, char *usefulOutput, int maxBufferLimit, const char *delimiter,
+                                          unsigned char showCommandOutput)
 {
     unsigned char watchdog_enable_required = 0;
 
@@ -24,5 +24,11 @@ void run_simple_at_command_and_get_output(const char *command, char *usefulOutpu
     if(watchdog_enable_required == 1)
     {
         watchdog_disable(NULL, NULL);
+    }
+
+    if(showCommandOutput == 1)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Command = [%s], Output = [%s]", command, usefulOutput);
+        info_log(LOG_GLOBAL_BUFFER);
     }
 }
