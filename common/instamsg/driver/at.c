@@ -1,5 +1,6 @@
 #include "./include/at.h"
 #include "./include/watchdog.h"
+#include "./include/sg_stdlib.h"
 
 void run_simple_at_command_and_get_output(const char *command, char *usefulOutput, const char *delimiter)
 {

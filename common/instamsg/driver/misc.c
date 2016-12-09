@@ -35,6 +35,7 @@
 #include "./include/misc.h"
 #include "./include/data_logger.h"
 #include "./include/config.h"
+#include "./include/at.h"
 
 
 void exitApp()
