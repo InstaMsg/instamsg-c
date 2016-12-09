@@ -5,6 +5,9 @@
 #ifndef INSTAMSG_AT
 #define INSTAMSG_AT
 
+extern unsigned char showCommandOutput;
+
+
 /*
  * Public-APIs.
  */

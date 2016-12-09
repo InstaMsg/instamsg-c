@@ -2,6 +2,8 @@
 #include "./include/watchdog.h"
 #include "./include/sg_stdlib.h"
 
+unsigned char showCommandOutput;
+
 void run_simple_at_command_and_get_output(const char *command, char *usefulOutput, const char *delimiter)
 {
     unsigned char watchdog_enable_required = 0;
