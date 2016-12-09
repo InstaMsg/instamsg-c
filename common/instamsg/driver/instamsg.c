@@ -1868,6 +1868,10 @@ static void check_if_all_required_compile_time_defines_are_present()
 #ifndef SSL_ENABLED
 #error "SSL_ENABLED compile-time-parameter undefined"
 #endif
+
+#ifndef AT_INTERFACE_ENABLED
+#error "AT_INTERFACE_ENABLED compile-time-parameter undefined"
+#endif
 }
 
 
