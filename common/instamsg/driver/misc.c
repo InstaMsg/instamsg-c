@@ -43,6 +43,7 @@ void exitApp()
 
     release_data_logger();
     release_config();
+    release_at_interface();
 
 #if FILE_LOGGING_ENABLED == 1
     release_file_logger(&fileLogger);

@@ -14,7 +14,12 @@ void run_simple_at_command_and_get_output(const char *command, char *usefulOutpu
 /*
  * Internal-APIs.
  */
+void init_at_interface();
 void do_fire_at_command_and_get_output(const char *command, char *usefulOutput, const char *delimiter);
+void release_at_interface();
 #endif
+
+#else
+typedef int just_to_make_compiler_happy;
 
 #endif

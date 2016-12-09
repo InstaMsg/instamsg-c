@@ -523,6 +523,7 @@ void globalSystemInit(char *logFilePath)
     init_file_logger(&fileLogger, logFilePath);
 #endif
 
+    init_at_interface();
     init_config();
     init_data_logger();
 

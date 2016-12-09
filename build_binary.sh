@@ -32,6 +32,7 @@ SOURCES=`echo                                                                   
         common/instamsg/driver/time.c                                                           \
         common/instamsg/driver/hex.c                                                            \
         common/instamsg/driver/misc.c                                                           \
+        common/instamsg/driver/at.c                                                             \
                                                                                                 \
         common/instamsg/mqtt/src/MQTTFormat.c                                                   \
         common/instamsg/mqtt/src/MQTTPacket.c                                                   \
@@ -54,7 +55,8 @@ SOURCES=`echo                                                                   
         device/${VENDOR}/instamsg/device_data_logger.c                                          \
         device/${VENDOR}/instamsg/device_upgrade.c                                              \
         device/${VENDOR}/instamsg/device_gps.c                                                  \
-        device/${VENDOR}/instamsg/device_misc.c                                                 `
+        device/${VENDOR}/instamsg/device_misc.c                                                 \
+        device/${VENDOR}/instamsg/device_at.c                                                   `
 
 
 SOURCES=`echo ${SOURCES} | sed -e 's|VENDOR|'"${VENDOR}"'|g'`
