@@ -2,11 +2,16 @@
 #include "./include/watchdog.h"
 #include "./include/sg_stdlib.h"
 
+#include <string.h>
+
 unsigned char showCommandOutput;
 
-void run_simple_at_command_and_get_output(const char *command, char *usefulOutput, const char *delimiter)
+void run_simple_at_command_and_get_output(const char *command, char *usefulOutput, int maxBufferLimit, const char *delimiter)
 {
     unsigned char watchdog_enable_required = 0;
+
+    memset(usefulOutput, 0, maxBufferLimit);
+
     if(watchdog_active == 0)
     {
         watchdog_enable_required = 1;
