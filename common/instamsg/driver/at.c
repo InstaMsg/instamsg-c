@@ -6,7 +6,7 @@
 #include <string.h>
 
 void run_simple_at_command_and_get_output(const char *command, char *usefulOutput, int maxBufferLimit, const char *delimiter,
-                                          unsigned char showCommandOutput)
+                                          unsigned char showCommandOutput, unsigned char strip)
 {
     unsigned char watchdog_enable_required = 0;
 
@@ -19,7 +19,10 @@ void run_simple_at_command_and_get_output(const char *command, char *usefulOutpu
     }
 
     do_fire_at_command_and_get_output(command, usefulOutput, delimiter);
-    strip_leading_and_trailing_white_paces(usefulOutput);
+    if(strip == 1)
+    {
+        strip_leading_and_trailing_white_paces(usefulOutput);
+    }
 
     if(watchdog_enable_required == 1)
     {
