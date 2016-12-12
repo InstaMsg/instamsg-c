@@ -130,6 +130,45 @@ char* sg_strnstr(const char *str1, const char *str2, int maxSize)
 }
 
 
+char* sg_memnmem(const char *mem1, const char *mem2, int sizeMem1, int sizeMem2)
+{
+    unsigned int i = 0, j = 0;
+
+    if(mem1 == NULL)
+    {
+        return NULL;
+    }
+    if(mem2 == NULL)
+    {
+        return NULL;
+    }
+    if(sizeMem1 < sizeMem2)
+    {
+        return NULL;
+    }
+
+    for(i = 0; i <= (sizeMem1 - sizeMem2); i++)
+    {
+        unsigned char failure = 0;
+        for(j = 0; j < sizeMem2; j++)
+        {
+            if(mem1[i + j] != mem2[j])
+            {
+                failure = 1;
+                break;
+            }
+        }
+
+        if(failure == 0)
+        {
+            return ((char*)(mem1 + i));
+        }
+    }
+
+    return NULL;
+}
+
+
 void get_nth_token_thread_safe(char *original, char separator, int pos, char *res, unsigned char strip)
 {
     int buffer_index = 0, num_separators_encountered = 0, token_start_pos = 0, tmp_index = 0;
