@@ -21,6 +21,22 @@ void run_simple_at_command_and_get_output(const char *command, int len, char *us
     do_fire_at_command_and_get_output(command, len, usefulOutput, delimiter);
     if(strip == 1)
     {
+        /*
+         * a)
+         * The "usefulOutput" is guaranteed to contain the "delimiter", and that too at the very end.
+         *
+         * b)
+         * Also, whenever "strip" is 1, we assume that the "usefulOutput" is alphanumeric, so we can do all normal "string"-operations.
+         */
+
+        /*
+         * Firstly, strip the delimiter.
+         */
+        memset(usefulOutput + strlen(usefulOutput) - strlen(delimiter), 0, strlen(delimiter));
+
+        /*
+         * Secondly, strip the whitespaces.
+         */
         strip_leading_and_trailing_white_paces(usefulOutput);
     }
 
