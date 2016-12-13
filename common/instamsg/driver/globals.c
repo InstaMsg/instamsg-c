@@ -482,22 +482,28 @@ void startAndCountdownTimer(int seconds, unsigned char showRunningStatus)
 
 static void set_up_network_ports()
 {
+    unsigned char sslEnabledAtSocketLayer = 0;
+
 #if SSL_ENABLED == 1
     int rc = get_config_value_from_persistent_storage(SSL_ACTUALLY_ENABLED, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
 
-    sslEnabled = 1;
+    sslEnabledAtAppLayer = 1;
     if(rc == SUCCESS)
     {
         char small[3] = {0};
         getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, small);
 
-        sslEnabled = sg_atoi(small);
+        sslEnabledAtAppLayer = sg_atoi(small);
     }
 #else
-    sslEnabled = 0;
+    sslEnabledAtAppLayer = 0;
 #endif
 
-    if(sslEnabled == 0)
+#if SOCKET_SSL_ENABLED == 1
+    sslEnabledAtSocketLayer = 1;
+#endif
+
+    if((sslEnabledAtAppLayer == 0) && (sslEnabledAtSocketLayer == 0))
     {
         INSTAMSG_PORT = 1883;
         INSTAMSG_HTTP_PORT = 80;
@@ -558,5 +564,5 @@ char USER_DEVICE_UUID[MAX_BUFFER_SIZE];
 int editableBusinessLogicInterval;
 int INSTAMSG_PORT;
 int INSTAMSG_HTTP_PORT;
-unsigned char sslEnabled;
+unsigned char sslEnabledAtAppLayer;
 

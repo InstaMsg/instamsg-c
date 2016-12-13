@@ -632,7 +632,7 @@ void init_socket(SG_Socket *socket, const char *hostName, unsigned int port, con
     BIO_set_ssl(socket->ssl_bio, socket->ssl, BIO_NOCLOSE);
 #endif
 
-    if((secure == 1) && (sslEnabled == 1))
+    if((secure == 1) && (sslEnabledAtAppLayer == 1))
     {
 #if SSL_ENABLED == 1
 	    socket->read = secure_socket_read;
