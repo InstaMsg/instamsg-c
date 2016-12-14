@@ -33,7 +33,7 @@
 #ifndef DEVICE_DEFINES
 #define DEVICE_DEFINES
 
-#define DEVICE_VERSION "3.0.2"
+#define DEVICE_VERSION "3.0.4"
 
 /*
  * We use the vanilla "sprintf" method for Linux.
@@ -79,6 +79,7 @@
 #define FILE_SYSTEM_ENABLED         1
 #define GSM_INTERFACE_ENABLED       0
 #define SSL_ENABLED                 1
+#define SOCKET_SSL_ENABLED          0
 
 #if SSL_ENABLED == 1
 #define SSL_WIRE_BUFFER_SIZE        MAX_BUFFER_SIZE
@@ -100,5 +101,6 @@
 #define HAVE_LONG_LONG              0
 
 #define MAX_MESSAGE_HANDLERS        50
+#define AT_INTERFACE_ENABLED        0
 
 #endif

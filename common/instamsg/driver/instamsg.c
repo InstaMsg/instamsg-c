@@ -3218,7 +3218,7 @@ void start(int (*onConnectOneTimeOperations)(),
                         if((latestTick >= nextBusinessLogicTick) || (runBusinessLogicImmediately == 1) ||
                            (businessLogicRunOnceAtStart == 0))
                         {
-                            if((coreLoopyBusinessLogicInitiatedBySelf != NULL) && (msgSource == GENERAL))
+                            if(coreLoopyBusinessLogicInitiatedBySelf != NULL)
 
                             {
                                 coreLoopyBusinessLogicInitiatedBySelf();

@@ -52,6 +52,4 @@ void run_simple_at_command_and_get_output(const char *command, int len, char *us
         info_log(LOG_GLOBAL_BUFFER);
     }
 }
-#else
-typedef int just_to_make_compiler_happy;
 #endif
