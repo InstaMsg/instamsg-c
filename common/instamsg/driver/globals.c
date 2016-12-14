@@ -530,7 +530,10 @@ void globalSystemInit(char *logFilePath)
     init_file_logger(&fileLogger, logFilePath);
 #endif
 
+#if AT_INTERFACE_ENABLED == 1
     init_at_interface();
+#endif
+
     init_config();
     init_data_logger();
 

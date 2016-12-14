@@ -5,6 +5,7 @@
 
 #include <string.h>
 
+#if AT_INTERFACE_ENABLED == 1
 void run_simple_at_command_and_get_output(const char *command, int len, char *usefulOutput, int maxBufferLimit, const char *delimiter,
                                           unsigned char showCommandOutput, unsigned char strip)
 {
@@ -51,3 +52,6 @@ void run_simple_at_command_and_get_output(const char *command, int len, char *us
         info_log(LOG_GLOBAL_BUFFER);
     }
 }
+#else
+typedef int just_to_make_compiler_happy;
+#endif
