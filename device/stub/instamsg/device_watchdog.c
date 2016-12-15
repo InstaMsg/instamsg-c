@@ -10,7 +10,6 @@
  */
 void init_watchdog()
 {
-#error "Function not implemented."
 }
 
 
@@ -25,7 +24,6 @@ void init_watchdog()
  */
 void do_watchdog_reset_and_enable(int n, unsigned char immediate)
 {
-#error "Function not implemented."
 }
 
 
@@ -34,5 +32,4 @@ void do_watchdog_reset_and_enable(int n, unsigned char immediate)
  */
 void do_watchdog_disable()
 {
-#error "Function not implemented."
 }

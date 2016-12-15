@@ -14,7 +14,6 @@
  */
 void init_global_timer()
 {
-#error "Function not implemented."
 }
 
 
@@ -23,7 +22,7 @@ void init_global_timer()
  */
 unsigned long getMinimumDelayPossibleInMicroSeconds()
 {
-#error "Function not implemented."
+    return 0;
 }
 
 
@@ -32,7 +31,6 @@ unsigned long getMinimumDelayPossibleInMicroSeconds()
  */
 void minimumDelay()
 {
-#error "Function not implemented."
 }
 
 
@@ -41,7 +39,7 @@ void minimumDelay()
  */
 unsigned long getCurrentTick()
 {
-#error "Function not implemented."
+    return 0;
 }
 
 
