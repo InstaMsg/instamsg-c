@@ -12,6 +12,7 @@ struct Serial
     SERIAL_DEVICE_TYPE deviceType;
     char identifier[50];
     char serial_params_identifier[100];
+    char serial_delimiter_identifier[100];
     unsigned char assignedSerialNumber;
     int (*send_command_and_read_response_sync)(Serial *serial,
                                                unsigned char *commandBytes,
@@ -21,6 +22,7 @@ struct Serial
 
     char serialCommands[SERIAL_COMMANDS_BUFFER_SIZE];
     char serialParams[50];
+    char serialDelimiter[5];
     unsigned char commandsLoaded;
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
 
