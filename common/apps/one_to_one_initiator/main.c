@@ -41,17 +41,17 @@ int main(int argc, char** argv)
     char *logFilePath = NULL;
 
 #if FILE_SYSTEM_ENABLED == 1
-    logFilePath = LOG_FILE_PATH;
+    logFilePath = "instamsg.log";
 #else
     logFilePath = NULL;
 #endif
 
-    /*
-     * This method is only for the test publisher/subscriber apps.
-     * For real-world apps, this method will not be needed.
-     */
-    init_publisher_subscriber_params(argc, argv, &logFilePath);
+    memset(TOPIC, 0, sizeof(TOPIC));
+    strcpy(TOPIC, "listener_topic");
+
 
     globalSystemInit(logFilePath);
-    start(NULL, NULL, NULL, onConnectOneTimeOperations, 1);
+    start(NULL, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, 1);
+
+    return 0;
 }
