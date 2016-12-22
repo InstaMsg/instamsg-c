@@ -35,6 +35,8 @@ static int oneToOneMessageHandler(OneToOneResult* result)
                   msg,
                   oneToOneResponseReceivedCallback,
                   3600);
+
+    sg_free(msg);
     return SUCCESS;
 }
 
