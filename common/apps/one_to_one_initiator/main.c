@@ -31,10 +31,18 @@ static int onConnectOneTimeOperations()
     {
         onceDone = 1;
 
-        send(TOPIC,
-             "Hi... this is one-to-one initiator !!",
-             oneToOneResponseReceivedCallback,
-             3600);
+        if(strlen(TOPIC) == 0)
+        {
+            sg_sprintf(LOG_GLOBAL_BUFFER, "Peer Client-Id not specified .. exiting");
+            error_log(LOG_GLOBAL_BUFFER);
+
+            exitApp();
+        }
+
+        sendOneToOne(TOPIC,
+                     "Hi... this is one-to-one initiator !!",
+                     oneToOneResponseReceivedCallback,
+                     3600);
     }
     else
     {
@@ -55,7 +63,10 @@ int main(int argc, char** argv)
 #endif
 
     memset(TOPIC, 0, sizeof(TOPIC));
-    strcpy(TOPIC, "listener_topic");
+    /*
+     * Set the name of peer client-id here.
+     */
+    strcpy(TOPIC, "a14de8b0-c808-11e6-9650-bc764e106405");
 
 
     globalSystemInit(logFilePath);
