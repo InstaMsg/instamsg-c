@@ -2701,6 +2701,7 @@ int subscribe(const char* topicName,
          }
     }
 
+    startAndCountdownTimer(1, 0);
     if ((rc = sendPacket(c, &(c->ipstack), GLOBAL_BUFFER, len)) != SUCCESS) /* send the subscribe packet */
         goto exit;             /* there was a problem */
 
