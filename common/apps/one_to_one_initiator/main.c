@@ -3,6 +3,12 @@
 
 char TOPIC[100];
 
+
+void release_app_resources()
+{
+}
+
+
 static int oneToOneResponseReceivedCallback(OneToOneResult* result)
 {
     sg_sprintf(LOG_GLOBAL_BUFFER, "Received [%s] from peer [%s]", result->peerMsg, result->peerClientId);
@@ -12,12 +18,12 @@ static int oneToOneResponseReceivedCallback(OneToOneResult* result)
 }
 
 
-static void onConnectOneTimeOperations()
+static int onConnectOneTimeOperations()
 {
     static unsigned char onceDone = 0;
     if(onceDone == 1)
     {
-        return;
+        return SUCCESS;
     }
 
 
@@ -33,6 +39,8 @@ static void onConnectOneTimeOperations()
     else
     {
     }
+
+    return SUCCESS;
 }
 
 
@@ -51,7 +59,7 @@ int main(int argc, char** argv)
 
 
     globalSystemInit(logFilePath);
-    start(NULL, NULL, NULL, coreLoopyBusinessLogicInitiatedBySelf, 1);
+    start(onConnectOneTimeOperations, NULL, NULL, NULL, 1);
 
     return 0;
 }
