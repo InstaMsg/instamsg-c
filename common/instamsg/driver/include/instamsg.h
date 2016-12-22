@@ -324,7 +324,7 @@ int publishMessageWithDeliveryGuarantee(char *topic, char *payload);
  * Kindly see
  *
  *                  common/apps/one_to_one_initiator/main.c
- *                  common/apps/subscriber/main.c
+ *                  common/apps/one_to_one_peer/main.c
  *
  *      for simple (yet complete) example-usage.
  *
