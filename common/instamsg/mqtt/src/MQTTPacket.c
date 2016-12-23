@@ -412,6 +412,6 @@ void fillFixedHeaderFieldsFromPacketHeader(MQTTFixedHeader *fixedHeader, const M
 {
     fixedHeader->packetType = (header->bits).type;
     fixedHeader->dup = (header->bits).dup;
-    fixedHeader->qos = (header->bits).qos;
+    fixedHeader->qos = (enum QoS)((header->bits).qos);
     fixedHeader->retain = (header->bits).retain;
 }

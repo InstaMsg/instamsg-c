@@ -208,8 +208,8 @@ char* MQTTFormat_toServerString(char* strbuf, int strbuflen, unsigned char* buf,
 	case CONNECT:
 	{
 		MQTTPacket_connectData data;
-		int rc;
-		if ((rc = MQTTDeserialize_connect(&data, buf, buflen)) == 1)
+		int rc = MQTTDeserialize_connect(&data, buf, buflen);
+		if (rc == 1)
         {
             MQTTStringFormat_connect(strbuf, strbuflen, &data);
         }
