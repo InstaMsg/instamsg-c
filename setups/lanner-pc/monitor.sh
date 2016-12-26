@@ -7,7 +7,7 @@ while true
 do
     cd /home/sensegrow
     ./wd_tst --swt 120
-    ./wd_tst --s-start
+    ./wd_tst --start
 
     PID=`ps -aux | grep -v grep | grep -v tail | grep instamsg`
 
