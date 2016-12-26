@@ -32,6 +32,9 @@ echo wd_drv >> /etc/modules
 touch "${HOME_DIRECTORY}/data.txt"
 chmod 777 "${HOME_DIRECTORY}/data.txt"
 
+cp wd_tst "${HOME_DIRECTORY}"
+chmod 777 "${HOME_DIRECTORY}/wd_tst"
+
 kill -9 `pgrep -x wwan-monitor` || true
 cp wwan-monitor "${HOME_DIRECTORY}"
 chmod 777 "${HOME_DIRECTORY}/wwan-monitor"

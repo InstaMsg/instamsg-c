@@ -1,7 +1,14 @@
 #!/bin/sh
 
+/bin/mknod /dev/wd_drv c 241 0
+chmod 777 /home/sensegrow/wd_tst
+
 while true
 do
+    cd /home/sensegrow
+    ./wd_tst --swt 120
+    ./wd_tst --s-start
+
     PID=`ps -aux | grep -v grep | grep -v tail | grep instamsg`
 
     if [ -z "${PID}" ]
