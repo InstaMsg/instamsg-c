@@ -40,6 +40,7 @@ client/tiva_build
 third_party/ti-compiler-environment
 third_party/openat
 third_party/stm32f0-environment/stlink
+third_party/philips-gateway-iar
 
 subscriber.sh
 filetester.sh
@@ -65,6 +66,8 @@ device/lanner-pc
 device/windows-embedded
 device/test_device
 device/philips-gateway
+device/linux-simcom
+device/philips-gateway-windows
 
 common/apps/atoll-gms
 common/apps/energy-meter
@@ -73,6 +76,7 @@ common/apps/generator-monitoring-plus-energy-meter
 common/apps/generator-monitoring-plus-energy-meter-plus-gps-monitoring
 common/apps/gps
 common/apps/lanner-pc-wwan-interface-monitor
+common/apps/philips-app-luminar
 
 common/ioeye
 common/ioeye-c
