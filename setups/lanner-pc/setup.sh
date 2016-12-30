@@ -35,9 +35,6 @@ chmod 777 "${HOME_DIRECTORY}/data.txt"
 cp wd_tst "${HOME_DIRECTORY}"
 chmod 777 "${HOME_DIRECTORY}/wd_tst"
 
-cp reboot.sh "${HOME_DIRECTORY}"
-chmod 777 "${HOME_DIRECTORY}/reboot.sh"
-
 kill -9 `pgrep -x wwan-monitor` || true
 cp wwan-monitor "${HOME_DIRECTORY}"
 chmod 777 "${HOME_DIRECTORY}/wwan-monitor"
