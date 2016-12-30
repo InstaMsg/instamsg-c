@@ -1,2 +1,3 @@
-*/1 * * * * echo > /home/sensegrow/instamsg.log
-*/1 * * * * echo > /home/sensegrow/wwan-monitor.log
+*/1 *   * * * echo > /home/sensegrow/instamsg.log
+*/1 *   * * * echo > /home/sensegrow/wwan-monitor.log
+0   */2 * * * /usr/bin/killall wwan-monitor
