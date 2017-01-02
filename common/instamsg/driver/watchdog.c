@@ -29,9 +29,6 @@
 
 
 
-#ifndef WATCHDOG_COMMON_IMPL
-#define WATCHDOG_COMMON_IMPL
-
 #include <stdio.h>
 
 #include "./include/watchdog.h"
@@ -91,4 +88,3 @@ unsigned char time_fine_for_time_limit_function()
 {
     return ( ((watchdog_active == 1) && (watchdog_expired == 0)) || (watchdog_active == 0) );
 }
-#endif
