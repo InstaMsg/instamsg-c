@@ -37,10 +37,36 @@
 #include "./include/config.h"
 #include "./include/at.h"
 #include "./include/log.h"
+#include "./include/time.h"
+
+extern unsigned long nextBusinessLogicTick;
+extern int editableBusinessLogicInterval;
+
+void waitBeforeReboot()
+{
+    if(1)
+    {
+        unsigned long difference = getCurrentTick() - nextBusinessLogicTick;
+        while(difference >= editableBusinessLogicInterval)
+        {
+            difference = difference - editableBusinessLogicInterval;
+        }
+
+        if(difference > 0)
+        {
+            sg_sprintf(LOG_GLOBAL_BUFFER, "Waiting [%u] seconds before rebooting", (int)difference);
+            info_log(LOG_GLOBAL_BUFFER);
+
+            startAndCountdownTimer(difference, 1);
+        }
+    }
+}
 
 
 void exitApp()
 {
+    waitBeforeReboot();
+
     release_app_resources();
 
     release_data_logger();

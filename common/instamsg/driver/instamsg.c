@@ -3022,6 +3022,8 @@ void sendGpsLocationToServer()
 #endif
 
 
+unsigned long nextBusinessLogicTick;
+
 void start(int (*onConnectOneTimeOperations)(),
            int (*onDisconnect)(),
            int (*oneToOneMessageReceivedHandler)(OneToOneResult *),
@@ -3038,14 +3040,12 @@ void start(int (*onConnectOneTimeOperations)(),
     unsigned long nextSendGpsLocationTick = latestTick + sendGpsLocationInterval;
 #endif
 
-    unsigned long nextBusinessLogicTick;
 
     statsDisplayInterval = 60;
     nextStatsDisplayTick = latestTick + statsDisplayInterval;
 
     editableBusinessLogicInterval = businessLogicInterval;
     nextBusinessLogicTick = latestTick + editableBusinessLogicInterval;
-
 
     sendPacketIrrespective = 0;
     pingRequestInterval = 0;
@@ -3243,6 +3243,7 @@ void start(int (*onConnectOneTimeOperations)(),
                                     msgSource = PERSISTENT_STORAGE;
                                 }
 
+                                nextBusinessLogicTick = latestTick + editableBusinessLogicInterval;
                                 if((rebootPending == 1) && (businessLogicRunOnceAtStart == 1))
                                 {
                                     sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Rebooting due to an error condition that occurred before."));
@@ -3252,9 +3253,7 @@ void start(int (*onConnectOneTimeOperations)(),
                                 }
 
                                 businessLogicRunOnceAtStart = 1;
-                                nextBusinessLogicTick = latestTick + editableBusinessLogicInterval;
                             }
-
                         }
 
 #if MEDIA_STREAMING_ENABLED == 1

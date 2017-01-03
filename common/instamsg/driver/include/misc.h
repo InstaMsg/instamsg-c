@@ -59,6 +59,7 @@ void release_app_resources();
 void get_prov_pin_for_non_gsm_devices(char *buffer, int maxbufferlength);
 #endif
 
+void waitBeforeReboot();
 void exitApp();
 
 #endif
