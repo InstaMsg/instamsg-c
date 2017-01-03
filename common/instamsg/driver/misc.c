@@ -46,7 +46,7 @@ void waitBeforeReboot()
 {
     if(1)
     {
-        unsigned long difference = getCurrentTick() - nextBusinessLogicTick;
+        unsigned long difference = nextBusinessLogicTick - getCurrentTick();
         while(difference >= editableBusinessLogicInterval)
         {
             difference = difference - editableBusinessLogicInterval;
