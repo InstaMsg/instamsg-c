@@ -1,0 +1,5 @@
+HOME_DIRECTORY="/home/sensegrow"
+PLATFORM="lanner-pc"
+
+FIRST_PID=`ps -aux | grep -v grep | grep -v tail | grep sg_upgrade.sh`
+SECOND_PID=`ps -aux | grep -v grep | grep -v tail | grep sg_setup.sh`

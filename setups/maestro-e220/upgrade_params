@@ -1,0 +1,5 @@
+HOME_DIRECTORY="/overlay/home/sensegrow"
+PLATFORM="maestro-e220"
+
+FIRST_PID=`ps | grep sg_upgrade.sh | grep -v grep | grep -v tail | sed -e 's/^ *//g' | cut -d\  -f 1`
+SECOND_PID=`ps | grep sg_setup.sh | grep -v grep | grep -v tail | sed -e 's/^ *//g' | cut -d\  -f 1`

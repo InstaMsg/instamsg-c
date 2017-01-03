@@ -1,17 +1,16 @@
 #!/bin/sh
 
-PID=`ps | grep sg_upgrade.sh | grep -v grep | grep -v tail | sed -e 's/^ *//g' | cut -d\  -f 1`
+. ./upgrade_params
 
-if [ -z "${PID}" ]
+if [ -z "${FIRST_PID}" ]
 then
     echo "Safe to proceed (stage 1) ..."
 
-    PID=`ps -aux | grep -v grep | grep -v tail | grep sg_setup.sh`
-    if [ -z "${PID}" ]
+    if [ -z "${SECOND_PID}" ]
     then
-	echo "Safe to proceed (stage 2) ..."
+	    echo "Safe to proceed (stage 2) ..."
 
-    	cd /overlay/home/sensegrow
+    	cd "${HOME_DIRECTORY}"
     	chmod 777 ./sg_upgrade.sh
     	./sg_upgrade.sh &
     else
