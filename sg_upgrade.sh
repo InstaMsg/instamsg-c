@@ -8,7 +8,7 @@ cd "${HOME_DIRECTORY}"
 rm -f setup.zip*
 rm -rf setup
 
-wget "https://github.com/InstaMsg/instamsg-c/blob/master/setups/${PLATFORM}/setup.zip?raw=true"
+wget "${PLATFORM}"
 
 mv setup.zip* setup.zip
 unzip setup.zip -d .

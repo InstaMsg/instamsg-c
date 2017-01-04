@@ -1,5 +1,5 @@
 HOME_DIRECTORY="/overlay/home/sensegrow"
-PLATFORM="maestro-e220"
+PLATFORM="http://0260b1be9a0d4c3515c2-970a230c3dade1e1f677b583f3dc944e.r18.cf2.rackcdn.com/maestro-e220/setup.zip"
 
 FIRST_PID=`ps | grep sg_upgrade.sh | grep -v grep | grep -v tail | sed -e 's/^ *//g' | cut -d\  -f 1`
 SECOND_PID=`ps | grep sg_setup.sh | grep -v grep | grep -v tail | sed -e 's/^ *//g' | cut -d\  -f 1`
