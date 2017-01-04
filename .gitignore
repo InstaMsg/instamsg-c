@@ -80,3 +80,8 @@ common/apps/philips-app-luminar
 
 common/ioeye
 common/ioeye-c
+
+setups/linux_desktop/setup
+setups/lanner-pc/setup
+setups/maestro-e220/setup
+setups/pi/setup
