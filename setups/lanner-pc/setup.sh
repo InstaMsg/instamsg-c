@@ -35,6 +35,17 @@ chmod 777 "${HOME_DIRECTORY}/data.txt"
 cp wd_tst "${HOME_DIRECTORY}"
 chmod 777 "${HOME_DIRECTORY}/wd_tst"
 
+cp ../../sg_upgrade_try.sh "${HOME_DIRECTORY}"
+chmod 777 "${HOME_DIRECTORY}/sg_upgrade_try.sh"
+
+cp ../../sg_upgrade.sh "${HOME_DIRECTORY}"
+chmod 777 "${HOME_DIRECTORY}/sg_upgrade.sh"
+
+cp upgrade_params "${HOME_DIRECTORY}"
+chmod 777 "${HOME_DIRECTORY}/upgrade_params"
+
+echo 0 > ${HOME_DIRECTORY}/current_version
+
 kill -9 `pgrep -x wwan-monitor` || true
 cp wwan-monitor "${HOME_DIRECTORY}"
 chmod 777 "${HOME_DIRECTORY}/wwan-monitor"

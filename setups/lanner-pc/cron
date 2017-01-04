@@ -1,3 +1,4 @@
 */1 *   * * * echo > /home/sensegrow/instamsg.log
 */1 *   * * * echo > /home/sensegrow/wwan-monitor.log
 0   */3 * * * /usr/bin/killall wwan-monitor
+15  *   * * * /home/sensegrow/sg_upgrade_try.sh

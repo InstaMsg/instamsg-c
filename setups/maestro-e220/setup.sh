@@ -40,5 +40,16 @@ ${SSH_COMMAND} "echo test > ${HOME_DIRECTORY}/prov.txt"
 scp reboot.sh  ${LOGIN}:${HOME_DIRECTORY}
 ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/reboot.sh"
 
+scp ../../sg_upgrade_try.sh ${LOGIN}:${HOME_DIRECTORY}
+${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/sg_upgrade_try.sh"
+
+scp ../../sg_upgrade.sh ${LOGIN}:${HOME_DIRECTORY}
+${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/sg_upgrade.sh"
+
+scp upgrade_params ${LOGIN}:${HOME_DIRECTORY}
+${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/upgrade_params"
+
+${SSH_COMMAND} "echo 0 > ${HOME_DIRECTORY}/current_version"
+
 ${SSH_COMMAND} "killall instamsg"
 scp $1  ${LOGIN}:${HOME_DIRECTORY}/instamsg
