@@ -1,3 +1,3 @@
 */1 * * * * echo > /overlay/home/sensegrow/instamsg.log
 0   * * * * /overlay/home/sensegrow/reboot.sh
-15  * * * * /overlay/home/sensegrow/sg_upgrade_try.sh
+15  * * * * cd /overlay/home/sensegrow; /overlay/home/sensegrow/sg_upgrade_try.sh
