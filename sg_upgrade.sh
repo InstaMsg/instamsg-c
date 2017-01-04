@@ -11,7 +11,7 @@ rm -rf setup
 wget "${PLATFORM}"
 
 mv setup.zip* setup.zip
-unzip setup.zip -d .
+${EXTRACT_COMMAND}
 
 cd setup
 
