@@ -82,5 +82,4 @@ common/ioeye
 common/ioeye-c
 
 setups/linux_desktop/setup
-setups/lanner-pc/setup
 setups/pi/setup
