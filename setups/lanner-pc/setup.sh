@@ -28,6 +28,7 @@ chmod 644 /lib/modules/3.19.8-031908-generic/kernel/drivers/watchdog/wd_drv.ko
 sed -i '/^[ :\t]*wd_drv/d' /etc/modules
 echo wd_drv >> /etc/modules
 
+rm -f /etc/udev/rules.d/70-persistent-net.rules
 
 touch "${HOME_DIRECTORY}/data.txt"
 chmod 777 "${HOME_DIRECTORY}/data.txt"
