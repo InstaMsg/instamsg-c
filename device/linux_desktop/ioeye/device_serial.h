@@ -10,7 +10,7 @@ typedef struct SimulatedModbus SimulatedModbus;
 struct Serial
 {
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
-    SERIAL_DEVICE_TYPE deviceType;
+    unsigned char isSimulatedDevice;
     char identifier[50];
     char serial_params_identifier[100];
     char serial_delimiter_identifier[100];
