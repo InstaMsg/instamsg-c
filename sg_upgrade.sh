@@ -5,12 +5,12 @@
 set -e
 
 cd "${HOME_DIRECTORY}"
+rm -f setup.zip
 rm -f setup.zip*
 rm -rf setup
 
 wget "${PLATFORM}"
 
-mv setup.zip* setup.zip
 ${EXTRACT_COMMAND}
 
 cd setup
