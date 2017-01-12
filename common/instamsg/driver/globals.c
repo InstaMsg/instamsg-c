@@ -564,7 +564,7 @@ char USER_LOG_FILE_PATH[MAX_BUFFER_SIZE];
 char USER_DEVICE_UUID[MAX_BUFFER_SIZE];
 #endif
 
-int editableBusinessLogicInterval;
+volatile int editableBusinessLogicInterval;
 int INSTAMSG_PORT;
 int INSTAMSG_HTTP_PORT;
 unsigned char sslEnabledAtAppLayer;

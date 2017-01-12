@@ -520,7 +520,7 @@ static void saveClientAuthFieldInfoOntoDevice(char *payload, char *key, void (*f
         sg_sprintf(LOG_GLOBAL_BUFFER, "Could not allocate memory in saveClientAuthFieldInfoOntoDevice");
         error_log(LOG_GLOBAL_BUFFER);
 
-        exitApp();
+        exitApp(0);
     }
 
     memset(temp, 0, sz);
@@ -566,7 +566,7 @@ static void processCertificateInfoIfAny(InstaMsg *c, char *payload)
         sg_sprintf(LOG_GLOBAL_BUFFER, "Could not allocate memory in processCertificateInfoIfAny");
         error_log(LOG_GLOBAL_BUFFER);
 
-        exitApp();
+        exitApp(0);
     }
 
     memset(temp, 0, sz);
@@ -589,7 +589,7 @@ static void handleCertReceived(InstaMsg *c, MQTTMessage *msg)
     sg_sprintf(LOG_GLOBAL_BUFFER, "Rebooting machine, as certificate has been updated.");
     info_log(LOG_GLOBAL_BUFFER);
 
-    exitApp();
+    exitApp(0);
 }
 
 
@@ -1447,7 +1447,7 @@ void clearInstaMsg(InstaMsg *c)
      * If we need to clear (most probably due to no network-connection, we must then restart if media-streaming is enabled.
      * Else, the media-reply message will not be re-sent.
      */
-    exitApp();
+    exitApp(0);
 #endif
 }
 
@@ -1645,7 +1645,7 @@ failure_while_syncing_through_gsm:
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to sync-time through NTP/GPS/GSM, no point proceeding further ..."), CLOCK_ERROR);
         error_log(LOG_GLOBAL_BUFFER);
 
-        exitApp();
+        exitApp(0);
     }
 }
 #endif
@@ -1773,7 +1773,7 @@ failure_in_time_syncing:
                        PROSTR("%sSince GPS/GSM-Time-Syncing is absent/disabled, so no point proceeding further ..."), CLOCK_ERROR);
             error_log(LOG_GLOBAL_BUFFER);
 
-            exitApp();
+            exitApp(0);
         }
 #endif
 }
@@ -2103,10 +2103,11 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
 
         {
             char interval[6];
+            int *ptr = (int *)(&editableBusinessLogicInterval);
             memset(interval, 0, sizeof(interval));
 
             sg_sprintf(interval, "%d", editableBusinessLogicInterval);
-            registerEditableConfig(&editableBusinessLogicInterval,
+            registerEditableConfig(ptr,
                                    PROSTR("BUSINESS_LOGIC_INTERVAL"),
                                    CONFIG_INT,
                                    interval,
@@ -2203,7 +2204,7 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Client-%s failed with code [%d]"), mode, connack_rc);
         error_log(LOG_GLOBAL_BUFFER);
 
-        exitApp();
+        exitApp(0);
     }
 }
 
@@ -2290,7 +2291,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                         }
 
                         process_received_client_id(c, msg.payload);
-                        exitApp();
+                        exitApp(0);
                     }
                     else if(connack_rc == 0x06) /* Provision-Successful-With-Certificate */
                     {
@@ -2307,7 +2308,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                             sg_sprintf(LOG_GLOBAL_BUFFER, "Could not allocate memory for processing provisioning-response, bye ..");
                             error_log(LOG_GLOBAL_BUFFER);
 
-                            exitApp();
+                            exitApp(0);
                         }
 
                         memset(temp, 0, sz);
@@ -2331,7 +2332,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                         sg_free(temp);
 
                         processCertificateInfoIfAny(c, (char*)(msg.payload));
-                        exitApp();
+                        exitApp(0);
                     }
 
                     handleConnOrProvAckGeneric(c, connack_rc, PROVISIONED);
@@ -2438,7 +2439,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Received REBOOT request from server.. rebooting !!!"));
                         info_log(LOG_GLOBAL_BUFFER);
 
-                        exitApp();
+                        exitApp(0);
                     }
                     else if(strcmp(topicName, c->clientIdComplete) == 0)
                     {
@@ -3022,7 +3023,7 @@ void sendGpsLocationToServer()
 #endif
 
 
-unsigned long nextBusinessLogicTick;
+volatile unsigned long nextBusinessLogicTick;
 
 void start(int (*onConnectOneTimeOperations)(),
            int (*onDisconnect)(),
@@ -3157,7 +3158,7 @@ void start(int (*onConnectOneTimeOperations)(),
                                            MEDIA_ERROR, mediaReplyMessageWaitInterval);
                                 error_log(LOG_GLOBAL_BUFFER);
 
-                                exitApp();
+                                exitApp(0);
                             }
                         }
 #endif
@@ -3249,7 +3250,7 @@ void start(int (*onConnectOneTimeOperations)(),
                                     sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Rebooting due to an error condition that occurred before."));
                                     error_log(LOG_GLOBAL_BUFFER);
 
-                                    exitApp();
+                                    exitApp(1);
                                 }
 
                                 businessLogicRunOnceAtStart = 1;
@@ -3263,7 +3264,7 @@ void start(int (*onConnectOneTimeOperations)(),
                                        PROSTR("%sError occurred in media-streaming ... rebooting device to reset everything"), MEDIA);
                             error_log(LOG_GLOBAL_BUFFER);
 
-                            exitApp();
+                            exitApp(0);
                         }
 #endif
                     }

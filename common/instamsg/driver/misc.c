@@ -39,14 +39,14 @@
 #include "./include/log.h"
 #include "./include/time.h"
 
-extern unsigned long nextBusinessLogicTick;
-extern int editableBusinessLogicInterval;
+extern volatile unsigned long nextBusinessLogicTick;
+extern volatile int editableBusinessLogicInterval;
 
 void waitBeforeReboot()
 {
     if(1)
     {
-        unsigned long difference = nextBusinessLogicTick - getCurrentTick();
+        long difference = ((long)nextBusinessLogicTick) - ((long)(getCurrentTick()));
         while(difference >= editableBusinessLogicInterval)
         {
             difference = difference - editableBusinessLogicInterval;
@@ -63,9 +63,12 @@ void waitBeforeReboot()
 }
 
 
-void exitApp()
+void exitApp(unsigned char waitForReboot)
 {
-    waitBeforeReboot();
+    if(waitForReboot == 1)
+    {
+        waitBeforeReboot();
+    }
 
     release_app_resources();
 

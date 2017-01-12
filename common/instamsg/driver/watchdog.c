@@ -78,7 +78,7 @@ void watchdog_disable(void * (*func)(void *), void *arg)
         else
         {
             print_rebooting_message();
-            exitApp();
+            exitApp(0);
         }
     }
 }

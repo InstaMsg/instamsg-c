@@ -56,7 +56,7 @@ static void* watchdog_func(void *arg)
                 if(immediate_reboot == 1)
                 {
                     print_rebooting_message();
-                    exitApp();
+                    exitApp(0);
                 }
             }
         }

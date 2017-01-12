@@ -397,7 +397,7 @@ void connect_serial_port(int *fd, const char *port_name, char *params_string, un
     return;
 
 error_while_init:
-    exitApp();
+    exitApp(0);
 }
 
 

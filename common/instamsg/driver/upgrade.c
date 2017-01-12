@@ -88,7 +88,7 @@ exit:
 
     if(reboot == 1)
     {
-        exitApp();
+        exitApp(0);
     }
 }
 

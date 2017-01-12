@@ -60,6 +60,6 @@ void get_prov_pin_for_non_gsm_devices(char *buffer, int maxbufferlength);
 #endif
 
 void waitBeforeReboot();
-void exitApp();
+void exitApp(unsigned char waitForReboot);
 
 #endif
