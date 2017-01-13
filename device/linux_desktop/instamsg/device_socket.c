@@ -387,7 +387,6 @@ int socket_write(SG_Socket* socket, unsigned char* buffer, int len)
 void release_underlying_socket_medium_guaranteed(SG_Socket* socket)
 {
 #if SSL_ENABLED == 1
-    waitBeforeReboot();
     resetDevice();
 #else
     close(socket->socket);
