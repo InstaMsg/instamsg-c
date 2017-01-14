@@ -81,6 +81,29 @@ void process_config(char *configJson)
      */
     save_config_value_on_persistent_storage(config_key, configJson, 1);
 
+#if FILE_SYSTEM_ENABLED == 1
+    {
+        if(strcmp(config_key, AUTO_UPGRADE_ENABLED) == 0)
+        {
+            char *config_value = (char*) sg_malloc(3);
+            if(config_value == NULL)
+            {
+                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCould not allocate memory for reading value of config"), CONFIG_ERROR);
+                error_log(LOG_GLOBAL_BUFFER);
+            }
+            else
+            {
+                memset(config_value, 0, 3);
+
+                getJsonKeyValueIfPresent(configJson, CONFIG_VALUE_KEY, config_value);
+                write_singular_line_into_file("auto_upgrade", config_value);
+
+                sg_free(config_value);
+            }
+        }
+    }
+#endif
+
     /*
      * Finally, publish the config on the server, so that the device and server remain in sync.
      */

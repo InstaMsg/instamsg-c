@@ -47,6 +47,8 @@ enum CONFIG_TYPE
 #define CONFIG_VALUE_KEY            "val"
 #define CONFIG_DESCRIPTION_KEY      "desc"
 
+#define AUTO_UPGRADE_ENABLED        PROSTR("AUTO_UPGRADE_ENABLED")
+
 
 void init_config();
 int get_config_value_from_persistent_storage(const char *key, char *buffer, int maxBufferLength);

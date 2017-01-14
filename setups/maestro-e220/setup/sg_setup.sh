@@ -1,13 +1,14 @@
 #!/bin/sh
 
 . ../upgrade_params
-PKG_VERSION="2"
+PKG_VERSION="3"
 
 ###################### PERFORM ACTIONS NOW ##################################
 
 /usr/bin/killall monitor.sh || true
 /usr/bin/killall instamsg || true
 
-cp energy-meter_maestro-e220_3.0.7_3.0.7 /overlay/home/sensegrow/instamsg
+cp energy-meter_maestro-e220_3.0.8_3.0.8 ${HOME_DIRECTORY}/instamsg
+cp sg_upgrade.sh ${HOME_DIRECTORY}
 
-/overlay/home/sensegrow/reboot.sh
+${HOME_DIRECTORY}/reboot.sh

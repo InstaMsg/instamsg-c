@@ -118,6 +118,10 @@ static unsigned char sendPacketIrrespective;
 static unsigned char notifyServerOfSecretReceived;
 static int actuallyEnsureGuaranteeWhereRequired;
 
+#if FILE_SYSTEM_ENABLED == 1
+static int autoUpgradeEnabled;
+#endif
+
 static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *mode);
 
 #if NTP_TIME_SYNC_PRESENT == 1
@@ -2119,6 +2123,14 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
                                CONFIG_INT,
                                PROSTR("1"),
                                PROSTR(""));
+
+#if FILE_SYSTEM_ENABLED == 1
+        registerEditableConfig(&autoUpgradeEnabled,
+                               AUTO_UPGRADE_ENABLED,
+                               CONFIG_INT,
+                               PROSTR("1"),
+                               PROSTR(""));
+#endif
 
         /*
          * Although we took the decision to enable/disable GPS and NTP earlier in the flow, yet we do the following,
