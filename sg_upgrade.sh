@@ -8,9 +8,9 @@ cd "${HOME_DIRECTORY}"
 
 touch auto_upgrade
 enabled=`cat "auto_upgrade"`
-if [ ${enabled} != "1" ]
+if [ ${enabled} = "0" ]
 then
-    echo "Upgrade is not enabled ... aborting .."
+    echo "Upgrade is disabled ... aborting .."
     exit
 fi
 
