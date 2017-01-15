@@ -52,3 +52,4 @@ chmod 777 ./sg_setup.sh
 ./sg_setup.sh
 
 echo "${new_version}" > "${HOME_DIRECTORY}/current_version"
+${REBOOT_COMMAND}

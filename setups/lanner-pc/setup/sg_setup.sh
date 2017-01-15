@@ -10,5 +10,3 @@ PKG_VERSION="3"
 
 cp energy-meter_lanner-pc_3.0.8_3.0.8 ${HOME_DIRECTORY}/instamsg
 cp -f sg_upgrade.sh ${HOME_DIRECTORY}
-
-/sbin/reboot
