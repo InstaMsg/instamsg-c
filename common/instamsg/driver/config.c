@@ -96,7 +96,9 @@ void process_config(char *configJson)
                 memset(config_value, 0, 3);
 
                 getJsonKeyValueIfPresent(configJson, CONFIG_VALUE_KEY, config_value);
-                write_singular_line_into_file("auto_upgrade", config_value);
+
+                write_singular_line_into_file(SYSTEM_WIDE_TEMP_FILE, config_value);
+                renameFile(NULL, SYSTEM_WIDE_TEMP_FILE, "auto_upgrade");
 
                 sg_free(config_value);
             }
