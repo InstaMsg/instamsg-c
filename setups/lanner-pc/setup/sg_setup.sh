@@ -9,4 +9,5 @@ PKG_VERSION="3"
 /usr/bin/killall instamsg || true
 
 cp energy-meter_lanner-pc_3.0.8_3.0.8 ${HOME_DIRECTORY}/instamsg
+cp upgrade_params ${HOME_DIRECTORY}
 cp -f sg_upgrade.sh ${HOME_DIRECTORY}
