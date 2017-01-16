@@ -49,7 +49,7 @@ ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/sg_upgrade.sh"
 scp upgrade_params ${LOGIN}:${HOME_DIRECTORY}
 ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/upgrade_params"
 
-${SSH_COMMAND} "echo 3 > ${HOME_DIRECTORY}/current_version"
+${SSH_COMMAND} "echo 4 > ${HOME_DIRECTORY}/current_version"
 
 ${SSH_COMMAND} "killall instamsg"
 scp $1  ${LOGIN}:${HOME_DIRECTORY}/instamsg
