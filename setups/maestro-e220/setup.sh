@@ -51,5 +51,6 @@ ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/upgrade_params"
 
 ${SSH_COMMAND} "echo 4 > ${HOME_DIRECTORY}/current_version"
 
+${SSH_COMMAND} "killall monitor.sh"
 ${SSH_COMMAND} "killall instamsg"
 scp $1  ${LOGIN}:${HOME_DIRECTORY}/instamsg
