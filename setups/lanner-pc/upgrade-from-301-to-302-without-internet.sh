@@ -7,7 +7,7 @@ update-grub
 apt-get -y remove pm-utils
 
 kill -9 `pgrep -x instamsg` || true
-cp energy-meter_lanner-pc_3.0.3_3.0.3 /home/sensegrow/instamsg
+cp energy-meter_lanner-pc_3.0.9_3.0.9 /home/sensegrow/instamsg
 
 echo
 echo
