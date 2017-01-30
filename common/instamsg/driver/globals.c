@@ -499,9 +499,22 @@ static void set_up_network_ports()
     sslEnabledAtAppLayer = 0;
 #endif
 
+
 #if SOCKET_SSL_ENABLED == 1
+    int rc = get_config_value_from_persistent_storage(SSL_ACTUALLY_ENABLED, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
+
     sslEnabledAtSocketLayer = 1;
+    if(rc == SUCCESS)
+    {
+        char small[3] = {0};
+        getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, small);
+
+        sslEnabledAtSocketLayer = sg_atoi(small);
+    }
+#else
+    sslEnabledAtSocketLayer = 0;
 #endif
+
 
     if((sslEnabledAtAppLayer == 0) && (sslEnabledAtSocketLayer == 0))
     {
