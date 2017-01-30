@@ -119,7 +119,7 @@ void release_underlying_socket_medium_guaranteed(SG_Socket* socket)
 }
 
 
-#if SSL_ENABLED == 1
+#if (SSL_ENABLED == 1) || (SOCKET_SSL_ENABLED == 1)
 /*
  * This method loads the client-certificate into buffer.
  */

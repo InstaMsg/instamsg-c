@@ -513,7 +513,7 @@ static void handleConfigReceived(InstaMsg *c, MQTTMessage *msg)
 }
 
 
-#if SSL_ENABLED == 1
+#if (SSL_ENABLED == 1) || (SOCKET_SSL_ENABLED == 1)
 static void saveClientAuthFieldInfoOntoDevice(char *payload, char *key, void (*func)(char *buffer))
 {
     int sz = 2000;
@@ -561,7 +561,7 @@ static void saveClientAuthFieldInfoOntoDevice(char *payload, char *key, void (*f
 
 static void processCertificateInfoIfAny(InstaMsg *c, char *payload)
 {
-#if SSL_ENABLED == 1
+#if (SSL_ENABLED == 1) || (SOCKET_SSL_ENABLED == 1)
     int sz = 2000;
 
     char *temp = (char*) sg_malloc(sz);

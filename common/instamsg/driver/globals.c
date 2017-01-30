@@ -482,8 +482,6 @@ void startAndCountdownTimer(int seconds, unsigned char showRunningStatus)
 
 static void set_up_network_ports()
 {
-    unsigned char sslEnabledAtSocketLayer = 0;
-
 #if SSL_ENABLED == 1
     int rc = get_config_value_from_persistent_storage(SSL_ACTUALLY_ENABLED, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
 
@@ -581,4 +579,5 @@ volatile int editableBusinessLogicInterval;
 int INSTAMSG_PORT;
 int INSTAMSG_HTTP_PORT;
 unsigned char sslEnabledAtAppLayer;
+unsigned char sslEnabledAtSocketLayer;
 
