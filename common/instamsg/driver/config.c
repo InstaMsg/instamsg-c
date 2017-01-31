@@ -39,6 +39,12 @@
 #include "include/sg_stdlib.h"
 #include "include/json.h"
 
+#if FILE_SYSTEM_ENABLED == 1
+#include "include/file_system.h"
+int write_singular_line_into_file(const char *filePath, const char *buffer);
+#endif
+
+
 static int publishConfig(const char *topicName, const char *message)
 {
     return publish(topicName,
