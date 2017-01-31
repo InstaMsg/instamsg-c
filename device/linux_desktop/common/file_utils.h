@@ -27,6 +27,7 @@
  *    Ajay Garg <ajay.garg@sensegrow.com>
  *******************************************************************************/
 
+#include "device_defines.h"
 
 #if FILE_SYSTEM_ENABLED == 1
 
