@@ -107,6 +107,10 @@ char* sg_strnstr(const char *str1, const char *str2, int maxSize)
     {
         return NULL;
     }
+    if(maxSize < strlen(str2))
+    {
+        return NULL;
+    }
 
     for(i = 0; i < (maxSize - strlen(str2)); i++)
     {

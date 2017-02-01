@@ -77,7 +77,7 @@ static void trim_buffer_to_contain_only_first_required_sentence_type(unsigned ch
         /*
          * Now, search for closing *
          */
-        ptrEnd = sg_strnstr(ptrBegin, "*", strlen(ptrBegin) - 1);
+        ptrEnd = sg_strnstr(ptrBegin, "*", strlen(ptrBegin));
         if(ptrEnd != NULL)
         {
             while(1)
