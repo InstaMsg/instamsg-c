@@ -112,7 +112,7 @@ char* sg_strnstr(const char *str1, const char *str2, int maxSize)
         return NULL;
     }
 
-    for(i = 0; i < (maxSize - strlen(str2)); i++)
+    for(i = 0; i <= (maxSize - strlen(str2)); i++)
     {
         unsigned char failure = 0;
         for(j = 0; j < strlen(str2); j++)
