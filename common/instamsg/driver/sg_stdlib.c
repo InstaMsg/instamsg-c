@@ -97,7 +97,7 @@ int sg_atoi(const char *buf)
 
 char* sg_strnstr(const char *str1, const char *str2, int maxSize)
 {
-    unsigned int i = 0, j = 0;
+    int i = 0, j = 0;
 
     if(str1 == NULL)
     {
@@ -132,7 +132,7 @@ char* sg_strnstr(const char *str1, const char *str2, int maxSize)
 
 char* sg_memnmem(const char *mem1, const char *mem2, int sizeMem1, int sizeMem2)
 {
-    unsigned int i = 0, j = 0;
+    int i = 0, j = 0;
 
     if(mem1 == NULL)
     {
