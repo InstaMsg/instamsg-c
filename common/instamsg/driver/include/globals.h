@@ -89,8 +89,8 @@ struct KeyValuePairs
 
 extern int INSTAMSG_PORT;
 extern int INSTAMSG_HTTP_PORT;
-extern unsigned char sslEnabledAtAppLayer;
-extern unsigned char sslEnabledAtSocketLayer;
+extern int sslEnabledAtAppLayer;
+extern int sslEnabledAtSocketLayer;
 
 #define NTP_PORT            123
 

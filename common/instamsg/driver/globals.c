@@ -578,6 +578,6 @@ char USER_DEVICE_UUID[MAX_BUFFER_SIZE];
 volatile int editableBusinessLogicInterval;
 int INSTAMSG_PORT;
 int INSTAMSG_HTTP_PORT;
-unsigned char sslEnabledAtAppLayer;
-unsigned char sslEnabledAtSocketLayer;
+int sslEnabledAtAppLayer;
+int sslEnabledAtSocketLayer;
 
