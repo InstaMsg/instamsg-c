@@ -61,11 +61,7 @@ struct MQTTMessage
 
 struct InstaMsg {
     unsigned int next_packetid;
-#if SSL_ENABLED == 1
-    unsigned char readbuf[4000];
-#else
-    unsigned char readbuf[MAX_BUFFER_SIZE];
-#endif
+    unsigned char readbuf[READ_BUFFER_SIZE];
 
     struct MessageHandlers
     {
