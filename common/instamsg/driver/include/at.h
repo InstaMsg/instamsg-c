@@ -9,8 +9,11 @@
 /*
  * Public-APIs.
  */
-void run_simple_at_command_and_get_output(const char *command, int len, char *usefulOutput, int maxBufferLimit, const char *delimiter,
-                                          unsigned char showCommandOutput, unsigned char strip);
+void run_simple_at_command_and_get_output(const char *command, int len, char *usefulOutput, int maxBufferLimit,
+                                          const char *delimiter, unsigned char showCommandOutput, unsigned char strip);
+void run_simple_at_command_and_get_output_with_user_timeout(const char *command, int len, char *usefulOutput, int maxBufferLimit,
+                                                            const char *delimiter, unsigned char showCommandOutput, unsigned char strip,
+                                                            int timeout);
 
 
 /*

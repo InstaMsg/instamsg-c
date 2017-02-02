@@ -6,8 +6,10 @@
 #include <string.h>
 
 #if AT_INTERFACE_ENABLED == 1
-void run_simple_at_command_and_get_output(const char *command, int len, char *usefulOutput, int maxBufferLimit, const char *delimiter,
-                                          unsigned char showCommandOutput, unsigned char strip)
+static void do_run_simple_at_command_and_get_output_with_timeout(const char *command, int len, char *usefulOutput, int maxBufferLimit,
+                                                                 const char *delimiter, unsigned char showCommandOutput, unsigned char strip,
+                                                                 int timeout)
+
 {
     unsigned char watchdog_enable_required = 0;
 
@@ -16,7 +18,7 @@ void run_simple_at_command_and_get_output(const char *command, int len, char *us
     if(watchdog_active == 0)
     {
         watchdog_enable_required = 1;
-        watchdog_reset_and_enable(10, (char*)command, 1);
+        watchdog_reset_and_enable(timeout, (char*)command, 1);
     }
 
     do_fire_at_command_and_get_output(command, len, usefulOutput, delimiter);
@@ -52,4 +54,21 @@ void run_simple_at_command_and_get_output(const char *command, int len, char *us
         info_log(LOG_GLOBAL_BUFFER);
     }
 }
+
+
+void run_simple_at_command_and_get_output(const char *command, int len, char *usefulOutput, int maxBufferLimit,
+                                          const char *delimiter, unsigned char showCommandOutput, unsigned char strip)
+{
+    do_run_simple_at_command_and_get_output_with_timeout(command, len, usefulOutput, maxBufferLimit, delimiter, showCommandOutput, strip, 10);
+}
+
+
+void run_simple_at_command_and_get_output_with_user_timeout(const char *command, int len, char *usefulOutput, int maxBufferLimit,
+                                                            const char *delimiter, unsigned char showCommandOutput, unsigned char strip,
+                                                            int timeout)
+{
+    do_run_simple_at_command_and_get_output_with_timeout(command, len, usefulOutput, maxBufferLimit, delimiter, showCommandOutput, strip,
+                                                         timeout);
+}
+
 #endif
