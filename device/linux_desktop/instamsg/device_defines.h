@@ -61,7 +61,8 @@
 #define FILE_GETC                   fgetc
 #define FILE_PUTC                   fputc
 
-#define MAX_BUFFER_SIZE 1000
+#define MAX_BUFFER_SIZE             1000
+#define READ_BUFFER_SIZE            4000
 
 #define DATA_LOGGING_ENABLED        1
 #define MAX_DATA_LOGGER_SIZE_BYTES  100000
