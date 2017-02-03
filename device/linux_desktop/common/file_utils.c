@@ -115,16 +115,11 @@ void sg_readFile(const char *filePath, char *buffer, int maxBufferLength)
 void sg_writeFile(const char *filePath, char *buffer)
 {
     FILE_STRUCT *fp = NULL;
-    unsigned int i = 0;
 
     fp = FILE_OPEN(filePath, "w");
     if(fp != NULL)
     {
-        for(i = 0; i < strlen(buffer); i++)
-        {
-            FILE_PUTC(buffer[i], fp);
-        }
-
+    	FILE_WRITE_LINE(buffer, 1, strlen(buffer), fp);
         FILE_CLOSE(fp);
     }
     else
@@ -140,18 +135,12 @@ void sg_writeFile(const char *filePath, char *buffer)
 int sg_appendLine(const char *filePath, const char *buffer)
 {
     int rc = FAILURE;
-
     FILE_STRUCT *fp = NULL;
-    unsigned int i;
 
     fp = FILE_OPEN(filePath, "a+");
     if(fp != NULL)
     {
-        for(i = 0; i < strlen(buffer); i++)
-        {
-            FILE_PUTC(buffer[i], fp);
-        }
-
+    	FILE_WRITE_LINE(buffer, 1, strlen(buffer), fp);
         FILE_PUTC('\n', fp);
         FILE_CLOSE(fp);
 
@@ -208,18 +197,12 @@ void read_singular_line_from_file(const char *filePath, const char *content, cha
 int write_singular_line_into_file(const char *filePath, const char *buffer)
 {
     int rc = FAILURE;
-
     FILE_STRUCT *fp = NULL;
-    unsigned int i;
 
     fp = FILE_OPEN(filePath, "w");
     if(fp != NULL)
     {
-        for(i = 0; i < strlen(buffer); i++)
-        {
-            FILE_PUTC(buffer[i], fp);
-        }
-
+    	FILE_WRITE_LINE(buffer, 1, strlen(buffer), fp);
         FILE_CLOSE(fp);
 
         rc = SUCCESS;
