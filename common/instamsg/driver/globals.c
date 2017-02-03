@@ -576,6 +576,8 @@ char USER_DEVICE_UUID[MAX_BUFFER_SIZE];
 #endif
 
 volatile int editableBusinessLogicInterval;
+volatile int countdownTimerForBusinessLogic;
+
 int INSTAMSG_PORT;
 int INSTAMSG_HTTP_PORT;
 int sslEnabledAtAppLayer;

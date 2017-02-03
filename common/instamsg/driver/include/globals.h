@@ -144,6 +144,7 @@ extern char USER_DEVICE_UUID[MAX_BUFFER_SIZE];
 #endif
 
 extern volatile int editableBusinessLogicInterval;
+extern volatile int countdownTimerForBusinessLogic;
 
 #define SYSTEM_WIDE_TEMP_FILE   "temp"
 #endif
