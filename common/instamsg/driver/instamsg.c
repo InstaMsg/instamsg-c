@@ -3236,7 +3236,6 @@ void start(int (*onConnectOneTimeOperations)(),
 
                             {
                                 coreLoopyBusinessLogicInitiatedBySelf();
-				countdownTimerForBusinessLogic = 2 * editableBusinessLogicInterval;
 
 #if SEND_GPS_LOCATION == 1
                                 /*
@@ -3267,6 +3266,7 @@ void start(int (*onConnectOneTimeOperations)(),
                                 }
 
                                 businessLogicRunOnceAtStart = 1;
+				countdownTimerForBusinessLogic = 2 * editableBusinessLogicInterval;
                             }
                         }
 
