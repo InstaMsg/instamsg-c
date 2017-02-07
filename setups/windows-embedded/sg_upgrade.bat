@@ -46,8 +46,10 @@ if %new_version% GTR %prev_version% (
 	sleep 5
 	shutdown /r
 
-	exit /b
+	exit
 )
 
 echo Upgrade did not proceed because the new version is not greater !!
+sleep 5
 
+exit
