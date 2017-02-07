@@ -8,7 +8,9 @@ mkdir %HOME_DIRECTORY%
 cp -f monitor.bat  %HOME_DIRECTORY%
 echo test > %HOME_DIRECTORY%\prov.txt
 
+cp -f curl.exe  %HOME_DIRECTORY%
 
+cp -f upgrade_params.bat  %HOME_DIRECTORY%
 cp -f sg_upgrade_try.bat  %HOME_DIRECTORY%
 cp -f sg_upgrade.bat  %HOME_DIRECTORY%
 cp -f upgrade_params.bat  %HOME_DIRECTORY%

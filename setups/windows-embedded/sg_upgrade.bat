@@ -12,7 +12,7 @@ if %enabled% EQU 0 (
 )
 
 rm -f version.txt
-wget "${VERSION_URL}"
+.\curl.exe %VERSION_URL || exit /b
 
 
 set prev_version=
@@ -35,13 +35,14 @@ if %new_version% GTR %prev_version% (
 	rm -f setup.zip
 	rmdir /S setup
 
-	wget %PLATFORM%
-	%EXTRACT_COMMAND%
+	.\curl.exe %PLATFORM% || exit /b
+	unzip setup.zip
 
+	cd setup
 	call sg_setup.bat
 
 	echo %new_version% > ..\current_version
-	%REBOOT_COMMAND%
+	shutdown /r
 
 	exit
 )
