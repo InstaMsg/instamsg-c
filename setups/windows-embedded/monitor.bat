@@ -19,5 +19,7 @@ if %PID% EQU 1 (
 )
 
 sleep 60
+echo > %HOME_DIRECTORY%\instamsg.log
+
 goto loop
 
