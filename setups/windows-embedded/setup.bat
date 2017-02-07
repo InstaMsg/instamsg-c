@@ -16,6 +16,8 @@ cp -f sg_upgrade.bat  %HOME_DIRECTORY%
 cp -f upgrade_params.bat  %HOME_DIRECTORY%
 echo 0 > %HOME_DIRECTORY%\current_version
 
+>>data.txt type nul
+
 cp -f baretail.exe %HOME_DIRECTORY%
 echo > %HOME_DIRECTORY%\instamsg.log
 
