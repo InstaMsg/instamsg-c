@@ -3,6 +3,7 @@ setlocal enabledelayedexpansion
 
 set HOME_DIRECTORY=c:\sensegrow
 
+:loop
 
 set PID=
 for /f "tokens=* delims=" %%i in ('tasklist ^| findstr /b /l instamsg.exe ^| find /c "instamsg.exe"') do set PID=!PID!^%%i
@@ -16,4 +17,7 @@ if %PID% EQU 0 (
 if %PID% EQU 1 (
 	echo Binary running fine
 )
+
+sleep 60
+goto loop
 
