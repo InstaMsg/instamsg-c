@@ -8,17 +8,15 @@ set PID=
 for /f "tokens=* delims=" %%i in ('tasklist /v ^| findstr /l sg_upgrade.bat ^| find /c "sg_upgrade.bat"') do set PID=!PID!^%%i
 
 if %PID% EQU 0 (
-    	echo "Safe to proceed to stage 1"
+    	echo Safe to proceed to stage 1
 
 	set PID=
 	for /f "tokens=* delims=" %%i in ('tasklist /v ^| findstr /l sg_setup.bat.bat ^| find /c "sg_setup.bat"') do set PID=!PID!^%%i
 
 	if %PID% EQU 0 (
-	    	echo "Safe to proceed to stage 2"
+	    	echo Safe to proceed to stage 2
 
-		cd %HOME_DIRECTORY%
-		start /B sg_upgrade.bat
-
+		start sg_upgrade.bat
 		exit /b
 	)
 
