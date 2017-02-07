@@ -21,7 +21,8 @@ if %PID% EQU 0 (
 	)
 
         echo "An instance of sg_setup.bat already running, bye bye"
-	exit /b
+	exit
 )
 
 echo "An instance of sg_upgrade.bat already running, bye bye"
+exit

@@ -2,6 +2,7 @@
 setlocal enabledelayedexpansion
 
 set HOME_DIRECTORY=c:\sensegrow
+set upgrade_timer=0
 
 :loop
 
@@ -19,6 +20,16 @@ if %PID% EQU 1 (
 )
 
 sleep 60
+
+set /a upgrade_timer=%upgrade_timer%+60
+if %upgrade_timer% GTR 3600 (
+	cd %HOME_DIRECTORY%
+	.\sg_upgrade_try.bat
+
+	set upgrade_timer=0
+)
+
+
 echo > %HOME_DIRECTORY%\instamsg.log
 
 goto loop
