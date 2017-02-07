@@ -210,6 +210,24 @@ int get_next_record_from_persistent_storage(char *buffer, int maxLength)
         }
     }
 
+	{
+		unsigned int i = 0;
+		unsigned char onlyWhiteSpace = 1;
+
+		for (i = strlen(buffer) - 1; i >= 0; i--)
+		{
+			if ((buffer[i] != ' ') && (buffer[i] != '\r') && (buffer[i] != '\n'))
+			{
+				onlyWhiteSpace = 0;
+				break;
+			}
+		}
+
+		if (onlyWhiteSpace == 1)
+		{
+			buffer[0] = 0;
+		}
+	}
 exit:
     if(fp != NULL)
     {
