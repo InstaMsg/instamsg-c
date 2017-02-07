@@ -6,13 +6,12 @@ set HOME_DIRECTORY=c:\sensegrow
 mkdir %HOME_DIRECTORY%
 
 cp -f monitor.bat  %HOME_DIRECTORY%
-echo > %HOME_DIRECTORY%\data.txt
 echo test > %HOME_DIRECTORY%\prov.txt
 
 
 cp -f sg_upgrade_try.bat  %HOME_DIRECTORY%
 cp -f sg_upgrade.bat  %HOME_DIRECTORY%
-cp -f upgrade_params  %HOME_DIRECTORY%
+cp -f upgrade_params.bat  %HOME_DIRECTORY%
 echo 0 > %HOME_DIRECTORY%\current_version
 
 cp -f baretail.exe %HOME_DIRECTORY%
