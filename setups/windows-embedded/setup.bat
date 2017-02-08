@@ -1,6 +1,11 @@
 @echo off
 setlocal enabledelayedexpansion
 
+if not exist "C:\Program Files\GnuWin32\bin\unzip.exe" (
+	echo "unzip.exe is not present, please install it."
+	exit /b
+)
+
 set HOME_DIRECTORY=c:\sensegrow
 
 mkdir %HOME_DIRECTORY%
@@ -34,3 +39,5 @@ copy /Y %1.iobj %HOME_DIRECTORY%
 move %HOME_DIRECTORY%\%1.iobj %HOME_DIRECTORY%\instamsg.iobj
 copy /Y %1.pdb %HOME_DIRECTORY%
 move %HOME_DIRECTORY%\%1.pdb %HOME_DIRECTORY%\instamsg.pdb
+
+echo "Setup completed successfully ...."
