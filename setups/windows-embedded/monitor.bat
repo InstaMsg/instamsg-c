@@ -27,10 +27,9 @@ if %upgrade_timer% GTR 3600 (
 	call sg_upgrade_try.bat
 
 	set upgrade_timer=0
+	echo > %HOME_DIRECTORY%\instamsg.log
 )
 
-
-echo > %HOME_DIRECTORY%\instamsg.log
 
 goto loop
 
