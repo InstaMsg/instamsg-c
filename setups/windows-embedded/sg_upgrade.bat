@@ -19,7 +19,7 @@ if %enabled% EQU 0 (
 )
 
 >>version.txt type nul
-rm -f version.txt
+del /F version.txt
 .\curl.exe -s -O "%VERSION_URL%" || exit /b
 
 
@@ -32,7 +32,7 @@ for /f "tokens=* delims=" %%i in ('type version.txt') do set new_version=!new_ve
 if %new_version% GTR %prev_version% (
     	echo Upgrade will proceed now ...
 
-	rm -f setup.zip
+	del /F setup.zip
 	rmdir /S /Q setup
 
 	.\curl.exe -s -O "%PLATFORM%" || exit /b
