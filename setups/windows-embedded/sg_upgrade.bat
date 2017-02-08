@@ -13,6 +13,8 @@ if "%enabled%" == "" (
 
 if %enabled% EQU 0 (
     	echo Upgrade is disabled ... aborting ..
+
+	sleep 5
 	exit /b
 )
 
@@ -38,7 +40,7 @@ if %new_version% GTR %prev_version% (
 
 
 	cd setup || exit /b
-	call sg_setup.bat || exit /b
+	call sg_setup.bat
 
 	echo %new_version% > ..\current_version
 	echo "Upgrade completed successfully, rebooting in 5 seconds ..."
@@ -46,10 +48,10 @@ if %new_version% GTR %prev_version% (
 	sleep 5
 	shutdown /r
 
-	exit
+	exit /b
 )
 
 echo Upgrade did not proceed because the new version is not greater !!
 sleep 5
 
-exit
+exit /b

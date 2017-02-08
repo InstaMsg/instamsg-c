@@ -16,13 +16,17 @@ if %PID% EQU 0 (
 	if %PID% EQU 0 (
 	    	echo Safe to proceed to stage 2
 
-		start sg_upgrade.bat
+		call sg_upgrade.bat
 		exit /b
 	)
 
         echo "An instance of sg_setup.bat already running, bye bye"
-	exit
+
+	sleep 5
+	exit /b
 )
 
 echo "An instance of sg_upgrade.bat already running, bye bye"
-exit
+
+sleep 5
+exit /b

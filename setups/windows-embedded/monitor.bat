@@ -24,7 +24,7 @@ sleep 60
 set /a upgrade_timer=%upgrade_timer%+60
 if %upgrade_timer% GTR 3600 (
 	cd %HOME_DIRECTORY%
-	.\sg_upgrade_try.bat
+	call sg_upgrade_try.bat
 
 	set upgrade_timer=0
 )
