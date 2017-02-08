@@ -138,6 +138,7 @@ static unsigned char gpsGsmTimeSyncFeatureEnabled;
 
 static volatile unsigned char timeSyncedViaExternalResources;
 
+#define DEBUG_LOGGING_ENABLED                       PROSTR("DEBUG_LOGGING_ENABLED")
 
 #if NTP_TIME_SYNC_PRESENT == 1
 #define NTP_SERVER                                  PROSTR("NTP_SERVER")
@@ -2124,6 +2125,12 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
                                PROSTR("1"),
                                PROSTR(""));
 
+        registerEditableConfig(&debugLoggingEnabled,
+                               DEBUG_LOGGING_ENABLED,
+                               CONFIG_INT,
+                               PROSTR("1"),
+                               PROSTR(""));
+
 #if FILE_SYSTEM_ENABLED == 1
         registerEditableConfig(&autoUpgradeEnabled,
                                AUTO_UPGRADE_ENABLED,
@@ -3044,6 +3051,7 @@ void start(int (*onConnectOneTimeOperations)(),
            int businessLogicInterval)
 {
     InstaMsg *c = &instaMsg;
+    int rc = FAILURE;
 
     volatile unsigned long latestTick = getCurrentTick();
     unsigned long nextSocketTick = latestTick + NETWORK_INFO_INTERVAL;
@@ -3053,6 +3061,26 @@ void start(int (*onConnectOneTimeOperations)(),
     unsigned long nextSendGpsLocationTick = latestTick + sendGpsLocationInterval;
 #endif
 
+    debugLoggingEnabled = 1;
+    RESET_GLOBAL_BUFFER;
+
+    rc = get_config_value_from_persistent_storage(DEBUG_LOGGING_ENABLED, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
+    if(rc == SUCCESS)
+    {
+        char small[3] = {0};
+        getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, small);
+
+        if(strlen(small) > 0)
+        {
+            if(sg_atoi(small) == 0)
+            {
+                sg_sprintf(LOG_GLOBAL_BUFFER, "Disabling serial-logging .......");
+                info_log(LOG_GLOBAL_BUFFER);
+
+                debugLoggingEnabled = 0;
+            }
+        }
+    }
 
     statsDisplayInterval = 60;
     nextStatsDisplayTick = latestTick + statsDisplayInterval;

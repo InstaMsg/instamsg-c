@@ -33,7 +33,7 @@
 #ifndef DEVICE_DEFINES
 #define DEVICE_DEFINES
 
-#define DEVICE_VERSION "3.0.8"
+#define DEVICE_VERSION "4.0.0"
 
 /*
  * We use the vanilla "sprintf" method for Linux.
@@ -60,6 +60,7 @@
 #define FILE_END_ID                 EOF
 #define FILE_GETC                   fgetc
 #define FILE_PUTC                   fputc
+#define FILE_WRITE_LINE             fwrite
 
 #define MAX_BUFFER_SIZE             1000
 #define READ_BUFFER_SIZE            4000

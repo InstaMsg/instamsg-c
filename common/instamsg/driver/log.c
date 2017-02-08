@@ -64,8 +64,11 @@ int currentLogLevel;
     }                                                                                                   \
     else if(level <= currentLogLevel)                                                                   \
     {                                                                                                   \
-        serial_logger_write((unsigned char *)log, strlen(log));                                         \
-        fileLogger.fs.write(&(fileLogger.fs), (unsigned char *)log, strlen(log));                       \
+        if(debugLoggingEnabled == 1)                                                                    \
+        {                                                                                               \
+            serial_logger_write((unsigned char *)log, strlen(log));                                     \
+            fileLogger.fs.write(&(fileLogger.fs), (unsigned char *)log, strlen(log));                   \
+        }                                                                                               \
     }                                                                                                   \
     memset(LOG_GLOBAL_BUFFER, 0, sizeof(LOG_GLOBAL_BUFFER));
 #else
@@ -85,7 +88,10 @@ int currentLogLevel;
     }                                                                                                   \
     else if(level <= currentLogLevel)                                                                   \
     {                                                                                                   \
-        serial_logger_write((unsigned char *)log, strlen(log));                                         \
+        if(debugLoggingEnabled == 1)                                                                    \
+        {                                                                                               \
+            serial_logger_write((unsigned char *)log, strlen(log));                                     \
+        }                                                                                               \
     }                                                                                                   \
     memset(LOG_GLOBAL_BUFFER, 0, sizeof(LOG_GLOBAL_BUFFER));
 #endif
