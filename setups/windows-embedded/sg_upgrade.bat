@@ -36,7 +36,7 @@ if %new_version% GTR %prev_version% (
 	rmdir /S /Q setup
 
 	.\curl.exe -s -O "%PLATFORM%" || exit /b
-	unzip setup.zip || exit /b
+	"C:\Program Files\GnuWin32\bin\unzip" setup.zip || exit /b
 
 
 	cd setup || exit /b
