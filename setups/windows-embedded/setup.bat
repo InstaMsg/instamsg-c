@@ -24,7 +24,7 @@ echo > %HOME_DIRECTORY%\instamsg.log
 taskkill /IM monitor.bat /F
 taskkill /IM instamsg.exe /F
 
-copy -f instamsg.lnk "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup"
+copy /Y instamsg.lnk "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup"
 
 copy /Y %1.exe %HOME_DIRECTORY%
 move %HOME_DIRECTORY%\%1.exe %HOME_DIRECTORY%\instamsg.exe
