@@ -529,6 +529,8 @@ static void set_up_network_ports()
 
 void globalSystemInit(char *logFilePath)
 {
+    debugLoggingEnabled = 1;
+
     bootstrapInit();
 
     currentLogLevel = LOG_LEVEL;
