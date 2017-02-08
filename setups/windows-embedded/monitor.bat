@@ -19,7 +19,7 @@ if %PID% EQU 1 (
 	echo Binary running fine
 )
 
-sleep 60
+timeout 60 /nobreak
 
 set /a upgrade_timer=%upgrade_timer%+60
 if %upgrade_timer% GTR 3600 (

@@ -14,7 +14,7 @@ if "%enabled%" == "" (
 if %enabled% EQU 0 (
     	echo Upgrade is disabled ... aborting ..
 
-	sleep 5
+	timeout 5 /nobreak
 	exit /b
 )
 
@@ -45,13 +45,13 @@ if %new_version% GTR %prev_version% (
 	echo %new_version% > ..\current_version
 	echo "Upgrade completed successfully, rebooting in 5 seconds ..."
 
-	sleep 5
+	timeout 5 /nobreak
 	shutdown /r
 
 	exit /b
 )
 
-echo Upgrade did not proceed because the new version is not greater !!
-sleep 5
+echo "Upgrade did not proceed because the new version is not greater !!"
+timeout 5 /nobreak
 
 exit /b

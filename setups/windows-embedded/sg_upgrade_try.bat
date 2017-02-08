@@ -22,11 +22,11 @@ if %PID% EQU 0 (
 
         echo "An instance of sg_setup.bat already running, bye bye"
 
-	sleep 5
+	timeout 5 /nobreak
 	exit /b
 )
 
 echo "An instance of sg_upgrade.bat already running, bye bye"
 
-sleep 5
+timeout 5 /nobreak
 exit /b
