@@ -12,6 +12,7 @@ static void do_run_simple_at_command_and_get_output_with_timeout(const char *com
 
 {
     unsigned char watchdog_enable_required = 0;
+    int offset = 0;
 
     memset(usefulOutput, 0, maxBufferLimit);
 
@@ -35,7 +36,11 @@ static void do_run_simple_at_command_and_get_output_with_timeout(const char *com
         /*
          * Firstly, strip the delimiter.
          */
-        memset(usefulOutput + strlen(usefulOutput) - strlen(delimiter), 0, strlen(delimiter));
+        offset = ((int) (strlen(usefulOutput))) - ((int) (strlen(delimiter)));
+        if(offset > 0)
+        {
+            memset(usefulOutput + offset, 0, strlen(delimiter));
+        }
 
         /*
          * Secondly, strip the whitespaces.
