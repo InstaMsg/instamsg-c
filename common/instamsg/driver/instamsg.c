@@ -2103,7 +2103,7 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
         registerEditableConfig(&compulsorySocketReadAfterMQTTPublishInterval,
                                PROSTR("COMPULSORY_SOCKET_READ_AFTER_WRITE_COUNT"),
                                CONFIG_INT,
-                               "3",
+                               DEFAULT_COMPULSORY_SOCKET_READ_AFTER_WRITE_TIMEOUT,
                                PROSTR("This variable controls after how many MQTT-Publishes a compulsory socket-read is done. This prevents any socket-pverrun errors (particularly in hardcore embedded-devices"));
 
         {
