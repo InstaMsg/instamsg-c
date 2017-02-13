@@ -8,7 +8,7 @@ apt-get -y remove pm-utils
 dpkg -i pm-utils_1.4.1-13ubuntu0.2_all.deb
 
 kill -9 `pgrep -x instamsg` || true
-cp energy-meter_lanner-pc_4.1.0_4.1.0 /home/sensegrow/instamsg
+cp energy-meter_lanner-pc_4.2.0_4.2.0 /home/sensegrow/instamsg
 
 echo
 echo
