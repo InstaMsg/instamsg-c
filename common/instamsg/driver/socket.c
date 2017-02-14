@@ -48,6 +48,7 @@
 #if GSM_INTERFACE_ENABLED == 1
 
 static char sms[200];
+static unsigned char smsFetched;
 
 void replaceSmsCharacter(char *sms, char old_char, char new_char)
 {
@@ -663,6 +664,14 @@ void init_socket(SG_Socket *socket, const char *hostName, unsigned int port, con
     memset(socket->gsmPin, 0, sizeof(socket->gsmPin));
     memset(socket->provPin, 0, sizeof(socket->provPin));
 
+    if(smsFetched == 1)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("\n\n SMS already fetched ... not re-fetching ...\n\n"));
+        info_log(LOG_GLOBAL_BUFFER);
+
+        goto sms_already_fetched;
+    }
+
     /* Fill-in the provisioning-parameters. */
     memset(sms, 0, sizeof(sms));
 
@@ -730,6 +739,10 @@ void init_socket(SG_Socket *socket, const char *hostName, unsigned int port, con
     replaceSmsCharacter(sms, '@', '\'');
     replaceSmsCharacter(sms, '#', '"');
 
+    smsFetched = 1;
+
+
+sms_already_fetched:
     sg_sprintf(LOG_GLOBAL_BUFFER, "\n\nFinal (Converted) SMS being used for variables-extraction = [%s]\n\n", sms);
     info_log(LOG_GLOBAL_BUFFER);
 
