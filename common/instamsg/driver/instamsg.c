@@ -2148,7 +2148,7 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
         registerEditableConfig(maxSecondsWaitForGpsGsmTimeSync,
                                MAX_SECONDS_FOR_GPS_GSM_TIME_SYNC,
                                CONFIG_STRING,
-                               PROSTR("0"),
+                               PROSTR(DEFAULT_MAX_SECONDS_FOR_GPS_GSM_TIME_SYNC),
                                PROSTR(""));
 #endif
 
