@@ -2158,7 +2158,7 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
         registerEditableConfig(ntpServer,
                                NTP_SERVER,
                                CONFIG_STRING,
-                               PROSTR(""),
+                               PROSTR(DEFAULT_NTP_SERVER),
                                PROSTR(""));
 #endif
 
