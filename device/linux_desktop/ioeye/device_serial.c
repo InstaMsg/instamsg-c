@@ -12,12 +12,18 @@ static pthread_t tid;
 
 static unsigned char response_thread_started;
 
-static unsigned char *responseBuffer;
-static int bytesToRead;
-static int responseBytesSoFar;
+static volatile unsigned char *responseBuffer;
+static volatile int bytesToRead;
+static volatile int responseBytesSoFar;
 
-static int serial_fd;
-static unsigned char readResponse;
+static volatile unsigned char readResponse;
+
+static volatile Serial *global_serial;
+static volatile unsigned char *global_commandBytes;
+static volatile int global_commandBytesLength;
+static volatile unsigned char global_serial_delimiter;
+
+static volatile int maxTriesForSerialResponse;
 
 static void* serial_poller_func(void *arg)
 {
@@ -29,12 +35,44 @@ static void* serial_poller_func(void *arg)
             continue;
         }
 
-        read(serial_fd, responseBuffer + responseBytesSoFar, 1);
+        read(global_serial->fd, ((unsigned char*)responseBuffer) + responseBytesSoFar, 1);
         responseBytesSoFar++;
 
-        if(responseBytesSoFar == bytesToRead)
+        if(responseBuffer[0] == 0)
         {
-            readResponse = 0;
+            responseBytesSoFar = 0;
+        }
+        else if(bytesToRead > 0)
+        {
+            /*
+             * Fixed-bytes case.
+             */
+            if(responseBytesSoFar == bytesToRead)
+            {
+                readResponse = 0;
+            }
+        }
+        else if(responseBuffer[responseBytesSoFar - 1] == global_serial_delimiter)
+        {
+            /*
+             * Delimiter case.
+             */
+            if((responseBytesSoFar == 1) && (maxTriesForSerialResponse < 3))
+            {
+                /*
+                 * Handle when empty response is received.
+                 */
+                maxTriesForSerialResponse++;
+		        responseBytesSoFar = 0;
+    		    write(global_serial->fd, (unsigned char*)global_commandBytes, global_commandBytesLength);
+	        }
+            else
+            {
+                /*
+                 * We are done.
+                 */
+                readResponse = 0;
+            }
         }
     }
 
@@ -91,20 +129,35 @@ int serial_send_command_and_read_response_sync(Serial *serial,
                                                unsigned char *responseByteBuffer,
                                                int *responseBytesLength)
 {
-    write(serial->fd, commandBytes, commandBytesLength);
+    global_serial = serial;
+    global_commandBytes = commandBytes;
+    global_commandBytesLength = commandBytesLength;
+    global_serial_delimiter = sg_atoi(serial->serialDelimiter);
+
+    write(global_serial->fd, (unsigned char*)global_commandBytes, global_commandBytesLength);
 
     {
         responseBuffer = responseByteBuffer;
         bytesToRead = *responseBytesLength;
+        maxTriesForSerialResponse = 0;
         responseBytesSoFar = 0;
 
-        serial_fd = serial->fd;
         readResponse = 1;
 
         while((readResponse == 1) && (time_fine_for_time_limit_function() == 1))
         {
             startAndCountdownTimer(1, 0);
         }
+
+        if(readResponse == 0)
+        {
+            *responseBytesLength = responseBytesSoFar;
+        }
+
+        /*
+         * Stop the poller-thread to read unnecessarily.
+         */
+        readResponse = 0;
     }
 
     return SUCCESS;

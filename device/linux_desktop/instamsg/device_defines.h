@@ -33,7 +33,7 @@
 #ifndef DEVICE_DEFINES
 #define DEVICE_DEFINES
 
-#define DEVICE_VERSION "4.2.0"
+#define DEVICE_VERSION "4.2.8"
 
 /*
  * We use the vanilla "sprintf" method for Linux.
@@ -69,8 +69,8 @@
 #define MAX_DATA_LOGGER_SIZE_BYTES  100000
 
 #define SERIAL_COMMANDS_BUFFER_SIZE 600
-#define NUM_CLASSICAL_MODBUS_PORTS  1
-#define NUM_DELIM_TERMINATED_PORTS  0
+
+#define MAX_PORTS_ALLOWED           1
 
 #define OTA_BUFFER_SIZE             500
 #define OTA_PING_BUFFER_SIZE        10000
@@ -104,5 +104,10 @@
 
 #define MAX_MESSAGE_HANDLERS        50
 #define AT_INTERFACE_ENABLED        0
+
+#define SERIAL_RESPONSE_TIMEOUT_SECS    10
+
+#define DEFAULT_COMPULSORY_SOCKET_READ_AFTER_WRITE_TIMEOUT  "3"
+#define DEFAULT_NTP_SERVER                                  ""
 
 #endif
