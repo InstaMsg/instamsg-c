@@ -1,5 +1,8 @@
 sudo kill `pgrep -x instamsg`
 
+sudo killall monitor.sh
+sudo killall instamsg
+
 HOME_DIRECTORY="/home/sensegrow"
 
 sudo mkdir -p "${HOME_DIRECTORY}"
