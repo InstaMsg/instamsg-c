@@ -483,15 +483,17 @@ void startAndCountdownTimer(int seconds, unsigned char showRunningStatus)
 static void set_up_network_ports()
 {
 #if SSL_ENABLED == 1
-    int rc = get_config_value_from_persistent_storage(SSL_ACTUALLY_ENABLED, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
-
-    sslEnabledAtAppLayer = 1;
-    if(rc == SUCCESS)
     {
-        char small[3] = {0};
-        getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, small);
+        int rc = get_config_value_from_persistent_storage(SSL_ACTUALLY_ENABLED, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
 
-        sslEnabledAtAppLayer = sg_atoi(small);
+        sslEnabledAtAppLayer = 1;
+        if(rc == SUCCESS)
+        {
+            char small[3] = {0};
+            getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, small);
+
+            sslEnabledAtAppLayer = sg_atoi(small);
+        }
     }
 #else
     sslEnabledAtAppLayer = 0;
@@ -499,15 +501,17 @@ static void set_up_network_ports()
 
 
 #if SOCKET_SSL_ENABLED == 1
-    int rc = get_config_value_from_persistent_storage(SSL_ACTUALLY_ENABLED, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
-
-    sslEnabledAtSocketLayer = 1;
-    if(rc == SUCCESS)
     {
-        char small[3] = {0};
-        getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, small);
+        int rc = get_config_value_from_persistent_storage(SSL_ACTUALLY_ENABLED, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
 
-        sslEnabledAtSocketLayer = sg_atoi(small);
+        sslEnabledAtSocketLayer = 1;
+        if(rc == SUCCESS)
+        {
+            char small[3] = {0};
+            getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, small);
+
+            sslEnabledAtSocketLayer = sg_atoi(small);
+        }
     }
 #else
     sslEnabledAtSocketLayer = 0;
