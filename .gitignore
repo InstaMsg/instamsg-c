@@ -68,6 +68,7 @@ device/test_device
 device/philips-gateway
 device/linux-simcom
 device/philips-gateway-windows
+device/msf-gateway-windows
 
 common/apps/atoll-gms
 common/apps/energy-meter
