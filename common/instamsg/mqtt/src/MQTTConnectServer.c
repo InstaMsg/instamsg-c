@@ -18,7 +18,7 @@
 #include "MQTTPacket.h"
 #include <string.h>
 
-#define min(a, b) ((a < b) ? a : b)
+#define sg_min(a, b) ((a < b) ? a : b)
 
 
 /**
@@ -32,10 +32,10 @@ int MQTTPacket_checkVersion(MQTTString* protocol, int version)
 	int rc = 0;
 
 	if (version == 3 && memcmp(protocol->lenstring.data, "MQIsdp",
-			min(6, protocol->lenstring.len)) == 0)
+			sg_min(6, protocol->lenstring.len)) == 0)
 		rc = 1;
 	else if (version == 4 && memcmp(protocol->lenstring.data, "MQTT",
-			min(4, protocol->lenstring.len)) == 0)
+			sg_min(4, protocol->lenstring.len)) == 0)
 		rc = 1;
 	return rc;
 }

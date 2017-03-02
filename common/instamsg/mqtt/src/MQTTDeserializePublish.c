@@ -18,8 +18,6 @@
 #include "MQTTPacket.h"
 #include <string.h>
 
-#define min(a, b) ((a < b) ? 1 : 0)
-
 int MQTTDeserialize_publish(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId,
                             MQTTString* topicName,
                             unsigned char** payload,
