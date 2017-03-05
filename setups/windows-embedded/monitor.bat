@@ -3,6 +3,7 @@ setlocal enabledelayedexpansion
 
 set HOME_DIRECTORY=c:\sensegrow
 set upgrade_timer=0
+set log_file_timer=0
 
 :loop
 
@@ -12,6 +13,7 @@ for /f "tokens=* delims=" %%i in ('tasklist ^| findstr /b /l instamsg.exe ^| fin
 if %PID% EQU 0 (
 	echo Binary not running
 	cd %HOME_DIRECTORY%
+    del /F instamsg.log
 	start /B instamsg
 )
 
@@ -27,9 +29,14 @@ if %upgrade_timer% GTR 3600 (
 	call sg_upgrade_try.bat
 
 	set upgrade_timer=0
-	echo > %HOME_DIRECTORY%\instamsg.log
 )
 
+set /a log_file_timer=%log_file_timer%+60
+if %log_file_timer% GTR 36000 (
+	cd %HOME_DIRECTORY%
+    taskkill /IM instamsg.exe /F
+	set log_file_timer=0
+)
 
 goto loop
 
