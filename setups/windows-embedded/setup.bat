@@ -19,7 +19,7 @@ copy /Y upgrade_params.bat  %HOME_DIRECTORY%
 copy /Y sg_upgrade_try.bat  %HOME_DIRECTORY%
 copy /Y sg_upgrade.bat  %HOME_DIRECTORY%
 copy /Y upgrade_params.bat  %HOME_DIRECTORY%
-echo 1 > %HOME_DIRECTORY%\current_version
+echo 2 > %HOME_DIRECTORY%\current_version
 
 >>data.txt type nul
 
