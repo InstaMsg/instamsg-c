@@ -8,7 +8,7 @@
  * to provide the reference to an implementation shipped with their compiler-environment.
  */
 
-#define DEVICE_VERSION              "1.0.0"
+#define DEVICE_VERSION "1.0.0"
 
 #define sg_sprintf                  DEFAULT_SPRINTF
 
