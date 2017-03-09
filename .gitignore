@@ -69,6 +69,7 @@ device/philips-gateway
 device/linux-simcom
 device/philips-gateway-windows
 device/msf-gateway-windows
+device/masibus-gateway-gsm-windows
 
 common/apps/atoll-gms
 common/apps/energy-meter
@@ -82,5 +83,5 @@ common/apps/philips-app-luminar
 common/ioeye
 common/ioeye-c
 
-setups/linux_desktop/setup
+setups/linux_desktop
 setups/pi/setup
