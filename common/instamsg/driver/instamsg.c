@@ -510,7 +510,7 @@ static void handleConfigReceived(InstaMsg *c, MQTTMessage *msg)
     sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sReceived the config-payload [%s] from server"), CONFIG, (char*)(msg->payload));
     info_log(LOG_GLOBAL_BUFFER);
 
-    process_config(msg->payload);
+    process_config(msg->payload, 1);
 }
 
 

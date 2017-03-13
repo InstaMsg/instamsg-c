@@ -67,7 +67,7 @@ void generate_config_json(char *messageBuffer, const char *key, enum CONFIG_TYPE
 }
 
 
-void process_config(char *configJson)
+void process_config(char *configJson, unsigned char persistConfig)
 {
     char *config_key = NULL;
 
@@ -85,7 +85,10 @@ void process_config(char *configJson)
     /*
      * Save the config on persistent-storage.
      */
-    save_config_value_on_persistent_storage(config_key, configJson, 1);
+    if(persistConfig == 1)
+    {
+        save_config_value_on_persistent_storage(config_key, configJson, 1);
+    }
 
 #if FILE_SYSTEM_ENABLED == 1
     {
@@ -131,6 +134,7 @@ void registerEditableConfig(void *var,
                             char *desc)
 {
     int rc = FAILURE;
+    unsigned char persistConfig = 1;
 
     char *stored_value = NULL;
     char *stored_desc = NULL;
@@ -175,6 +179,8 @@ void registerEditableConfig(void *var,
                    PROSTR("%sDefault-config-values overridden by stored-values. Key = [%s], Value = [%s], Description = [%s]"),
                    CONFIG, key, stringified_value, desc);
         info_log(LOG_GLOBAL_BUFFER);
+
+        persistConfig = 0;
     }
 
 
@@ -206,7 +212,7 @@ void registerEditableConfig(void *var,
     memset(messageBuffer, 0, sizeof(messageBuffer));
     generate_config_json(messageBuffer, key, type, stringified_value, desc);
 
-    process_config(messageBuffer);
+    process_config(messageBuffer, persistConfig);
 
 exit:
     if(stored_desc)
