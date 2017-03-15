@@ -1882,6 +1882,10 @@ static void check_if_all_required_compile_time_defines_are_present()
 #ifndef SOCKET_SSL_ENABLED
 #error "SOCKET_SSL_ENABLED compile-time-parameter undefined"
 #endif
+
+#ifndef ENSURE_EXPLICIT_TIME_SYNC
+#error "ENSURE_EXPLICIT_TIME_SYNC compile-time-parameter undefined"
+#endif
 }
 
 
@@ -3264,6 +3268,16 @@ void start(int (*onConnectOneTimeOperations)(),
                             if(coreLoopyBusinessLogicInitiatedBySelf != NULL)
 
                             {
+
+#if ENSURE_EXPLICIT_TIME_SYNC == 1
+                                if(timeSyncedViaExternalResources == 0)
+                                {
+                                    sg_sprintf(LOG_GLOBAL_BUFFER, "Time is still not synced, nothing to live for ...");
+                                    error_log(LOG_GLOBAL_BUFFER);
+
+                                    resetDevice();
+                                }
+#endif
                                 coreLoopyBusinessLogicInitiatedBySelf();
 
 #if SEND_GPS_LOCATION == 1
