@@ -136,7 +136,7 @@ static DateParams dateParams;
 static unsigned char gpsGsmTimeSyncFeatureEnabled;
 #endif
 
-static volatile unsigned char timeSyncedViaExternalResources;
+volatile unsigned char timeSyncedViaExternalResources;
 
 #define DEBUG_LOGGING_ENABLED                       PROSTR("DEBUG_LOGGING_ENABLED")
 
