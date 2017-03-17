@@ -4,6 +4,9 @@
 
 #include "device_socket.h"
 
+
+#include "../../driver/include/watchdog.h"
+
 extern volatile char *responseBuffer;
 extern volatile unsigned char readResponse;
 extern volatile char *response_delimiter;
@@ -26,6 +29,7 @@ short remove_unwanted_line_with_prefix(char *usefulOutput, char *prefix);
 
 
 extern volatile unsigned char timeSyncedViaExternalResources;
+void serial_poller_func();
 #define WAIT_FOR_SIMCOM_MODEM_RESPONSE                                                                                                  \
     {                                                                                                                                   \
         responseBuffer = usefulOutput;                                                                                                  \
