@@ -31,6 +31,14 @@ volatile unsigned char readResponse;
 volatile char *response_delimiter;
 
 
+#define INVALID_DATA            0
+#define VALID_DATA              1
+
+#define STARTING_INDEX          0
+
+static volatile unsigned int writeIndex;
+static volatile unsigned int readIndex;
+
 static unsigned char returnSingleCharacter()
 {
     unsigned char c;
@@ -95,14 +103,6 @@ static void reset_modem_receive_buffer()
 }
 
 
-#define INVALID_DATA            0
-#define VALID_DATA              1
-
-#define STARTING_INDEX          0
-
-static volatile unsigned int writeIndex;
-static volatile unsigned int readIndex;
-
 void reset_circular_buffer()
 {
 	{
@@ -122,8 +122,8 @@ void reset_circular_buffer()
 
 void add_data_to_circular_buffer(unsigned char c)
 {
-		unsigned int tmp1 = 0, tmp2 = 0;
-		
+    unsigned int tmp1 = 0, tmp2 = 0;
+
     {
         circularBuffer[writeIndex + 1] = c;
         circularBuffer[writeIndex] = VALID_DATA;
