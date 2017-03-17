@@ -667,7 +667,7 @@ exit:
  * "connect_underlying_socket_medium_try_once".
  */
 #define SMS_MODE_SETTER_COMMAND         "AT+CMGF=1\r"
-static char tempSmsBuffer[170];
+static char tempSmsBuffer[400];
 
 void simcom_get_latest_sms_containing_substring(SG_Socket *socket, char *buffer, const char *substring)
 {
