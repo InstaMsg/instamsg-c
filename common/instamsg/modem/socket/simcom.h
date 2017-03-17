@@ -31,7 +31,6 @@ void simcom_load_client_private_key_into_buffer(char *private_key_buffer, int ma
 void simcom_save_client_private_key_from_buffer(char *private_key_buffer);
 
 void reset_circular_buffer();
-void add_data_to_circular_buffer(unsigned char c);
 short remove_unwanted_line_with_prefix(char *usefulOutput, char *prefix);
 
 

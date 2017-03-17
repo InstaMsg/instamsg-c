@@ -114,8 +114,6 @@ void reset_circular_buffer()
 }
 
 
-void add_data_to_circular_buffer(unsigned char c)
-
 
 #define SOCKET_CONNECTION_DELIM     "CONNECT"
 #define BYTES_POLL_RESP_HEADER      "+CIPRXGET: 2,"
