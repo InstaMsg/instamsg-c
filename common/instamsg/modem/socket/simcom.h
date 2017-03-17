@@ -1,4 +1,8 @@
+#include "device_defines.h"
+
 #if DEFAULT_SIMCOM_SOCKET_ENABLED == 1
+
+#include "device_socket.h"
 
 extern volatile char *responseBuffer;
 extern volatile unsigned char readResponse;

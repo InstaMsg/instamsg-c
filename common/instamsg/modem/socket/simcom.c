@@ -1,3 +1,5 @@
+#include "./simcom.h"
+
 #if DEFAULT_SIMCOM_SOCKET_ENABLED == 1
 
 #include "../driver/include/globals.h"
@@ -120,6 +122,8 @@ void reset_circular_buffer()
 
 void add_data_to_circular_buffer(unsigned char c)
 {
+		unsigned int tmp1 = 0, tmp2 = 0;
+		
     {
         circularBuffer[writeIndex + 1] = c;
         circularBuffer[writeIndex] = VALID_DATA;
