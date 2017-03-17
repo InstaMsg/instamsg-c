@@ -5,13 +5,20 @@
 #include "device_socket.h"
 
 
-#include "../../driver/include/watchdog.h"
 
 extern volatile char *responseBuffer;
 extern volatile unsigned char readResponse;
 extern volatile char *response_delimiter;
 
-#define CIRCULAR_BUFFER_SIZE 500
+
+#define CIRCULAR_BUFFER_SIZE    500
+#define INVALID_DATA            0
+#define VALID_DATA              1
+#define STARTING_INDEX          0
+
+extern volatile unsigned int writeIndex;
+extern volatile unsigned int readIndex;
+extern volatile unsigned char circularBuffer[2 * CIRCULAR_BUFFER_SIZE];
 
 void simcom_get_latest_sms_containing_substring(SG_Socket *socket, char *buffer, const char *substring);
 void simcom_connect_underlying_socket_medium_try_once(SG_Socket* socket);
@@ -27,6 +34,8 @@ void reset_circular_buffer();
 void add_data_to_circular_buffer(unsigned char c);
 short remove_unwanted_line_with_prefix(char *usefulOutput, char *prefix);
 
+
+#include "../../driver/include/watchdog.h"
 
 extern volatile unsigned char timeSyncedViaExternalResources;
 void serial_poller_func();
@@ -85,5 +94,30 @@ void serial_poller_func();
         }                                                                                                                               \
     }
 
+
+#include "../../driver/include/log.h"
+#include "../../driver/include/misc.h"
+
+#define ADD_DATA_TO_CIRCULAR_BUFFER                                                                                                     \
+        unsigned int tmp1 = 0, tmp2 = 0;                                                                                                \
+                                                                                                                                        \
+        circularBuffer[writeIndex + 1] = c;                                                                                             \
+        circularBuffer[writeIndex] = VALID_DATA;                                                                                        \
+                                                                                                                                        \
+        writeIndex = writeIndex + 2;                                                                                                    \
+        if(writeIndex == (2 * CIRCULAR_BUFFER_SIZE))                                                                                    \
+        {                                                                                                                               \
+            writeIndex = STARTING_INDEX;                                                                                                \
+        }                                                                                                                               \
+                                                                                                                                        \
+        tmp1 = writeIndex;                                                                                                              \
+        tmp2 = readIndex;                                                                                                               \
+        if(tmp1 == tmp2)                                                                                                                \
+        {                                                                                                                               \
+            sg_sprintf(LOG_GLOBAL_BUFFER, "Catastropic Overrun Error !!!!");                                                            \
+            error_log(LOG_GLOBAL_BUFFER);                                                                                               \
+                                                                                                                                        \
+            resetDevice();                                                                                                              \
+        }
 
 #endif

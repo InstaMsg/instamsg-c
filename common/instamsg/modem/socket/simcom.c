@@ -1,6 +1,8 @@
-#include "./simcom.h"
+#include "device_defines.h"
 
 #if DEFAULT_SIMCOM_SOCKET_ENABLED == 1
+
+#include "./simcom.h"
 
 #include "../driver/include/globals.h"
 #include "../driver/include/at.h"
@@ -10,8 +12,6 @@
 #include "../driver/include/misc.h"
 #include "../driver/include/socket.h"
 
-#include "./simcom.h"
-
 
 char modemReceiveBuffer[MAX_BUFFER_SIZE];
 volatile int modemReceiveBytesSoFar;
@@ -20,7 +20,6 @@ static char smallBuffer[100];
 static char receiveBuffer[MAX_BUFFER_SIZE];
 
 static volatile unsigned char errorObtained;
-static volatile unsigned char circularBuffer[2 * CIRCULAR_BUFFER_SIZE];
 
 static volatile unsigned char bytesStartReading;
 static volatile unsigned char *bytesFromServerBuffer;
@@ -30,14 +29,9 @@ volatile char *responseBuffer;
 volatile unsigned char readResponse;
 volatile char *response_delimiter;
 
-
-#define INVALID_DATA            0
-#define VALID_DATA              1
-
-#define STARTING_INDEX          0
-
-static volatile unsigned int writeIndex;
-static volatile unsigned int readIndex;
+volatile unsigned int writeIndex;
+volatile unsigned int readIndex;
+volatile unsigned char circularBuffer[2 * CIRCULAR_BUFFER_SIZE];
 
 static unsigned char returnSingleCharacter()
 {
@@ -121,30 +115,6 @@ void reset_circular_buffer()
 
 
 void add_data_to_circular_buffer(unsigned char c)
-{
-    unsigned int tmp1 = 0, tmp2 = 0;
-
-    {
-        circularBuffer[writeIndex + 1] = c;
-        circularBuffer[writeIndex] = VALID_DATA;
-
-        writeIndex = writeIndex + 2;
-        if(writeIndex == (2 * CIRCULAR_BUFFER_SIZE))
-        {
-            writeIndex = STARTING_INDEX;
-        }
-
-        tmp1 = writeIndex;
-        tmp2 = readIndex;
-        if(tmp1 == tmp2)
-        {
-            sg_sprintf(LOG_GLOBAL_BUFFER, "Catastropic Overrun Error !!!!");
-            error_log(LOG_GLOBAL_BUFFER);
-
-            resetDevice();
-        }
-    }
-}
 
 
 #define SOCKET_CONNECTION_DELIM     "CONNECT"
