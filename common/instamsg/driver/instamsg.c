@@ -3299,7 +3299,6 @@ void start(int (*onConnectOneTimeOperations)(),
                                     msgSource = PERSISTENT_STORAGE;
                                 }
 
-                                businessLogicRunOnceAtStart = 1;
 
                                 nextBusinessLogicTick = latestTick + editableBusinessLogicInterval;
                                 if((rebootPending == 1) && (businessLogicRunOnceAtStart == 1))
@@ -3310,6 +3309,7 @@ void start(int (*onConnectOneTimeOperations)(),
                                     exitApp(1);
                                 }
 
+                                businessLogicRunOnceAtStart = 1;
 				                countdownTimerForBusinessLogic = 2 * editableBusinessLogicInterval;
                             }
                         }
