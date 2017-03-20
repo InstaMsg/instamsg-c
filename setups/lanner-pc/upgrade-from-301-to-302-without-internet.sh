@@ -20,6 +20,10 @@ echo 4 > /home/sensegrow/current_version
 
 crontab < cron
 
+cp wwan-monitor /home/sensegrow
+chmod 777 /home/sensegrow/wwan-monitor
+
+
 kill -9 `pgrep -x instamsg` || true
 cp energy-meter_lanner-pc_4.4.0_4.4.0 /home/sensegrow/instamsg
 
