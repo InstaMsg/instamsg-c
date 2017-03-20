@@ -214,12 +214,6 @@ while True:
     params_str = add_to_gprs_params_string(params_str, latest_sms, SG_USER, 'user')
     params_str = add_to_gprs_params_string(params_str, latest_sms, SG_PASS, 'password')
 
-    bearer_string = ' --create-bearer="%s"' % (params_str,)
-    [output, status] = run_command_and_check_validity('mmcli -m ' + MODEM_ID + bearer_string, ['Successfully created new bearer in modem:'])
-    if status == FAILURE:
-        reset_modem_state()
-        continue
-
     connect_string = ' --simple-connect="%s"' % (params_str,)
     [output, status] = run_command_and_check_validity('mmcli -m ' + MODEM_ID + connect_string, ['successfully connected the modem'])
     if status == FAILURE:
