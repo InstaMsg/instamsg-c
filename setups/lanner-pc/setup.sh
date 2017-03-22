@@ -45,7 +45,7 @@ chmod 777 "${HOME_DIRECTORY}/sg_upgrade.sh"
 cp upgrade_params "${HOME_DIRECTORY}"
 chmod 777 "${HOME_DIRECTORY}/upgrade_params"
 
-echo 5 > ${HOME_DIRECTORY}/current_version
+echo 6 > ${HOME_DIRECTORY}/current_version
 
 kill -9 `pgrep -x wwan-monitor` || true
 cp wwan-monitor "${HOME_DIRECTORY}"

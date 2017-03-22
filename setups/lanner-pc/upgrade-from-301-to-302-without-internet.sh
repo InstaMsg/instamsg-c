@@ -16,7 +16,7 @@ chmod 777 /home/sensegrow/sg_upgrade.sh
 cp upgrade_params /home/sensegrow
 chmod 777 /home/sensegrow/upgrade_params
 
-echo 5 > /home/sensegrow/current_version
+echo 6 > /home/sensegrow/current_version
 
 crontab < cron
 
@@ -25,7 +25,7 @@ chmod 777 /home/sensegrow/wwan-monitor
 
 
 kill -9 `pgrep -x instamsg` || true
-cp energy-meter_lanner-pc_5.3.0_5.3.0 /home/sensegrow/instamsg
+cp energy-meter_lanner-pc_5.3.0_5.3.1 /home/sensegrow/instamsg
 
 echo
 echo
