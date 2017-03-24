@@ -214,7 +214,7 @@ while True:
     params_str = add_to_gprs_params_string(params_str, latest_sms, SG_USER, 'user')
     params_str = add_to_gprs_params_string(params_str, latest_sms, SG_PASS, 'password')
 
-    connect_string = ' --simple-connect="%s,ip-type=ipv6" --timeout=600' % (params_str,)
+    connect_string = ' --simple-connect="%s" --timeout=600' % (params_str,)
     [output, status] = run_command_and_check_validity('mmcli -m ' + MODEM_ID + connect_string, ['successfully connected the modem'])
     if status == FAILURE:
         reset_modem_state()
