@@ -2177,7 +2177,7 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
         registerEditableConfig(&sslEnabledAtAppLayer,
                                SSL_ACTUALLY_ENABLED,
                                CONFIG_INT,
-                               PROSTR("1"),
+                               DEFAULT_SSL_ENABLED,
                                PROSTR(""));
 #endif
 
