@@ -76,7 +76,6 @@ volatile unsigned char runBusinessLogicImmediately;
 #define SIMULATED                   PROSTR("SIMULATED")
 
 
-#define MAX_CYCLES_TO_WAIT_FOR_PUBACK   10
 #define MAX_CYCLES_TO_WAIT_FOR_PINGRESP 10
 
 int pubAckMsgId;
