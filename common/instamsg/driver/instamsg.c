@@ -1677,6 +1677,14 @@ static void sync_time_through_NTP(InstaMsg *c)
         return;
     }
 
+    if(timeSyncedViaExternalResources == 1)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sTime has already been synced earlier.. not re-syncing."), CLOCK);
+        info_log(LOG_GLOBAL_BUFFER);
+
+        return;
+    }
+
     (c->timeSyncerSocket).socketCorrupted = 1;
 
 	init_socket(&(c->timeSyncerSocket), ntpServer, NTP_PORT, SOCKET_UDP, 0);
