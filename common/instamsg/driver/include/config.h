@@ -49,6 +49,7 @@ enum CONFIG_TYPE
 
 #define AUTO_UPGRADE_ENABLED        PROSTR("AUTO_UPGRADE_ENABLED")
 
+extern unsigned char disableSyncingWithServer;
 
 void init_config();
 int get_config_value_from_persistent_storage(const char *key, char *buffer, int maxBufferLength);

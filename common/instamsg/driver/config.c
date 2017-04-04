@@ -44,6 +44,7 @@
 int write_singular_line_into_file(const char *filePath, const char *buffer);
 #endif
 
+unsigned char disableSyncingWithServer;
 
 static int publishConfig(const char *topicName, const char *message)
 {
@@ -115,11 +116,14 @@ void process_config(char *configJson, unsigned char persistConfig)
     }
 #endif
 
-    /*
-     * Finally, publish the config on the server, so that the device and server remain in sync.
-     */
-    startAndCountdownTimer(1, 0);
-    publishConfig(TOPIC_CONFIG_SEND, configJson);
+    if(disableSyncingWithServer == 0)
+    {
+        /*
+         * Finally, publish the config on the server, so that the device and server remain in sync.
+         */
+        startAndCountdownTimer(1, 0);
+        publishConfig(TOPIC_CONFIG_SEND, configJson);
+    }
 
 exit:
     if(config_key)
