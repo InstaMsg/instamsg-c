@@ -16,6 +16,7 @@ do
         chmod 777 instamsg
 
         sleep 3
+        /usr/bin/killall sshpass
 	    ./instamsg &
     else
 	    echo "Binary running fine"

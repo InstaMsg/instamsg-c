@@ -107,6 +107,16 @@ struct InstaMsg {
     char mediaServerIpAddress[20];
     char mediaServerPort[10];
 #endif
+#if HTTP_PROXY_ENABLED == 1
+    char proxyTopic[100];
+
+    char proxyUser[100];
+    char proxyPasswd[100];
+    char proxyServer[50];
+    char proxyPort[10];
+
+    char proxyEndUnitServerAndPort[100];
+#endif
 
     unsigned char serverLoggingEnabled;
 

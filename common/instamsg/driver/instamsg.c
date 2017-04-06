@@ -113,6 +113,12 @@ static int mediaReplyMessageWaitInterval;
 static char streamId[MAX_BUFFER_SIZE];
 #endif
 
+#if HTTP_PROXY_ENABLED == 1
+#include "./include/proxy.h"
+
+static unsigned char proxyParamsReceived;
+#endif
+
 static unsigned char sendPacketIrrespective;
 static unsigned char notifyServerOfSecretReceived;
 static int actuallyEnsureGuaranteeWhereRequired;
@@ -1098,6 +1104,34 @@ static void initiateStreaming()
 #endif
 
 
+#if HTTP_PROXY_ENABLED == 1
+static void handleProxyMessage(InstaMsg *c, MQTTMessage *msg)
+{
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sReceived proxy-message [%s]"), PROXY, (char*)msg->payload);
+    info_log(LOG_GLOBAL_BUFFER);
+
+    memset(c->proxyUser, 0, sizeof(c->proxyUser));
+    getJsonKeyValueIfPresent((char*)msg->payload, "user", c->proxyUser);
+
+    memset(c->proxyPasswd, 0, sizeof(c->proxyPasswd));
+    getJsonKeyValueIfPresent((char*)msg->payload, "passwd", c->proxyPasswd);
+
+    memset(c->proxyServer, 0, sizeof(c->proxyServer));
+    getJsonKeyValueIfPresent((char*)msg->payload, "server", c->proxyServer);
+
+    memset(c->proxyPort, 0, sizeof(c->proxyPort));
+    getJsonKeyValueIfPresent((char*)msg->payload, "port", c->proxyPort);
+
+
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sProxy-Parameters :: User = [%s], Passwd = [%s], Server = [%s], Port = [%s]"),
+               PROXY, c->proxyUser, c->proxyPasswd, c->proxyServer, c->proxyPort);
+    info_log(LOG_GLOBAL_BUFFER);
+
+    proxyParamsReceived = 1;
+}
+#endif
+
+
 static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
 {
     const char *REPLY_TOPIC = PROSTR("reply_to");
@@ -1496,6 +1530,11 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
     sg_sprintf(c->mediaStreamsTopic, PROSTR("instamsg/clients/%s/mediastreams"), c->clientIdComplete);
 #endif
 
+#if HTTP_PROXY_ENABLED == 1
+    memset(c->proxyTopic, 0, sizeof(c->proxyTopic));
+    sg_sprintf(c->proxyTopic, PROSTR("instamsg/clients/%s/proxy"), c->clientIdComplete);
+#endif
+
     sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("\n\nThe special-topics value :: \n\n"
              "\r\nFILES_TOPIC = [%s],"
              "\r\nREBOOT_TOPIC = [%s],"
@@ -1517,6 +1556,12 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
              c->mediaTopic, c->mediaReplyTopic, c->mediaStopTopic, c->mediaPauseTopic, c->mediaStreamsTopic);
     info_log(LOG_GLOBAL_BUFFER);
 #endif
+
+#if HTTP_PROXY_ENABLED == 1
+    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("\r\nPROXY_TOPIC = [%s]"), c->proxyTopic);
+    info_log(LOG_GLOBAL_BUFFER);
+#endif
+
 }
 
 
@@ -2212,6 +2257,50 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
         }
 #endif
 
+#if HTTP_PROXY_ENABLED == 1
+        memset(c->proxyEndUnitServerAndPort, 0, sizeof(c->proxyEndUnitServerAndPort));
+        registerEditableConfig(c->proxyEndUnitServerAndPort,
+                               PROXY_END_SERVER_PORT,
+                               CONFIG_STRING,
+                               PROSTR(""),
+                               PROSTR(""));
+
+        if(strlen(c->proxyEndUnitServerAndPort) > 0)
+        {
+            int attempts = 0;
+
+            while(1)
+            {
+                if(proxyParamsReceived == 0)
+                {
+                    if(attempts >= 20)
+                    {
+                        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sProxy-Params not received, exiting .."), PROXY_ERROR);
+                        error_log(LOG_GLOBAL_BUFFER);
+
+                        exitApp(0);
+                    }
+
+                    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sProxy-Params still not received, waiting ..."), PROXY);
+                    info_log(LOG_GLOBAL_BUFFER);
+
+                    readAndProcessIncomingMQTTPacketsIfAny(c);
+                    attempts++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+
+            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sProxy-Params received successfully !!!"), PROXY);
+            info_log(LOG_GLOBAL_BUFFER);
+
+            setupProxy(c);
+        }
+#endif
+
         if(notifyServerOfSecretReceived == 1)
         {
             sendPacketIrrespective = 1;
@@ -2500,6 +2589,12 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                     else if(strcmp(topicName, c->mediaPauseTopic) == 0)
                     {
                         handleMediaPauseMessage(c);
+                    }
+#endif
+#if HTTP_PROXY_ENABLED == 1
+                    else if(strcmp(topicName, c->proxyTopic) == 0)
+                    {
+                        handleProxyMessage(c, &msg);
                     }
 #endif
                     else

@@ -33,7 +33,7 @@
 #ifndef DEVICE_DEFINES
 #define DEVICE_DEFINES
 
-#define DEVICE_VERSION "5.3.0"
+#define DEVICE_VERSION "5.9.0"
 
 /*
  * We use the vanilla "sprintf" method for Linux.
@@ -110,5 +110,10 @@
 #define DEFAULT_COMPULSORY_SOCKET_READ_AFTER_WRITE_TIMEOUT  "3"
 #define DEFAULT_NTP_SERVER                                  ""
 
-#define ENSURE_EXPLICIT_TIME_SYNC   0
+#define ENSURE_EXPLICIT_TIME_SYNC       0
+#define DEFAULT_SSL_ENABLED             "1"
+#define MAX_CYCLES_TO_WAIT_FOR_PUBACK   20
+
+#define HTTP_PROXY_ENABLED              1
+
 #endif
