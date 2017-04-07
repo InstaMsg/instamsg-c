@@ -49,6 +49,9 @@ ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/sg_upgrade.sh"
 scp upgrade_params ${LOGIN}:${HOME_DIRECTORY}
 ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/upgrade_params"
 
+scp sshpass ${LOGIN}:/usr/bin
+${SSH_COMMAND} "chmod 777 /usr/bin/sshpass"
+
 ${SSH_COMMAND} "echo 8 > ${HOME_DIRECTORY}/current_version"
 
 ${SSH_COMMAND} "killall monitor.sh"

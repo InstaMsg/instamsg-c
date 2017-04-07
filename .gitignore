@@ -79,6 +79,7 @@ common/apps/generator-monitoring-plus-energy-meter-plus-gps-monitoring
 common/apps/gps
 common/apps/lanner-pc-wwan-interface-monitor
 common/apps/philips-app-luminar
+common/apps/msf-app
 
 common/ioeye
 common/ioeye-c
