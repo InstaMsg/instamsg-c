@@ -46,6 +46,11 @@ ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/sg_upgrade_try.sh"
 scp ../../sg_upgrade.sh ${LOGIN}:${HOME_DIRECTORY}
 ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/sg_upgrade.sh"
 
+scp ../../proxy.sh ${LOGIN}:${HOME_DIRECTORY}
+${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/proxy.sh"
+
+${SSH_COMMAND} "echo > ${HOME_DIRECTORY}/proxy_command"
+
 scp upgrade_params ${LOGIN}:${HOME_DIRECTORY}
 ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/upgrade_params"
 

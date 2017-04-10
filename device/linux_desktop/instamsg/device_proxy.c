@@ -6,6 +6,8 @@
 #include "../../../common/instamsg/driver/include/instamsg.h"
 #include "../../../common/instamsg/driver/include/misc.h"
 
+#include "../common/file_utils.h"
+
 #if HTTP_PROXY_ENABLED == 1
 
 static void *setupTunnel(void *arg)
@@ -19,8 +21,12 @@ static void *setupTunnel(void *arg)
     sg_sprintf(LOG_GLOBAL_BUFFER, "Command for proxy = [%s]", command);
     info_log(LOG_GLOBAL_BUFFER);
 
-    system(command);
-    resetDevice();
+    sg_writeFile("proxy_command", command);
+
+    while(1)
+    {
+        sleep(1000);
+    }
 }
 
 
