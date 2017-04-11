@@ -3,7 +3,7 @@
 while true
 do
 
-proxy_command=`cat proxy_command`
+proxy_command=`cat /overlay/home/sensegrow/proxy_command`
 
 if [ -z "${proxy_command}" ]
 then
