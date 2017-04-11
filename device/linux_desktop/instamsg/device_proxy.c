@@ -15,11 +15,8 @@ static void *setupTunnel(void *arg)
     char command[500] = {0};
     InstaMsg *c = (InstaMsg *) arg;
 
-    sg_sprintf(command, "sshpass -p %s ssh -N -R 0.0.0.0:%s:%s %s@%s",
+    sg_sprintf(command, "%s %s %s %s %s",
                         c->proxyPasswd, c->proxyPort, c->proxyEndUnitServerAndPort, c->proxyUser, c->proxyServer);
-
-    sg_sprintf(LOG_GLOBAL_BUFFER, "Command for proxy = [%s]", command);
-    info_log(LOG_GLOBAL_BUFFER);
 
     sg_writeFile("proxy_command", command);
 
