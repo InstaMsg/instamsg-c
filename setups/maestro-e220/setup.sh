@@ -57,6 +57,7 @@ ${SSH_COMMAND} "echo > ${HOME_DIRECTORY}/proxy_command"
 scp upgrade_params ${LOGIN}:${HOME_DIRECTORY}
 ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/upgrade_params"
 
+${SSH_COMMAND} "killall proxy.sh"
 ${SSH_COMMAND} "killall sshpass"
 scp sshpass ${LOGIN}:/usr/bin
 ${SSH_COMMAND} "chmod 777 /usr/bin/sshpass"
