@@ -116,6 +116,10 @@ static char streamId[MAX_BUFFER_SIZE];
 #if HTTP_PROXY_ENABLED == 1
 #include "./include/proxy.h"
 
+#if SEND_POWER_INFORMATION == 1
+volatile unsigned char sendPowerInformationNow;
+#endif
+
 static unsigned char proxyParamsReceived;
 #endif
 
@@ -3394,6 +3398,18 @@ void start(int (*onConnectOneTimeOperations)(),
                                     sendGpsLocationToServer();
                                 }
 #endif
+
+#if SEND_POWER_INFORMATION == 1
+                                if((businessLogicRunOnceAtStart == 0) || (sendPowerInformationNow == 1))
+                                {
+                                    sg_sprintf(LOG_GLOBAL_BUFFER, "Sending Power-Information info for the first time ..");
+                                    info_log(LOG_GLOBAL_BUFFER);
+
+                                    send_power_information();
+                                    sendPowerInformationNow = 0;
+                                }
+#endif
+
                                 runBusinessLogicImmediately = 0;
 
                                 if(businessLogicRunOnceAtStart == 0)

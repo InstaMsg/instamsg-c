@@ -33,7 +33,7 @@
 #ifndef DEVICE_DEFINES
 #define DEVICE_DEFINES
 
-#define DEVICE_VERSION "5.9.0"
+#define DEVICE_VERSION "6.0.0"
 
 /*
  * We use the vanilla "sprintf" method for Linux.
@@ -115,5 +115,6 @@
 #define MAX_CYCLES_TO_WAIT_FOR_PUBACK   20
 
 #define HTTP_PROXY_ENABLED              1
+#define SEND_POWER_INFORMATION          1
 
 #endif
