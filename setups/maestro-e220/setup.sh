@@ -37,6 +37,9 @@ ${SSH_COMMAND} chmod 777 ${HOME_DIRECTORY}/data.txt
 
 ${SSH_COMMAND} "echo test > ${HOME_DIRECTORY}/prov.txt"
 
+${SSH_COMMAND} "mkdir -p /root/.ssh"
+${SSH_COMMAND} "echo \"23.253.207.208 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDL8xzmBwnpGm5Yjl0GSN6JchAEy7VS3lnPesoB45rLZS5uq/fBSS26USaFophmUk5RRsAvibibFEfEAVNmmX8XwwTjihc2QyNMJlvgo5wlAiR5x5xpCtvMD1tvMOEUywkHVMHcLnzhG0UlpQa6wpwxCvdy50gqMqmq44/Ev3HhM2z0UJe/cc5uwCIXW52DdbWqAd87SStSgFeX67e1QnzNLEYZIvWet9tk+CTW/MdJMJc96978hxFDm3AXKbMPChoWjby7jwpeJohP5JxXvHE91eyq/R1YvEzSCAZRxa0ja4q85BV4Gdc1EiIOJJjHUbPAPhVdhvFCUChhQIrYVMbN\" > /root/.ssh/known_hosts"
+
 scp reboot.sh  ${LOGIN}:${HOME_DIRECTORY}
 ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/reboot.sh"
 
