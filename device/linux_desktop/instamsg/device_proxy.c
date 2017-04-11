@@ -5,6 +5,7 @@
 
 #include "../../../common/instamsg/driver/include/instamsg.h"
 #include "../../../common/instamsg/driver/include/misc.h"
+#include "../../../common/instamsg/driver/include/file_system.h"
 
 #include "../common/file_utils.h"
 
@@ -18,7 +19,7 @@ void setupProxy(InstaMsg *c)
                         c->proxyPasswd, c->proxyPort, c->proxyEndUnitServerAndPort, c->proxyUser, c->proxyServer);
 
     sg_writeFile(SYSTEM_WIDE_TEMP_FILE, command);
-    renameFile(SYSTEM_WIDE_TEMP_FILE, "proxy_command");
+    renameFile(NULL, SYSTEM_WIDE_TEMP_FILE, "proxy_command");
 }
 
 #endif
