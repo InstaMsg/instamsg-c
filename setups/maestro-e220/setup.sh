@@ -15,9 +15,6 @@ ${SSH_COMMAND} "sed -i 's/^[ :\t]*\/usr\/sbin\/event_sms.sh/#\/usr\/sbin\/event_
 ${SSH_COMMAND} "sed -i '/^[ :\t]*\/home\/sensegrow\/monitor.sh \&/d' /etc/rc.local"
 ${SSH_COMMAND} "sed -i 's/^[ :\t]*exit 0/\/home\/sensegrow\/monitor.sh \&\nexit 0/g' /etc/rc.local"
 
-${SSH_COMMAND} "sed -i '/^[ :\t]*\/home\/sensegrow\/proxy.sh \&/d' /etc/rc.local"
-${SSH_COMMAND} "sed -i 's/^[ :\t]*exit 0/\/home\/sensegrow\/proxy.sh \&\nexit 0/g' /etc/rc.local"
-
 ${SSH_COMMAND} "sed -i 's/HL8548/HL85/g' /lib/netifd/proto/3g.sh"
 ${SSH_COMMAND} "sed -i 's/IPV4V6/IP/g' /etc/chatscripts/3g.chat"
 ${SSH_COMMAND} "rm -f /etc/init.d/gps"
