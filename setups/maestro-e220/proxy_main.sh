@@ -17,9 +17,10 @@ else
 
    remote_diag=`/usr/bin/sshpass -p ${password} /usr/bin/ssh ${user}@${server} "netstat -an | grep LISTEN | grep 127.0.0.1:${port}`
    remote_diag=`echo ${remote_diag} | grep -v unreachable | grep -v SO_PRIORITY`
+
    if [ -z "${remote_diag}" ]
    then
-	/usr/bin/killall sshpass
+   	/usr/bin/killall sshpass
    fi
 
    PID=`ps | grep sshpass | grep -v grep | grep -v tail | sed -e 's/^ *//g' | cut -d\  -f 1`

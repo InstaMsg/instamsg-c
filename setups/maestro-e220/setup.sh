@@ -49,15 +49,18 @@ ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/sg_upgrade_try.sh"
 scp ../../sg_upgrade.sh ${LOGIN}:${HOME_DIRECTORY}
 ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/sg_upgrade.sh"
 
-scp proxy.sh ${LOGIN}:${HOME_DIRECTORY}
-${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/proxy.sh"
-
 ${SSH_COMMAND} "echo > ${HOME_DIRECTORY}/proxy_command"
 
 scp upgrade_params ${LOGIN}:${HOME_DIRECTORY}
 ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/upgrade_params"
 
-${SSH_COMMAND} "killall proxy.sh"
+${SSH_COMMAND} "killall proxy_check.sh"
+${SSH_COMMAND} "killall proxy_main.sh"
+scp proxy_check.sh ${LOGIN}:${HOME_DIRECTORY}
+scp proxy_main.sh ${LOGIN}:${HOME_DIRECTORY}
+${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/proxy_check.sh"
+${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/proxy_main.sh"
+
 ${SSH_COMMAND} "killall sshpass"
 scp sshpass ${LOGIN}:/usr/bin
 ${SSH_COMMAND} "chmod 777 /usr/bin/sshpass"
