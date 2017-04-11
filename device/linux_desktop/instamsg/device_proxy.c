@@ -10,33 +10,15 @@
 
 #if HTTP_PROXY_ENABLED == 1
 
-static void *setupTunnel(void *arg)
+
+void setupProxy(InstaMsg *c)
 {
     char command[500] = {0};
-    InstaMsg *c = (InstaMsg *) arg;
-
     sg_sprintf(command, "%s %s %s %s %s",
                         c->proxyPasswd, c->proxyPort, c->proxyEndUnitServerAndPort, c->proxyUser, c->proxyServer);
 
-    sg_writeFile("proxy_command", command);
-
-    while(1)
-    {
-        sleep(1000);
-    }
-}
-
-
-static pthread_t tid;
-void setupProxy(InstaMsg *c)
-{
-    static unsigned char done = 0;
-
-    if(done == 0)
-    {
-        done = 1;
-        pthread_create(&tid, NULL, setupTunnel, c);
-    }
+    sg_writeFile(SYSTEM_WIDE_TEMP_FILE, command);
+    renameFile(SYSTEM_WIDE_TEMP_FILE, "proxy_command");
 }
 
 #endif
