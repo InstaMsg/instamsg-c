@@ -14,6 +14,9 @@ cp energy-meter_maestro-e220_6.0.0_6.0.0 ${HOME_DIRECTORY}/instamsg
 cp upgrade_params ${HOME_DIRECTORY}
 cp -f sg_upgrade.sh ${HOME_DIRECTORY}
 
+cp -f monitor.sh ${HOME_DIRECTORY}
+/bin/chmod 777 ${HOME_DIRECTORY}/monitor.sh
+
 cp -f proxy_check.sh ${HOME_DIRECTORY}
 /bin/chmod 777 ${HOME_DIRECTORY}/proxy_check.sh
 

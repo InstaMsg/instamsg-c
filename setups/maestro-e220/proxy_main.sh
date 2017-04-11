@@ -8,6 +8,7 @@ proxy_command=`cat /overlay/home/sensegrow/proxy_command`
 if [ -z "${proxy_command}" ]
 then
    echo "proxy_command is empty, nothing to do"
+   /usr/bin/killall sshpass
 else
    server=`echo "${proxy_command}" | cut -d\  -f 5`
    user=`echo "${proxy_command}" | cut -d\  -f 4`
