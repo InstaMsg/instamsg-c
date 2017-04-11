@@ -16,7 +16,6 @@ do
         chmod 777 instamsg
 
         sleep 3
-        /usr/bin/killall proxy_main.sh
 	    ./instamsg &
     else
 	    echo "Binary running fine"
