@@ -15,6 +15,9 @@ ${SSH_COMMAND} "sed -i 's/^[ :\t]*\/usr\/sbin\/event_sms.sh/#\/usr\/sbin\/event_
 ${SSH_COMMAND} "sed -i '/^[ :\t]*\/home\/sensegrow\/monitor.sh \&/d' /etc/rc.local"
 ${SSH_COMMAND} "sed -i 's/^[ :\t]*exit 0/\/home\/sensegrow\/monitor.sh \&\nexit 0/g' /etc/rc.local"
 
+${SSH_COMMAND} "sed -i '/^[ :\t]*\/home\/sensegrow\/proxy.sh \&/d' /etc/rc.local"
+${SSH_COMMAND} "sed -i 's/^[ :\t]*exit 0/\/home\/sensegrow\/proxy.sh \&\nexit 0/g' /etc/rc.local"
+
 ${SSH_COMMAND} "sed -i 's/HL8548/HL85/g' /lib/netifd/proto/3g.sh"
 ${SSH_COMMAND} "sed -i 's/IPV4V6/IP/g' /etc/chatscripts/3g.chat"
 ${SSH_COMMAND} "rm -f /etc/init.d/gps"
@@ -46,7 +49,7 @@ ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/sg_upgrade_try.sh"
 scp ../../sg_upgrade.sh ${LOGIN}:${HOME_DIRECTORY}
 ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/sg_upgrade.sh"
 
-scp ../../proxy.sh ${LOGIN}:${HOME_DIRECTORY}
+scp proxy.sh ${LOGIN}:${HOME_DIRECTORY}
 ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/proxy.sh"
 
 ${SSH_COMMAND} "echo > ${HOME_DIRECTORY}/proxy_command"
