@@ -15,8 +15,7 @@ do
         cd /overlay/home/sensegrow
         chmod 777 instamsg
 
-        rm /overlay/home/sensegrow/proxy_command
-        touch /overlay/home/sensegrow/proxy_command
+        echo > /overlay/home/sensegrow/proxy_command
         /usr/bin/killall sshpass
 
         sleep 3
