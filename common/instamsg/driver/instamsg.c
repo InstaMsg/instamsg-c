@@ -1972,6 +1972,12 @@ void initInstaMsg(InstaMsg* c,
 
     check_if_conditional_features_are_enabled();
 
+    c->defaultMessageHandler = NULL;
+    c->next_packetid = MAX_PACKET_ID;
+    c->onConnectCallback = connectHandler;
+    c->onDisconnectCallback = disconnectHandler;
+    c->oneToOneMessageHandler = oneToOneMessageHandler;
+
 #if NTP_TIME_SYNC_PRESENT == 1
     sync_time_through_NTP(c);
 #endif
@@ -1999,11 +2005,6 @@ void initInstaMsg(InstaMsg* c,
         c->oneToOneHandlers[i].timeout = 0;
     }
 
-    c->defaultMessageHandler = NULL;
-    c->next_packetid = MAX_PACKET_ID;
-    c->onConnectCallback = connectHandler;
-    c->onDisconnectCallback = disconnectHandler;
-    c->oneToOneMessageHandler = oneToOneMessageHandler;
 
     c->serverLoggingEnabled = 0;
 
