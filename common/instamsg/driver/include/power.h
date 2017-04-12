@@ -37,6 +37,7 @@ extern volatile unsigned char sendPowerInformationNow;
 
 #define POWERED_OFF         PROSTR("0")
 #define POWERED_ON          PROSTR("1")
+#define POWERED_UNKNOWN     PROSTR("2")
 
 /*
  * Common-Section
