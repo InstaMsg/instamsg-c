@@ -29,6 +29,9 @@ cp -f gpio.sh ${HOME_DIRECTORY}
 cp -f sshpass /usr/bin
 /bin/chmod 777 /usr/bin/sshpass
 
+sed -i '/^[ :\t]*\/home\/sensegrow\/gpio.sh \&/d' /etc/rc.local
+sed -i 's/^[ :\t]*exit 0/\/home\/sensegrow\/gpio.sh \&\nexit 0/g' /etc/rc.local
+
 /bin/echo > ${HOME_DIRECTORY}/proxy_command
 
 /bin/mkdir -p /root/.ssh
