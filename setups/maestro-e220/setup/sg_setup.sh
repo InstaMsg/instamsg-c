@@ -23,6 +23,9 @@ cp -f proxy_check.sh ${HOME_DIRECTORY}
 cp -f proxy_main.sh ${HOME_DIRECTORY}
 /bin/chmod 777 ${HOME_DIRECTORY}/proxy_main.sh
 
+cp -f gpio.sh ${HOME_DIRECTORY}
+/bin/chmod 777 ${HOME_DIRECTORY}/gpio.sh
+
 cp -f sshpass /usr/bin
 /bin/chmod 777 /usr/bin/sshpass
 

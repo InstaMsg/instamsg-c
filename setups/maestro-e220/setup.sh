@@ -54,6 +54,9 @@ ${SSH_COMMAND} "echo > ${HOME_DIRECTORY}/proxy_command"
 scp upgrade_params ${LOGIN}:${HOME_DIRECTORY}
 ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/upgrade_params"
 
+scp gpio.sh ${LOGIN}:${HOME_DIRECTORY}
+${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/gpio.sh"
+
 ${SSH_COMMAND} "killall proxy_check.sh"
 ${SSH_COMMAND} "killall proxy_main.sh"
 scp proxy_check.sh ${LOGIN}:${HOME_DIRECTORY}
