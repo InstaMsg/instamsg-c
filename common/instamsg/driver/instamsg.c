@@ -3401,9 +3401,9 @@ void start(int (*onConnectOneTimeOperations)(),
 #endif
 
 #if SEND_POWER_INFORMATION == 1
-                                if((businessLogicRunOnceAtStart == 0) || (sendPowerInformationNow == 1))
+                                if(sendPowerInformationNow == 1)
                                 {
-                                    sg_sprintf(LOG_GLOBAL_BUFFER, "Sending Power-Information info for the first time ..");
+                                    sg_sprintf(LOG_GLOBAL_BUFFER, "Sending Power-Information ..");
                                     info_log(LOG_GLOBAL_BUFFER);
 
                                     send_power_information();
