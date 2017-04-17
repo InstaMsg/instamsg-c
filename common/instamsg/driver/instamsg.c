@@ -1114,8 +1114,11 @@ static void handleProxyMessage(InstaMsg *c, MQTTMessage *msg)
     sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sReceived proxy-message [%s]"), PROXY, (char*)msg->payload);
     info_log(LOG_GLOBAL_BUFFER);
 
-    memset(c->proxyUser, 0, sizeof(c->proxyUser));
-    getJsonKeyValueIfPresent((char*)msg->payload, "user", c->proxyUser);
+    memset(c->proxyHttpUser, 0, sizeof(c->proxyHttpUser));
+    getJsonKeyValueIfPresent((char*)msg->payload, "http_user", c->proxyHttpUser);
+
+    memset(c->proxyHttpsUser, 0, sizeof(c->proxyHttpsUser));
+    getJsonKeyValueIfPresent((char*)msg->payload, "https_user", c->proxyHttpsUser);
 
     memset(c->proxyPasswd, 0, sizeof(c->proxyPasswd));
     getJsonKeyValueIfPresent((char*)msg->payload, "passwd", c->proxyPasswd);
@@ -1127,8 +1130,9 @@ static void handleProxyMessage(InstaMsg *c, MQTTMessage *msg)
     getJsonKeyValueIfPresent((char*)msg->payload, "port", c->proxyPort);
 
 
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sProxy-Parameters :: User = [%s], Passwd = [%s], Server = [%s], Port = [%s]"),
-               PROXY, c->proxyUser, c->proxyPasswd, c->proxyServer, c->proxyPort);
+    sg_sprintf(LOG_GLOBAL_BUFFER,
+                PROSTR("%sProxy-Parameters :: Http-User = [%s], Https-User = [%s], Passwd = [%s], Server = [%s], Port = [%s]"),
+                PROXY, c->proxyHttpUser, c->proxyHttpsUser, c->proxyPasswd, c->proxyServer, c->proxyPort);
     info_log(LOG_GLOBAL_BUFFER);
 
     proxyParamsReceived = 1;

@@ -110,7 +110,8 @@ struct InstaMsg {
 #if HTTP_PROXY_ENABLED == 1
     char proxyTopic[100];
 
-    char proxyUser[100];
+    char proxyHttpUser[100];
+    char proxyHttpsUser[100];
     char proxyPasswd[100];
     char proxyServer[50];
     char proxyPort[10];
