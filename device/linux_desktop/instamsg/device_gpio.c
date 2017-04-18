@@ -9,12 +9,11 @@
 
 #include "../driver/include/power.h"
 
-#if SEND_POWER_INFORMATION == 1
+#if SEND_GPIO_INFORMATION == 1
 /*
- * The device may decide how to send the power-information to the server.
- * Or how to consume this string in general.
+ *
  */
-void send_power_information()
+void fill_dio_data(char *buffer, int maxBufferLength)
 {
 }
 #endif

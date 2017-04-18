@@ -30,18 +30,12 @@
 
 
 
-#ifndef INSTAMSG_POWER_COMMON
-#define INSTAMSG_POWER_COMMON
-
-extern volatile unsigned char sendPowerInformationNow;
-
-#define POWERED_OFF         PROSTR("0")
-#define POWERED_ON          PROSTR("1")
-#define POWERED_UNKNOWN     PROSTR("2")
+#ifndef INSTAMSG_GPIO_COMMON
+#define INSTAMSG_GPIO_COMMON
 
 /*
  * Common-Section
  */
-void send_power_information();
+void fill_dio_data(char *buffer, int maxBufferLength);
 
 #endif

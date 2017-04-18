@@ -76,6 +76,10 @@ volatile unsigned char runBusinessLogicImmediately;
 #define SIMULATED                   PROSTR("SIMULATED")
 
 
+#if SEND_GPIO_INFORMATION == 1
+#include "../../ioeye/include/payload.h"
+#endif
+
 #define MAX_CYCLES_TO_WAIT_FOR_PINGRESP 10
 
 int pubAckMsgId;
@@ -115,10 +119,6 @@ static char streamId[MAX_BUFFER_SIZE];
 
 #if HTTP_PROXY_ENABLED == 1
 #include "./include/proxy.h"
-
-#if SEND_POWER_INFORMATION == 1
-volatile unsigned char sendPowerInformationNow;
-#endif
 
 static unsigned char proxyParamsReceived;
 #endif
@@ -3160,6 +3160,11 @@ void sendGpsLocationToServer()
 
 volatile unsigned long nextBusinessLogicTick;
 
+#if SEND_GPIO_INFORMATION == 1
+static char deviceDioData[100];
+static char previousDeviceDioData[100];
+#endif
+
 void start(int (*onConnectOneTimeOperations)(),
            int (*onDisconnect)(),
            int (*oneToOneMessageReceivedHandler)(OneToOneResult *),
@@ -3175,6 +3180,11 @@ void start(int (*onConnectOneTimeOperations)(),
     unsigned long nextStatsDisplayTick = 0;
 #if SEND_GPS_LOCATION == 1
     unsigned long nextSendGpsLocationTick = latestTick + sendGpsLocationInterval;
+#endif
+
+#if SEND_GPIO_INFORMATION == 1
+    memset(deviceDioData, 0, sizeof(deviceDioData));
+    memset(previousDeviceDioData, 0, sizeof(previousDeviceDioData));
 #endif
 
     debugLoggingEnabled = 1;
@@ -3404,15 +3414,19 @@ void start(int (*onConnectOneTimeOperations)(),
                                 }
 #endif
 
-#if SEND_POWER_INFORMATION == 1
-                                if(sendPowerInformationNow == 1)
+#if SEND_GPIO_INFORMATION == 1
+                                fill_dio_data(deviceDioData, sizeof(deviceDioData));
+                                if(strcmp(deviceDioData, previousDeviceDioData) != 0)
                                 {
-                                    sg_sprintf(LOG_GLOBAL_BUFFER, "Sending Power-Information ..");
+                                    sg_sprintf(LOG_GLOBAL_BUFFER, "Sending GPIO-Information ..");
                                     info_log(LOG_GLOBAL_BUFFER);
 
-                                    send_power_information();
-                                    sendPowerInformationNow = 0;
+
+                                    ioeye_send_gpio_data_to_server(deviceDioData);
                                 }
+
+                                memset(previousDeviceDioData, 0, sizeof(previousDeviceDioData));
+                                strcpy(previousDeviceDioData, deviceDioData);
 #endif
 
                                 runBusinessLogicImmediately = 0;
