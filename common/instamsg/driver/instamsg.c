@@ -3415,7 +3415,9 @@ void start(int (*onConnectOneTimeOperations)(),
 #endif
 
 #if SEND_GPIO_INFORMATION == 1
+                                memset(deviceDioData, 0, sizeof(deviceDioData));
                                 fill_dio_data(deviceDioData, sizeof(deviceDioData));
+
                                 if(strcmp(deviceDioData, previousDeviceDioData) != 0)
                                 {
                                     sg_sprintf(LOG_GLOBAL_BUFFER, "Sending GPIO-Information ..");
