@@ -3380,6 +3380,29 @@ void start(int (*onConnectOneTimeOperations)(),
                             nextStatsDisplayTick = latestTick + statsDisplayInterval;
                         }
 
+#if SEND_GPIO_INFORMATION == 1
+                        if(1)
+                        {
+                            if(1)
+                            {
+                                memset(deviceDioData, 0, sizeof(deviceDioData));
+                                fill_dio_data(deviceDioData, sizeof(deviceDioData));
+
+                                if(strcmp(deviceDioData, previousDeviceDioData) != 0)
+                                {
+                                    sg_sprintf(LOG_GLOBAL_BUFFER, "Sending GPIO-Information ..");
+                                    info_log(LOG_GLOBAL_BUFFER);
+
+
+                                    ioeye_send_gpio_data_to_server(deviceDioData);
+                                }
+
+                                memset(previousDeviceDioData, 0, sizeof(previousDeviceDioData));
+                                strcpy(previousDeviceDioData, deviceDioData);
+                            }
+                        }
+#endif
+
                         /*
                          * Time to run the business-logic !!
                          */
@@ -3414,22 +3437,6 @@ void start(int (*onConnectOneTimeOperations)(),
                                 }
 #endif
 
-#if SEND_GPIO_INFORMATION == 1
-                                memset(deviceDioData, 0, sizeof(deviceDioData));
-                                fill_dio_data(deviceDioData, sizeof(deviceDioData));
-
-                                if(strcmp(deviceDioData, previousDeviceDioData) != 0)
-                                {
-                                    sg_sprintf(LOG_GLOBAL_BUFFER, "Sending GPIO-Information ..");
-                                    info_log(LOG_GLOBAL_BUFFER);
-
-
-                                    ioeye_send_gpio_data_to_server(deviceDioData);
-                                }
-
-                                memset(previousDeviceDioData, 0, sizeof(previousDeviceDioData));
-                                strcpy(previousDeviceDioData, deviceDioData);
-#endif
 
                                 runBusinessLogicImmediately = 0;
 
