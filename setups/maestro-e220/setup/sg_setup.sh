@@ -8,9 +8,6 @@ PKG_VERSION="10"
 /usr/bin/killall monitor.sh || true
 /usr/bin/killall proxy_check.sh || true
 /usr/bin/killall proxy_main.sh || true
-/usr/bin/killall instamsg || true
-
-cp energy-meter_maestro-e220_6.0.0_6.0.0 ${HOME_DIRECTORY}/instamsg
 cp upgrade_params ${HOME_DIRECTORY}
 cp -f sg_upgrade.sh ${HOME_DIRECTORY}
 
@@ -36,5 +33,8 @@ sed -i 's/^[ :\t]*exit 0/\/home\/sensegrow\/gpio.sh \&\nexit 0/g' /etc/rc.local
 
 /bin/mkdir -p /root/.ssh
 echo "23.253.207.208 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDL8xzmBwnpGm5Yjl0GSN6JchAEy7VS3lnPesoB45rLZS5uq/fBSS26USaFophmUk5RRsAvibibFEfEAVNmmX8XwwTjihc2QyNMJlvgo5wlAiR5x5xpCtvMD1tvMOEUywkHVMHcLnzhG0UlpQa6wpwxCvdy50gqMqmq44/Ev3HhM2z0UJe/cc5uwCIXW52DdbWqAd87SStSgFeX67e1QnzNLEYZIvWet9tk+CTW/MdJMJc96978hxFDm3AXKbMPChoWjby7jwpeJohP5JxXvHE91eyq/R1YvEzSCAZRxa0ja4q85BV4Gdc1EiIOJJjHUbPAPhVdhvFCUChhQIrYVMbN" > /root/.ssh/known_hosts
+
+/usr/bin/killall instamsg || true
+cp energy-meter_maestro-e220_6.0.2_6.0.2 ${HOME_DIRECTORY}/instamsg
 
 cat cron | crontab -
