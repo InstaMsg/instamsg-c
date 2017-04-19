@@ -7,7 +7,6 @@
 
 #include "device_defines.h"
 
-#include "../driver/include/power.h"
 
 #if SEND_GPIO_INFORMATION == 1
 /*
