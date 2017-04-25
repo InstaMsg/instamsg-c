@@ -1295,6 +1295,7 @@ int simcom_socket_write(SG_Socket* socket, unsigned char* buffer, int len)
  */
 void simcom_release_underlying_socket_medium_guaranteed(SG_Socket* socket)
 {
+    waitBeforeReboot();
     resetDevice();
 }
 
