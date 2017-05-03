@@ -1,0 +1,4 @@
+55  * * * * echo > /overlay/home/sensegrow/instamsg.log
+*   * * * * /overlay/home/sensegrow/proxy_check.sh
+*   * * * * /sbin/ifup wan
+15  * * * * cd /overlay/home/sensegrow; /overlay/home/sensegrow/sg_upgrade_try.sh

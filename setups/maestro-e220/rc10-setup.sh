@@ -6,11 +6,9 @@ HOME_DIRECTORY="/overlay/home/sensegrow"
 ${SSH_COMMAND} "mkdir -p ${HOME_DIRECTORY}"
 ${SSH_COMMAND} "chmod -R 777 ${HOME_DIRECTORY}"
 
-${SSH_COMMAND} "sed -i 's/^[ :\t]*\/etc\/init.d\/event_sms reload/#\/etc\/init.d\/event_sms reload/g' /usr/sbin/eventtrack.sh"
-${SSH_COMMAND} "sed -i 's/^[ :\t]*\/etc\/init.d\/event_sms stop/#\/etc\/init.d\/event_sms stop/g' /usr/sbin/eventtrack.sh"
-${SSH_COMMAND} "sed -i 's/^[ :\t]*\/etc\/init.d\/event_sms start/#\/etc\/init.d\/event_sms start/g' /usr/sbin/eventtrack.sh"
-
+${SSH_COMMAND} "sed -i '/eventsms_config/d' /etc/init.d/event_sms"
 ${SSH_COMMAND} "sed -i 's/^[ :\t]*\/usr\/sbin\/event_sms.sh/#\/usr\/sbin\/event_sms.sh/g' /etc/init.d/event_sms"
+${SSH_COMMAND} "sed -i 's/^[ :\t]*\/usr\/bin\/eventsms \&/#\/usr\/bin\/eventsms \&\n\/usr\/bin\/sendat \/dev\/ttyACM4 \"at\*psstki=3\" 10/g' /etc/init.d/event_sms"
 
 ${SSH_COMMAND} "sed -i '/^[ :\t]*\/home\/sensegrow\/monitor.sh \&/d' /etc/rc.local"
 ${SSH_COMMAND} "sed -i 's/^[ :\t]*exit 0/\/home\/sensegrow\/monitor.sh \&\nexit 0/g' /etc/rc.local"
@@ -18,16 +16,17 @@ ${SSH_COMMAND} "sed -i 's/^[ :\t]*exit 0/\/home\/sensegrow\/monitor.sh \&\nexit 
 ${SSH_COMMAND} "sed -i '/^[ :\t]*\/home\/sensegrow\/gpio.sh \&/d' /etc/rc.local"
 ${SSH_COMMAND} "sed -i 's/^[ :\t]*exit 0/\/home\/sensegrow\/gpio.sh \&\nexit 0/g' /etc/rc.local"
 
-${SSH_COMMAND} "sed -i 's/HL8548/HL85/g' /lib/netifd/proto/3g.sh"
-${SSH_COMMAND} "sed -i 's/IPV4V6/IP/g' /etc/chatscripts/3g.chat"
 ${SSH_COMMAND} "rm -f /etc/init.d/gps"
 
 
 
-scp monitor.sh  ${LOGIN}:${HOME_DIRECTORY}
+scp rc10-monitor.sh  ${LOGIN}:${HOME_DIRECTORY}/monitor.sh
 ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/monitor.sh"
 
-scp cron  ${LOGIN}:${HOME_DIRECTORY}
+scp rc10-wandete.sh  ${LOGIN}:/sbin/wandete.sh
+${SSH_COMMAND} "chmod 777 /sbin/wandete.sh"
+
+scp rc10-cron  ${LOGIN}:${HOME_DIRECTORY}/cron
 ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/cron"
 
 ${SSH_COMMAND} "cat ${HOME_DIRECTORY}/cron | crontab -"
@@ -54,7 +53,7 @@ ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/sg_upgrade.sh"
 
 ${SSH_COMMAND} "echo > ${HOME_DIRECTORY}/proxy_command"
 
-scp upgrade_params ${LOGIN}:${HOME_DIRECTORY}
+scp rc10-upgrade_params ${LOGIN}:${HOME_DIRECTORY}/upgrade_params
 ${SSH_COMMAND} "chmod 777 ${HOME_DIRECTORY}/upgrade_params"
 
 scp gpio.sh ${LOGIN}:${HOME_DIRECTORY}
@@ -71,7 +70,7 @@ ${SSH_COMMAND} "killall sshpass"
 scp sshpass ${LOGIN}:/usr/bin
 ${SSH_COMMAND} "chmod 777 /usr/bin/sshpass"
 
-${SSH_COMMAND} "echo 12 > ${HOME_DIRECTORY}/current_version"
+${SSH_COMMAND} "echo 1 > ${HOME_DIRECTORY}/current_version"
 
 ${SSH_COMMAND} "killall monitor.sh"
 ${SSH_COMMAND} "killall instamsg"
