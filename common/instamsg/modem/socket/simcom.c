@@ -450,26 +450,45 @@ static int setUpModemMinimal(SG_Socket *socket)
       /*
      * Prepare-init-commands.
      */
-    commands[0].command = "ATE0&W\r";
+    
+    commands[0].command = "AT+IPR=9600\r";
     commands[0].delimiter = OK_DELIMITER;
-    commands[0].logInfoCommand = "Stop-Echo";
+    commands[0].logInfoCommand = "Enable-GSM-Sync-IPR";
     commands[0].successStrings[0] = OK_DELIMITER;
     commands[0].successStrings[1] = NULL;
     commands[0].commandInCaseNoSuccessStringPresent = NULL;
 
-
     /*
      */
-    commands[1].command = "AT+CPIN?\r";
+    commands[1].command = "AT&W\r";
     commands[1].delimiter = OK_DELIMITER;
-    commands[1].logInfoCommand = "SIM-PIN-Ready";
-    commands[1].successStrings[0] = "READY";
+    commands[1].logInfoCommand = "Persist-GSM-Sync";
+    commands[1].successStrings[0] = OK_DELIMITER;
     commands[1].successStrings[1] = NULL;
     commands[1].commandInCaseNoSuccessStringPresent = NULL;
+    
+    /*
+     */
+    commands[2].command = "ATE0&W\r";
+    commands[2].delimiter = OK_DELIMITER;
+    commands[2].logInfoCommand = "Stop-Echo";
+    commands[2].successStrings[0] = OK_DELIMITER;
+    commands[2].successStrings[1] = NULL;
+    commands[2].commandInCaseNoSuccessStringPresent = NULL;
+
 
     /*
      */
-    commands[2].command = NULL;
+    commands[3].command = "AT+CPIN?\r";
+    commands[3].delimiter = OK_DELIMITER;
+    commands[3].logInfoCommand = "SIM-PIN-Ready";
+    commands[3].successStrings[0] = "READY";
+    commands[3].successStrings[1] = NULL;
+    commands[3].commandInCaseNoSuccessStringPresent = NULL;
+
+    /*
+     */
+    commands[4].command = NULL;
     return runBatchCommands("MODEM-SETUP-MINIMAL", 1);
 }
 
@@ -506,25 +525,18 @@ static int enableGsmSync(SG_Socket *socket)
     commands[0].successStrings[1] = NULL;
     commands[0].commandInCaseNoSuccessStringPresent = NULL;
 
-    commands[1].command = "AT+IPR=9600\r";
+    /*
+     */
+    commands[1].command = "AT&W\r";
     commands[1].delimiter = OK_DELIMITER;
-    commands[1].logInfoCommand = "Enable-GSM-Sync-IPR";
+    commands[1].logInfoCommand = "Persist-GSM-Sync";
     commands[1].successStrings[0] = OK_DELIMITER;
     commands[1].successStrings[1] = NULL;
     commands[1].commandInCaseNoSuccessStringPresent = NULL;
 
     /*
      */
-    commands[2].command = "AT&W\r";
-    commands[2].delimiter = OK_DELIMITER;
-    commands[2].logInfoCommand = "Persist-GSM-Sync";
-    commands[2].successStrings[0] = OK_DELIMITER;
-    commands[2].successStrings[1] = NULL;
-    commands[2].commandInCaseNoSuccessStringPresent = NULL;
-
-    /*
-     */
-    commands[3].command = NULL;
+    commands[2].command = NULL;
     return runBatchCommands("ENABLE-AND-PERSIST-GSM-SYNC", 1);
 }
 
