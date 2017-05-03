@@ -447,13 +447,12 @@ static unsigned char setUpModemDone;
 
 static int setUpModemMinimal(SG_Socket *socket)
 {
-      /*
+    /*
      * Prepare-init-commands.
      */
-    
     commands[0].command = "AT+IPR=9600\r";
     commands[0].delimiter = OK_DELIMITER;
-    commands[0].logInfoCommand = "Enable-GSM-Sync-IPR";
+    commands[0].logInfoCommand = "Set-Baud-Rate";
     commands[0].successStrings[0] = OK_DELIMITER;
     commands[0].successStrings[1] = NULL;
     commands[0].commandInCaseNoSuccessStringPresent = NULL;
@@ -462,11 +461,11 @@ static int setUpModemMinimal(SG_Socket *socket)
      */
     commands[1].command = "AT&W\r";
     commands[1].delimiter = OK_DELIMITER;
-    commands[1].logInfoCommand = "Persist-GSM-Sync";
+    commands[1].logInfoCommand = "Persist-Baud-Rate";
     commands[1].successStrings[0] = OK_DELIMITER;
     commands[1].successStrings[1] = NULL;
     commands[1].commandInCaseNoSuccessStringPresent = NULL;
-    
+
     /*
      */
     commands[2].command = "ATE0&W\r";
