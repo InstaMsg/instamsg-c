@@ -175,6 +175,9 @@ static volatile unsigned long timestampFromGSM;
 
 static volatile unsigned char pingReqResponsePending;
 
+#define SEND_GPIO_DATA      PROSTR("SEND_GPIO_DATA")
+static int sendGpioData;
+
 static int statsDisplayInterval;
 unsigned int bytes_sent_over_wire;
 unsigned int bytes_received_over_wire;
@@ -2197,6 +2200,12 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
                                PROSTR("1"),
                                PROSTR(""));
 
+        registerEditableConfig(&sendGpioData,
+                               SEND_GPIO_DATA,
+                               CONFIG_INT,
+                               PROSTR("0"),
+                               PROSTR(""));
+
 #if FILE_SYSTEM_ENABLED == 1
         registerEditableConfig(&autoUpgradeEnabled,
                                AUTO_UPGRADE_ENABLED,
@@ -3208,6 +3217,19 @@ void start(int (*onConnectOneTimeOperations)(),
         }
     }
 
+    sendGpioData = 0;
+    RESET_GLOBAL_BUFFER;
+
+    rc = get_config_value_from_persistent_storage(SEND_GPIO_DATA, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
+    if(rc == SUCCESS)
+    {
+        char small[3] = {0};
+        getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, small);
+
+        sendGpioData = sg_atoi(small);
+    }
+
+
     statsDisplayInterval = 60;
     nextStatsDisplayTick = latestTick + statsDisplayInterval;
 
@@ -3381,7 +3403,7 @@ void start(int (*onConnectOneTimeOperations)(),
                         }
 
 #if SEND_GPIO_INFORMATION == 1
-                        if(1)
+                        if(sendGpioData == 1)
                         {
                             if(1)
                             {
