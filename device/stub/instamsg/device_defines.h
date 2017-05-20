@@ -23,6 +23,10 @@
 
 #define DATA_LOGGING_ENABLED        1
 
+#define SERIAL_COMMANDS_BUFFER_SIZE 600
+
+#define MAX_PORTS_ALLOWED           0
+
 #define OTA_BUFFER_SIZE             500
 #define OTA_PING_BUFFER_SIZE        500
 
@@ -50,5 +54,12 @@
 
 #define DEFAULT_COMPULSORY_SOCKET_READ_AFTER_WRITE_TIMEOUT      "0"
 #define DEFAULT_MAX_SECONDS_FOR_GPS_GSM_TIME_SYNC               "0"
+
+#define DEFAULT_NTP_SERVER                                      "pool.ntp.org"
+
+#define SERIAL_RESPONSE_TIMEOUT_SECS                            10
+#define ENSURE_EXPLICIT_TIME_SYNC                               0
+#define MAX_CYCLES_TO_WAIT_FOR_PUBACK                           20
+
 
 #endif
