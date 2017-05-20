@@ -175,8 +175,10 @@ static volatile unsigned long timestampFromGSM;
 
 static volatile unsigned char pingReqResponsePending;
 
+#if SEND_GPIO_INFORMATION == 1
 #define SEND_GPIO_DATA      PROSTR("SEND_GPIO_DATA")
 static int sendGpioData;
+#endif
 
 static int statsDisplayInterval;
 unsigned int bytes_sent_over_wire;
@@ -2200,11 +2202,13 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
                                PROSTR("1"),
                                PROSTR(""));
 
+#if SEND_GPIO_INFORMATION == 1
         registerEditableConfig(&sendGpioData,
                                SEND_GPIO_DATA,
                                CONFIG_INT,
                                PROSTR("0"),
                                PROSTR(""));
+#endif
 
 #if FILE_SYSTEM_ENABLED == 1
         registerEditableConfig(&autoUpgradeEnabled,
@@ -3217,6 +3221,7 @@ void start(int (*onConnectOneTimeOperations)(),
         }
     }
 
+#if SEND_GPIO_INFORMATION == 1
     sendGpioData = 0;
     RESET_GLOBAL_BUFFER;
 
@@ -3228,6 +3233,7 @@ void start(int (*onConnectOneTimeOperations)(),
 
         sendGpioData = sg_atoi(small);
     }
+#endif
 
 
     statsDisplayInterval = 60;
