@@ -2219,7 +2219,7 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
         registerEditableConfig(gpioPinOrientation,
                                GPIO_PINS_ORIENTATION,
                                CONFIG_STRING,
-                               PROSTR("0"),
+                               PROSTR(""),
                                PROSTR(""));
 #endif
 
