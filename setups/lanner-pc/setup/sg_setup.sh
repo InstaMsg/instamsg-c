@@ -1,7 +1,7 @@
 #!/bin/sh
 
 . ../upgrade_params
-PKG_VERSION="8"
+PKG_VERSION="9"
 
 ###################### PERFORM ACTIONS NOW ##################################
 
