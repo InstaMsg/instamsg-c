@@ -29,19 +29,28 @@
 
 
 
+#include "./include/gpio.h"
 
-#ifndef INSTAMSG_GPIO_COMMON
-#define INSTAMSG_GPIO_COMMON
+#if SEND_GPIO_INFORMATION == 1
 
-#include "device_defines.h"
+#include <string.h>
 
-#define DIO           "[DIO] "
-#define DIO_ERROR     "[DIO-ERROR] "
+void fillPinPrefix(char *orientationConfig, int positionInOrientationConfig, char *pinPrefix, char *pinId)
+{
+    char orientation[10] = {0};
 
-/*
- * Common-Section
- */
-void fill_dio_data(char *buffer, int maxBufferLength);
-void fillPinPrefix(char *orientationConfig, int positionInOrientationConfig, char *pinPrefix, char *pinId);
+    memset(orientation, 0, sizeof(orientation));
+    get_nth_token_thread_safe(orientationConfig, ',', positionInOrientationConfig, orientation, 1);
+
+    if(strcmp(orientation, "in") == 0)
+    {
+        sprintf(pinPrefix, "DI%s", pinId);
+    }
+    else if(strcmp(orientation, "out") == 0)
+    {
+        sprintf(pinPrefix, "DO%s", pinId);
+    }
+}
 
 #endif
+
