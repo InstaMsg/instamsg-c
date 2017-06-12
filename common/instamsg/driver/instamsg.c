@@ -58,6 +58,7 @@
 #include "./include/globals.h"
 #include "./include/upgrade.h"
 #include "./include/gps.h"
+#include "./include/cron.h"
 
 #if FILE_SYSTEM_ENABLED == 1
 #include "include/file_system.h"
@@ -178,6 +179,13 @@ static volatile unsigned char pingReqResponsePending;
 #if SEND_GPIO_INFORMATION == 1
 #define SEND_GPIO_DATA      PROSTR("SEND_GPIO_DATA")
 static int sendGpioData;
+#endif
+
+#if CRON_ENABLED == 1
+#define CRON_CONFIG         PROSTR("CRON")
+static char cronConfig[MAX_BUFFER_SIZE];
+static char cronTask[200];
+static int cronInterval;
 #endif
 
 static int statsDisplayInterval;
@@ -1951,6 +1959,10 @@ static void check_if_all_required_compile_time_defines_are_present()
 #ifndef ENSURE_EXPLICIT_TIME_SYNC
 #error "ENSURE_EXPLICIT_TIME_SYNC compile-time-parameter undefined"
 #endif
+
+#ifndef CRON_ENABLED
+#error "CRON_ENABLED compile-time-parameter undefined"
+#endif
 }
 
 
@@ -2237,6 +2249,15 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
                                NTP_SERVER,
                                CONFIG_STRING,
                                PROSTR(DEFAULT_NTP_SERVER),
+                               PROSTR(""));
+#endif
+
+#if CRON_ENABLED == 1
+        memset(cronConfig, 0, sizeof(cronConfig));
+        registerEditableConfig(cronConfig,
+                               CRON_CONFIG,
+                               CONFIG_STRING,
+                               PROSTR(""),
                                PROSTR(""));
 #endif
 
@@ -3172,6 +3193,9 @@ void sendGpsLocationToServer()
 
 
 volatile unsigned long nextBusinessLogicTick;
+#if CRON_ENABLED == 1
+volatile unsigned long nextCronTick;
+#endif
 
 #if SEND_GPIO_INFORMATION == 1
 static char deviceDioData[100];
@@ -3236,11 +3260,27 @@ void start(int (*onConnectOneTimeOperations)(),
 #endif
 
 
+#if CRON_ENABLED == 1
+    RESET_GLOBAL_BUFFER;
+
+    rc = get_config_value_from_persistent_storage(CRON_CONFIG, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
+    if(rc == SUCCESS)
+    {
+        memset(cronConfig, 0, sizeof(cronConfig));
+        getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, cronConfig);
+    }
+#endif
+
     statsDisplayInterval = 60;
     nextStatsDisplayTick = latestTick + statsDisplayInterval;
 
     editableBusinessLogicInterval = businessLogicInterval;
     nextBusinessLogicTick = latestTick + editableBusinessLogicInterval;
+
+#if CRON_ENABLED == 1
+    cronInterval = 60;
+    nextCronTick = latestTick + cronInterval;
+#endif
 
     sendPacketIrrespective = 0;
     pingRequestInterval = 0;
@@ -3340,6 +3380,9 @@ void start(int (*onConnectOneTimeOperations)(),
 
                     {
                         static unsigned char businessLogicRunOnceAtStart = 0;
+#if CRON_ENABLED == 1
+                        static unsigned char cronRunOnceAtStart = 0;
+#endif
 
                         latestTick = getCurrentTick();
 
@@ -3428,6 +3471,76 @@ void start(int (*onConnectOneTimeOperations)(),
                                 memset(previousDeviceDioData, 0, sizeof(previousDeviceDioData));
                                 strcpy(previousDeviceDioData, deviceDioData);
                             }
+                        }
+#endif
+
+#if CRON_ENABLED == 1
+                        if((latestTick >= nextCronTick) || (cronRunOnceAtStart == 0))
+                        {
+                            if(strlen(cronConfig) == 0)
+                            {
+                                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sNothing in cron ..."), CRON);
+                                info_log(LOG_GLOBAL_BUFFER);
+                            }
+                            else
+                            {
+                                char *cron = (char*) sg_malloc(MAX_BUFFER_SIZE);
+                                if(cron == NULL)
+                                {
+                                    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCould not allocate memeory :("), CRON_ERROR);
+                                    error_log(LOG_GLOBAL_BUFFER);
+                                }
+                                else
+                                {
+                                    int pos = 1;
+
+                                    while(1)
+                                    {
+                                        int runCron = 0;
+
+                                        memset(cron, 0, MAX_BUFFER_SIZE);
+                                        get_nth_token_thread_safe(cronConfig, ',', pos, cron, 1);
+
+                                        if(strlen(cron) > 0)
+                                        {
+                                            runCron = isOkToFireCronTask(cron);
+                                            if(runCron == SUCCESS)
+                                            {
+                                                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sTime to run cron [%s]"), CRON, cron);
+                                                info_log(LOG_GLOBAL_BUFFER);
+
+                                                memset(cronTask, 0, sizeof(cronTask));
+                                                getCronTaskFromCron(cron, cronTask, sizeof(cronTask));
+
+                                                if(strlen(cronTask) == 0)
+                                                {
+                                                    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCould not extract task from [%s]"),
+                                                                                  CRON_ERROR, cron);
+                                                    error_log(LOG_GLOBAL_BUFFER);
+                                                }
+                                                else
+                                                {
+                                                    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sRunning task [%s]"), CRON, cronTask);
+                                                    info_log(LOG_GLOBAL_BUFFER);
+
+                                                    runCronTask(cronTask);
+                                                }
+                                            }
+
+                                            pos++;
+                                        }
+                                        else
+                                        {
+                                            break;
+                                        }
+                                    }
+
+                                    sg_free(cron);
+                                }
+                            }
+
+                            nextCronTick = latestTick + cronInterval;
+                            cronRunOnceAtStart = 1;
                         }
 #endif
 

@@ -70,6 +70,8 @@ device/linux-simcom
 device/philips-gateway-windows
 device/msf-gateway-windows
 device/masibus-gateway-gsm-windows
+device/masibus-gateway-gsm-windows-rs485
+device/masibus-gateway-ethernet-windows
 
 common/apps/atoll-gms
 common/apps/energy-meter
