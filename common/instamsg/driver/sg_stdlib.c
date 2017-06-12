@@ -213,7 +213,7 @@ void get_nth_token_thread_safe(char *original, char separator, int pos, char *re
 
     if(token_end_pos == -1)
     {
-    	if(num_separators_encountered == 0)
+    	if((num_separators_encountered == 0) && (pos == 1))
     	{
     		/*
     		 * If no separator found, this means that the whole original-string is the token.
@@ -227,10 +227,14 @@ void get_nth_token_thread_safe(char *original, char separator, int pos, char *re
     }
 
     buffer_index = 0;
-    for(tmp_index = token_start_pos; tmp_index < token_end_pos; tmp_index++)
+
+    if((num_separators_encountered == 0) || (num_separators_encountered == pos))
     {
-    	res[buffer_index] = original[tmp_index];
-    	buffer_index++;
+        for(tmp_index = token_start_pos; tmp_index < token_end_pos; tmp_index++)
+        {
+    	    res[buffer_index] = original[tmp_index];
+    	    buffer_index++;
+        }
     }
 
     res[buffer_index] = 0;
