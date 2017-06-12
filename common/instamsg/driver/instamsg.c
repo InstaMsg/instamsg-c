@@ -177,8 +177,9 @@ static volatile unsigned long timestampFromGSM;
 static volatile unsigned char pingReqResponsePending;
 
 #if SEND_GPIO_INFORMATION == 1
-#define SEND_GPIO_DATA      PROSTR("SEND_GPIO_DATA")
-static int sendGpioData;
+#define GPIO_PINS_ORIENTATION      PROSTR("GPIO_PINS_ORIENTATION")
+unsigned char sendGpioData;
+char gpioPinOrientation[GPIO_PIN_ORIENTATION_CONFIG_LENGTH];
 #endif
 
 #if CRON_ENABLED == 1
@@ -2215,9 +2216,9 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
                                PROSTR(""));
 
 #if SEND_GPIO_INFORMATION == 1
-        registerEditableConfig(&sendGpioData,
-                               SEND_GPIO_DATA,
-                               CONFIG_INT,
+        registerEditableConfig(gpioPinOrientation,
+                               GPIO_PINS_ORIENTATION,
+                               CONFIG_STRING,
                                PROSTR("0"),
                                PROSTR(""));
 #endif
@@ -3249,13 +3250,20 @@ void start(int (*onConnectOneTimeOperations)(),
     sendGpioData = 0;
     RESET_GLOBAL_BUFFER;
 
-    rc = get_config_value_from_persistent_storage(SEND_GPIO_DATA, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
+    rc = get_config_value_from_persistent_storage(GPIO_PINS_ORIENTATION, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
     if(rc == SUCCESS)
     {
-        char small[3] = {0};
-        getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, small);
+        memset(gpioPinOrientation, 0, sizeof(gpioPinOrientation));
+        getJsonKeyValueIfPresent((char*)GLOBAL_BUFFER, CONFIG_VALUE_KEY, gpioPinOrientation);
 
-        sendGpioData = sg_atoi(small);
+        if(strlen(gpioPinOrientation) == 0)
+        {
+            sendGpioData = 0;
+        }
+        else
+        {
+            sendGpioData = 1;
+        }
     }
 #endif
 

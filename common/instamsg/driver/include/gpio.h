@@ -33,6 +33,9 @@
 #ifndef INSTAMSG_GPIO_COMMON
 #define INSTAMSG_GPIO_COMMON
 
+#define DIO           "[DIO] "
+#define DIO_ERROR     "[DIO-ERROR] "
+
 /*
  * Common-Section
  */
