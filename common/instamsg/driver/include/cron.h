@@ -39,12 +39,19 @@
 #define CRON           "[CRON] "
 #define CRON_ERROR     "[CRON-ERROR] "
 
+struct dateFieldRange
+{
+    unsigned char lower;
+    unsigned char upper;
+};
+
+
 struct CronParams
 {
-    unsigned char cron_month;               /* 1-12 */
-    unsigned char cron_month_day;           /* 1-31 */
-    unsigned char cron_hour;                /* 0-23 */
-    unsigned char cron_minute;              /* 0-59 */
+    struct dateFieldRange cron_month;               /* 1-12 */
+    struct dateFieldRange cron_month_day;           /* 1-31 */
+    struct dateFieldRange cron_hour;                /* 0-23 */
+    struct dateFieldRange cron_minute;              /* 0-59 */
     int cron_offset;
 
     unsigned char system_month;             /* 1-12 */

@@ -51,7 +51,7 @@ static void assignUnsignedCharValue(char *src, unsigned char *dest, int offset, 
 }
 
 
-static int processParsedCronField(char *cron, char *field, char *field_desc, unsigned char *cronParam)
+static int processParsedCronField(char *cron, char *field, char *field_desc, struct dateFieldRange *cronParam)
 {
     if(1)
     {
@@ -66,11 +66,24 @@ static int processParsedCronField(char *cron, char *field, char *field_desc, uns
         {
             if(strcmp(field, "*") == 0)
             {
-                *cronParam = 0;
+                (*cronParam).lower = 0;
+            }
+            else if(get_character_count(field, '-') == 1)
+            {
+                char small[10] = {0};
+
+                memset(small, 0, sizeof(small));
+                get_nth_token_thread_safe(field, '-', 1, small, 1);
+                (*cronParam).lower = sg_atoi(small);
+
+                memset(small, 0, sizeof(small));
+                get_nth_token_thread_safe(field, '-', 2, small, 1);
+                (*cronParam).upper = sg_atoi(small);
             }
             else
             {
-                *cronParam = sg_atoi(field);
+                (*cronParam).lower = sg_atoi(field);
+                (*cronParam).upper = sg_atoi(field);
             }
         }
     }
@@ -80,11 +93,15 @@ static int processParsedCronField(char *cron, char *field, char *field_desc, uns
 static char temporaryCron[200];
 int isOkToFireCronTask(char *cron)
 {
-    cronParams.cron_month       = DUMMY_VALUE;
-    cronParams.cron_month_day   = DUMMY_VALUE;
-    cronParams.cron_hour        = DUMMY_VALUE;
-    cronParams.cron_minute      = DUMMY_VALUE;
-    cronParams.cron_offset      = DUMMY_VALUE;
+    cronParams.cron_month.lower       = DUMMY_VALUE;
+    cronParams.cron_month.upper       = DUMMY_VALUE;
+    cronParams.cron_month_day.lower   = DUMMY_VALUE;
+    cronParams.cron_month_day.upper   = DUMMY_VALUE;
+    cronParams.cron_hour.lower        = DUMMY_VALUE;
+    cronParams.cron_hour.upper        = DUMMY_VALUE;
+    cronParams.cron_minute.lower      = DUMMY_VALUE;
+    cronParams.cron_minute.upper      = DUMMY_VALUE;
+    cronParams.cron_offset            = DUMMY_VALUE;
 
     cronParams.system_month     = DUMMY_VALUE;
     cronParams.system_month_day = DUMMY_VALUE;
@@ -206,9 +223,9 @@ int isOkToFireCronTask(char *cron)
         return FAILURE;
     }
 
-    if(cronParams.cron_month != 0)
+    if(cronParams.cron_month.lower != 0)
     {
-        if(cronParams.system_month == cronParams.cron_month)
+        if((cronParams.system_month >= cronParams.cron_month.lower) && (cronParams.system_month <= cronParams.cron_month.upper))
         {
         }
         else
@@ -217,9 +234,9 @@ int isOkToFireCronTask(char *cron)
         }
     }
 
-    if(cronParams.cron_month_day != 0)
+    if(cronParams.cron_month_day.lower != 0)
     {
-        if(cronParams.system_month_day == cronParams.cron_month_day)
+        if((cronParams.system_month_day >= cronParams.cron_month_day.lower) && (cronParams.system_month_day <= cronParams.cron_month_day.upper))
         {
         }
         else
@@ -228,9 +245,9 @@ int isOkToFireCronTask(char *cron)
         }
     }
 
-    if(cronParams.cron_hour != 0)
+    if(cronParams.cron_hour.lower != 0)
     {
-        if(cronParams.system_hour == cronParams.cron_hour)
+        if((cronParams.system_hour >= cronParams.cron_hour.lower) && (cronParams.system_hour <= cronParams.cron_hour.upper))
         {
         }
         else
@@ -239,9 +256,9 @@ int isOkToFireCronTask(char *cron)
         }
     }
 
-    if(cronParams.cron_minute != 0)
+    if(cronParams.cron_minute.lower != 0)
     {
-        if(cronParams.system_minute == cronParams.cron_minute)
+        if((cronParams.system_minute >= cronParams.cron_minute.lower) && (cronParams.system_minute <= cronParams.cron_minute.upper))
         {
         }
         else
