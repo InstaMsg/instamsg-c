@@ -2258,7 +2258,7 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
         registerEditableConfig(cronConfig,
                                CRON_CONFIG,
                                CONFIG_STRING,
-                               PROSTR(""),
+                               PROSTR(DEFAULT_CRON_CONFIG),
                                PROSTR(""));
 #endif
 
