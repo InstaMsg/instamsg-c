@@ -2,4 +2,3 @@
 */1 *   * * * echo > /home/sensegrow/wwan-monitor.log
 0   */3 * * * /usr/bin/killall wwan-monitor
 15  *   * * * cd /home/sensegrow; /home/sensegrow/sg_upgrade_try.sh
-5  23   * * * rm -f /etc/udev/rules.d/70-persistent-net.rules; /sbin/reboot
