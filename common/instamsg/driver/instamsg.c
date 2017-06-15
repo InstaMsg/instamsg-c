@@ -1744,7 +1744,7 @@ static void sync_time_through_NTP(InstaMsg *c)
         return;
     }
 
-    if(timeSyncedViaExternalResources == 1)
+    if((timeSyncedViaExternalResources == 1) && (COMPULSORY_NTP_SYNC == 0))
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sTime has already been synced earlier.. not re-syncing."), CLOCK);
         info_log(LOG_GLOBAL_BUFFER);
