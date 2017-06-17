@@ -78,7 +78,7 @@ volatile unsigned char runBusinessLogicImmediately;
 
 
 #if SEND_GPIO_INFORMATION == 1
-#include "../../ioeye/include/payload.h"
+#include "./include/payload.h"
 #endif
 
 #define MAX_CYCLES_TO_WAIT_FOR_PINGRESP 10

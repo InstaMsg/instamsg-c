@@ -118,5 +118,8 @@
 #define SEND_POWER_INFORMATION          1
 
 #define CRON_ENABLED                    1
+#define DEFAULT_CRON_CONFIG             ""
+
+#define COMPULSORY_NTP_SYNC             1
 
 #endif

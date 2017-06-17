@@ -35,6 +35,7 @@ SOURCES=`echo                                                                   
         common/instamsg/driver/at.c                                                             \
         common/instamsg/driver/gpio.c                                                           \
         common/instamsg/driver/cron.c                                                           \
+        common/instamsg/driver/payload.c                                                        \
                                                                                                 \
         common/instamsg/mqtt/src/MQTTFormat.c                                                   \
         common/instamsg/mqtt/src/MQTTPacket.c                                                   \
