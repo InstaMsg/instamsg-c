@@ -82,6 +82,7 @@ common/apps/gps
 common/apps/lanner-pc-wwan-interface-monitor
 common/apps/philips-app-luminar
 common/apps/msf-app
+common/apps/avl-app
 
 common/ioeye
 common/ioeye-c
