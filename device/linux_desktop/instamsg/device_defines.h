@@ -33,7 +33,7 @@
 #ifndef DEVICE_DEFINES
 #define DEVICE_DEFINES
 
-#define DEVICE_VERSION "7.0.0"
+#define DEVICE_VERSION "8.2.0"
 
 /*
  * We use the vanilla "sprintf" method for Linux.
@@ -121,5 +121,7 @@
 #define DEFAULT_CRON_CONFIG             ""
 
 #define COMPULSORY_NTP_SYNC             1
+
+#define SEPARATOR                       "/"
 
 #endif

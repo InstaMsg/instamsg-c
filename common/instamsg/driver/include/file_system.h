@@ -60,6 +60,7 @@ int copyFile(FileSystem *fs, const char *oldPath, const char *newPath);
 int deleteFile(FileSystem *fs, const char *filePath);
 void getFileListing(FileSystem *fs, char *buf, int maxValueLenAllowed, const char *directoryPath);
 long getFileSize(FileSystem *fs, const char *filepath);
+void getNextFileToProcessPath(char *folder, char *path, int maxBufferLength);
 
 
 /*

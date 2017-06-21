@@ -223,6 +223,41 @@ long getFileSize(FileSystem *fs, const char *filepath)
 
 
 /*
+ * Gets the first available file-path in the folder
+ */
+void getNextFileToProcessPath(char *folder, char *path, int maxBufferLength)
+{
+    struct dirent *pDirent;
+    DIR *pDir;
+
+    pDir = opendir(folder);
+    if(pDir == NULL)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Cannot open directory [%s]", folder);
+        error_log(LOG_GLOBAL_BUFFER);
+
+        return;
+    }
+
+    while((pDirent = readdir(pDir)) != NULL)
+    {
+        struct stat path_stat;
+        stat(pDirent->d_name, &path_stat);
+
+        if( (strcmp(pDirent->d_name, ".") != 0) && (strcmp(pDirent->d_name, "..") != 0) )
+        {
+            sg_sprintf(path, "%s%s%s", folder, SEPARATOR, pDirent->d_name);
+            break;
+        }
+        else
+        {
+            continue;
+        }
+    }
+}
+
+
+/*
  * This method MUST release the underlying medium (even if it means to retry continuously).
  * But if it is ok to re-connect without releasing the underlying-system-resource, then this can be left empty.
  */
