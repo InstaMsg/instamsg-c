@@ -586,7 +586,11 @@ static int setUpModem(SG_Socket *socket)
     commands[1].logInfoCommand = "GPRS-Attachment-State";
     commands[1].successStrings[0] = "+CGATT: 1";
     commands[1].successStrings[1] = NULL;
+#if DISABLE_EXPLICIT_PS_ATTACHMENT == 1
+    commands[1].commandInCaseNoSuccessStringPresent = NULL;
+#else
     commands[1].commandInCaseNoSuccessStringPresent = "AT+CGATT=1\r";
+#endif
 
 
     /*
