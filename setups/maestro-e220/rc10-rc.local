@@ -1,0 +1,14 @@
+# Put your custom commands here that should be executed once
+# the system init finished. By default this file does nothing.
+waitformountroot=`ps | grep mount_root | grep -v grep`
+while [ "$waitformountroot" != "" ]
+do
+sleep 5
+waitformountroot=`ps | grep mount_root | grep -v grep`
+done
+eventtrack.sh &
+wandete.sh &
+/home/sensegrow/monitor.sh &
+/home/sensegrow/gpio.sh &
+/bin/date +%s -s @`cat /overlay/home/sensegrow/last_reboot_timestamp` &
+exit 0

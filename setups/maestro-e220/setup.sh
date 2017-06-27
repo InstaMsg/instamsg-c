@@ -12,11 +12,8 @@ ${SSH_COMMAND} "sed -i 's/^[ :\t]*\/etc\/init.d\/event_sms start/#\/etc\/init.d\
 
 ${SSH_COMMAND} "sed -i 's/^[ :\t]*\/usr\/sbin\/event_sms.sh/#\/usr\/sbin\/event_sms.sh/g' /etc/init.d/event_sms"
 
-${SSH_COMMAND} "sed -i '/^[ :\t]*\/home\/sensegrow\/monitor.sh \&/d' /etc/rc.local"
-${SSH_COMMAND} "sed -i 's/^[ :\t]*exit 0/\/home\/sensegrow\/monitor.sh \&\nexit 0/g' /etc/rc.local"
-
-${SSH_COMMAND} "sed -i '/^[ :\t]*\/home\/sensegrow\/gpio.sh \&/d' /etc/rc.local"
-${SSH_COMMAND} "sed -i 's/^[ :\t]*exit 0/\/home\/sensegrow\/gpio.sh \&\nexit 0/g' /etc/rc.local"
+scp rc.local  ${LOGIN}:/etc
+${SSH_COMMAND} "chmod 777 /etc/rc.local"
 
 ${SSH_COMMAND} "sed -i 's/HL8548/HL85/g' /lib/netifd/proto/3g.sh"
 ${SSH_COMMAND} "sed -i 's/IPV4V6/IP/g' /etc/chatscripts/3g.chat"
@@ -71,7 +68,7 @@ ${SSH_COMMAND} "killall sshpass"
 scp sshpass ${LOGIN}:/usr/bin
 ${SSH_COMMAND} "chmod 777 /usr/bin/sshpass"
 
-${SSH_COMMAND} "echo 13 > ${HOME_DIRECTORY}/current_version"
+${SSH_COMMAND} "echo 14 > ${HOME_DIRECTORY}/current_version"
 
 ${SSH_COMMAND} "killall monitor.sh"
 ${SSH_COMMAND} "killall instamsg"
