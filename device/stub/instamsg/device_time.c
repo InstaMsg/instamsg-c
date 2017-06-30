@@ -63,5 +63,5 @@ unsigned long get_GSM_timestamp()
  */
 int sync_system_clock(DateParams *dateParams, unsigned long seconds)
 {
-    return SUCCESS;
+    return FAILURE;
 }
