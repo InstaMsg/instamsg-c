@@ -102,21 +102,21 @@ void pre_process_payload(char *portName, char *portAddress, char *hostAddress, c
     strcat(messageBuffer, "{");
 #endif
 
-    strcat(messageBuffer, "\"v\":\"1.0\",");
+    strcat(messageBuffer, "\"v\" : \"1.0\", ");
 
     addPayloadField(messageBuffer, "topic", get_data_topic);
     addPayloadField(messageBuffer, "manufacturer", get_manufacturer);
     addPayloadField(messageBuffer, "client_id", get_client_id);
 
-    strcat(messageBuffer, ",\"port\":{\"port_name\":\"");
+    strcat(messageBuffer, ", \"port\" : {\"port_name\" : \"");
     strcat(messageBuffer, portName);
-    strcat(messageBuffer, "\",\"port_address\":\"");
+    strcat(messageBuffer, "\", \"port_address\" : \"");
     strcat(messageBuffer, portAddress);
-    strcat(messageBuffer, "\",\"host_address\":\"");
+    strcat(messageBuffer, "\", \"host_address\" : \"");
     strcat(messageBuffer, hostAddress);
-    strcat(messageBuffer, "\",\"host_port\":\"");
+    strcat(messageBuffer, "\", \"host_port\" : \"");
     strcat(messageBuffer, hostPort);
-    strcat(messageBuffer, "\"},");
+    strcat(messageBuffer, "\"}, ");
 
 
     /*
