@@ -77,10 +77,8 @@ struct KeyValuePairs
 
 /****************************************************************************************/
 #if 1
-#define INSTAMSG_HOST           PROSTR("device.instamsg.io")
 #define INSTAMSG_HTTP_HOST      PROSTR("platform.instamsg.io")
 #else
-#define INSTAMSG_HOST           PROSTR("localhost")
 #define INSTAMSG_HTTP_HOST      PROSTR("localhost")
 #endif
 
