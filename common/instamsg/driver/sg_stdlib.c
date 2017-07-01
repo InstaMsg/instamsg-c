@@ -95,6 +95,69 @@ int sg_atoi(const char *buf)
 }
 
 
+unsigned long sg_atoul(const char *buf)
+{
+    unsigned long result;
+    int len, i, exponent, k;
+    unsigned char someNumberParsed = 0;
+    unsigned char negative = 0;
+
+    result = 0;
+    exponent = -1;
+
+    len = strlen(buf);
+    for(i = len - 1; i >= 0; i--)
+    {
+        int base = 1;
+
+        if(buf[i] == ' ')
+        {
+            if(someNumberParsed == 0)
+            {
+                continue;
+            }
+            else
+            {
+                break;
+            }
+        }
+        else if(buf[i] == '-')
+        {
+            if(someNumberParsed == 0)
+            {
+            }
+            else
+            {
+                negative = 1;
+            }
+
+            continue;
+        }
+        else if( (buf[i] < '0') || (buf[i] > '9') )
+        {
+            return 0;
+        }
+
+        someNumberParsed = 1;
+
+        exponent++;
+        for(k = 0; k < exponent; k++)
+        {
+            base = base * 10;
+        }
+
+        result = result + (base * (buf[i] - '0'));
+    }
+
+    if(negative == 1)
+    {
+        result = result * -1;
+    }
+
+    return result;
+}
+
+
 char* sg_strnstr(const char *str1, const char *str2, int maxSize)
 {
     int i = 0, j = 0;

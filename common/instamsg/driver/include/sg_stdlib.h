@@ -32,6 +32,7 @@
 #define INSTAMSG_STDLIB
 
 int sg_atoi(const char *buf);
+unsigned long sg_atoul(const char *buf);
 char* sg_strnstr(const char *str1, const char *str2, int maxSize);
 char* sg_memnmem(const char *mem1, const char *mem2, int sizeMem1, int sizeMem2);
 void get_nth_token_thread_safe(char *original, char separator, int pos, char *res, unsigned char strip);

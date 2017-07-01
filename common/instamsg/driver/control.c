@@ -27,15 +27,36 @@
  *    Ajay Garg <ajay.garg@sensegrow.com>
  *******************************************************************************/
 
+#include <string.h>
 
+#include "./include/globals.h"
+#include "./include/control.h"
+#include "./include/time.h"
+#include "./include/json.h"
+#include "./include/sg_stdlib.h"
 
-#ifndef INSTAMSG_JSON
-#define INSTAMSG_JSON
+static char temp[20];
+int isOkToRunControlCommandTimeWise(char *outerJson)
+{
+    unsigned long utcTimeStampFromControlCommandLong = 0;
+    unsigned long currentUtcTimeStamp = 0;
+    int ttl = 0;
 
-void getJsonKeyValueIfPresent(char *json_original, const char *key, char *buf);
-void get_inner_outer_json_from_two_level_json(const char *nestedJson, const char *nestedJsonKey,
-                                              char *outerJsonBuffer, int outerJsonBufferLength,
-                                              char *innerJsonBuffer, int innerJsonBufferLength);
+    memset(temp, 0, sizeof(temp));
+    getJsonKeyValueIfPresent(outerJson, "time", temp);
+    utcTimeStampFromControlCommandLong = sg_atoul(temp);
 
+    memset(temp, 0, sizeof(temp));
+    getJsonKeyValueIfPresent(outerJson, "ttl", temp);
+    ttl = sg_atoi(temp);
 
-#endif
+    currentUtcTimeStamp = getCurrentTick();
+    if( (currentUtcTimeStamp) < (utcTimeStampFromControlCommandLong + (unsigned long)ttl) )
+    {
+        return SUCCESS;
+    }
+    else
+    {
+        return FAILURE;
+    }
+}

@@ -28,6 +28,11 @@ struct Serial
     char serialParams[50];
     char serialDelimiter[5];
 
+    char portName[50];
+    char portAddress[50];
+    char hostAddress[50];
+    char hostPort[50];
+
     char modbusTcpIPAddress[50];
     SG_Socket modbusSocket;
 

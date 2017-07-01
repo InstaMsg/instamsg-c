@@ -187,3 +187,68 @@ exit:
 
 }
 
+
+void get_inner_outer_json_from_two_level_json(const char *nestedJson, const char *nestedJsonKey,
+                                              char *outerJsonBuffer, int outerJsonBufferLength,
+                                              char *innerJsonBuffer, int innerJsonBufferLength)
+{
+    char *nestedJsonCopy = NULL;
+
+    nestedJsonCopy = (char*) sg_malloc(strlen(nestedJson) + 1);
+    if(nestedJsonCopy == NULL)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Could not allocate memory"));
+        error_log(LOG_GLOBAL_BUFFER);
+
+        goto exit;
+    }
+
+    strcpy(nestedJsonCopy, nestedJson);
+
+    if(1)
+    {
+        char *firstOpeningBrace = strstr(nestedJsonCopy, "{");
+        if(firstOpeningBrace != NULL)
+        {
+            char *secondOpeningBrace = strstr(firstOpeningBrace + 1, "{");
+            if(secondOpeningBrace != NULL)
+            {
+                char *secondClosingBrace = strstr(secondOpeningBrace + 1, "}");
+                if(secondClosingBrace != NULL)
+                {
+                    char *nestedJsonKeyBeginner = NULL;
+
+                    memset(innerJsonBuffer, 0, innerJsonBufferLength);
+                    memmove(innerJsonBuffer, secondOpeningBrace, secondClosingBrace - secondOpeningBrace + 1);
+
+                    nestedJsonKeyBeginner = strstr(nestedJsonCopy, nestedJsonKey);
+                    if(nestedJsonKeyBeginner != NULL)
+                    {
+                        int lenFromSecondClosingBrace = 0;
+
+                        char *tmp = strstr(secondClosingBrace + 1, ",");
+                        if(tmp != NULL)
+                        {
+                            secondClosingBrace = tmp;
+                        }
+
+                        lenFromSecondClosingBrace = strlen(secondClosingBrace + 1);
+
+                        memmove(nestedJsonKeyBeginner, secondClosingBrace + 1, lenFromSecondClosingBrace);
+                        nestedJsonKeyBeginner[lenFromSecondClosingBrace] = 0;
+
+                        memset(outerJsonBuffer, 0, outerJsonBufferLength);
+                        strcpy(outerJsonBuffer, nestedJsonCopy);
+                    }
+                }
+            }
+        }
+    }
+
+exit:
+    if(nestedJsonCopy != NULL)
+    {
+        sg_free(nestedJsonCopy);
+    }
+}
+

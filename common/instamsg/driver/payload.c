@@ -87,7 +87,7 @@ static void addPayloadField(char *messageBuffer,
 }
 
 
-void pre_process_payload()
+void pre_process_payload(char *portName, char *portAddress, char *hostAddress, char *hostPort)
 {
     errorCase = 0;
 
@@ -102,9 +102,21 @@ void pre_process_payload()
     strcat(messageBuffer, "{");
 #endif
 
+    strcat(messageBuffer, "\"v\":\"1.0\",");
+
     addPayloadField(messageBuffer, "topic", get_data_topic);
     addPayloadField(messageBuffer, "manufacturer", get_manufacturer);
     addPayloadField(messageBuffer, "client_id", get_client_id);
+
+    strcat(messageBuffer, ",\"port\":{\"port_name\":\"");
+    strcat(messageBuffer, portName);
+    strcat(messageBuffer, "\",\"port_address\":\"");
+    strcat(messageBuffer, portAddress);
+    strcat(messageBuffer, "\",\"host_address\":\"");
+    strcat(messageBuffer, hostAddress);
+    strcat(messageBuffer, "\",\"host_port\":\"");
+    strcat(messageBuffer, hostPort);
+    strcat(messageBuffer, "\"},");
 
 
     /*
@@ -179,7 +191,7 @@ static void send_special_command(const char *data, char *command)
 {
     serialCommandUnderProcess = command;
 
-    pre_process_payload();
+    pre_process_payload(PORT_NAME_GPS, "0", "", "");
     strcat(messageBuffer, data);
     post_process_payload(0);
 }
