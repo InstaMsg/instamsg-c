@@ -108,6 +108,7 @@ void pre_process_payload(char *portName, char *portAddress, char *hostAddress, c
     addPayloadField(messageBuffer, "manufacturer", get_manufacturer);
     addPayloadField(messageBuffer, "client_id", get_client_id);
 
+#if 0
     strcat(messageBuffer, "\"port\" : {\"port_name\" : \"");
     strcat(messageBuffer, portName);
     strcat(messageBuffer, "\", \"port_address\" : \"");
@@ -117,6 +118,7 @@ void pre_process_payload(char *portName, char *portAddress, char *hostAddress, c
     strcat(messageBuffer, "\", \"host_port\" : \"");
     strcat(messageBuffer, hostPort);
     strcat(messageBuffer, "\"}, ");
+#endif
 
 
     /*
