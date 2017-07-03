@@ -102,7 +102,9 @@ void pre_process_payload(char *portName, char *portAddress, char *hostAddress, c
     strcat(messageBuffer, "{");
 #endif
 
+#if 0
     strcat(messageBuffer, "\"v\" : \"1.0\", ");
+#endif
 
     addPayloadField(messageBuffer, "topic", get_data_topic);
     addPayloadField(messageBuffer, "manufacturer", get_manufacturer);
