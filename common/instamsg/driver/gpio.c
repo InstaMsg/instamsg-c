@@ -30,6 +30,7 @@
 
 
 #include "./include/gpio.h"
+#include "./include/sg_stdlib.h"
 
 #if SEND_GPIO_INFORMATION == 1
 

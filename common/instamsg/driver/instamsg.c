@@ -79,6 +79,7 @@ volatile unsigned char runBusinessLogicImmediately;
 
 #if SEND_GPIO_INFORMATION == 1
 #include "./include/payload.h"
+#include "./include/gpio.h"
 #endif
 
 #define MAX_CYCLES_TO_WAIT_FOR_PINGRESP 10
