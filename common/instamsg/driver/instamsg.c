@@ -2927,6 +2927,7 @@ static void waitForPubAck()
             {
                 while(1)
                 {
+                    startAndCountdownTimer(1, 0);
                     readAndProcessIncomingMQTTPacketsIfAny(&instaMsg);
                     if(waitingForPuback == WAITING_FOR_PUBACK)
                     {
