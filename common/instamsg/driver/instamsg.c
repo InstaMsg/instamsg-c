@@ -2960,6 +2960,7 @@ static void waitForPingResp()
             {
                 while(1)
                 {
+                    startAndCountdownTimer(1, 0);
                     readAndProcessIncomingMQTTPacketsIfAny(&instaMsg);
                     if(pingReqResponsePending == 1)
                     {
