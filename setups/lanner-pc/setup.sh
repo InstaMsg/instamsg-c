@@ -21,6 +21,8 @@ chmod 777 "${HOME_DIRECTORY}/monitor.sh"
 sed -i '/^[ :\t]*\/home\/sensegrow\/monitor.sh \&/d' /etc/rc.local
 sed -i 's/^[ :\t]*exit 0/\/home\/sensegrow\/monitor.sh \&\nexit 0/g' /etc/rc.local
 
+sed -i 's/#FSCKFIX=no/FSCKFIX=yes/g' /etc/default/rcS
+
 sed -i '/^[ :\t]*insmod \/lib\/modules\/3.19.8-031908-generic\/kernel\/drivers\/watchdog\/wd_drv.ko/d' /etc/rc.local
 sed -i 's/^[ :\t]*exit 0/insmod \/lib\/modules\/3.19.8-031908-generic\/kernel\/drivers\/watchdog\/wd_drv.ko\nexit 0/g' /etc/rc.local
 cp wd_drv.ko /lib/modules/3.19.8-031908-generic/kernel/drivers/watchdog
@@ -45,7 +47,7 @@ chmod 777 "${HOME_DIRECTORY}/sg_upgrade.sh"
 cp upgrade_params "${HOME_DIRECTORY}"
 chmod 777 "${HOME_DIRECTORY}/upgrade_params"
 
-echo 13 > ${HOME_DIRECTORY}/current_version
+echo 14 > ${HOME_DIRECTORY}/current_version
 
 kill -9 `pgrep -x wwan-monitor` || true
 cp wwan-monitor "${HOME_DIRECTORY}"
