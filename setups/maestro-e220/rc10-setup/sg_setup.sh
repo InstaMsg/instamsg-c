@@ -1,7 +1,7 @@
 #!/bin/sh
 
 . ../upgrade_params
-PKG_VERSION="7"
+PKG_VERSION="8"
 
 ###################### PERFORM ACTIONS NOW ##################################
 
@@ -20,5 +20,5 @@ cp -f rc10-rc.local /etc/rc.local
 cp -f rc10-systemreboot.sh  /usr/sbin/systemreboot.sh
 /bin/chmod 777 /usr/sbin/systemreboot.sh
 
-cp energy-meter_maestro-e220_9.2.0_9.2.0 ${HOME_DIRECTORY}/instamsg
+cp energy-meter_maestro-e220_9.5.0_9.5.0 ${HOME_DIRECTORY}/instamsg
 

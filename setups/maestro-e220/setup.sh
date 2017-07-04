@@ -68,7 +68,7 @@ ${SSH_COMMAND} "killall sshpass"
 scp sshpass ${LOGIN}:/usr/bin
 ${SSH_COMMAND} "chmod 777 /usr/bin/sshpass"
 
-${SSH_COMMAND} "echo 17 > ${HOME_DIRECTORY}/current_version"
+${SSH_COMMAND} "echo 18 > ${HOME_DIRECTORY}/current_version"
 
 ${SSH_COMMAND} "killall monitor.sh"
 ${SSH_COMMAND} "killall instamsg"
