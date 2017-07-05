@@ -39,9 +39,7 @@ static char temp[20];
 int isOkToRunControlCommandTimeWise(char *outerJson)
 {
     unsigned long utcTimeStampFromControlCommandLong = 0;
-
-    unsigned long currentTimeStamp = 0;
-    int offset = 0;
+    unsigned long currentUTCTimeStamp = 0;
 
     int ttl = 0;
 
@@ -53,23 +51,8 @@ int isOkToRunControlCommandTimeWise(char *outerJson)
     getJsonKeyValueIfPresent(outerJson, "ttl", temp);
     ttl = sg_atoi(temp);
 
-    memset(temp, 0, sizeof(temp));
-    getTimezoneOffset(temp, sizeof(temp));
-    offset = sg_atoi(temp);
-
-    currentTimeStamp = getCurrentTick();
-
-    if(offset >= 0)
-    {
-        currentTimeStamp = currentTimeStamp - ((unsigned long) offset);
-    }
-    else
-    {
-        offset = offset * (-1);
-        currentTimeStamp = currentTimeStamp + ((unsigned long) offset);
-    }
-
-    if(currentTimeStamp < ( utcTimeStampFromControlCommandLong + ((unsigned long)ttl) ) )
+    currentUTCTimeStamp = getUTCTimeStamp();
+    if(currentUTCTimeStamp < ( utcTimeStampFromControlCommandLong + ((unsigned long)ttl) ) )
     {
         return SUCCESS;
     }

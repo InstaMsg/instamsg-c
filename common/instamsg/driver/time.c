@@ -32,6 +32,10 @@
 #include "./include/globals.h"
 #include "./include/time.h"
 #include "./include/log.h"
+#include "./include/sg_stdlib.h"
+
+#include <string.h>
+
 
 /* 2000-03-01 (mod 400 year, immediately after feb29 */
 #define LEAPOCH (946684800 + (86400 * (31 + 29)) )
@@ -147,4 +151,70 @@ void extract_date_params(unsigned long t, DateParams *tm, const char *mode)
 	tm->tm_sec = remsecs % 60;
 
     print_date_info(tm, mode);
+}
+
+
+static char systemTime[20];
+static char systemOffset[10];
+static unsigned short days[4][12] =
+{
+    {0,    31,   60,   91,   121,  152,  182,  213,  244,  274,  305,  335},
+    {366,  397,  425,  456,  486,  517,  547,  578,  609,  639,  670,  700},
+    {731,  762,  790,  821,  851,  882,  912,  943,  974,  1004, 1035, 1065},
+    {1096, 1127, 1155, 1186, 1216, 1247, 1277, 1308, 1339, 1369, 1400, 1430}
+};
+
+
+unsigned long getUTCTimeStamp()
+{
+    unsigned long timestamp = 946684800;        /* 1 Jan, 2000, 12:00 AM */
+    int offset = 0;
+
+    unsigned short temp1 = 0;
+    unsigned short temp2 = 0;
+
+    /*
+     * The system-time is in the format ::
+     *
+     *      YYYYMMDD4HHMMSS
+     *      201507304155546
+     */
+    memset(systemTime, 0, sizeof(systemTime));
+    getTimeInDesiredFormat(systemTime, sizeof(systemTime));
+
+    assignUnsignedShortValue(systemTime, &temp1, 0, 4);                                 /* year from 2000-2099 */
+    temp1 = temp1 - 2000;
+    assignUnsignedShortValue(systemTime, &temp2, 4, 2);                                 /* month from 1-12 */
+    temp2 = temp2 - 1;
+    timestamp = timestamp + ( ((temp1 / 4) * ((365 * 4) + 1)) * (24 * 60 * 60) );
+    timestamp = timestamp + ( (days[temp1 % 4][temp2]) * (24 * 60 * 60) );
+
+    assignUnsignedShortValue(systemTime, &temp1, 6, 2);                                 /* day from 1-31 */
+    temp1 = temp1 - 1;
+    timestamp = timestamp + (temp1 * (24 * 60 * 60));
+
+    assignUnsignedShortValue(systemTime, &temp1, 9, 2);                                 /* hour from 0-23 */
+    timestamp = timestamp + (temp1 * (60 * 60));
+
+    assignUnsignedShortValue(systemTime, &temp1, 11, 2);                                /* minute from 0-59 */
+    timestamp = timestamp + (temp1 * 60);
+
+    assignUnsignedShortValue(systemTime, &temp1, 13, 2);                                /* second from 0-59 */
+    timestamp = timestamp + temp1;
+
+    memset(systemOffset, 0, sizeof(systemOffset));
+    getTimezoneOffset(systemOffset, sizeof(systemOffset));
+
+    offset = sg_atoi(systemOffset);
+    if(offset >= 0)
+    {
+        timestamp = timestamp - offset;
+    }
+    else
+    {
+        offset = offset * (-1);
+        timestamp = timestamp + offset;
+    }
+
+    return timestamp;
 }

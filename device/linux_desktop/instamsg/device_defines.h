@@ -33,7 +33,7 @@
 #ifndef DEVICE_DEFINES
 #define DEVICE_DEFINES
 
-#define DEVICE_VERSION "9.0.0"
+#define DEVICE_VERSION "9.8.0"
 
 /*
  * We use the vanilla "sprintf" method for Linux.
@@ -123,5 +123,7 @@
 #define COMPULSORY_NTP_SYNC             1
 
 #define SEPARATOR                       "/"
+
+#define INSTAMSG_HOST                   "device.instamsg.io"
 
 #endif

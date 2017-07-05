@@ -355,6 +355,27 @@ int get_character_count(char *buffer, char c)
 }
 
 
+void assignUnsignedCharValue(char *src, unsigned char *dest, int offset, int numBytes)
+{
+    char small[10] = {0};
+
+    memset(small, 0, sizeof(small));
+    memcpy(small, src + offset, numBytes);
+
+    *dest = sg_atoi(small);
+}
+
+
+void assignUnsignedShortValue(char *src, unsigned short *dest, int offset, int numBytes)
+{
+    char small[10] = {0};
+
+    memset(small, 0, sizeof(small));
+    memcpy(small, src + offset, numBytes);
+
+    *dest = sg_atoi(small);
+}
+
 #if 0
 int main()
 {

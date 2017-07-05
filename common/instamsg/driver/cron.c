@@ -40,17 +40,6 @@
 #define DUMMY_VALUE         100
 static struct CronParams cronParams;
 
-static void assignUnsignedCharValue(char *src, unsigned char *dest, int offset, int numBytes)
-{
-    char small[10] = {0};
-
-    memset(small, 0, sizeof(small));
-    memcpy(small, src + offset, numBytes);
-
-    *dest = sg_atoi(small);
-}
-
-
 static int processParsedCronField(char *cron, char *field, char *field_desc, struct dateFieldRange *cronParam)
 {
     if(1)

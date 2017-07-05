@@ -38,5 +38,7 @@ char* sg_memnmem(const char *mem1, const char *mem2, int sizeMem1, int sizeMem2)
 void get_nth_token_thread_safe(char *original, char separator, int pos, char *res, unsigned char strip);
 void strip_leading_and_trailing_white_paces(char *buffer);
 int get_character_count(char *buffer, char c);
+void assignUnsignedCharValue(char *src, unsigned char *dest, int offset, int numBytes);
+void assignUnsignedShortValue(char *src, unsigned short *dest, int offset, int numBytes);
 
 #endif
