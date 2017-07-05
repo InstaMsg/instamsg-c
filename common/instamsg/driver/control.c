@@ -58,7 +58,18 @@ int isOkToRunControlCommandTimeWise(char *outerJson)
     offset = sg_atoi(temp);
 
     currentTimeStamp = getCurrentTick();
-    if( ( currentTimeStamp - ((unsigned long)offset) ) < ( utcTimeStampFromControlCommandLong + ((unsigned long)ttl) ) )
+
+    if(offset >= 0)
+    {
+        currentTimeStamp = currentTimeStamp - ((unsigned long) offset);
+    }
+    else
+    {
+        offset = offset * (-1);
+        currentTimeStamp = currentTimeStamp + ((unsigned long) offset);
+    }
+
+    if(currentTimeStamp < ( utcTimeStampFromControlCommandLong + ((unsigned long)ttl) ) )
     {
         return SUCCESS;
     }
