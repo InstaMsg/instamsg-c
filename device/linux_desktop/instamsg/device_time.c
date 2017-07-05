@@ -144,7 +144,7 @@ void getTimeInDesiredFormat(char *buffer, int maxBufferLength)
     struct tm *info;
 
     time(&rawtime);
-    info = localtime(&rawtime);
+    info = gmtime(&rawtime);
 
     strftime(buffer, maxBufferLength,"%Y%m%d4%H%M%S", info);
 }
@@ -155,13 +155,5 @@ void getTimeInDesiredFormat(char *buffer, int maxBufferLength)
  */
 void getTimezoneOffset(char *buffer, int maxBufferLength)
 {
-#if 1
-    time_t rawtime;
-    struct tm *info;
-
-    time(&rawtime);
-    info = localtime(&rawtime);
-
-    sg_sprintf(buffer, "%ld", info->tm_gmtoff);
-#endif
+    strcpy(buffer, "0");
 }
