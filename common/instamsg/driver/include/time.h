@@ -67,6 +67,7 @@ void print_date_info(DateParams *tm, const char *mode);
 
 /* This method must be used sparingly only, definitely not every second */
 unsigned long getUTCTimeStamp();
+void getUTCTimeInDesiredFormat(char *buffer, int maxBufferLength);
 
 void getTimeInDesiredFormat(char *buffer, int maxBufferLength);
 void getTimezoneOffset(char *buffer, int maxBufferLength);

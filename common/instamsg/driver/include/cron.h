@@ -52,13 +52,11 @@ struct CronParams
     struct dateFieldRange cron_month_day;           /* 1-31 */
     struct dateFieldRange cron_hour;                /* 0-23 */
     struct dateFieldRange cron_minute;              /* 0-59 */
-    int cron_offset;
 
-    unsigned char system_month;             /* 1-12 */
-    unsigned char system_month_day;         /* 1-31 */
-    unsigned char system_hour;              /* 0-23 */
-    unsigned char system_minute;            /* 0-59 */
-    int system_offset;
+    unsigned char system_month;                     /* 1-12 */
+    unsigned char system_month_day;                 /* 1-31 */
+    unsigned char system_hour;                      /* 0-23 */
+    unsigned char system_minute;                    /* 0-59 */
 };
 
 

@@ -150,7 +150,10 @@ void extract_date_params(unsigned long t, DateParams *tm, const char *mode)
 	tm->tm_min = remsecs / 60 % 60;
 	tm->tm_sec = remsecs % 60;
 
-    print_date_info(tm, mode);
+    if(mode != NULL)
+    {
+        print_date_info(tm, mode);
+    }
 }
 
 
@@ -217,4 +220,44 @@ unsigned long getUTCTimeStamp()
     }
 
     return timestamp;
+}
+
+
+static DateParams dateParams;
+static void addTwoDigitField(char *buffer, int field, char *follower)
+{
+    char smallBuffer[4] = {0};
+
+    if(field < 10)
+    {
+        sg_sprintf(smallBuffer, "0%u%s", field, follower);
+    }
+    else
+    {
+        sg_sprintf(smallBuffer, "%u%s", field, follower);
+    }
+
+    strcat(buffer, smallBuffer);
+}
+
+
+/*
+ * This method gets the system-time as UTC in the following-format
+ *
+ *          YYYYMMDD4HHMMSS
+ *          201507304155546
+ */
+void getUTCTimeInDesiredFormat(char *buffer, int maxBufferLength)
+{
+    unsigned long utcTimestamp = getUTCTimeStamp();
+    extract_date_params(utcTimestamp, &dateParams, NULL);
+
+    strcat(buffer, "20");
+    addTwoDigitField(buffer, dateParams.tm_year, "");
+    addTwoDigitField(buffer, dateParams.tm_mon, "");
+    addTwoDigitField(buffer, dateParams.tm_mday, "");
+    strcat(buffer, "4");
+    addTwoDigitField(buffer, dateParams.tm_hour, "");
+    addTwoDigitField(buffer, dateParams.tm_min, "");
+    addTwoDigitField(buffer, dateParams.tm_sec, "");
 }
