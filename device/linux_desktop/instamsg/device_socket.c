@@ -395,6 +395,18 @@ void release_underlying_socket_medium_guaranteed(SG_Socket* socket)
 }
 
 
+/*
+ * This method must JUST close the socket, and nothing else (resetting, etc).
+ *
+ * Since this method is most likely to be used internally only, so it can be assumed that whenever this method is called,
+ * the socket is in fine state.
+ */
+void release_socket_simple_guaranteed(SG_Socket* socket)
+{
+    close(socket->socket);
+}
+
+
 #if (SSL_ENABLED == 1) || (SOCKET_SSL_ENABLED == 1)
 
 #define CERT_FILE_NAME  "cert"

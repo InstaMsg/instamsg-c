@@ -87,7 +87,7 @@ static void addPayloadField(char *messageBuffer,
 }
 
 
-void pre_process_payload(char *portName, char *portAddress, char *hostAddress, char *hostPort)
+void pre_process_payload()
 {
     errorCase = 0;
 
@@ -102,25 +102,11 @@ void pre_process_payload(char *portName, char *portAddress, char *hostAddress, c
     strcat(messageBuffer, "{");
 #endif
 
-#if 0
-    strcat(messageBuffer, "\"v\" : \"1.0\", ");
-#endif
 
     addPayloadField(messageBuffer, "topic", get_data_topic);
     addPayloadField(messageBuffer, "manufacturer", get_manufacturer);
     addPayloadField(messageBuffer, "client_id", get_client_id);
 
-#if 0
-    strcat(messageBuffer, "\"port\" : {\"port_name\" : \"");
-    strcat(messageBuffer, portName);
-    strcat(messageBuffer, "\", \"port_address\" : \"");
-    strcat(messageBuffer, portAddress);
-    strcat(messageBuffer, "\", \"host_address\" : \"");
-    strcat(messageBuffer, hostAddress);
-    strcat(messageBuffer, "\", \"host_port\" : \"");
-    strcat(messageBuffer, hostPort);
-    strcat(messageBuffer, "\"}, ");
-#endif
 
 
     /*
@@ -134,7 +120,7 @@ void pre_process_payload(char *portName, char *portAddress, char *hostAddress, c
 }
 
 
-void post_process_payload(unsigned int errorCase)
+void post_process_payload(unsigned int errorCase, char *portName, char *portAddress, char *hostAddress, char *hostPort)
 {
 #if USE_XML_FOR_PAYLOAD == 1
     strcat(messageBuffer, "></data>");
@@ -150,6 +136,28 @@ void post_process_payload(unsigned int errorCase)
     addPayloadField(messageBuffer, "geo", get_geo_tag);
 #endif
     addPayloadField(messageBuffer, "offset", getTimezoneOffset);
+
+#if 1
+    strcat(messageBuffer, "\"v\" : \"1.0\", ");
+
+    strcat(messageBuffer, "\"port\" : {\"port_name\" : \"");
+    strcat(messageBuffer, portName);
+
+    strcat(messageBuffer, "\", \"port_address\" : \"");
+    {
+        char small[3] = {0};
+        sg_sprintf(small, "%x", sg_atoi(portAddress));
+        addPaddingIfRequired(small, sizeof(small) - 1);
+        strcat(messageBuffer, small);
+    }
+
+    strcat(messageBuffer, "\", \"host_address\" : \"");
+    strcat(messageBuffer, hostAddress);
+
+    strcat(messageBuffer, "\", \"host_port\" : \"");
+    strcat(messageBuffer, hostPort);
+    strcat(messageBuffer, "\"}, ");
+#endif
 
     if(errorCase == 1)
     {
@@ -191,11 +199,11 @@ void post_process_payload(unsigned int errorCase)
 
 
 #if (SEND_GPS_LOCATION == 1) || (SEND_GPIO_INFORMATION == 1)
-static void send_special_command(const char *data, char *command)
+static void send_special_command(const char *data, char *command, const char *portName, const char *portAddress)
 {
     serialCommandUnderProcess = command;
 
-    pre_process_payload(PORT_NAME_GPS, "0", "", "");
+    pre_process_payload(portName, portAddress, "", "");
     strcat(messageBuffer, data);
     post_process_payload(0);
 }
@@ -205,7 +213,7 @@ static void send_special_command(const char *data, char *command)
 #if SEND_GPS_LOCATION == 1
 void ioeye_send_gps_data_to_server(const char *data)
 {
-    send_special_command(data, "GPS-INFO");
+    send_special_command(data, "GPS-INFO", PORT_NAME_GPS, "0");
 }
 #endif
 
@@ -213,6 +221,6 @@ void ioeye_send_gps_data_to_server(const char *data)
 #if SEND_GPIO_INFORMATION == 1
 void ioeye_send_gpio_data_to_server(const char *data)
 {
-    send_special_command(data, "GPIO-INFO");
+    send_special_command(data, "GPIO-INFO", PORT_NAME_GPIO, "0");
 }
 #endif

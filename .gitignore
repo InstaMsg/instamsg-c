@@ -84,6 +84,7 @@ common/apps/lanner-pc-wwan-interface-monitor
 common/apps/philips-app-luminar
 common/apps/msf-app
 common/apps/avl-app
+common/apps/energy-meter-masibus-ethernet
 
 common/ioeye
 common/ioeye-c
