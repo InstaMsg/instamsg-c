@@ -254,6 +254,11 @@ void getNextFileToProcessPath(char *folder, char *path, int maxBufferLength)
             continue;
         }
     }
+
+    if(pDir != NULL)
+    {
+        closedir(pDir);
+    }
 }
 
 
