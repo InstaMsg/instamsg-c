@@ -120,7 +120,43 @@ void pre_process_payload()
 }
 
 
-void post_process_payload(unsigned int errorCase, char *portName, char *portAddress, char *hostAddress, char *hostPort)
+void add_port_info(char *buffer, void *arg)
+{
+    struct PortInfoArgument *portInfo = (struct PortInfoArgument *) arg;
+
+    strcat(buffer, "\"v\" : \"1.0\", ");
+
+    strcat(buffer, "\"port\" : {\"port_name\" : \"");
+    strcat(buffer, portInfo->portName);
+
+    strcat(buffer, "\", \"port_address\" : \"");
+    {
+        char small[3] = {0};
+        sg_sprintf(small, "%x", sg_atoi(portInfo->portAddress));
+        addPaddingIfRequired(small, sizeof(small) - 1);
+        strcat(buffer, small);
+    }
+
+    strcat(buffer, "\", \"host_address\" : \"");
+    strcat(buffer, portInfo->hostAddress);
+
+    strcat(buffer, "\", \"host_port\" : \"");
+    strcat(buffer, portInfo->hostPort);
+    strcat(buffer, "\"}, ");
+}
+
+
+void add_csv_metadata_info(char *buffer, void *arg)
+{
+    struct CsvMetadataInfo *csvInfo = (struct CsvMetadataInfo *) arg;
+
+    strcat(buffer, "\"metadata\" : {\"protocol\" : \"csv\", \"file_id\" : \"");
+    strcat(buffer, csvInfo->fileId);
+    strcat(buffer, "\"}, ");
+}
+
+
+void post_process_payload(unsigned int errorCase, void (*func)(char *, void*), void *arg)
 {
 #if USE_XML_FOR_PAYLOAD == 1
     strcat(messageBuffer, "></data>");
@@ -138,25 +174,7 @@ void post_process_payload(unsigned int errorCase, char *portName, char *portAddr
     addPayloadField(messageBuffer, "offset", getTimezoneOffset);
 
 #if 1
-    strcat(messageBuffer, "\"v\" : \"1.0\", ");
-
-    strcat(messageBuffer, "\"port\" : {\"port_name\" : \"");
-    strcat(messageBuffer, portName);
-
-    strcat(messageBuffer, "\", \"port_address\" : \"");
-    {
-        char small[3] = {0};
-        sg_sprintf(small, "%x", sg_atoi(portAddress));
-        addPaddingIfRequired(small, sizeof(small) - 1);
-        strcat(messageBuffer, small);
-    }
-
-    strcat(messageBuffer, "\", \"host_address\" : \"");
-    strcat(messageBuffer, hostAddress);
-
-    strcat(messageBuffer, "\", \"host_port\" : \"");
-    strcat(messageBuffer, hostPort);
-    strcat(messageBuffer, "\"}, ");
+    func(messageBuffer, arg);
 #endif
 
     if(errorCase == 1)
@@ -203,9 +221,9 @@ static void send_special_command(const char *data, char *command, const char *po
 {
     serialCommandUnderProcess = command;
 
-    pre_process_payload(portName, portAddress, "", "");
+    pre_process_payload(portName);
     strcat(messageBuffer, data);
-    post_process_payload(0);
+    post_process_payload(0, portName, portAddress, "", "");
 }
 #endif
 

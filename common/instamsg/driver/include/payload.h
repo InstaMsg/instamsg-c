@@ -5,10 +5,30 @@
 
 #define TOPIC_WEBHOOK           "instamsg/webhook"
 
+
+struct PortInfoArgument
+{
+    char *portName;
+    char *portAddress;
+    char *hostAddress;
+    char *hostPort;
+};
+
+
+struct CsvMetadataInfo
+{
+    char *protocol;
+    char *fileId;
+};
+
+
 extern char *stringified_ioeye_data_prefix;
 
 void pre_process_payload();
-void post_process_payload(unsigned int errorCase, char *portName, char *portAddress, char *hostAddress, char *hostPort);
+void post_process_payload(unsigned int errorCase, void (*func)(char *, void*), void *arg);
+
+void add_port_info(char *buffer, void *arg);
+void add_csv_metadata_info(char *buffer, void *arg);
 
 #define PORT_NAME_COM           PROSTR("com")
 #define PORT_NAME_WIFI          PROSTR("wifi")
