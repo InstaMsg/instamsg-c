@@ -1,7 +1,7 @@
 #!/bin/sh
 
 . ../upgrade_params
-PKG_VERSION="16"
+PKG_VERSION="17"
 
 ###################### PERFORM ACTIONS NOW ##################################
 
@@ -14,4 +14,4 @@ sed -i 's/#FSCKFIX=no/FSCKFIX=yes/g' /etc/default/rcS
 
 cp upgrade_params ${HOME_DIRECTORY}
 cp -f sg_upgrade.sh ${HOME_DIRECTORY}
-cp energy-meter_lanner-pc_9.7.0_9.7.0 ${HOME_DIRECTORY}/instamsg
+cp energy-meter_lanner-pc_10.0.0_10.0.1 ${HOME_DIRECTORY}/instamsg
