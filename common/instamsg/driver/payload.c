@@ -228,30 +228,30 @@ void assignPortInfoToStructure(struct PortInfoArgument *portInfoArgument, char *
 
 
 #if (SEND_GPS_LOCATION == 1) || (SEND_GPIO_INFORMATION == 1)
-static void send_special_command(const char *data, char *command, const char *portName, const char *portAddress)
+static void send_special_command(char *data, char *command, char *portName, char *portAddress)
 {
     serialCommandUnderProcess = command;
 
-    pre_process_payload(portName);
+    pre_process_payload();
     strcat(messageBuffer, data);
 
-    assignPortInfoToStructure(&portInfoArgument, PORT_NAME_SIMULATED, "00", "", "");
+    assignPortInfoToStructure(&portInfoArgument, portName, portAddress, "", "");
     post_process_payload(0, add_port_info, &portInfoArgument);
 }
 #endif
 
 
 #if SEND_GPS_LOCATION == 1
-void ioeye_send_gps_data_to_server(const char *data)
+void ioeye_send_gps_data_to_server(char *data)
 {
-    send_special_command(data, "GPS-INFO", PORT_NAME_GPS, "0");
+    send_special_command(data, "GPS-INFO", PORT_NAME_GPS, "00");
 }
 #endif
 
 
 #if SEND_GPIO_INFORMATION == 1
-void ioeye_send_gpio_data_to_server(const char *data)
+void ioeye_send_gpio_data_to_server(char *data)
 {
-    send_special_command(data, "GPIO-INFO", PORT_NAME_GPIO, "0");
+    send_special_command(data, "GPIO-INFO", PORT_NAME_GPIO, "00");
 }
 #endif

@@ -40,11 +40,11 @@ extern struct PortInfoArgument portInfoArgument;
 #define PORT_NAME_SIMULATED     PROSTR("simulated")
 
 #if SEND_GPS_LOCATION == 1
-void ioeye_send_gps_data_to_server(const char *data);
+void ioeye_send_gps_data_to_server(char *data);
 #endif
 
 #if SEND_GPIO_INFORMATION == 1
-void ioeye_send_gpio_data_to_server(const char *data);
+void ioeye_send_gpio_data_to_server(char *data);
 #endif
 
 #endif
