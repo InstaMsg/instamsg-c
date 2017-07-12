@@ -30,6 +30,9 @@ void post_process_payload(unsigned int errorCase, void (*func)(char *, void*), v
 void add_port_info(char *buffer, void *arg);
 void add_csv_metadata_info(char *buffer, void *arg);
 
+void assignPortInfoToStructure(struct PortInfoArgument *portInfoArgument, char *portName, char *portAddress, char *hostAddress, char *hostPort);
+extern struct PortInfoArgument portInfoArgument;
+
 #define PORT_NAME_COM           PROSTR("com")
 #define PORT_NAME_WIFI          PROSTR("wifi")
 #define PORT_NAME_GPS           PROSTR("gps")

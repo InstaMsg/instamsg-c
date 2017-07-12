@@ -19,6 +19,8 @@ unsigned int errorCase;
 static char watchdogAssistant[50];
 static char smallBuffer[MAX_BUFFER_SIZE / 2];
 
+struct PortInfoArgument portInfoArgument;
+
 #define USE_XML_FOR_PAYLOAD             0
 
 static void get_command_under_process(char *messagebuffer, int maxbufferlength)
@@ -216,6 +218,15 @@ void post_process_payload(unsigned int errorCase, void (*func)(char *, void*), v
 }
 
 
+void assignPortInfoToStructure(struct PortInfoArgument *portInfoArgument, char *portName, char *portAddress, char *hostAddress, char *hostPort)
+{
+    portInfoArgument->portName = portName;
+    portInfoArgument->portAddress = portAddress;
+    portInfoArgument->hostAddress = hostAddress;
+    portInfoArgument->hostPort = hostPort;
+}
+
+
 #if (SEND_GPS_LOCATION == 1) || (SEND_GPIO_INFORMATION == 1)
 static void send_special_command(const char *data, char *command, const char *portName, const char *portAddress)
 {
@@ -223,7 +234,9 @@ static void send_special_command(const char *data, char *command, const char *po
 
     pre_process_payload(portName);
     strcat(messageBuffer, data);
-    post_process_payload(0, portName, portAddress, "", "");
+
+    assignPortInfoToStructure(&portInfoArgument, PORT_NAME_SIMULATED, "00", "", "");
+    post_process_payload(0, add_port_info, &portInfoArgument);
 }
 #endif
 
