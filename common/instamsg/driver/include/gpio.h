@@ -38,6 +38,8 @@
 #define DIO           "[DIO] "
 #define DIO_ERROR     "[DIO-ERROR] "
 
+#define GPIO_PREFIX   PROSTR("GPIO/")
+
 /*
  * Common-Section
  */
