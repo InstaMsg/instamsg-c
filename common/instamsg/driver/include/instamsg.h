@@ -89,13 +89,18 @@ struct InstaMsg {
     int (*onDisconnectCallback)();
     int (*oneToOneMessageHandler)();
 
+#if FILE_SYSTEM_ENABLED == 1
     char filesTopic[100];
+    char fileUploadUrl[100];
+#endif
+
     char rebootTopic[100];
     char enableServerLoggingTopic[100];
     char serverLogsTopic[100];
-    char fileUploadUrl[100];
     char receiveConfigTopic[100];
     char updateCertTopic[100];
+    char controlActionTopic[100];
+
 #if MEDIA_STREAMING_ENABLED == 1
     char mediaTopic[100];
     char mediaReplyTopic[100];

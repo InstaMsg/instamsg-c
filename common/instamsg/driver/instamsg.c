@@ -59,6 +59,7 @@
 #include "./include/upgrade.h"
 #include "./include/gps.h"
 #include "./include/cron.h"
+#include "./include/control.h"
 
 #if FILE_SYSTEM_ENABLED == 1
 #include "include/file_system.h"
@@ -1515,8 +1516,13 @@ void clearInstaMsg(InstaMsg *c)
 
 static void setValuesOfSpecialTopics(InstaMsg *c)
 {
+#if FILE_SYSTEM_ENABLED == 1
     memset(c->filesTopic, 0, sizeof(c->filesTopic));
     sg_sprintf(c->filesTopic, PROSTR("instamsg/clients/%s/files"), c->clientIdComplete);
+
+    memset(c->fileUploadUrl, 0, sizeof(c->fileUploadUrl));
+    sg_sprintf(c->fileUploadUrl, PROSTR("/api/beta/clients/%s/files"), c->clientIdComplete);
+#endif
 
     memset(c->rebootTopic, 0, sizeof(c->rebootTopic));
     sg_sprintf(c->rebootTopic, PROSTR("instamsg/clients/%s/reboot"), c->clientIdComplete);
@@ -1530,11 +1536,11 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
     memset(c->serverLogsTopic, 0, sizeof(c->serverLogsTopic));
     sg_sprintf(c->serverLogsTopic, PROSTR("instamsg/clients/%s/logs"), c->clientIdComplete);
 
-    memset(c->fileUploadUrl, 0, sizeof(c->fileUploadUrl));
-    sg_sprintf(c->fileUploadUrl, PROSTR("/api/beta/clients/%s/files"), c->clientIdComplete);
-
     memset(c->receiveConfigTopic, 0, sizeof(c->receiveConfigTopic));
     sg_sprintf(c->receiveConfigTopic, PROSTR("instamsg/clients/%s/config/serverToClient"), c->clientIdComplete);
+
+    memset(c->controlActionTopic, 0, sizeof(c->controlActionTopic));
+    sg_sprintf(c->controlActionTopic, PROSTR("instamsg/clients/%s/config/controlAction"), c->clientIdComplete);
 
 #if MEDIA_STREAMING_ENABLED == 1
     memset(c->mediaTopic, 0, sizeof(c->mediaTopic));
@@ -1559,15 +1565,14 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
 #endif
 
     sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("\n\nThe special-topics value :: \n\n"
-             "\r\nFILES_TOPIC = [%s],"
+             "\r\nCONTROL_TOPIC = [%s],"
              "\r\nREBOOT_TOPIC = [%s],"
              "\r\nENABLE_SERVER_LOGGING_TOPIC = [%s],"
              "\r\nSERVER_LOGS_TOPIC = [%s],"
-             "\r\nFILE_UPLOAD_URL = [%s],"
              "\r\nCONFIG_FROM_SERVER_TO_CLIENT = [%s],"
              "\r\nUPDATE_CERT_TOPIC = [%s]"),
-              c->filesTopic, c->rebootTopic, c->enableServerLoggingTopic,
-              c->serverLogsTopic, c->fileUploadUrl, c->receiveConfigTopic, c->updateCertTopic);
+              c->controlActionTopic, c->rebootTopic, c->enableServerLoggingTopic,
+              c->serverLogsTopic, c->receiveConfigTopic, c->updateCertTopic);
     info_log(LOG_GLOBAL_BUFFER);
 
 #if MEDIA_STREAMING_ENABLED == 1
@@ -2391,6 +2396,11 @@ static void process_received_secret(InstaMsg *c)
 }
 
 
+static void handleControlActionMessage(InstaMsg *c, MQTTMessage *msg)
+{
+    processControlCommand(msg->payload);
+}
+
 
 void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
 {
@@ -2617,6 +2627,10 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                     else if(strcmp(topicName, c->updateCertTopic) == 0)
                     {
                         handleCertReceived(c, &msg);
+                    }
+                    else if(strcmp(topicName, c->controlActionTopic) == 0)
+                    {
+                        handleControlActionMessage(c, &msg);
                     }
 #if MEDIA_STREAMING_ENABLED == 1
                     else if(strcmp(topicName, c->mediaReplyTopic) == 0)
