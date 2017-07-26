@@ -63,6 +63,7 @@ SOURCES=`echo                                                                   
         device/${VENDOR}/instamsg/device_gps.c                                                  \
         device/${VENDOR}/instamsg/device_misc.c                                                 \
         device/${VENDOR}/instamsg/device_cron.c                                                 \
+        device/${VENDOR}/instamsg/device_control.c                                              \
         device/${VENDOR}/instamsg/device_at.c                                                   `
 
 
