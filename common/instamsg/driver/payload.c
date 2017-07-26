@@ -244,7 +244,7 @@ static void send_special_command(char *data, char *command, char *portName, char
 #if SEND_GPS_LOCATION == 1
 void ioeye_send_gps_data_to_server(char *data)
 {
-    send_special_command(data, "GPS-INFO", PORT_NAME_GPS, "00");
+    send_special_command(data, "GPS-INFO", PORT_NAME_GPS, "");
 }
 #endif
 
@@ -252,6 +252,6 @@ void ioeye_send_gps_data_to_server(char *data)
 #if SEND_GPIO_INFORMATION == 1
 void ioeye_send_gpio_data_to_server(char *data)
 {
-    send_special_command(data, "GPIO-INFO", PORT_NAME_GPIO, "00");
+    send_special_command(data, "GPIO-INFO", PORT_NAME_GPIO, "");
 }
 #endif
