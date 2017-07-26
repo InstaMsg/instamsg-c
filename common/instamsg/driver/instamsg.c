@@ -1540,7 +1540,7 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
     sg_sprintf(c->receiveConfigTopic, PROSTR("instamsg/clients/%s/config/serverToClient"), c->clientIdComplete);
 
     memset(c->controlActionTopic, 0, sizeof(c->controlActionTopic));
-    sg_sprintf(c->controlActionTopic, PROSTR("instamsg/clients/%s/config/controlAction"), c->clientIdComplete);
+    sg_sprintf(c->controlActionTopic, PROSTR("instamsg/clients/%s/controlaction"), c->clientIdComplete);
 
 #if MEDIA_STREAMING_ENABLED == 1
     memset(c->mediaTopic, 0, sizeof(c->mediaTopic));
