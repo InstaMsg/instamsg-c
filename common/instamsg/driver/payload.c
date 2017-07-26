@@ -134,8 +134,13 @@ void add_port_info(char *buffer, void *arg)
     strcat(buffer, "\", \"port_address\" : \"");
     {
         char small[3] = {0};
-        sg_sprintf(small, "%x", sg_atoi(portInfo->portAddress));
-        addPaddingIfRequired(small, sizeof(small) - 1);
+
+        if(strlen(portInfo->portAddress) > 0)
+        {
+            sg_sprintf(small, "%x", sg_atoi(portInfo->portAddress));
+            addPaddingIfRequired(small, sizeof(small) - 1);
+        }
+
         strcat(buffer, small);
     }
 
