@@ -46,7 +46,6 @@
 
 
 #include "./include/instamsg.h"
-#include "./include/httpclient.h"
 #include "./include/json.h"
 #include "./include/sg_mem.h"
 #include "./include/sg_stdlib.h"
@@ -902,279 +901,6 @@ static void handleProxyMessage(InstaMsg *c, MQTTMessage *msg)
 #endif
 
 
-#if FILE_SYSTEM_ENABLED == 1
-static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
-{
-    const char *REPLY_TOPIC = PROSTR("reply_to");
-    const char *MESSAGE_ID = PROSTR("message_id");
-    const char *METHOD = PROSTR("method");
-    char *replyTopic, *messageId, *method, *url, *filename, *ackMessage;
-    unsigned char downloadCase = 0;
-
-    replyTopic = (char *)sg_malloc(MAX_BUFFER_SIZE);
-    memset(replyTopic, 0, MAX_BUFFER_SIZE);
-
-    messageId = (char *)sg_malloc(50);
-    memset(messageId, 0, 50);
-
-    method = (char *)sg_malloc(20);
-    memset(method, 0, 20);
-
-    url = (char *)sg_malloc(MAX_BUFFER_SIZE);
-    memset(url, 0, MAX_BUFFER_SIZE);
-
-    filename = (char *)sg_malloc(MAX_BUFFER_SIZE);
-    memset(filename, 0, MAX_BUFFER_SIZE);
-
-    ackMessage = (char *)sg_malloc(MAX_BUFFER_SIZE);
-    memset(ackMessage, 0, MAX_BUFFER_SIZE);
-
-    getJsonKeyValueIfPresent(msg->payload, REPLY_TOPIC, replyTopic);
-    getJsonKeyValueIfPresent(msg->payload, MESSAGE_ID, messageId);
-    getJsonKeyValueIfPresent(msg->payload, METHOD, method);
-    getJsonKeyValueIfPresent(msg->payload, "url", url);
-    getJsonKeyValueIfPresent(msg->payload, "filename", filename);
-
-
-    if(strlen(replyTopic) == 0)
-    {
-        logJsonFailureMessageAndReturn(FILE_TRANSFER, REPLY_TOPIC, msg);
-        goto exit;
-    }
-    if(strlen(messageId) == 0)
-    {
-        logJsonFailureMessageAndReturn(FILE_TRANSFER, MESSAGE_ID, msg);
-        goto exit;
-    }
-    if(strlen(method) == 0)
-    {
-        logJsonFailureMessageAndReturn(FILE_TRANSFER, METHOD, msg);
-        goto exit;
-    }
-
-
-
-    if( (   (strcmp(method, "POST") == 0) || (strcmp(method, "PUT") == 0)   ) &&
-            (strlen(filename) > 0) &&
-            (strlen(url) > 0)   )
-    {
-        downloadCase = 1;
-    }
-
-    if(downloadCase == 1)
-    {
-        /*
-         * Remove the protocol:hostname.
-         *
-         * Eg. ::  https://localhost, http://localhost, etc.
-         */
-        if(strlen(url) > 0)
-        {
-            char *subs = "//";
-
-            char *tmp = strstr(url, subs);
-            if(tmp != NULL)
-            {
-                tmp = strstr(tmp + strlen(subs), "/");
-                if(tmp != NULL)
-                {
-                    strncpy(url, tmp, strlen(tmp));
-                    url[strlen(tmp)] = 0;
-                }
-            }
-        }
-    }
-
-
-    if(downloadCase == 1)
-    {
-        int ackStatus = 0;
-
-        /*
-         * Behaviour of File-Download Status-Notification to user
-         * (as per the scenario tested, when a browser-client uploads file, and a C-client downloads the file).
-         * ====================================================================================================
-         *
-         * While browser-client uploads the file to server, "Uploading %" is shown.
-         *
-         * Once the upload is complete, the C-client starts downloading, and the browser-client sees a "Waiting .."
-         * note .. (in the browser-lower panel).
-         *
-         * Now, following scenarios arise ::
-         *
-         * a)
-         * C-client finishes the downloading, returns status 200 and the ACK-message is sent to server
-         * with status 1.
-         *
-         * In this case, the "Waiting .." message disappears (as expected), and an additional ioEYE-message
-         * "File uploaded successfully" is displayed to browser-client.
-         *
-         *
-         * b)
-         * C-client might or might not finish downloading, but it returns a status other than 200, and the ACK-message
-         * is sent to server with status 0.
-         *
-         * In this case, the "Waiting .." message disappears (as expected), but no additional ioEYE message is displayed.
-         * (MAY BE, SOME ERROR-NOTIFICATION SHOULD BE SHOWN TO THE BROWSER-CLIENT).
-         *
-         *
-         * c)
-         * C-client might or might not finish downloading, but no ACK-message is sent to the server whatsoever.
-         *
-         * In this case, the "Waiting .." message is kept showing on the browser-client (posssibly timing out after
-         * a long time).
-         *
-         *
-         * ALL IN ALL, IF THE "Waiting .." MESSAGE DISAPPEARS, AND THE "File uploaded succcessfully" MESSAGE IS SEEN,
-         * IT MEANS THE FILE-TRANSFER COMPLETED, AND THAT TOO PERFECTLY SUCCESSFULLY.
-         *
-         */
-
-        RESET_HTTP_RESPONSE;
-        downloadFile(url, filename, NULL, NULL, 10, &httpResponse);
-
-        if(httpResponse.status == HTTP_FILE_DOWNLOAD_SUCCESS)
-        {
-            ackStatus = 1;
-        }
-        sg_sprintf(ackMessage, PROSTR("{\"response_id\": \"%s\", \"status\": %d}"), messageId, ackStatus);
-
-    }
-    else if( (strcmp(method, "GET") == 0) && (strlen(filename) == 0))
-    {
-        char *fileListing;
-
-        RESET_GLOBAL_BUFFER;
-        fileListing = (char*)GLOBAL_BUFFER;
-
-#if FILE_SYSTEM_ENABLED == 1
-        (c->singletonUtilityFs).getFileListing(&(c->singletonUtilityFs), fileListing, MAX_BUFFER_SIZE, ".");
-#else
-        strcat(fileListing, "{}");
-#endif
-
-        sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s: [%s]"), FILE_LISTING, fileListing);
-        info_log(LOG_GLOBAL_BUFFER);
-
-        sg_sprintf(ackMessage, PROSTR("{\"response_id\": \"%s\", \"status\": 1, \"files\": %s}"), messageId, fileListing);
-    }
-    else if( (strcmp(method, "DELETE") == 0) && (strlen(filename) > 0))
-    {
-        int status = FAILURE;
-
-#if FILE_SYSTEM_ENABLED == 1
-        status = (c->singletonUtilityFs).deleteFile(&(c->singletonUtilityFs), filename);
-#endif
-
-        if(status == SUCCESS)
-        {
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[%s] deleted successfully."), FILE_DELETE, filename);
-            info_log(LOG_GLOBAL_BUFFER);
-
-            sg_sprintf(ackMessage, PROSTR("{\"response_id\": \"%s\", \"status\": 1}"), messageId);
-        }
-        else
-        {
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%s[%s] could not be deleted :("), FILE_DELETE, filename);
-            error_log(LOG_GLOBAL_BUFFER);
-
-            sg_sprintf(ackMessage, PROSTR("{\"response_id\": \"%s\", \"status\": 0, \"error_msg\":\"%s\"}"),
-                       messageId, PROSTR("File-Removal Failed :("));
-        }
-    }
-    else if( (strcmp(method, "GET") == 0) && (strlen(filename) > 0))
-    {
-#if FILE_SYSTEM_ENABLED == 1
-        HTTPResponse response = {0};
-
-        char *clientIdBuf;
-        KeyValuePairs headers[5];
-
-        headers[0].key = "Authorization";
-        headers[0].value = c->connectOptions.password.cstring;
-
-        headers[1].key = "ClientId";
-
-        clientIdBuf = (char*) sg_malloc(MAX_BUFFER_SIZE);
-        if(clientIdBuf == NULL)
-        {
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sFailed to allocate memory"), FILE_UPLOAD);
-            error_log(LOG_GLOBAL_BUFFER);
-
-            goto terminateFileUpload;
-        }
-        memset(clientIdBuf, 0, MAX_BUFFER_SIZE);
-
-        sg_sprintf(clientIdBuf, "%s", c->clientIdComplete);
-        headers[1].value = clientIdBuf;
-
-        headers[2].key = "Content-Type";
-        headers[2].value = "multipart/form-data; boundary=" POST_BOUNDARY;
-
-        headers[3].key = CONTENT_LENGTH;
-        headers[3].value = "0"; /* This will be updated to proper bytes later. */
-
-        headers[4].key = 0;
-        headers[4].value = 0;
-
-
-        RESET_HTTP_RESPONSE;
-        uploadFile(c->fileUploadUrl, filename, NULL, headers, 10, &httpResponse);
-
-terminateFileUpload:
-
-        if(clientIdBuf)
-            sg_free(clientIdBuf);
-        if(response.status == HTTP_FILE_UPLOAD_SUCCESS)
-        {
-            sg_sprintf(ackMessage, PROSTR("{\"response_id\": \"%s\", \"status\": 1, \"url\": \"%s\"}"), messageId, response.body);
-        }
-        else
-        {
-            sg_sprintf(ackMessage, PROSTR("{\"response_id\": \"%s\", \"status\": 0}"), messageId);
-        }
-#else
-        sg_sprintf(ackMessage, PROSTR("{\"response_id\": \"%s\", \"status\": 0}"), messageId);
-#endif
-    }
-
-
-    /*
-     * Send the acknowledgement, along with the ackStatus (success/failure).
-     */
-    publish(replyTopic,
-            ackMessage,
-            (msg->fixedHeaderPlusMsgId).fixedHeader.qos,
-            (msg->fixedHeaderPlusMsgId).fixedHeader.dup,
-            NULL,
-            MQTT_RESULT_HANDLER_TIMEOUT,
-            1);
-
-exit:
-    if(ackMessage)
-        sg_free(ackMessage);
-
-    if(filename)
-        sg_free(filename);
-
-    if(url)
-        sg_free(url);
-
-    if(method)
-        sg_free(method);
-
-    if(messageId)
-        sg_free(messageId);
-
-    if(replyTopic)
-        sg_free(replyTopic);
-
-
-    return;
-}
-#endif
-
-
 static void checkAndRemoveExpiredHandler(int *msgId, unsigned int *timeout, const char *info)
 {
     if(*msgId == 0)
@@ -1256,14 +982,6 @@ void clearInstaMsg(InstaMsg *c)
 
 static void setValuesOfSpecialTopics(InstaMsg *c)
 {
-#if FILE_SYSTEM_ENABLED == 1
-    memset(c->filesTopic, 0, sizeof(c->filesTopic));
-    sg_sprintf(c->filesTopic, PROSTR("instamsg/clients/%s/files"), c->clientIdComplete);
-
-    memset(c->fileUploadUrl, 0, sizeof(c->fileUploadUrl));
-    sg_sprintf(c->fileUploadUrl, PROSTR("/api/beta/clients/%s/files"), c->clientIdComplete);
-#endif
-
     memset(c->rebootTopic, 0, sizeof(c->rebootTopic));
     sg_sprintf(c->rebootTopic, PROSTR("instamsg/clients/%s/reboot"), c->clientIdComplete);
 
@@ -1707,7 +1425,6 @@ void initInstaMsg(InstaMsg* c,
     deleteFile(&(c->singletonUtilityFs), SYSTEM_WIDE_TEMP_FILE);
 #endif
 
-    check_for_upgrade();
     check_if_all_required_compile_time_defines_are_present();
 
 
@@ -2291,12 +2008,6 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                     {
                         serverLoggingTopicMessageArrived(c, &msg);
                     }
-#if FILE_SYSTEM_ENABLED == 1
-                    else if(strcmp(topicName, c->filesTopic) == 0)
-                    {
-                        handleFileTransfer(c, &msg);
-                    }
-#endif
                     else if(strcmp(topicName, c->rebootTopic) == 0)
                     {
                         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Received REBOOT request from server.. rebooting !!!"));

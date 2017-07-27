@@ -89,11 +89,6 @@ struct InstaMsg {
     int (*onDisconnectCallback)();
     int (*oneToOneMessageHandler)();
 
-#if FILE_SYSTEM_ENABLED == 1
-    char filesTopic[100];
-    char fileUploadUrl[100];
-#endif
-
     char rebootTopic[100];
     char enableServerLoggingTopic[100];
     char serverLogsTopic[100];
