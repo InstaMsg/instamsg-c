@@ -45,11 +45,11 @@ void fillPinPrefix(char *orientationConfig, int positionInOrientationConfig, cha
 
     if(strcmp(orientation, "in") == 0)
     {
-        sprintf(pinPrefix, "DI%s", pinId);
+        sg_sprintf(pinPrefix, "DI%s", pinId);
     }
     else if(strcmp(orientation, "out") == 0)
     {
-        sprintf(pinPrefix, "DO%s", pinId);
+        sg_sprintf(pinPrefix, "DO%s", pinId);
     }
 }
 
