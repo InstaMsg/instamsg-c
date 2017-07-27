@@ -33,6 +33,7 @@
 #include "./include/control.h"
 #include "./include/time.h"
 #include "./include/json.h"
+#include "./include/log.h"
 #include "./include/sg_stdlib.h"
 
 static char temp[20];
