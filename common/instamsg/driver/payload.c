@@ -10,6 +10,7 @@
 #include "../../instamsg/driver/include/hex.h"
 #include "../../instamsg/driver/include/gps.h"
 #include "../../instamsg/driver/include/time.h"
+#include "../../instamsg/driver/include/sg_stdlib.h"
 
 #include <string.h>
 
