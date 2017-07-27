@@ -870,13 +870,14 @@ static int fireResultHandlerUsingMsgIdAsTheKey(InstaMsg *c)
     return msgId;
 }
 
-
+#if (FILE_SYSTEM_ENABLED == 1) || (MEDIA_STREAMING_ENABLED == 1)
 static void logJsonFailureMessageAndReturn(const char *module, const char *key, MQTTMessage *msg)
 {
     sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCould not find key [%s] in message-payload [%s] .. not proceeding further"),
                module, key, (char*) (msg->payload));
     error_log(LOG_GLOBAL_BUFFER);
 }
+#endif
 
 
 #if MEDIA_STREAMING_ENABLED == 1

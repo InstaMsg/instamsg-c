@@ -76,6 +76,8 @@ static int processParsedCronField(char *cron, char *field, char *field_desc, str
             }
         }
     }
+
+    return SUCCESS;
 }
 
 
