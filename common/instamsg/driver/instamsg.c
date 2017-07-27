@@ -2601,14 +2601,16 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
 
                 if(topicName != NULL)
                 {
-                    if(strcmp(topicName, c->filesTopic) == 0)
-                    {
-                        handleFileTransfer(c, &msg);
-                    }
-                    else if(strcmp(topicName, c->enableServerLoggingTopic) == 0)
+                    if(strcmp(topicName, c->enableServerLoggingTopic) == 0)
                     {
                         serverLoggingTopicMessageArrived(c, &msg);
                     }
+#if FILE_SYSTEM_ENABLED == 1
+                    else if(strcmp(topicName, c->filesTopic) == 0)
+                    {
+                        handleFileTransfer(c, &msg);
+                    }
+#endif
                     else if(strcmp(topicName, c->rebootTopic) == 0)
                     {
                         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("Received REBOOT request from server.. rebooting !!!"));
