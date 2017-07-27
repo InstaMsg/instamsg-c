@@ -30,7 +30,6 @@
 #define OTA_BUFFER_SIZE             500
 #define OTA_PING_BUFFER_SIZE        500
 
-#define MEDIA_STREAMING_ENABLED     0
 #define FILE_LOGGING_ENABLED        0
 #define FILE_SYSTEM_ENABLED         0
 #define GSM_INTERFACE_ENABLED       0
@@ -52,8 +51,8 @@
 #define MAX_MESSAGE_HANDLERS        5
 #define AT_INTERFACE_ENABLED        0
 
-#define DEFAULT_COMPULSORY_SOCKET_READ_AFTER_WRITE_TIMEOUT      "0"
-#define DEFAULT_MAX_SECONDS_FOR_GPS_GSM_TIME_SYNC               "0"
+#define DEFAULT_COMPULSORY_SOCKET_READ_AFTER_WRITE_TIMEOUT      "3"
+#define DEFAULT_MAX_SECONDS_FOR_GPS_GSM_TIME_SYNC               "900"
 
 #define DEFAULT_NTP_SERVER                                      "pool.ntp.org"
 

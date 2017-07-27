@@ -110,16 +110,6 @@ unsigned char rebootPending;
 
 #define SECRET                                      PROSTR("SECRET")
 
-#if MEDIA_STREAMING_ENABLED == 1
-#include "./include/media.h"
-
-static unsigned char mediaReplyReceived;
-unsigned long mediaMessageRequestTime;
-static int mediaReplyMessageWaitInterval;
-
-static char streamId[MAX_BUFFER_SIZE];
-#endif
-
 #if HTTP_PROXY_ENABLED == 1
 #include "./include/proxy.h"
 
@@ -880,251 +870,6 @@ static void logJsonFailureMessageAndReturn(const char *module, const char *key, 
 #endif
 
 
-#if MEDIA_STREAMING_ENABLED == 1
-static void handleMediaStopMessage(InstaMsg *c)
-{
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sStopping ....."), MEDIA);
-    info_log(LOG_GLOBAL_BUFFER);
-
-    stop_streaming();
-
-    RESET_GLOBAL_BUFFER;
-    sg_sprintf((char*)GLOBAL_BUFFER, PROSTR("{'to':'%s','from':'%s','type':3,'stream_id': '%s'}"),
-               c->clientIdComplete, c->clientIdComplete, streamId);
-
-    publish(c->mediaTopic,
-            (char*)GLOBAL_BUFFER,
-            QOS0,
-            0,
-            NULL,
-            MQTT_RESULT_HANDLER_TIMEOUT,
-            1);
-}
-
-
-static void handleMediaPauseMessage(InstaMsg *c)
-{
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sPausing ....."), MEDIA);
-    info_log(LOG_GLOBAL_BUFFER);
-
-    pause_streaming();
-}
-
-
-static void broadcastMedia(InstaMsg * c, char *sdpAnswer)
-{
-    {
-        /*
-         * We hard-code the media-server-ip-address.
-         */
-        memset(c->mediaServerIpAddress, 0, sizeof(c->mediaServerIpAddress));
-        strcpy(c->mediaServerIpAddress, "23.253.42.123");
-    }
-
-    {
-        /*
-         * We need to extract port from the string of type
-         *
-         *              m=video 12345 RTP/AVP 96
-         */
-        const char *stringToSearch = "m=video ";
-
-        char *pos = strstr(sdpAnswer, stringToSearch);
-        if(pos != NULL)
-        {
-            char *token = strtok(pos, " ");
-
-            if(token != NULL)
-            {
-                /*
-                * Find the server-port.
-                */
-                memset(c->mediaServerPort, 0, sizeof(c->mediaServerPort));
-                strcpy(c->mediaServerPort, strtok(NULL, " "));
-
-                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sMedia-Server IP-Address and Port being used for streaming [%s], [%s]"),
-                                              MEDIA, c->mediaServerIpAddress,  c->mediaServerPort);
-                info_log(LOG_GLOBAL_BUFFER);
-
-                mediaReplyReceived = 1;
-                create_and_start_streaming_pipeline(c->mediaServerIpAddress, c->mediaServerPort);
-
-                return;
-            }
-        }
-    }
-
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCould not find server-port for streaming.. not doing anything else !!!"), MEDIA);
-    error_log(LOG_GLOBAL_BUFFER);
-}
-
-
-static void handleMediaReplyMessage(InstaMsg *c, MQTTMessage *msg)
-{
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sReceived media-reply-message [%s]"), MEDIA, (char*)msg->payload);
-    info_log(LOG_GLOBAL_BUFFER);
-
-    {
-        const char *STREAM_ID = PROSTR("stream_id");
-        const char *SDP_ANSWER = PROSTR("sdp_answer");
-
-        char *sdpAnswer;
-
-        memset(streamId, 0, sizeof(streamId));
-        getJsonKeyValueIfPresent(msg->payload, STREAM_ID, streamId);
-
-        sdpAnswer = (char *)sg_malloc(MAX_BUFFER_SIZE);
-        if(sdpAnswer == NULL)
-        {
-            sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not allocate memory for sdp-answer", MEDIA);
-            error_log(LOG_GLOBAL_BUFFER);
-
-            goto exit;
-        }
-        memset(sdpAnswer, 0, MAX_BUFFER_SIZE);
-        getJsonKeyValueIfPresent(msg->payload, SDP_ANSWER, sdpAnswer);
-
-        if(strlen(sdpAnswer) > 0)
-        {
-            broadcastMedia(c, sdpAnswer);
-        }
-        else
-        {
-            sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCould not process sdp-answer ... media will not start streaming !!!"), MEDIA);
-            error_log(LOG_GLOBAL_BUFFER);
-
-            goto exit;
-        }
-
-exit:
-        if(sdpAnswer)
-        {
-            sg_free(sdpAnswer);
-        }
-    }
-}
-
-
-static void handleMediaStreamsMessage(InstaMsg *c, MQTTMessage *msg)
-{
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sReceived media-streams-message [%s]"), MEDIA, (char*) msg->payload);
-    info_log(LOG_GLOBAL_BUFFER);
-
-    {
-        const char *REPLY_TO = PROSTR("reply_to");
-        const char *MESSAGE_ID = PROSTR("message_id");
-        const char *METHOD = PROSTR("method");
-
-        char *replyTopic, *messageId, *method;
-        replyTopic = (char*) sg_malloc(100);
-        messageId = (char*) sg_malloc(MAX_BUFFER_SIZE);
-        method = (char*) sg_malloc(10);
-
-        if((replyTopic == NULL) || (messageId == NULL) || (method == NULL))
-        {
-            sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not allocate memory for replyTopic/messageId/method", MEDIA);
-            error_log(LOG_GLOBAL_BUFFER);
-
-            goto exit;
-        }
-
-        getJsonKeyValueIfPresent(msg->payload, REPLY_TO, replyTopic);
-        getJsonKeyValueIfPresent(msg->payload, MESSAGE_ID, messageId);
-        getJsonKeyValueIfPresent(msg->payload, METHOD, method);
-
-        if(strlen(replyTopic) == 0)
-        {
-            logJsonFailureMessageAndReturn(MEDIA, REPLY_TO, msg);
-            goto exit;
-        }
-
-        if(strlen(messageId) == 0)
-        {
-            logJsonFailureMessageAndReturn(MEDIA, MESSAGE_ID, msg);
-            goto exit;
-        }
-
-        if(strlen(method) == 0)
-        {
-            logJsonFailureMessageAndReturn(MEDIA, METHOD, msg);
-            goto exit;
-        }
-
-        if(strcmp(method, "GET") == 0)
-        {
-            RESET_GLOBAL_BUFFER;
-            sg_sprintf((char*) GLOBAL_BUFFER, PROSTR("{\"response_id\": \"%s\", \"status\": 1, \"streams\": \"[%s]\"}"), messageId, streamId);
-
-            publish(replyTopic,
-                    (char*)GLOBAL_BUFFER,
-                    QOS0,
-                    0,
-                    NULL,
-                    MQTT_RESULT_HANDLER_TIMEOUT,
-                    1);
-        }
-
-exit:
-        if(method)
-            sg_free(method);
-
-        if(messageId)
-            sg_free(messageId);
-
-        if(replyTopic)
-            sg_free(replyTopic);
-    }
-}
-
-
-static void initiateStreaming()
-{
-    InstaMsg *c = &instaMsg;
-
-    memset(c->selfIpAddress, 0, sizeof(c->selfIpAddress));
-    get_device_ip_address(c->selfIpAddress, sizeof(c->selfIpAddress));
-
-    memset(messageBuffer, 0, sizeof(messageBuffer));
-    sg_sprintf(messageBuffer,
-               "{"
-                    "'to': '%s', "
-                    "'sdp_offer' : 'v=0\r\n"
-                                   "o=- 0 0 IN IP4 %s\r\n"
-                                   "s=\r\n"
-                                   "c=IN IP4 %s\r\n"
-                                   "t=0 0\r\n"
-                                   "a=charset:UTF-8\n"
-                                   "a=recvonly\r\n"
-                                   "m=video 50004 RTP/AVP 96\r\n"
-                                   "a=rtpmap:96 H264/90000\r\n"
-                                    "', "
-	    			"'from': '%s', "
-                    "'protocol' : 'rtp', "
-                    "'type':'7', "
-                    "'stream_id':'%s', "
-	    			"'record': True"
-	    		"}",
-                c->clientIdComplete,
-                                    c->selfIpAddress,
-                                    c->selfIpAddress,
-                c->clientIdComplete,
-                c->clientIdComplete);
-
-
-    mediaReplyReceived = 2;
-    mediaMessageRequestTime = getCurrentTick();
-
-    publish(c->mediaTopic,
-	    	messageBuffer,
-			QOS0,
-			0,
-			NULL,
-			MQTT_RESULT_HANDLER_TIMEOUT,
-			1);
-}
-#endif
-
-
 #if HTTP_PROXY_ENABLED == 1
 static void handleProxyMessage(InstaMsg *c, MQTTMessage *msg)
 {
@@ -1506,14 +1251,6 @@ void clearInstaMsg(InstaMsg *c)
 #endif
 
     c->connected = 0;
-
-#if MEDIA_STREAMING_ENABLED == 1
-    /*
-     * If we need to clear (most probably due to no network-connection, we must then restart if media-streaming is enabled.
-     * Else, the media-reply message will not be re-sent.
-     */
-    exitApp(0);
-#endif
 }
 
 
@@ -1545,23 +1282,6 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
     memset(c->controlActionTopic, 0, sizeof(c->controlActionTopic));
     sg_sprintf(c->controlActionTopic, PROSTR("instamsg/clients/%s/controlaction"), c->clientIdComplete);
 
-#if MEDIA_STREAMING_ENABLED == 1
-    memset(c->mediaTopic, 0, sizeof(c->mediaTopic));
-    sg_sprintf(c->mediaTopic, PROSTR("instamsg/clients/%s/media"), c->clientIdComplete);
-
-    memset(c->mediaReplyTopic, 0, sizeof(c->mediaReplyTopic));
-    sg_sprintf(c->mediaReplyTopic, PROSTR("instamsg/clients/%s/mediareply"), c->clientIdComplete);
-
-    memset(c->mediaStopTopic, 0, sizeof(c->mediaStopTopic));
-    sg_sprintf(c->mediaStopTopic, PROSTR("instamsg/clients/%s/mediastop"), c->clientIdComplete);
-
-    memset(c->mediaPauseTopic, 0, sizeof(c->mediaPauseTopic));
-    sg_sprintf(c->mediaPauseTopic, PROSTR("instamsg/clients/%s/mediapause"), c->clientIdComplete);
-
-    memset(c->mediaStreamsTopic, 0, sizeof(c->mediaStreamsTopic));
-    sg_sprintf(c->mediaStreamsTopic, PROSTR("instamsg/clients/%s/mediastreams"), c->clientIdComplete);
-#endif
-
 #if HTTP_PROXY_ENABLED == 1
     memset(c->proxyTopic, 0, sizeof(c->proxyTopic));
     sg_sprintf(c->proxyTopic, PROSTR("instamsg/clients/%s/proxy"), c->clientIdComplete);
@@ -1577,16 +1297,6 @@ static void setValuesOfSpecialTopics(InstaMsg *c)
               c->controlActionTopic, c->rebootTopic, c->enableServerLoggingTopic,
               c->serverLogsTopic, c->receiveConfigTopic, c->updateCertTopic);
     info_log(LOG_GLOBAL_BUFFER);
-
-#if MEDIA_STREAMING_ENABLED == 1
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("\r\nMEDIA_TOPIC = [%s],"
-             "\r\nMEDIA_REPLY_TOPIC = [%s],"
-             "\r\nMEDIA_STOP_TOPIC = [%s],"
-             "\r\nMEDIA_PAUSE_TOPIC = [%s],"
-             "\r\nMEDIA_STREAMS_TOPIC = [%s]"),
-             c->mediaTopic, c->mediaReplyTopic, c->mediaStopTopic, c->mediaPauseTopic, c->mediaStreamsTopic);
-    info_log(LOG_GLOBAL_BUFFER);
-#endif
 
 #if HTTP_PROXY_ENABLED == 1
     sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("\r\nPROXY_TOPIC = [%s]"), c->proxyTopic);
@@ -2053,10 +1763,6 @@ void initInstaMsg(InstaMsg* c,
     waitingForPuback = NOT_WAITING_FOR_PUBACK;
     rebootPending = 0;
 
-#if MEDIA_STREAMING_ENABLED == 1
-    mediaReplyReceived = 0;
-#endif
-
     MQTTConnect(c);
 }
 
@@ -2285,29 +1991,6 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
                                CONFIG_INT,
                                DEFAULT_SSL_ENABLED,
                                PROSTR(""));
-#endif
-
-#if MEDIA_STREAMING_ENABLED == 1
-        registerEditableConfig(&mediaStreamingEnabledRuntime,
-                               PROSTR("MEDIA_STREAMING_ENABLED"),
-                               CONFIG_INT,
-                               "0",
-                               PROSTR("0 - Disabled; 1 - Enabled"));
-        registerEditableConfig(&mediaReplyMessageWaitInterval,
-                               PROSTR("MEDIA_REPLY_MESSAGE_WAIT_INTERVAL"),
-                               CONFIG_INT,
-                               "120",
-                               PROSTR(""));
-
-        if(mediaStreamingEnabledRuntime == 1)
-        {
-            static unsigned char streamingInitDone = 0;
-            if(streamingInitDone == 0)
-            {
-                initiateStreaming();
-                streamingInitDone = 1;
-            }
-        }
 #endif
 
 #if HTTP_PROXY_ENABLED == 1
@@ -2637,24 +2320,6 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                     {
                         handleControlActionMessage(c, &msg);
                     }
-#if MEDIA_STREAMING_ENABLED == 1
-                    else if(strcmp(topicName, c->mediaReplyTopic) == 0)
-                    {
-                        handleMediaReplyMessage(c, &msg);
-                    }
-                    else if(strcmp(topicName, c->mediaStreamsTopic) == 0)
-                    {
-                        handleMediaStreamsMessage(c, &msg);
-                    }
-                    else if(strcmp(topicName, c->mediaStopTopic) == 0)
-                    {
-                        handleMediaStopMessage(c);
-                    }
-                    else if(strcmp(topicName, c->mediaPauseTopic) == 0)
-                    {
-                        handleMediaPauseMessage(c);
-                    }
-#endif
 #if HTTP_PROXY_ENABLED == 1
                     else if(strcmp(topicName, c->proxyTopic) == 0)
                     {
@@ -3331,9 +2996,6 @@ void start(int (*onConnectOneTimeOperations)(),
     notifyServerOfSecretReceived = 0;
 
     compulsorySocketReadAfterMQTTPublishInterval = 0;
-#if MEDIA_STREAMING_ENABLED == 1
-    mediaStreamingErrorOccurred = 0;
-#endif
 
     while(1)
     {
@@ -3429,21 +3091,6 @@ void start(int (*onConnectOneTimeOperations)(),
 #endif
 
                         latestTick = getCurrentTick();
-
-#if MEDIA_STREAMING_ENABLED == 1
-                        if(mediaReplyReceived == 2)
-                        {
-                            if(latestTick >= (mediaMessageRequestTime + mediaReplyMessageWaitInterval))
-                            {
-                                sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sMedia-Reply message not received in %u seconds ... rebooting"),
-                                           MEDIA_ERROR, mediaReplyMessageWaitInterval);
-                                error_log(LOG_GLOBAL_BUFFER);
-
-                                exitApp(0);
-                            }
-                        }
-#endif
-
 
                         /*
                          * Send network-stats if time has arrived.
@@ -3637,17 +3284,6 @@ void start(int (*onConnectOneTimeOperations)(),
 				                countdownTimerForBusinessLogic = 2 * editableBusinessLogicInterval;
                             }
                         }
-
-#if MEDIA_STREAMING_ENABLED == 1
-                        if(mediaStreamingErrorOccurred == 1)
-                        {
-                            sg_sprintf(LOG_GLOBAL_BUFFER,
-                                       PROSTR("%sError occurred in media-streaming ... rebooting device to reset everything"), MEDIA);
-                            error_log(LOG_GLOBAL_BUFFER);
-
-                            exitApp(0);
-                        }
-#endif
                     }
                 }
 

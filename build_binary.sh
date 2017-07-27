@@ -26,7 +26,6 @@ SOURCES=`echo                                                                   
         common/instamsg/driver/watchdog.c                                                       \
         common/instamsg/driver/file_system.c                                                    \
         common/instamsg/driver/httpclient.c                                                     \
-        common/instamsg/driver/media.c                                                          \
         common/instamsg/driver/upgrade.c                                                        \
         common/instamsg/driver/gps.c                                                            \
         common/instamsg/driver/time.c                                                           \
@@ -54,7 +53,6 @@ SOURCES=`echo                                                                   
         device/${VENDOR}/instamsg/device_time.c                                                 \
         device/${VENDOR}/instamsg/device_watchdog.c                                             \
         device/${VENDOR}/instamsg/device_config.c                                               \
-        device/${VENDOR}/instamsg/device_media.c                                                \
         device/${VENDOR}/instamsg/device_proxy.c                                                \
         device/${VENDOR}/instamsg/device_gpio.c                                                 \
         device/${VENDOR}/instamsg/device_file_system.c                                          \

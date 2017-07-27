@@ -101,17 +101,6 @@ struct InstaMsg {
     char updateCertTopic[100];
     char controlActionTopic[100];
 
-#if MEDIA_STREAMING_ENABLED == 1
-    char mediaTopic[100];
-    char mediaReplyTopic[100];
-    char mediaStopTopic[100];
-    char mediaPauseTopic[100];
-    char mediaStreamsTopic[100];
-
-    char selfIpAddress[20];
-    char mediaServerIpAddress[20];
-    char mediaServerPort[10];
-#endif
 #if HTTP_PROXY_ENABLED == 1
     char proxyTopic[100];
 
