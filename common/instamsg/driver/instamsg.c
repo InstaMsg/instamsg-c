@@ -1156,6 +1156,7 @@ static void handleProxyMessage(InstaMsg *c, MQTTMessage *msg)
 #endif
 
 
+#if FILE_SYSTEM_ENABLED == 1
 static void handleFileTransfer(InstaMsg *c, MQTTMessage *msg)
 {
     const char *REPLY_TOPIC = PROSTR("reply_to");
@@ -1425,6 +1426,7 @@ exit:
 
     return;
 }
+#endif
 
 
 static void checkAndRemoveExpiredHandler(int *msgId, unsigned int *timeout, const char *info)
