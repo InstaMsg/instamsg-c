@@ -83,6 +83,7 @@ void get_latest_sms_containing_substring(SG_Socket *socket, char *buffer, const 
 #endif
 void connect_underlying_socket_medium_try_once(SG_Socket* socket);
 void release_underlying_socket_medium_guaranteed(SG_Socket* socket);
+void release_socket_simple_guaranteed(SG_Socket* socket);
 
 #if (SSL_ENABLED == 1) || (SOCKET_SSL_ENABLED == 1)
 void load_client_certificate_into_buffer(char *cert_buffer, int maxLength);
