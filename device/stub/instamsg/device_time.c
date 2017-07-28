@@ -36,6 +36,12 @@ void minimumDelay()
 
 /*
  * This method returns the current-tick/timestamp.
+ *
+ * Note that the value returned by this method is used on a "relative basis" since the device reset.
+ * So, this method may return either of following ::
+ *
+ *      * Either the absolute timestamp (as returned by the linux-command "date +%s"), or
+ *      * Either the number of seconds that have passed (at the time of calling this method) since device reset.
  */
 unsigned long getCurrentTick()
 {
@@ -56,7 +62,10 @@ unsigned long get_GSM_timestamp()
 
 
 /*
- * Syncs the system-clock.
+ * Syncs the system-clock, using the structure "DateParams" as defined in common/instamsg/driver/include/time.h
+ *
+ * At the time of calling this method the variable "dateParams" is already filled in by the appropriate values
+ * of the current time in UTC.
  *
  * Returns SUCCESS on successful-syncing.
  * Else returns FAILURE.
@@ -72,6 +81,8 @@ int sync_system_clock(DateParams *dateParams, unsigned long seconds)
  *
  *          YYYYMMDD4HHMMSS
  *          201507304155546
+ *
+ * The time can be in any timezone (the timzone is taken care of appriately by "getTimezoneOffset" method).
  */
 void getTimeInDesiredFormat(char *buffer, int maxBufferLength)
 {
