@@ -72,7 +72,8 @@ device/msf-gateway-windows
 device/masibus-gateway-gsm-windows
 device/masibus-gateway-gsm-windows-rs485
 device/masibus-gateway-ethernet-windows
-device/windows-avl
+device/kritikal-gateway
+device/saveindia-gateway-gsm
 
 common/apps/atoll-gms
 common/apps/energy-meter
