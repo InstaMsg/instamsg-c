@@ -13,8 +13,13 @@
 #define sg_sprintf                                              DEFAULT_SPRINTF
 
 #define USE_DEFAULT_MALLOC                                      1
+#if USE_DEFAULT_MALLOC == 1
 #define sg_malloc                                               DEFAULT_MALLOC
 #define sg_free                                                 DEFAULT_FREE
+#else
+#define sg_malloc
+#define sg_free
+#endif
 
 #define PROSTR
 
