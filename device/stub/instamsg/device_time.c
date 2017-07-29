@@ -40,8 +40,19 @@ void minimumDelay()
  * Note that the value returned by this method is used on a "relative basis" since the device reset.
  * So, this method may return either of following ::
  *
- *      * Either the absolute timestamp (as returned by the linux-command "date +%s"), or
- *      * Either the number of seconds that have passed (at the time of calling this method) since device reset.
+ *      * The absolute timestamp (as returned by the linux-command "date +%s").
+ *        This method is more suitable for devices with Operating-Systems (eg. Linux).
+ *
+ *                                                      OR
+ *
+ *      * The number of seconds that have passed (at the time of calling this method) since device reset.
+ *        This is more suitable for native-devices without the luxuries of an operating-system.
+ *        Generally, for such devices, following is done ::
+ *
+ *              * An interrupt is setup, that is called every second.
+ *              * A unsigned-long variable, say "timestamp" is initialized to 0, which is then incremented on every call
+ *                of the interrupt-handler.
+ *              * This variable ("timestamp") is simply returned by this (getCurrentTick()) method.
  */
 unsigned long getCurrentTick()
 {
