@@ -38,7 +38,7 @@ short remove_unwanted_line_with_prefix(char *usefulOutput, char *prefix);
 
 extern volatile unsigned char timeSyncedViaExternalResources;
 void serial_poller_func();
-#define WAIT_FOR_SIMCOM_MODEM_RESPONSE                                                                                                  \
+#define WAIT_FOR_SIMCOM_5360_MODEM_RESPONSE                                                                                                  \
     {                                                                                                                                   \
         responseBuffer = usefulOutput;                                                                                                  \
         response_delimiter = (volatile char*)delimiter;                                                                                 \
