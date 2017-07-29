@@ -1,16 +1,26 @@
 #include "../../instamsg/driver/include/globals.h"
 #include "../../instamsg/driver/include/log.h"
+#include "../../instamsg/driver/include/data_logger.h"
 
 #include "device_defines.h"
 
+#include <string.h>
+
+
 char buf[MAX_BUFFER_SIZE];
+
+
+void release_app_resources()
+{
+}
+
 
 int main(int argc, char** argv)
 {
     int rc = FAILURE;
 
 
-    init_persistent_storage();
+    init_data_logger();
 
     /*
      * Do as many calls to save_record_to_persistent_storage ...
@@ -22,7 +32,7 @@ int main(int argc, char** argv)
     {
         memset(buf, 0, sizeof(buf));
 
-        rc = get_next_record_from_persistent_storage(char *buffer, int maxLength);
+        rc = get_next_record_from_persistent_storage(buf, sizeof(buf));
         if(rc == SUCCESS)
         {
             sg_sprintf(LOG_GLOBAL_BUFFER, "Record read from persistent-storage = [%s]", buf);
