@@ -2,7 +2,7 @@
 
 #if DEFAULT_QUECTEL_M95_SOCKET_ENABLED == 1
 
-#include "./simcom.h"
+#include "./quectel-m95.h"
 
 #include "../driver/include/globals.h"
 #include "../driver/include/at.h"

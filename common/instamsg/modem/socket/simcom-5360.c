@@ -2,7 +2,7 @@
 
 #if DEFAULT_SIMCOM_5360_SOCKET_ENABLED == 1
 
-#include "./simcom.h"
+#include "./simcom-5360.h"
 
 #include "../driver/include/globals.h"
 #include "../driver/include/at.h"
