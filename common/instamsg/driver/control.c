@@ -122,11 +122,14 @@ void processControlCommand(char *controlCommandPayload)
         getJsonKeyValueIfPresent(innerJson, "host_address", controlCommandParams.hostAddress);
         getJsonKeyValueIfPresent(innerJson, "host_port", controlCommandParams.hostPort);
 
-        do_process_control_action_command(&controlCommandParams);
     }
     else
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, "No-version information in control-action command [%s]", controlCommandPayload);
         error_log(LOG_GLOBAL_BUFFER);
+
+        strcpy(controlCommandParams.command, controlCommandPayload);
     }
+
+    do_process_control_action_command(&controlCommandParams);
 }
