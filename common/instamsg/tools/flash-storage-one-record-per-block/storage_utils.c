@@ -13,7 +13,10 @@
 #include "../../../common/instamsg/driver/include/globals.h"
 #include "../../../common/instamsg/driver/include/misc.h"
 
-#define MEMORY_FORMATTED_IDENTIFIER             'y'
+#define INVALID_SIZE														0
+#define OPERATING_SECTOR_SIZE										        1024
+
+#define MEMORY_FORMATTED_IDENTIFIER                                         'y'
 
 volatile unsigned char persistent_storage_initialized;
 static unsigned char tempBuffer[MAX_RECORD_SIZE_BYTES];
