@@ -40,8 +40,6 @@
 
 void init_file_system(FileSystem *fs, void *arg)
 {
-    /* Register other-callbacks. */
-    fs->getFileListing = getFileListing;
     fs->getFileSize = getFileSize;
 
     fs->fileName = (char*)arg;

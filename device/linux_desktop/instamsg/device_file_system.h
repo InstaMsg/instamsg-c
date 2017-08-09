@@ -44,8 +44,6 @@ struct FileSystem
 {
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
     char *fileName;
-
-    void (*getFileListing)(FileSystem *fs, char *buf, int maxValueLenAllowed, const char *directoryPath);
     long (*getFileSize)(FileSystem *fs, const char *filepath);
     /* ============================= THIS SECTION MUST NOT BE TEMPERED ==================================== */
 

@@ -45,59 +45,6 @@
 
 
 /*
- * This method returns the file-listing in the directory specified, and populates the "buf".
- * The format is ::
- *
- *          {"publisher.sh":152,"subscriber.sh":140,"filetester.sh":137,"config.txt_filetester":148,"stdoutsub":56040,"build_ubuntu_14_04.sh":2892,"README.md":1502,"config.txt":128,"stdoutsub.c":6649,"config.txt_local_testing":128}
- */
-void getFileListing(FileSystem *fs, char *buf, int maxValueLenAllowed, const char *directoryPath)
-{
-    int len;
-    struct dirent *pDirent;
-    DIR *pDir;
-    char firstEntryDone = 0;
-
-    pDir = opendir(directoryPath);
-    if(pDir == NULL)
-    {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Cannot open directory '%s'\n", directoryPath);
-        error_log(LOG_GLOBAL_BUFFER);
-
-        return;
-    }
-
-
-    strcat(buf, "{");
-    while ((pDirent = readdir(pDir)) != NULL)
-    {
-        struct stat path_stat;
-        stat(pDirent->d_name, &path_stat);
-
-        if(S_ISREG(path_stat.st_mode))
-        {
-            char newEntry[MAX_BUFFER_SIZE] = {0};
-            sg_sprintf(newEntry, "\"%s\":%u", pDirent->d_name, (unsigned int)path_stat.st_size);
-
-            if((strlen(buf) + strlen(newEntry)) < (maxValueLenAllowed - 10))
-            {
-                if(firstEntryDone == 1)
-                {
-                    strcat(buf, ",");
-                }
-                strcat(buf, newEntry);
-                firstEntryDone = 1;
-            }
-            else
-            {
-                break;
-            }
-        }
-    }
-    strcat(buf, "}");
-}
-
-
-/*
  * This method returns a long-value, specifying the size of file in bytes.
  */
 long getFileSize(FileSystem *fs, const char *filepath)
