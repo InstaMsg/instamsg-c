@@ -39,37 +39,30 @@
  * Global-functions callable.
  */
 void init_file_system(FileSystem *fs, void *arg);
+int sg_file_read(FileSystem *fs, unsigned char* buffer, int len, unsigned char guaranteed);
+int sg_file_write(FileSystem *fs, unsigned char* buffer, int len);
+int sg_copyFile(FileSystem *fs, const char *oldPath, const char *newPath);
+int sg_renameFile(FileSystem *fs, const char *oldPath, const char *newPath);
 void release_file_system(FileSystem *fs);
+
+void sg_readLine(FILE_STRUCT *fp, char *buffer, int maxBufferLength);
+void sg_readFile(const char *filePath, char *buffer, int maxBufferLength);
+void sg_writeFile(const char *filePath, char *buffer);
+int sg_appendLine(const char *filePath, const char *buffer);
+int sg_createEmptyFile(const char *filePath);
+
 
 
 /*
  * Must not be called directly.
  * Instead must be called as ::
  *
- *      fs->read
- *      fs->write
- *      fs->renameFile
- *      fs->deleteFile
  *      fs->getFileListing
  *      fs->getFileSize
  */
-int file_system_read (FileSystem *fs, unsigned char* buffer, int len, unsigned char guaranteed);
-int file_system_write(FileSystem *fs, unsigned char* buffer, int len);
-int renameFile(FileSystem *fs, const char *oldPath, const char *newPath);
-int copyFile(FileSystem *fs, const char *oldPath, const char *newPath);
-int deleteFile(FileSystem *fs, const char *filePath);
 void getFileListing(FileSystem *fs, char *buf, int maxValueLenAllowed, const char *directoryPath);
 long getFileSize(FileSystem *fs, const char *filepath);
 void getNextFileToProcessPath(char *folder, char *path, int maxBufferLength);
-
-
-/*
- * Internally Used.
- * Must not be called by anyone.
- */
-void connect_underlying_file_system_medium_guaranteed(FileSystem* fs);
-void release_underlying_file_system_medium_guaranteed(FileSystem* fs);
-
 
 
 #endif

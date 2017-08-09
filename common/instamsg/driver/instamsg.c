@@ -1422,7 +1422,7 @@ void initInstaMsg(InstaMsg* c,
 
 #if FILE_SYSTEM_ENABLED == 1
     init_file_system(&(c->singletonUtilityFs), "");
-    deleteFile(&(c->singletonUtilityFs), SYSTEM_WIDE_TEMP_FILE);
+    FILE_DELETE(SYSTEM_WIDE_TEMP_FILE);
 #endif
 
     check_if_all_required_compile_time_defines_are_present();

@@ -60,7 +60,10 @@
 #define FILE_END_ID                 EOF
 #define FILE_GETC                   fgetc
 #define FILE_PUTC                   fputc
+#define FILE_READ_LINE              fread
 #define FILE_WRITE_LINE             fwrite
+#define FILE_DELETE                 remove
+#define FILE_RENAME                 rename
 
 #define MAX_BUFFER_SIZE             1000
 #define READ_BUFFER_SIZE            4000

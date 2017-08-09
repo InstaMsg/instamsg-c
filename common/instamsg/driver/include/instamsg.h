@@ -148,7 +148,6 @@ void initInstaMsg(InstaMsg* c,
 #define FILE_DOWNLOAD   PROSTR("[FILE-DOWNLOAD] ")
 #define FILE_UPLOAD     PROSTR("[FILE-UPLOAD] ")
 #define FILE_LISTING    PROSTR("[FILE-LISTING] ")
-#define FILE_DELETE     PROSTR("[FILE-DELETE] ")
 
 void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c);
 void sendPingReqToServer(InstaMsg *c);

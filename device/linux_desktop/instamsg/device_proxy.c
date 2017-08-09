@@ -9,8 +9,6 @@
 #include "../../../common/instamsg/driver/include/config.h"
 #include "../../../common/instamsg/driver/include/proxy.h"
 
-#include "../common/file_utils.h"
-
 #if HTTP_PROXY_ENABLED == 1
 
 
@@ -49,7 +47,7 @@ void setupProxy(InstaMsg *c)
     if(strlen(command) > 0)
     {
         sg_writeFile(SYSTEM_WIDE_TEMP_FILE, command);
-        renameFile(NULL, SYSTEM_WIDE_TEMP_FILE, "proxy_command");
+        sg_renameFile(NULL, SYSTEM_WIDE_TEMP_FILE, "proxy_command");
     }
 }
 

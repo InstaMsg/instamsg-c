@@ -36,8 +36,6 @@
 #include "../../../common/instamsg/driver/include/log.h"
 #include "../../../common/instamsg/driver/include/file_system.h"
 
-#include "../common/file_utils.h"
-
 #define DATA_FILE_NAME      "data.txt"
 
 static char tempBuffer[1024];
@@ -46,7 +44,7 @@ static void make_the_switch()
 {
     if(1)
     {
-        if(renameFile(NULL, SYSTEM_WIDE_TEMP_FILE, DATA_FILE_NAME) != 0)
+        if(sg_renameFile(NULL, SYSTEM_WIDE_TEMP_FILE, DATA_FILE_NAME) != 0)
         {
             sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not move file from [%s] to [%s]", DATA_LOGGING_ERROR, SYSTEM_WIDE_TEMP_FILE, DATA_FILE_NAME);
             error_log(LOG_GLOBAL_BUFFER);
@@ -112,7 +110,7 @@ void save_record_to_persistent_storage(char *record)
 
                 FILE_CLOSE(fp);
 
-                if(renameFile(NULL, SYSTEM_WIDE_TEMP_FILE, DATA_FILE_NAME) != 0)
+                if(sg_renameFile(NULL, SYSTEM_WIDE_TEMP_FILE, DATA_FILE_NAME) != 0)
                 {
                     sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not move file from [%s] to [%s]",
                                DATA_LOGGING_ERROR, SYSTEM_WIDE_TEMP_FILE, DATA_FILE_NAME);
@@ -127,7 +125,7 @@ void save_record_to_persistent_storage(char *record)
         }
     }
 
-    copyFile(NULL, DATA_FILE_NAME, SYSTEM_WIDE_TEMP_FILE);
+    sg_copyFile(NULL, DATA_FILE_NAME, SYSTEM_WIDE_TEMP_FILE);
     sg_appendLine(SYSTEM_WIDE_TEMP_FILE, record);
     make_the_switch();
 }
@@ -236,7 +234,7 @@ exit:
 
     if(1)
     {
-        if(renameFile(NULL, SYSTEM_WIDE_TEMP_FILE, DATA_FILE_NAME) != 0)
+        if(sg_renameFile(NULL, SYSTEM_WIDE_TEMP_FILE, DATA_FILE_NAME) != 0)
         {
             sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not move file from [%s] to [%s]", DATA_LOGGING_ERROR, SYSTEM_WIDE_TEMP_FILE, DATA_FILE_NAME);
             error_log(LOG_GLOBAL_BUFFER);

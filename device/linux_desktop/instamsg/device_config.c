@@ -37,9 +37,6 @@
 #include "../../../common/instamsg/driver/include/sg_mem.h"
 #include "../../../common/instamsg/driver/include/file_system.h"
 
-#include "../common/file_utils.h"
-
-
 static char tempBuffer[1024];
 
 #define CONFIG_FILE_NAME "config.txt"
@@ -49,7 +46,7 @@ static void make_the_switch()
 {
     if(1)
     {
-        if(renameFile(NULL, SYSTEM_WIDE_TEMP_FILE, CONFIG_FILE_NAME) != 0)
+        if(sg_renameFile(NULL, SYSTEM_WIDE_TEMP_FILE, CONFIG_FILE_NAME) != 0)
         {
             sg_sprintf(LOG_GLOBAL_BUFFER, "%sCould not move file from [%s] to [%s]", CONFIG_ERROR, SYSTEM_WIDE_TEMP_FILE, CONFIG_FILE_NAME);
             error_log(LOG_GLOBAL_BUFFER);

@@ -14,7 +14,6 @@ SYSTEM_INCLUDES=`echo                                               		\
 # Device-specific extra source-files.
 #
 EXTRA_SOURCES=`echo															\
-			  device/${VENDOR}/common/file_utils.c							\
 			  device/${VENDOR}/common/serial_port_utils.c					`
 
 

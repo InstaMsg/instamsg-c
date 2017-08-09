@@ -108,7 +108,7 @@ void process_config(char *configJson, unsigned char persistConfig)
                 getJsonKeyValueIfPresent(configJson, CONFIG_VALUE_KEY, config_value);
 
                 write_singular_line_into_file(SYSTEM_WIDE_TEMP_FILE, config_value);
-                renameFile(NULL, SYSTEM_WIDE_TEMP_FILE, "auto_upgrade");
+                sg_renameFile(NULL, SYSTEM_WIDE_TEMP_FILE, "auto_upgrade");
 
                 sg_free(config_value);
             }
