@@ -158,7 +158,7 @@ void add_csv_metadata_info(char *buffer, void *arg)
 {
     struct CsvMetadataInfo *csvInfo = (struct CsvMetadataInfo *) arg;
 
-    strcat(buffer, "\"metadata\" : {\"protocol\" : \"csv\", \"file_id\" : \"");
+    strcat(buffer, "\"v\" : \"1.0\", \"metadata\" : {\"protocol\" : \"csv\", \"file_id\" : \"");
     strcat(buffer, csvInfo->fileId);
     strcat(buffer, "\"}, ");
 }
