@@ -83,6 +83,18 @@
 
 
 /*
+ * Whether config key-value pairs are on a file-system
+ */
+#define FILE_SYSTEM_CONFIG_ENABLED                              0
+
+
+/*
+ * Whether data-logging is on a file-system
+ */
+#define FILE_SYSTEM_DATA_LOGGING_ENABLED                        0
+
+
+/*
  * Whether the device is a GSM/GPRS device.
  */
 #define GSM_INTERFACE_ENABLED                                   0

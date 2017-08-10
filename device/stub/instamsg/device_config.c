@@ -5,6 +5,10 @@
  *
  *******************************************************************************/
 
+#include "device_defines.h"
+
+#if FILE_SYSTEM_CONFIG_ENABLED == 0
+
 #include "../../../common/instamsg/driver/include/globals.h"
 
 /*
@@ -72,3 +76,6 @@ int delete_config_value_from_persistent_storage(const char *key)
 void release_config()
 {
 }
+
+
+#endif

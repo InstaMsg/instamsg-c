@@ -79,9 +79,12 @@
 #define OTA_PING_BUFFER_SIZE        10000
 
 
-#define MEDIA_STREAMING_ENABLED     1
-#define FILE_LOGGING_ENABLED        1
-#define FILE_SYSTEM_ENABLED         1
+#define MEDIA_STREAMING_ENABLED                                 1
+#define FILE_LOGGING_ENABLED                                    1
+#define FILE_SYSTEM_ENABLED                                     1
+#define FILE_SYSTEM_CONFIG_ENABLED                              1
+#define FILE_SYSTEM_DATA_LOGGING_ENABLED                        1
+
 #define GSM_INTERFACE_ENABLED       0
 #define SSL_ENABLED                 1
 #define SOCKET_SSL_ENABLED          0

@@ -1,3 +1,7 @@
+#include "device_defines.h"
+
+#if FILE_SYSTEM_DATA_LOGGING_ENABLED == 0
+
 #include "../../../common/instamsg/driver/include/globals.h"
 
 /*
@@ -57,3 +61,6 @@ int get_next_record_from_persistent_storage(char *buffer, int maxLength)
 void release_data_logger()
 {
 }
+
+
+#endif
