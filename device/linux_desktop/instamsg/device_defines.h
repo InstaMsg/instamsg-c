@@ -65,8 +65,8 @@
 #define FILE_DELETE                 remove
 #define FILE_RENAME                 rename
 
-#define MAX_BUFFER_SIZE             1000
-#define READ_BUFFER_SIZE            4000
+#define MAX_BUFFER_SIZE             5000
+#define READ_BUFFER_SIZE            20000
 
 #define DATA_LOGGING_ENABLED        1
 #define MAX_DATA_LOGGER_SIZE_BYTES  100000
