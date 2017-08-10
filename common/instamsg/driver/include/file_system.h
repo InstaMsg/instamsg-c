@@ -43,6 +43,7 @@ int sg_file_read(FileSystem *fs, unsigned char* buffer, int len, unsigned char g
 int sg_file_write(FileSystem *fs, unsigned char* buffer, int len);
 int sg_copyFile(FileSystem *fs, const char *oldPath, const char *newPath);
 int sg_renameFile(FileSystem *fs, const char *oldPath, const char *newPath);
+int sg_deleteFile(FileSystem *fs, const char *filePath);
 void release_file_system(FileSystem *fs);
 
 void sg_readLine(FILE_STRUCT *fp, char *buffer, int maxBufferLength);

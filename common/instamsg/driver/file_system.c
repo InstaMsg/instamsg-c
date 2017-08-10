@@ -107,6 +107,12 @@ int sg_renameFile(FileSystem *fs, const char *oldPath, const char *newPath)
 }
 
 
+int sg_deleteFile(FileSystem *fs, const char *filePath)
+{
+    return FILE_DELETE(filePath);
+}
+
+
 void release_file_system(FileSystem *fs)
 {
     FILE_STRUCT *fp = fs->fp;
