@@ -1,14 +1,20 @@
-#include "device_defines.h"
+/*******************************************************************************
+ * Contributors:
+ *
+ *      Ajay Garg <ajay.garg@sensegrow.com>
+ *
+ *******************************************************************************/
 
-#if FILE_SYSTEM_DATA_LOGGING_ENABLED == 0
 
 #include "../../../common/instamsg/driver/include/globals.h"
+#include "../../../common/instamsg/driver/include/data_logger.h"
 
 /*
  * This method initializes the data-logger-interface for the device.
  */
 void init_data_logger()
 {
+    fs_init_data_logger();
 }
 
 
@@ -20,6 +26,7 @@ void init_data_logger()
  */
 void save_record_to_persistent_storage(char *record)
 {
+    fs_save_record_to_persistent_storage(record);
 }
 
 
@@ -51,7 +58,7 @@ void save_record_to_persistent_storage(char *record)
  */
 int get_next_record_from_persistent_storage(char *buffer, int maxLength)
 {
-    return FAILURE;
+    return fs_get_next_record_from_persistent_storage(buffer, maxLength);
 }
 
 
@@ -60,7 +67,6 @@ int get_next_record_from_persistent_storage(char *buffer, int maxLength)
  */
 void release_data_logger()
 {
+    fs_release_data_logger();
 }
 
-
-#endif

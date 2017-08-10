@@ -5,10 +5,6 @@
  *
  *******************************************************************************/
 
-#include "device_defines.h"
-
-#if FILE_SYSTEM_CONFIG_ENABLED == 0
-
 #include "../../../common/instamsg/driver/include/globals.h"
 
 /*
@@ -77,5 +73,3 @@ void release_config()
 {
 }
 
-
-#endif

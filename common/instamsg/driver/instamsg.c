@@ -1401,14 +1401,6 @@ static void check_if_all_required_compile_time_defines_are_present()
 #ifndef CRON_ENABLED
 #error "CRON_ENABLED compile-time-parameter undefined"
 #endif
-
-#ifndef FILE_SYSTEM_CONFIG_ENABLED
-#error "FILE_SYSTEM_CONFIG_ENABLED compile-time-parameter undefined"
-#endif
-
-#ifndef FILE_SYSTEM_DATA_LOGGING_ENABLED
-#error "FILE_SYSTEM_DATA_LOGGING_ENABLED compile-time-parameter undefined"
-#endif
 }
 
 

@@ -1,6 +1,10 @@
-#include "device_defines.h"
+/*******************************************************************************
+ * Contributors:
+ *
+ *      Ajay Garg <ajay.garg@sensegrow.com>
+ *
+ *******************************************************************************/
 
-#if FILE_SYSTEM_DATA_LOGGING_ENABLED == 0
 
 #include "../../../common/instamsg/driver/include/globals.h"
 
@@ -62,5 +66,3 @@ void release_data_logger()
 {
 }
 
-
-#endif

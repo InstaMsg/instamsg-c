@@ -5,17 +5,15 @@
  *
  *******************************************************************************/
 
-#include "device_defines.h"
-
-#if FILE_SYSTEM_CONFIG_ENABLED == 0
-
 #include "../../../common/instamsg/driver/include/globals.h"
+#include "../../../common/instamsg/driver/include/config.h"
 
 /*
  * This method initializes the Config-Interface for the device.
  */
 void init_config()
 {
+    fs_init_config();
 }
 
 
@@ -29,7 +27,7 @@ void init_config()
  */
 int get_config_value_from_persistent_storage(const char *key, char *buffer, int maxBufferLength)
 {
-    return FAILURE;
+    return fs_get_config_value_from_persistent_storage(key, buffer, maxBufferLength);
 }
 
 
@@ -52,7 +50,7 @@ int get_config_value_from_persistent_storage(const char *key, char *buffer, int 
  */
 int save_config_value_on_persistent_storage(const char *key, const char *value)
 {
-    return FAILURE;
+    return fs_save_config_value_on_persistent_storage(key, value);
 }
 
 
@@ -66,7 +64,7 @@ int save_config_value_on_persistent_storage(const char *key, const char *value)
  */
 int delete_config_value_from_persistent_storage(const char *key)
 {
-    return FAILURE;
+    return fs_delete_config_value_from_persistent_storage(key);
 }
 
 
@@ -75,7 +73,6 @@ int delete_config_value_from_persistent_storage(const char *key)
  */
 void release_config()
 {
+    fs_release_config();
 }
 
-
-#endif

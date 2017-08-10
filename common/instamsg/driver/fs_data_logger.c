@@ -29,7 +29,7 @@
 
 #include "device_defines.h"
 
-#if FILE_SYSTEM_DATA_LOGGING_ENABLED == 1
+#if FILE_SYSTEM_ENABLED == 1
 
 #include <stdio.h>
 #include <string.h>
@@ -59,7 +59,7 @@ static void make_the_switch()
 /*
  * This method initializes the data-logger-interface for the device.
  */
-void init_data_logger()
+void fs_init_data_logger()
 {
 }
 
@@ -70,7 +70,7 @@ void init_data_logger()
  * If and when the device-storage becomes full, the device MUST delete the oldest record, and instead replace
  * it with the current record. That way, we will maintain a rolling-data-logger.
  */
-void save_record_to_persistent_storage(char *record)
+void fs_save_record_to_persistent_storage(char *record)
 {
     while(1)
     {
@@ -160,7 +160,7 @@ void save_record_to_persistent_storage(char *record)
  * b)
  * FAILURE, if no record is available.
  */
-int get_next_record_from_persistent_storage(char *buffer, int maxLength)
+int fs_get_next_record_from_persistent_storage(char *buffer, int maxLength)
 {
     int rc = FAILURE;
     unsigned char lineRead = 0;
@@ -251,7 +251,7 @@ exit:
 /*
  * This method releases the data-logger, just before the system is going for a reset.
  */
-void release_data_logger()
+void fs_release_data_logger()
 {
 }
 

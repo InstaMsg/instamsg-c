@@ -29,7 +29,7 @@
 
 #include "device_defines.h"
 
-#if FILE_SYSTEM_CONFIG_ENABLED == 1
+#if FILE_SYSTEM_ENABLED == 1
 
 #include <stdio.h>
 #include <string.h>
@@ -186,7 +186,7 @@ static int do_delete_config_value_from_persistent_storage(const char *key, unsig
 /*
  * This method initializes the Config-Interface for the device.
  */
-void init_config()
+void fs_init_config()
 {
 }
 
@@ -199,7 +199,7 @@ void init_config()
  * SUCCESS ==> If a config with the specified "key" is found.
  * FAILURE ==> If no config with the specified "key" is found.
  */
-int get_config_value_from_persistent_storage(const char *key, char *buffer, int maxBufferLength)
+int fs_get_config_value_from_persistent_storage(const char *key, char *buffer, int maxBufferLength)
 {
 	int rc = FAILURE;
 	ACQUIRE_THREAD_MUTEX
@@ -228,7 +228,7 @@ int get_config_value_from_persistent_storage(const char *key, char *buffer, int 
  * SUCCESS ==> If the config was successfully saved.
  * FAILURE ==> If the config could not be saved.
  */
-int save_config_value_on_persistent_storage(const char *key, const char *value, unsigned char logging)
+int fs_save_config_value_on_persistent_storage(const char *key, const char *value)
 {
 	int rc = FAILURE;
 	ACQUIRE_THREAD_MUTEX
@@ -250,7 +250,7 @@ int save_config_value_on_persistent_storage(const char *key, const char *value, 
  * SUCCESS ==> If a config with the specified "key" was found and deleted successfully.
  * FAILURE ==> In every other case.
  */
-int delete_config_value_from_persistent_storage(const char *key)
+int fs_delete_config_value_from_persistent_storage(const char *key)
 {
 	return do_delete_config_value_from_persistent_storage(key, 1, 1);
 }
@@ -259,7 +259,7 @@ int delete_config_value_from_persistent_storage(const char *key)
 /*
  * This method releases the config, just before the system is going for a reset.
  */
-void release_config()
+void fs_release_config()
 {
 }
 
