@@ -65,7 +65,7 @@ int sg_file_write(FileSystem *fs, unsigned char* buffer, int len)
         return FAILURE;
     }
 
-    fflush(fs->fp);
+    FILE_FLUSH(fs->fp);
     return SUCCESS;
 }
 

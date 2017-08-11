@@ -859,15 +859,6 @@ static int fireResultHandlerUsingMsgIdAsTheKey(InstaMsg *c)
     return msgId;
 }
 
-#if (FILE_SYSTEM_ENABLED == 1) || (MEDIA_STREAMING_ENABLED == 1)
-static void logJsonFailureMessageAndReturn(const char *module, const char *key, MQTTMessage *msg)
-{
-    sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCould not find key [%s] in message-payload [%s] .. not proceeding further"),
-               module, key, (char*) (msg->payload));
-    error_log(LOG_GLOBAL_BUFFER);
-}
-#endif
-
 
 #if HTTP_PROXY_ENABLED == 1
 static void handleProxyMessage(InstaMsg *c, MQTTMessage *msg)
@@ -1859,7 +1850,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
 
                                 memset(messageBuffer, 0, sizeof(messageBuffer));
                                 generate_config_json(messageBuffer, SECRET, CONFIG_STRING, c->clientIdComplete, "");
-                                save_config_value_on_persistent_storage(SECRET, messageBuffer, 1);
+                                save_config_value_on_persistent_storage(SECRET, messageBuffer);
 
                                 /*
                                  * Send notification to the server, that the secret-password has been saved.
@@ -1905,7 +1896,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                         strcat(temp, c->password);
                         memset(messageBuffer, 0, sizeof(messageBuffer));
                         generate_config_json(messageBuffer, SECRET, CONFIG_STRING, temp, "");
-                        save_config_value_on_persistent_storage(SECRET, messageBuffer, 1);
+                        save_config_value_on_persistent_storage(SECRET, messageBuffer);
 
                         sg_free(temp);
 

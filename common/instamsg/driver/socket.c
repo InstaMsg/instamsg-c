@@ -111,7 +111,7 @@ void store_sms_in_config(char *sms, char *smsConfigBuffer, int smsConfigBufferLe
     		{
     			memset(bufferToUse, 0, bufferLengthToUse);
     			generate_config_json(bufferToUse, SMS, CONFIG_STRING, sms, "");
-    			save_config_value_on_persistent_storage(SMS, bufferToUse, 1);
+    			save_config_value_on_persistent_storage(SMS, bufferToUse);
 
     			sg_sprintf(LOG_GLOBAL_BUFFER, "Persisted [%s] ==> [%s]", SMS, sms);
     			info_log(LOG_GLOBAL_BUFFER);
