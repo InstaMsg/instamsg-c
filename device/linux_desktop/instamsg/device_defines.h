@@ -64,6 +64,7 @@
 #define FILE_WRITE_LINE             fwrite
 #define FILE_DELETE                 remove
 #define FILE_RENAME                 rename
+#define FILE_FLUSH                  fflush
 
 #define MAX_BUFFER_SIZE             5000
 #define READ_BUFFER_SIZE            20000
