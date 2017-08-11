@@ -69,35 +69,36 @@ int sg_file_write(FileSystem *fs, unsigned char* buffer, int len)
     return SUCCESS;
 }
 
-
+static char tempBuffer[MAX_BUFFER_SIZE];
 int sg_copyFile(FileSystem *fs, const char *oldPath, const char *newPath)
 {
-    FILE_STRUCT *fpr = NULL, *fpw = NULL;
-    int ch = 0;
+	FILE_STRUCT *src = NULL;
 
-    /*
-     * We assume that that the "oldPath" always exists.
-     */
-    fpr = FILE_OPEN(oldPath, "r");
-    fpw = FILE_OPEN(newPath, "w");
-
-    while(1)
+    src = FILE_OPEN(oldPath, "r");
+    if(src != NULL)
     {
-        ch = FILE_GETC(fpr);
-        if(ch != FILE_END_ID)
-        {
-            FILE_PUTC(ch, fpw);
-        }
-        else
-        {
-            break;
-        }
+       if(1)
+       {
+            while(1)
+            {
+                memset(tempBuffer, 0, sizeof(tempBuffer));
+                sg_readLine(src, tempBuffer, sizeof(tempBuffer));
+
+                if(strlen(tempBuffer) == 0)
+                {
+                    break;
+                }
+                else
+                {
+                	sg_appendLine(newPath, tempBuffer);
+                }
+            }
+       }
+
+       FILE_CLOSE(src);
     }
 
-    FILE_CLOSE(fpr);
-    FILE_CLOSE(fpw);
-
-    return 0;
+    return SUCCESS;
 }
 
 
