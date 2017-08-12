@@ -8,6 +8,6 @@ PKG_VERSION="2"
 /usr/bin/killall monitor.sh || true
 /usr/bin/killall instamsg || true
 
-cp energy-meter_maestro-e220_11.9.0_11.9.0 ${HOME_DIRECTORY}/instamsg
+cp energy-meter_pi_11.9.0_11.9.0 ${HOME_DIRECTORY}/instamsg
 
 
