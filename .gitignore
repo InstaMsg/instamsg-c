@@ -90,4 +90,6 @@ common/apps/energy-meter-masibus-ethernet
 common/ioeye
 common/ioeye-c
 
+common/apps/ioeye
+
 setups/linux_desktop

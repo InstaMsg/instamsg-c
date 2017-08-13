@@ -66,7 +66,7 @@ SOURCES=`echo                                                                   
 
 SOURCES=`echo ${SOURCES} | sed -e 's|VENDOR|'"${VENDOR}"'|g'`
 
-OUT_DIR="setups/${VENDOR}"
+OUT_DIR="../../ioeye-client-libs/ioeye-${VENDOR}"
 mkdir -p ${OUT_DIR}
 
 
