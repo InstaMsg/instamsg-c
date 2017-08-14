@@ -61,6 +61,18 @@ static void make_the_switch()
  */
 void fs_init_data_logger()
 {
+    /*
+     * Create the logger-file if not already.
+     */
+    FILE_STRUCT *fp = FILE_OPEN(DATA_FILE_NAME, "r");
+    if(fp == NULL)
+    {
+        sg_createEmptyFile(DATA_FILE_NAME);
+    }
+    else
+    {
+        FILE_CLOSE(fp);
+    }
 }
 
 
