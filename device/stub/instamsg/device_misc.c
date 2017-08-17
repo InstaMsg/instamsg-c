@@ -1,3 +1,5 @@
+#include "../driver/include/misc.h"
+
 /*
  * Utility-function that resets the device, bringing it into a clean, fresh state.
  */
