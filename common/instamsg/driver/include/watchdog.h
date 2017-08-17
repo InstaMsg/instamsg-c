@@ -32,10 +32,10 @@
 #ifndef INSTAMSG_WATCHDOG_COMMON
 #define INSTAMSG_WATCHDOG_COMMON
 
-void init_watchdog();
+void init_watchdog(void);
 void do_watchdog_reset_and_enable(int n, unsigned char immediate);
-void do_watchdog_disable();
-void print_rebooting_message();
+void do_watchdog_disable(void);
+void print_rebooting_message(void);
 
 extern volatile unsigned char watchdog_active;
 extern volatile unsigned char watchdog_expired;
@@ -121,6 +121,6 @@ void watchdog_disable(void * (*func)(void *), void *arg);
  * If it has, the method returns 1.
  * If not, the method returns 0.
  */
-unsigned char time_fine_for_time_limit_function();
+unsigned char time_fine_for_time_limit_function(void);
 
 #endif
