@@ -224,7 +224,7 @@ unsigned long getUTCTimeStamp()
 
 
 static DateParams dateParams;
-static void addTwoDigitField(char *buffer, int field, char *follower)
+static void addTwoDigitField(char *buffer, int field, const char *follower)
 {
     char smallBuffer[4] = {0};
 

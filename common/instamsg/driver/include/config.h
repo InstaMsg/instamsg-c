@@ -55,7 +55,6 @@ void init_config();
 int get_config_value_from_persistent_storage(const char *key, char *buffer, int maxBufferLength);
 int save_config_value_on_persistent_storage(const char *key, const char *value, unsigned char logging);
 int delete_config_value_from_persistent_storage(const char *key);
-void release_config();
 
 void fs_init_config();
 int fs_get_config_value_from_persistent_storage(const char *key, char *buffer, int maxBufferLength);

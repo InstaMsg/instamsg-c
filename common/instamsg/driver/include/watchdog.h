@@ -71,7 +71,7 @@ extern volatile unsigned char watchdog_expired;
  *      Value of 0 denotes not-immediate restart (in this case, device will be rebooted as per the case in "watchdog_disable").
  *
  */
-void watchdog_reset_and_enable(int n, char *callee, unsigned char immediate);
+void watchdog_reset_and_enable(int n, const char *callee, unsigned char immediate);
 
 
 

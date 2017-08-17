@@ -45,7 +45,7 @@ void print_rebooting_message()
 {
     if(trackString == NULL)
     {
-        trackString = "";
+        trackString = (char*) "";
     }
 
     sg_sprintf(LOG_GLOBAL_BUFFER, "Watch-Dog-Timer is RESETTING DEVICE .... due to hang at [%s]", trackString);
@@ -53,7 +53,7 @@ void print_rebooting_message()
 }
 
 
-void watchdog_reset_and_enable(int n, char *callee, unsigned char immediate)
+void watchdog_reset_and_enable(int n, const char *callee, unsigned char immediate)
 {
     watchdog_active = 1;
 

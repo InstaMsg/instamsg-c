@@ -52,13 +52,13 @@ struct DateParams
 /*
  * Global-functions callable.
  */
-void init_global_timer();
-unsigned long getMinimumDelayPossibleInMicroSeconds();
-void minimumDelay();
-unsigned long getCurrentTick();
+void init_global_timer(void);
+unsigned long getMinimumDelayPossibleInMicroSeconds(void);
+void minimumDelay(void);
+unsigned long getCurrentTick(void);
 
 #if GSM_TIME_SYNC_PRESENT == 1
-unsigned long get_GSM_timestamp();
+unsigned long get_GSM_timestamp(void);
 #endif
 
 void extract_date_params(unsigned long t, DateParams *tm, const char *mode);
@@ -66,7 +66,7 @@ int sync_system_clock(DateParams *dateParams, unsigned long seconds);
 void print_date_info(DateParams *tm, const char *mode);
 
 /* This method must be used sparingly only, definitely not every second */
-unsigned long getUTCTimeStamp();
+unsigned long getUTCTimeStamp(void);
 void getUTCTimeInDesiredFormat(char *buffer, int maxBufferLength);
 
 void getTimeInDesiredFormat(char *buffer, int maxBufferLength);

@@ -50,6 +50,8 @@
 static char sms[200];
 static unsigned char smsFetched;
 
+void replaceSmsCharacter(char *sms, char old_char, char new_char);
+
 void replaceSmsCharacter(char *sms, char old_char, char new_char)
 {
     {
