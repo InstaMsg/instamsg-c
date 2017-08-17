@@ -35,8 +35,8 @@
 /*
  * Need to be implemented by the device.
  */
-void resetDevice();
-void bootstrapInit();
+void resetDevice(void);
+void bootstrapInit(void);
 void get_client_session_data(char *messageBuffer, int maxBufferLength);
 void get_client_metadata(char *messageBuffer, int maxBufferLength);
 void get_network_data(char *messageBuffer, int maxBufferLength);
@@ -48,7 +48,7 @@ void get_device_ip_address(char *buffer, int maxbufferlength);
 /*
  * Need to be implemented by the app.
  */
-void release_app_resources();
+void release_app_resources(void);
 
 
 /*
@@ -59,7 +59,7 @@ void release_app_resources();
 void get_prov_pin_for_non_gsm_devices(char *buffer, int maxbufferlength);
 #endif
 
-void waitBeforeReboot();
+void waitBeforeReboot(void);
 void exitApp(unsigned char waitForReboot);
 
 #endif
