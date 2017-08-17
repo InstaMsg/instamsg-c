@@ -125,16 +125,10 @@ extern unsigned char GLOBAL_BUFFER[MAX_BUFFER_SIZE];
 #define NETWORK_INFO_INTERVAL           300
 extern int pingRequestInterval;
 extern int compulsorySocketReadAfterMQTTPublishInterval;
-#if MEDIA_STREAMING_ENABLED == 1
-extern int mediaStreamingEnabledRuntime;
-#endif
 
 extern char messageBuffer[MAX_BUFFER_SIZE];
 
 
-#if MEDIA_STREAMING_ENABLED == 1
-extern unsigned char mediaStreamingErrorOccurred;
-#endif
 
 #ifdef DEBUG_MODE
 extern char USER_LOG_FILE_PATH[MAX_BUFFER_SIZE];
