@@ -1,3 +1,5 @@
+#include "device_defines.h"
+
 #include "../driver/include/misc.h"
 
 /*
