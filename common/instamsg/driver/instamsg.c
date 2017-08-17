@@ -935,7 +935,6 @@ static void removeExpiredOneToOneResponseHandlers(InstaMsg *c)
 }
 
 
-static void waitForPingResp();
 void sendPingReqToServer(InstaMsg *c)
 {
     int len;
@@ -2505,7 +2504,7 @@ exit:
 }
 
 
-int publishMessageWithDeliveryGuarantee(char *topic, char *payload)
+int publishMessageWithDeliveryGuarantee(const char *topic, char *payload)
 {
     if(actuallyEnsureGuaranteeWhereRequired == 0)
     {
