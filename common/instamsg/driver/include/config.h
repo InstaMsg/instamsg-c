@@ -51,20 +51,21 @@ enum CONFIG_TYPE
 
 extern unsigned char disableSyncingWithServer;
 
-void init_config();
+void init_config(void);
 int get_config_value_from_persistent_storage(const char *key, char *buffer, int maxBufferLength);
 int save_config_value_on_persistent_storage(const char *key, const char *value, unsigned char logging);
 int delete_config_value_from_persistent_storage(const char *key);
+void release_config(void);
 
-void fs_init_config();
+void fs_init_config(void);
 int fs_get_config_value_from_persistent_storage(const char *key, char *buffer, int maxBufferLength);
 int fs_save_config_value_on_persistent_storage(const char *key, const char *value, unsigned char logging);
 int fs_delete_config_value_from_persistent_storage(const char *key);
-void fs_release_config();
+void fs_release_config(void);
 
 void generate_config_json(char *messageBuffer, const char *key, enum CONFIG_TYPE type, const char *stringified_value, const char *desc);
 void process_config(char *configJson, unsigned char persistConfig);
-void release_config();
+
 
 
 
@@ -125,8 +126,8 @@ void release_config();
 void registerEditableConfig(void *var,
                             const char *key,
                             enum CONFIG_TYPE type,
-                            char *stringified_value,
-                            char *desc);
+                            const char *stringified_value,
+                            const char *desc);
 
 
 #endif

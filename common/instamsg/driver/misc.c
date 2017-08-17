@@ -40,7 +40,6 @@
 #include "./include/time.h"
 
 extern volatile unsigned long nextBusinessLogicTick;
-extern volatile int editableBusinessLogicInterval;
 
 void waitBeforeReboot()
 {

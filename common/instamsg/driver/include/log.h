@@ -72,17 +72,17 @@ extern int currentLogLevel;
 /*
  * Logging at INFO level.
  */
-void info_log(char *log);
+void info_log(const char *log);
 
 /*
  * Logging at ERROR level.
  */
-void error_log(char *log);
+void error_log(const char *log);
 
 /*
  * Logging at DEBUG level.
  */
-void debug_log(char *log);
+void debug_log(const char *log);
 
 
 

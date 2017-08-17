@@ -34,6 +34,7 @@
 #include "include/globals.h"
 #include "include/log.h"
 #include "include/sg_mem.h"
+#include "include/json.h"
 
 #if (MAX_BUFFER_SIZE < 4000)
 #define SSL_JSON_BUFFER_SIZE            4000

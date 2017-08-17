@@ -96,7 +96,6 @@ static void reset_modem_receive_buffer()
     modemReceiveBytesSoFar = 0;
 }
 
-
 void reset_circular_buffer()
 {
 	{
@@ -264,12 +263,12 @@ struct SocketInitCommands
     /*
      * The command to run.
      */
-    char *command;
+    const char *command;
 
     /*
      * The command-response delimiter.
      */
-    char *delimiter;
+    const char *delimiter;
 
     /*
      * For logging purposes.
@@ -279,7 +278,7 @@ struct SocketInitCommands
     /*
      * Assuming that there can be a maximum of 5 such strings.
      */
-    char *successStrings[5];
+    const char *successStrings[5];
 
     /*
      * If the command-output does not contain any of the expected-strings, this command
@@ -288,7 +287,7 @@ struct SocketInitCommands
      * Ultimately, after running this command (1 or more times), the output of "command"
      * must contain one of the expected-strings.
      */
-    char *commandInCaseNoSuccessStringPresent;
+    const char *commandInCaseNoSuccessStringPresent;
 
     /*
      * A flag, so that we run the rectification-command just once.
@@ -629,7 +628,7 @@ static int setUpModem(SG_Socket *socket)
     }
     else
     {
-        sg_sprintf(commands[4].successStrings[0],"1,\"IP\",\"%s\"", socket->gsmApn);
+        sg_sprintf((char*) (commands[4].successStrings[0]),"1,\"IP\",\"%s\"", socket->gsmApn);
     }
     commands[4].successStrings[1] = NULL;
     commands[4].commandInCaseNoSuccessStringPresent = (char*)sg_malloc(MAX_BUFFER_SIZE);
@@ -642,7 +641,7 @@ static int setUpModem(SG_Socket *socket)
     }
     else
     {
-        sg_sprintf(commands[4].commandInCaseNoSuccessStringPresent, "AT+CGDCONT=1,\"IP\",\"%s\"\r",
+        sg_sprintf((char*) (commands[4].commandInCaseNoSuccessStringPresent), "AT+CGDCONT=1,\"IP\",\"%s\"\r",
                    socket->gsmApn);
     }
 
@@ -654,10 +653,10 @@ static int setUpModem(SG_Socket *socket)
 
 exit:
     if(commands[4].commandInCaseNoSuccessStringPresent)
-        sg_free(commands[4].commandInCaseNoSuccessStringPresent);
+        sg_free((char*) (commands[4].commandInCaseNoSuccessStringPresent));
 
     if(commands[4].successStrings[0])
-        sg_free(commands[4].successStrings[0]);
+        sg_free((char*) (commands[4].successStrings[0]));
 
 
     if(rc == SUCCESS)
@@ -766,7 +765,7 @@ void simcom_5360_get_latest_sms_containing_substring(SG_Socket *socket, char *bu
              */
             unsigned char newLineStart = 0;
             int i;
-            char *metadataPrefix = "+CMGR:";
+            const char *metadataPrefix = "+CMGR:";
 
             for(i = 0; i < strlen(messageBuffer); i++)
             {
@@ -890,7 +889,7 @@ static int bringUpWirelessOrReset(SG_Socket *socket)
         goto exit;
     }
 
-    sg_sprintf(commands[0].command, "AT+CSTT=\"%s\"\r", socket->gsmApn);
+    sg_sprintf((char*) (commands[0].command), "AT+CSTT=\"%s\"\r", socket->gsmApn);
     commands[0].delimiter = OK_DELIMITER;
     commands[0].logInfoCommand = "APN-Params";
     commands[0].successStrings[0] = OK_DELIMITER;
@@ -913,7 +912,7 @@ static int bringUpWirelessOrReset(SG_Socket *socket)
 
 exit:
     if(commands[0].command)
-        sg_free(commands[0].command);
+        sg_free((char*) (commands[0].command));
 
 
     if(rc == FAILURE)
@@ -958,7 +957,7 @@ static int setUpModemSocketUDP(SG_Socket *socket)
         goto exit;
     }
 
-    sg_sprintf(commands[1].command,
+    sg_sprintf((char*) (commands[1].command),
                "AT+CIPSTART=%u,\"%s\",\"%s\",\"%u\"\r", socket->socket, socket->type, socket->host, socket->port);
     commands[1].delimiter = SOCKET_CONNECTION_DELIM;
     commands[1].logInfoCommand = "UDP-Socket-Connection-To-Server";
@@ -974,7 +973,7 @@ static int setUpModemSocketUDP(SG_Socket *socket)
 
 exit:
     if(commands[1].command)
-        sg_free(commands[1].command);
+        sg_free((char*) (commands[1].command));
 
     return rc;
 }
@@ -1024,7 +1023,7 @@ static int setUpModemSocket(SG_Socket *socket)
             goto exit;
         }
 
-        sg_sprintf(commands[3].command,
+        sg_sprintf((char*) (commands[3].command),
                    "AT+CIPSTART=%u,\"%s\",\"%s\",\"%u\"\r", socket->socket, socket->type, socket->host, socket->port);
         commands[3].delimiter = SOCKET_CONNECTION_DELIM;
         commands[3].logInfoCommand = "Socket-Connection-To-Server";
@@ -1050,7 +1049,7 @@ static int setUpModemSocket(SG_Socket *socket)
             goto exit;
         }
 
-        sg_sprintf(commands[1].command,
+        sg_sprintf((char*) (commands[1].command),
                    "AT+CIPSTART=%u,\"%s\",\"%s\",\"%u\"\r", socket->socket, socket->type, socket->host, socket->port);
         commands[1].delimiter = SOCKET_CONNECTION_DELIM;
         commands[1].logInfoCommand = "Socket-Connection-To-Server";
@@ -1070,14 +1069,14 @@ exit:
     {
         if(commands[3].command)
         {
-            sg_free(commands[3].command);
+            sg_free((char*) (commands[3].command));
         }
     }
     else
     {
         if(commands[1].command)
         {
-            sg_free(commands[1].command);
+            sg_free((char*) (commands[1].command));
         }
     }
 

@@ -27,7 +27,7 @@
  *    Ajay Garg <ajay.garg@sensegrow.com>
  *******************************************************************************/
 
-
+#include "./include/hex.h"
 
 #include <string.h>
 

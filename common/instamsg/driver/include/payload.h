@@ -24,7 +24,7 @@ struct CsvMetadataInfo
 
 extern char *stringified_ioeye_data_prefix;
 
-void pre_process_payload();
+void pre_process_payload(void);
 void post_process_payload(unsigned int errorCase, void (*func)(char *, void*), void *arg);
 
 void add_port_info(char *buffer, void *arg);

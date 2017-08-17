@@ -36,9 +36,9 @@
 /*
  * Global-functions callable.
  */
-void init_serial_logger();
+void init_serial_logger(void);
 int serial_logger_write(unsigned char* buffer, int len);
-void release_serial_logger();
+void release_serial_logger(void);
 
 #endif
 

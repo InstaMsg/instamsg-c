@@ -154,6 +154,9 @@ void sendPingReqToServer(InstaMsg *c);
 
 int disconnect ();
 
+int MQTTUnsubscribe(const char* topicFilter);
+int MQTTDisconnect(InstaMsg* c);
+
 
 
 

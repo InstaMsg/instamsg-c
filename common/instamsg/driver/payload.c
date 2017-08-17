@@ -55,7 +55,7 @@ static void get_geo_tag(char *messagebuffer, int maxbufferlength)
 
 
 static void addPayloadField(char *messageBuffer,
-                            char *tag,
+                            const char *tag,
                             void (*func)(char *messageBuffer, int maxBufferLength))
 {
     memset(watchdogAssistant, 0, sizeof(watchdogAssistant));

@@ -2,6 +2,8 @@
 
 #if AT_INTERFACE_ENABLED == 1
 
+#include "../driver/include/at.h"
+
 /*
  * Initializes the AT-interface.
  */

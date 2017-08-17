@@ -130,6 +130,12 @@ int readMQTTLenString(MQTTString* mqttstring, unsigned char** pptr, unsigned cha
 void writeCString(unsigned char** pptr, const char* string);
 void writeMQTTString(unsigned char** pptr, MQTTString mqttstring);
 
+int bufchar(unsigned char* c, int count);
+int getLenStringLen(char* ptr);
+int MQTTPacket_checkVersion(MQTTString* protocol, int version);
+int MQTTSerialize_connectLength(MQTTPacket_connectData* options);
+int MQTTSerialize_zero(unsigned char* buf, int buflen, unsigned char packettype);
+
 DLLExport int MQTTPacket_read(unsigned char* buf, int buflen, int (*getfn)(unsigned char*, int));
 
 typedef struct {

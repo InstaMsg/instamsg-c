@@ -19,9 +19,9 @@ void run_simple_at_command_and_get_output_with_user_timeout(const char *command,
 /*
  * Internal-APIs.
  */
-void init_at_interface();
+void init_at_interface(void);
 void do_fire_at_command_and_get_output(const char *command, int len, char *usefulOutput, const char *delimiter);
-void release_at_interface();
+void release_at_interface(void);
 #endif
 
 #else

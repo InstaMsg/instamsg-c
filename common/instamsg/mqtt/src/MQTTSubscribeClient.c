@@ -25,6 +25,8 @@
   * @param topicFilters the array of topic filter strings to be used in the publish
   * @return the length of buffer needed to contain the serialized version of the packet
   */
+int MQTTSerialize_subscribeLength(int count, MQTTString topicFilters[]);
+
 int MQTTSerialize_subscribeLength(int count, MQTTString topicFilters[])
 {
 	int i;

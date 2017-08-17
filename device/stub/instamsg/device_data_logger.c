@@ -6,7 +6,8 @@
  *******************************************************************************/
 
 
-#include "../../../common/instamsg/driver/include/globals.h"
+#include "../driver/include/globals.h"
+#include "../driver/include/data_logger.h"
 
 /*
  * This method initializes the data-logger-interface for the device.

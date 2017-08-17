@@ -28,6 +28,8 @@
   * @param payloadlen the length of the payload to be sent
   * @return the length of buffer needed to contain the serialized version of the packet
   */
+int MQTTSerialize_publishLength(int qos, MQTTString topicName, int payloadlen);
+
 int MQTTSerialize_publishLength(int qos, MQTTString topicName, int payloadlen)
 {
 	int len = 0;

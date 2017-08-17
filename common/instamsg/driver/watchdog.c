@@ -58,7 +58,7 @@ void watchdog_reset_and_enable(int n, const char *callee, unsigned char immediat
     watchdog_active = 1;
 
     watchdog_expired = 0;
-    trackString = callee;
+    trackString = (char*) callee;
 
     do_watchdog_reset_and_enable(n, immediate);
 }

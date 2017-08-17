@@ -134,8 +134,8 @@ exit:
 void registerEditableConfig(void *var,
                             const char *key,
                             enum CONFIG_TYPE type,
-                            char *stringified_value,
-                            char *desc)
+                            const char *stringified_value,
+                            const char *desc)
 {
     int rc = FAILURE;
     unsigned char persistConfig = 1;

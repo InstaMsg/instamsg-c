@@ -50,7 +50,7 @@ int currentLogLevel;
 #if FILE_LOGGING_ENABLED == 1
 #define LOG_COMMON_CODE(log, level)                                                                     \
                                                                                                         \
-    strcat(log, "\r\n");                                                                                \
+    strcat(*char*) log, "\r\n");                                                                        \
                                                                                                         \
     if((instaMsg.serverLoggingEnabled == 1) && (level <= currentLogLevel))                              \
     {                                                                                                   \
@@ -74,7 +74,7 @@ int currentLogLevel;
 #else
 #define LOG_COMMON_CODE(log, level)                                                                     \
                                                                                                         \
-    strcat(log, "\r\n");                                                                                \
+    strcat((char*) log, "\r\n");                                                                        \
                                                                                                         \
     if((instaMsg.serverLoggingEnabled == 1) && (level <= currentLogLevel))                              \
     {                                                                                                   \
@@ -149,7 +149,7 @@ static void processServerLoggingMetadata()
 }
 
 
-void info_log(char *log)
+void info_log(const char *log)
 {
     processServerLoggingMetadata();
 
@@ -159,7 +159,7 @@ void info_log(char *log)
 }
 
 
-void error_log(char *log)
+void error_log(const char *log)
 {
     processServerLoggingMetadata();
 
@@ -169,7 +169,7 @@ void error_log(char *log)
 }
 
 
-void debug_log(char *log)
+void debug_log(const char *log)
 {
     processServerLoggingMetadata();
 

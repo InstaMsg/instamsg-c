@@ -184,6 +184,9 @@ static int statsDisplayInterval;
 unsigned int bytes_sent_over_wire;
 unsigned int bytes_received_over_wire;
 
+static void waitForPingResp(void);
+
+
 static void publishAckReceived(MQTTFixedHeaderPlusMsgId *fixedHeaderPlusMsgId)
 {
 }
