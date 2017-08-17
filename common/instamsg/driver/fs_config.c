@@ -228,7 +228,7 @@ int fs_get_config_value_from_persistent_storage(const char *key, char *buffer, i
  * SUCCESS ==> If the config was successfully saved.
  * FAILURE ==> If the config could not be saved.
  */
-int fs_save_config_value_on_persistent_storage(const char *key, const char *value)
+int fs_save_config_value_on_persistent_storage(const char *key, const char *value, unsigned char logging)
 {
 	int rc = FAILURE;
 	ACQUIRE_THREAD_MUTEX

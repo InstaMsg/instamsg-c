@@ -88,7 +88,7 @@ void process_config(char *configJson, unsigned char persistConfig)
      */
     if(persistConfig == 1)
     {
-        save_config_value_on_persistent_storage(config_key, configJson);
+        save_config_value_on_persistent_storage(config_key, configJson, 0);
     }
 
 #if FILE_SYSTEM_ENABLED == 1

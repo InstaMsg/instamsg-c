@@ -1850,7 +1850,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
 
                                 memset(messageBuffer, 0, sizeof(messageBuffer));
                                 generate_config_json(messageBuffer, SECRET, CONFIG_STRING, c->clientIdComplete, "");
-                                save_config_value_on_persistent_storage(SECRET, messageBuffer);
+                                save_config_value_on_persistent_storage(SECRET, messageBuffer, 0);
 
                                 /*
                                  * Send notification to the server, that the secret-password has been saved.
@@ -1896,7 +1896,7 @@ void readAndProcessIncomingMQTTPacketsIfAny(InstaMsg* c)
                         strcat(temp, c->password);
                         memset(messageBuffer, 0, sizeof(messageBuffer));
                         generate_config_json(messageBuffer, SECRET, CONFIG_STRING, temp, "");
-                        save_config_value_on_persistent_storage(SECRET, messageBuffer);
+                        save_config_value_on_persistent_storage(SECRET, messageBuffer, 0);
 
                         sg_free(temp);
 
