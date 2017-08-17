@@ -6,6 +6,7 @@
  *******************************************************************************/
 
 #include "../driver/include/globals.h"
+#include "../driver/include/serial_logger.h"
 
 /*
  * This method MUST connect the underlying medium (even if it means to retry continuously).

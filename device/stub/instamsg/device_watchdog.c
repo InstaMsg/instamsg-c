@@ -5,6 +5,8 @@
  *
  *******************************************************************************/
 
+#include "../driver/include/watchdog.h"
+
 /*
  * This method initializes the watchdog-timer.
  */
