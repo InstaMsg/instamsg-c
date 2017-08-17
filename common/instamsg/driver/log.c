@@ -50,7 +50,7 @@ int currentLogLevel;
 #if FILE_LOGGING_ENABLED == 1
 #define LOG_COMMON_CODE(log, level)                                                                     \
                                                                                                         \
-    strcat(*char*) log, "\r\n");                                                                        \
+    strcat((*char*) log, "\r\n");                                                                       \
                                                                                                         \
     if((instaMsg.serverLoggingEnabled == 1) && (level <= currentLogLevel))                              \
     {                                                                                                   \
