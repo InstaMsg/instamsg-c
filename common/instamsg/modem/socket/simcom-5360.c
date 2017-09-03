@@ -214,7 +214,7 @@ void serial_poller_func()
 }
 
 
-short remove_unwanted_line_with_prefix(char *usefulOutput, char *prefix)
+short remove_unwanted_line_with_prefix(char *usefulOutput, const char *prefix)
 {
     char *prefixPointer = strstr(usefulOutput, prefix);
     if(prefixPointer != NULL)

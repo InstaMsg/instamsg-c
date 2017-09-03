@@ -31,7 +31,7 @@ void simcom_5360_load_client_private_key_into_buffer(char *private_key_buffer, i
 void simcom_5360_save_client_private_key_from_buffer(char *private_key_buffer);
 
 void reset_circular_buffer(void);
-short remove_unwanted_line_with_prefix(char *usefulOutput, char *prefix);
+short remove_unwanted_line_with_prefix(char *usefulOutput, const char *prefix);
 
 
 #include "../../driver/include/watchdog.h"
