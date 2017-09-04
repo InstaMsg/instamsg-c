@@ -41,6 +41,7 @@ third_party/ti-compiler-environment
 third_party/openat
 third_party/stm32f0-environment/stlink
 third_party/philips-gateway-iar
+third_party/kritikal-gateway-workspace
 
 subscriber.sh
 filetester.sh

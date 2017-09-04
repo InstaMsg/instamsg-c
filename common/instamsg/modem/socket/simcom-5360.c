@@ -72,7 +72,7 @@ static unsigned char readNextChar()
 
     *(modemReceiveBuffer + modemReceiveBytesSoFar) = c;
     modemReceiveBytesSoFar++;
-
+	
     return c;
 }
 
@@ -127,7 +127,7 @@ static void check_if_output_desired_and_available()
         if(readResponse == 1)
         {
             unsigned char okToCheckForDelimiter = 0;
-            if( (*(response_delimiter + lengthOfDelimiter - 1) == '\n') || (strcmp((char*)response_delimiter, SOCKET_CONNECTION_DELIM) == 0) )
+            if(1)
             {
                 if(modemReceiveBytesSoFar > 0)
                 {
@@ -135,13 +135,6 @@ static void check_if_output_desired_and_available()
                     {
                         okToCheckForDelimiter = 1;
                     }
-                }
-            }
-            else
-            {
-                if(modemReceiveBytesSoFar >= lengthOfDelimiter)
-                {
-                    okToCheckForDelimiter = 1;
                 }
             }
 
@@ -217,7 +210,7 @@ void serial_poller_func()
 short remove_unwanted_line_with_prefix(char *usefulOutput, const char *prefix)
 {
     char *prefixPointer = strstr(usefulOutput, prefix);
-    if(prefixPointer != NULL)
+    if(prefixPointer == usefulOutput)
     {
         char *newLinePointer = strstr(prefixPointer, "\n");
         if(newLinePointer != NULL)

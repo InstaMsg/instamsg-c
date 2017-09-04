@@ -81,11 +81,6 @@ void serial_poller_func(void);
                 removed = removed + reply;                                                                                              \
             }                                                                                                                           \
                                                                                                                                         \
-            removed = removed + remove_unwanted_line_with_prefix(usefulOutput, "DST:");                                                 \
-            removed = removed + remove_unwanted_line_with_prefix(usefulOutput, "+CIEV:");                                               \
-            removed = removed + remove_unwanted_line_with_prefix(usefulOutput, "*PSNWID:");                                             \
-            removed = removed + remove_unwanted_line_with_prefix(usefulOutput, "+CTZV:");                                               \
-                                                                                                                                        \
             if(removed == 0)                                                                                                            \
             {                                                                                                                           \
                 break;                                                                                                                  \
@@ -97,8 +92,7 @@ void serial_poller_func(void);
 #include "../../driver/include/log.h"
 #include "../../driver/include/misc.h"
 
-#define ADD_DATA_TO_CIRCULAR_BUFFER                                                                                                     \
-        unsigned int tmp1 = 0, tmp2 = 0;                                                                                                \
+#define ADD_DATA_TO_CIRCULAR_BUFFER                                                                                                  \
                                                                                                                                         \
         circularBuffer[writeIndex + 1] = c;                                                                                             \
         circularBuffer[writeIndex] = VALID_DATA;                                                                                        \
@@ -107,11 +101,9 @@ void serial_poller_func(void);
         if(writeIndex == (2 * CIRCULAR_BUFFER_SIZE))                                                                                    \
         {                                                                                                                               \
             writeIndex = STARTING_INDEX;                                                                                                \
-        }                                                                                                                               \
+        }																																\
                                                                                                                                         \
-        tmp1 = writeIndex;                                                                                                              \
-        tmp2 = readIndex;                                                                                                               \
-        if(tmp1 == tmp2)                                                                                                                \
+        if(writeIndex == readIndex)                                                                                                     \
         {                                                                                                                               \
             sg_sprintf(LOG_GLOBAL_BUFFER, "Catastropic Overrun Error !!!!");                                                            \
             error_log(LOG_GLOBAL_BUFFER);                                                                                               \
