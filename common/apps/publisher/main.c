@@ -1,4 +1,5 @@
 #include "../../instamsg/driver/include/instamsg.h"
+#include "../../instamsg/driver/include/misc.h"
 
 char TOPIC[100];
 
