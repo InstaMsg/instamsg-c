@@ -5,6 +5,7 @@
 #ifndef INSTAMSG_AT
 #define INSTAMSG_AT
 
+extern char withoutTerminatedCommand[200];
 
 /*
  * Public-APIs.

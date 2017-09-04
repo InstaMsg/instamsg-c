@@ -289,7 +289,6 @@ struct SocketInitCommands
 };
 SocketInitCommands commands[8];
 
-
 static int runBatchCommands(const char *batchName, unsigned char giveModemSleep)
 {
     int i, j, passed, failed;
@@ -337,8 +336,13 @@ start_commands:
         sg_sprintf(LOG_GLOBAL_BUFFER, "\n\n");
         info_log(LOG_GLOBAL_BUFFER);
 
-        sg_sprintf(LOG_GLOBAL_BUFFER, COMMAND "Running [%s] for \"%s\"", i + 1, commands[i].command, commands[i].logInfoCommand);
-        info_log(LOG_GLOBAL_BUFFER);
+		{
+			memset(withoutTerminatedCommand, 0, sizeof(withoutTerminatedCommand));
+			memcpy(withoutTerminatedCommand, commands[i].command, strlen(commands[i].command) - 1);
+			
+			sg_sprintf(LOG_GLOBAL_BUFFER, COMMAND "Running [%s] for \"%s\"", i + 1, withoutTerminatedCommand, commands[i].logInfoCommand);
+			info_log(LOG_GLOBAL_BUFFER);
+		}
 
         run_simple_at_command_and_get_output(commands[i].command, strlen(commands[i].command),
                                              messageBuffer, sizeof(messageBuffer), commands[i].delimiter, 1, 0);
@@ -439,102 +443,35 @@ static unsigned char setUpModemDone;
 
 static int setUpModemMinimal(SG_Socket *socket)
 {
+	int i = -1;
+	
     /*
      * Prepare-init-commands.
      */
-    commands[0].command = "AT+IPR=9600\r";
-    commands[0].delimiter = OK_DELIMITER;
-    commands[0].logInfoCommand = "Set-Baud-Rate";
-    commands[0].successStrings[0] = OK_DELIMITER;
-    commands[0].successStrings[1] = NULL;
-    commands[0].commandInCaseNoSuccessStringPresent = NULL;
 
     /*
      */
-    commands[1].command = "AT&W\r";
-    commands[1].delimiter = OK_DELIMITER;
-    commands[1].logInfoCommand = "Persist-Baud-Rate";
-    commands[1].successStrings[0] = OK_DELIMITER;
-    commands[1].successStrings[1] = NULL;
-    commands[1].commandInCaseNoSuccessStringPresent = NULL;
+	i++;
+    commands[i].command = "AT+CPIN?\r";
+    commands[i].delimiter = OK_DELIMITER;
+    commands[i].logInfoCommand = "SIM-PIN-Ready";
+    commands[i].successStrings[0] = "READY";
+    commands[i].successStrings[1] = NULL;
+    commands[i].commandInCaseNoSuccessStringPresent = NULL;
 
     /*
      */
-    commands[2].command = "ATE0&W\r";
-    commands[2].delimiter = OK_DELIMITER;
-    commands[2].logInfoCommand = "Stop-Echo";
-    commands[2].successStrings[0] = OK_DELIMITER;
-    commands[2].successStrings[1] = NULL;
-    commands[2].commandInCaseNoSuccessStringPresent = NULL;
-
-
-    /*
-     */
-    commands[3].command = "AT+CPIN?\r";
-    commands[3].delimiter = OK_DELIMITER;
-    commands[3].logInfoCommand = "SIM-PIN-Ready";
-    commands[3].successStrings[0] = "READY";
-    commands[3].successStrings[1] = NULL;
-    commands[3].commandInCaseNoSuccessStringPresent = NULL;
-
-    /*
-     */
-    commands[4].command = NULL;
+	i++;
+    commands[i].command = NULL;
     return runBatchCommands("MODEM-SETUP-MINIMAL", 1);
-}
-
-
-static int checkGsmSyncEnabled(SG_Socket *socket)
-{
-    commands[0].command = "AT+CLTS?\r";
-    commands[0].delimiter = OK_DELIMITER;
-    commands[0].logInfoCommand = "Check-GSM-Sync-CLTS";
-    commands[0].successStrings[0] = "+CLTS: 1";
-    commands[0].successStrings[1] = NULL;
-    commands[0].commandInCaseNoSuccessStringPresent = NULL;
-
-    commands[1].command = "AT+IPR?\r";
-    commands[1].delimiter = OK_DELIMITER;
-    commands[1].logInfoCommand = "Check-GSM-Sync-IPR";
-    commands[1].successStrings[0] = "+IPR: 9600";
-    commands[1].successStrings[1] = NULL;
-    commands[1].commandInCaseNoSuccessStringPresent = NULL;
-
-    /*
-     */
-    commands[2].command = NULL;
-    return runBatchCommands("CHECK-GSM-SYNC-ENABLED", 1);
-}
-
-
-static int enableGsmSync(SG_Socket *socket)
-{
-    commands[0].command = "AT+CLTS=1\r";
-    commands[0].delimiter = OK_DELIMITER;
-    commands[0].logInfoCommand = "Enable-GSM-Sync-CLTS";
-    commands[0].successStrings[0] = OK_DELIMITER;
-    commands[0].successStrings[1] = NULL;
-    commands[0].commandInCaseNoSuccessStringPresent = NULL;
-
-    /*
-     */
-    commands[1].command = "AT&W\r";
-    commands[1].delimiter = OK_DELIMITER;
-    commands[1].logInfoCommand = "Persist-GSM-Sync";
-    commands[1].successStrings[0] = OK_DELIMITER;
-    commands[1].successStrings[1] = NULL;
-    commands[1].commandInCaseNoSuccessStringPresent = NULL;
-
-    /*
-     */
-    commands[2].command = NULL;
-    return runBatchCommands("ENABLE-AND-PERSIST-GSM-SYNC", 1);
 }
 
 
 static int setUpModem(SG_Socket *socket)
 {
     int rc = FAILURE;
+	int i = -1;
+	int sockContIndex = -1;
 
     if(setUpModemDone == 1)
     {
@@ -548,108 +485,110 @@ static int setUpModem(SG_Socket *socket)
     {
     }
 
-    if(checkGsmSyncEnabled(socket) != SUCCESS)
-    {
-        while(enableGsmSync(socket) != SUCCESS)
-        {
-        }
-
-        sg_sprintf(LOG_GLOBAL_BUFFER, "GSM-Sync-Feature has been enabled, we need to reset once ...");
-        info_log(LOG_GLOBAL_BUFFER);
-
-        resetDevice();
-    }
-
     /*
      */
-    commands[0].command = "AT+CREG?\r";
-    commands[0].delimiter = OK_DELIMITER;
-    commands[0].logInfoCommand = "SIM-Registered-To-Network";
-    commands[0].successStrings[0] = "0,1";
-    commands[0].successStrings[1] = "0,5";
-    commands[0].successStrings[2] = NULL;
-    commands[0].commandInCaseNoSuccessStringPresent = NULL;
+	i++;
+    commands[i].command = "AT+CREG?\r";
+    commands[i].delimiter = OK_DELIMITER;
+    commands[i].logInfoCommand = "SIM-Registered-To-Network";
+    commands[i].successStrings[0] = "0,1";
+    commands[i].successStrings[1] = "0,5";
+    commands[i].successStrings[2] = NULL;
+    commands[i].commandInCaseNoSuccessStringPresent = NULL;
 
 
     /*
      */
-    commands[1].command = "AT+CGATT?\r";
-    commands[1].delimiter = OK_DELIMITER;
-    commands[1].logInfoCommand = "GPRS-Attachment-State";
-    commands[1].successStrings[0] = "+CGATT: 1";
-    commands[1].successStrings[1] = NULL;
+	i++;
+    commands[i].command = "AT+CGATT?\r";
+    commands[i].delimiter = OK_DELIMITER;
+    commands[i].logInfoCommand = "GPRS-Attachment-State";
+    commands[i].successStrings[0] = "+CGATT: 1";
+    commands[i].successStrings[1] = NULL;
 #if DISABLE_EXPLICIT_PS_ATTACHMENT == 1
-    commands[1].commandInCaseNoSuccessStringPresent = NULL;
+    commands[i].commandInCaseNoSuccessStringPresent = NULL;
 #else
-    commands[1].commandInCaseNoSuccessStringPresent = "AT+CGATT=1\r";
-#endif
+    commands[i].commandInCaseNoSuccessStringPresent = "AT+CGATT=1\r";
+#endif 
 
 
     /*
      */
-    commands[2].command = "AT+CIPMUX?\r";
-    commands[2].delimiter = OK_DELIMITER;
-    commands[2].logInfoCommand = "Enable-Multi-Connection";
-    commands[2].successStrings[0] = "+CIPMUX: 1";
-    commands[2].successStrings[1] = NULL;
-    commands[2].commandInCaseNoSuccessStringPresent = "AT+CIPMUX=1\r";
-
-
-
-    /*
-     */
-    commands[3].command = "AT+CIPRXGET?\r";
-    commands[3].delimiter = OK_DELIMITER;
-    commands[3].logInfoCommand = "Enable-Data-Sync-Read";
-    commands[3].successStrings[0] = "+CIPRXGET: 1";
-    commands[3].successStrings[1] = NULL;
-    commands[3].commandInCaseNoSuccessStringPresent = "AT+CIPRXGET=1\r";
+	i++;
+    commands[i].command = "AT+CIPRXGET?\r";
+    commands[i].delimiter = OK_DELIMITER;
+    commands[i].logInfoCommand = "Enable-Data-Sync-Read";
+    commands[i].successStrings[0] = "+CIPRXGET: 1";
+    commands[i].successStrings[1] = NULL;
+    commands[i].commandInCaseNoSuccessStringPresent = "AT+CIPRXGET=1\r";
 
 
     /*
      */
-    commands[4].command = "AT+CGDCONT?\r";
-    commands[4].delimiter = OK_DELIMITER;
-    commands[4].logInfoCommand = "GPRS-Context-Correctness";
-    commands[4].successStrings[0] = (char*)sg_malloc(MAX_BUFFER_SIZE);
-    if(commands[4].successStrings[0] == NULL)
-    {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Could not allocate memory for successStrings[1] while testing for GPRS-context");
-        error_log(LOG_GLOBAL_BUFFER);
+	i++;
+	sockContIndex = i;
+    commands[i].command = (char*) sg_malloc(MAX_BUFFER_SIZE);
+	if(commands[i].command == NULL)
+	{
+		sg_sprintf(LOG_GLOBAL_BUFFER, "Could not allocate memory for CGSOCKCONT setting");
+		error_log(LOG_GLOBAL_BUFFER);
 
-        goto exit;
-    }
-    else
-    {
-        sg_sprintf((char*) (commands[4].successStrings[0]),"1,\"IP\",\"%s\"", socket->gsmApn);
-    }
-    commands[4].successStrings[1] = NULL;
-    commands[4].commandInCaseNoSuccessStringPresent = (char*)sg_malloc(MAX_BUFFER_SIZE);
-    if(commands[4].commandInCaseNoSuccessStringPresent == NULL)
-    {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Could not allocate memory for commandInCaseNoSuccessStringPresent while testing for GPRS-context");
-        error_log(LOG_GLOBAL_BUFFER);
-
-        goto exit;
-    }
-    else
-    {
-        sg_sprintf((char*) (commands[4].commandInCaseNoSuccessStringPresent), "AT+CGDCONT=1,\"IP\",\"%s\"\r",
-                   socket->gsmApn);
-    }
+		goto exit;
+	}	
+	else
+	{
+		sg_sprintf((char*) (commands[i].command), "AT+CGSOCKCONT=1,\"IP\",\"%s\"\r", socket->gsmApn);
+	}
+    commands[i].delimiter = OK_DELIMITER;
+    commands[i].logInfoCommand = "CGSOCKCONT-Setting";
+    commands[i].successStrings[0] = OK_DELIMITER;
+    commands[i].successStrings[1] = NULL;
+    commands[i].commandInCaseNoSuccessStringPresent = NULL;
+	
+	
+	/*
+     */
+	i++;
+    commands[i].command = "AT+CSOCKSETPN=1\r";
+    commands[i].delimiter = OK_DELIMITER;
+    commands[i].logInfoCommand = "CGSOCKSETPN-Setting";
+    commands[i].successStrings[0] = OK_DELIMITER;
+    commands[i].successStrings[1] = NULL;
+    commands[i].commandInCaseNoSuccessStringPresent = NULL;
+	
+	
+	/*
+     */
+	i++;
+    commands[i].command = "AT+NETOPEN\r";
+    commands[i].delimiter = "\r\n+NETOPEN:";
+    commands[i].logInfoCommand = "Open-Network";
+    commands[i].successStrings[0] = "\r\n+NETOPEN: 0\r\n";
+    commands[i].successStrings[1] = NULL;
+    commands[i].commandInCaseNoSuccessStringPresent = NULL;
+	
+	
+		/*
+     */
+	i++;
+    commands[i].command = "AT+IPADDR\r";
+    commands[i].delimiter = OK_DELIMITER;
+    commands[i].logInfoCommand = "Fetch-IP-Address";
+    commands[i].successStrings[0] = "\r\n+IPADDR: ";
+    commands[i].successStrings[1] = NULL;
+    commands[i].commandInCaseNoSuccessStringPresent = NULL;
+	
 
     /*
      */
-    commands[5].command = NULL;
+	i++;
+    commands[i].command = NULL;
     rc = runBatchCommands("MODEM-SETUP", 1);
 
 
 exit:
-    if(commands[4].commandInCaseNoSuccessStringPresent)
-        sg_free((char*) (commands[4].commandInCaseNoSuccessStringPresent));
-
-    if(commands[4].successStrings[0])
-        sg_free((char*) (commands[4].successStrings[0]));
+    if(commands[sockContIndex].command)
+        sg_free((char*) (commands[sockContIndex].command));
 
 
     if(rc == SUCCESS)
@@ -679,6 +618,9 @@ static char tempSmsBuffer[400];
 void simcom_5360_get_latest_sms_containing_substring(SG_Socket *socket, char *buffer, const char *substring)
 {
     int smsIndex = 1;
+	
+	strcpy(buffer, "{\"sg_apn\":\"www\",\"sg_user\":\"\",\"sg_pass\":\"\"}");
+	return;
 
 
 
@@ -860,71 +802,6 @@ void simcom_5360_get_latest_sms_containing_substring(SG_Socket *socket, char *bu
 }
 #endif
 
-static unsigned char bringUpWirelessOrResetDone;
-static int bringUpWirelessOrReset(SG_Socket *socket)
-{
-    int rc = FAILURE;
-
-    if(bringUpWirelessOrResetDone == 1)
-    {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "%s\"bringUpWirelessOrReset\" step already done successfully, not re-doing", SOCKET);
-        info_log(LOG_GLOBAL_BUFFER);
-
-        return SUCCESS;
-    }
-
-    commands[0].command = (char*)sg_malloc(MAX_BUFFER_SIZE);
-    if(commands[0].command == NULL)
-    {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Could not allocate memory for AT+CSTT");
-        error_log(LOG_GLOBAL_BUFFER);
-
-        goto exit;
-    }
-
-    sg_sprintf((char*) (commands[0].command), "AT+CSTT=\"%s\"\r", socket->gsmApn);
-    commands[0].delimiter = OK_DELIMITER;
-    commands[0].logInfoCommand = "APN-Params";
-    commands[0].successStrings[0] = OK_DELIMITER;
-    commands[0].successStrings[1] = NULL;
-    commands[0].commandInCaseNoSuccessStringPresent = NULL;
-
-
-    /*
-     */
-    commands[1].command = "AT+CIICR\r";
-    commands[1].delimiter = OK_DELIMITER;
-    commands[1].logInfoCommand = "Bring-Up-Wireless-Connection";
-    commands[1].successStrings[0] = OK_DELIMITER;
-    commands[1].successStrings[1] = NULL;
-    commands[1].commandInCaseNoSuccessStringPresent = NULL;
-
-
-    commands[2].command = NULL;
-    rc = runBatchCommands("BRING-UP-WIRELESS", 0);
-
-exit:
-    if(commands[0].command)
-        sg_free((char*) (commands[0].command));
-
-
-    if(rc == FAILURE)
-    {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Could not bring up wireless, nothing to live for ...");
-        info_log(LOG_GLOBAL_BUFFER);
-
-        resetDevice();
-    }
-
-    if(rc == SUCCESS)
-    {
-        bringUpWirelessOrResetDone = 1;
-    }
-
-    return rc;
-}
-
-
 static unsigned int nextConnectionNumber;
 static int setUpModemSocketUDP(SG_Socket *socket)
 {
@@ -1103,8 +980,11 @@ void simcom_5360_connect_underlying_socket_medium_try_once(SG_Socket* socket)
 
     sg_sprintf(LOG_GLOBAL_BUFFER, "MODEM INITIALIZATION DONE.");
     info_log(LOG_GLOBAL_BUFFER);
-
-    bringUpWirelessOrReset(socket);
+	
+	sg_sprintf(LOG_GLOBAL_BUFFER, "breakpoint reached baby");
+	info_log(LOG_GLOBAL_BUFFER);
+	
+	while(1);
 
     socket->socket = nextConnectionNumber;
     nextConnectionNumber++;

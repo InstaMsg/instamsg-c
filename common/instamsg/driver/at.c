@@ -5,6 +5,8 @@
 
 #include <string.h>
 
+char withoutTerminatedCommand[200];
+
 #if AT_INTERFACE_ENABLED == 1
 static void do_run_simple_at_command_and_get_output_with_timeout(const char *command, int len, char *usefulOutput, int maxBufferLimit,
                                                                  const char *delimiter, unsigned char showCommandOutput, unsigned char strip,
@@ -55,7 +57,19 @@ static void do_run_simple_at_command_and_get_output_with_timeout(const char *com
 
     if(showCommandOutput == 1)
     {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Command = [%s], Output = [%s]", command, usefulOutput);
+		int commandLength = strlen(command);
+		
+		memset(withoutTerminatedCommand, 0, sizeof(withoutTerminatedCommand));
+		if(command[commandLength - 1] == '\r')
+		{
+			memcpy(withoutTerminatedCommand, command, commandLength - 1);
+		}
+		else
+		{
+			memcpy(withoutTerminatedCommand, command, commandLength);
+		}
+		
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Command = [%s], Output = [%s]", withoutTerminatedCommand, usefulOutput);
         info_log(LOG_GLOBAL_BUFFER);
     }
 }
