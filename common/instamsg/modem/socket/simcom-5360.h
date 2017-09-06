@@ -79,7 +79,10 @@ void serial_poller_func(void);
                 }                                                                                                                       \
                                                                                                                                         \
                 removed = removed + reply;                                                                                              \
-            }                                                                                                                           \
+            }																															\
+																																		\
+			removed = removed + remove_unwanted_line_with_prefix(usefulOutput, "RECV FROM:");                                           \
+			removed = removed + remove_unwanted_line_with_prefix(usefulOutput, "+IPD");													\
                                                                                                                                         \
             if(removed == 0)                                                                                                            \
             {                                                                                                                           \

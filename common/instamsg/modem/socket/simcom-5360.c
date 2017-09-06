@@ -113,8 +113,6 @@ void reset_circular_buffer()
 }
 
 
-
-#define SOCKET_CONNECTION_DELIM     "CONNECT"
 #define BYTES_POLL_RESP_HEADER      "+CIPRXGET: 2,"
 
 static void check_if_output_desired_and_available()
@@ -151,17 +149,6 @@ static void check_if_output_desired_and_available()
 
                     if(strcmp((char*)response_delimiter, BYTES_POLL_RESP_HEADER) == 0)
                     {
-                        /*
-                         * Socket-Bytes-Reading Case
-                         */
-                        read_till_newline();
-
-                        /*
-                         * Send the bytes till newline.
-                         */
-                        memcpy((char*)responseBuffer + bytesReadTillThisIteration, modemReceiveBuffer, modemReceiveBytesSoFar);
-
-
                         {
                             char *bytesPollRespHeader = (char*)sg_memnmem((char*)responseBuffer, BYTES_POLL_RESP_HEADER,
                                                         modemReceiveBytesSoFar + bytesReadTillThisIteration, strlen(BYTES_POLL_RESP_HEADER));
@@ -210,7 +197,7 @@ void serial_poller_func()
 short remove_unwanted_line_with_prefix(char *usefulOutput, const char *prefix)
 {
     char *prefixPointer = strstr(usefulOutput, prefix);
-    if(prefixPointer == usefulOutput)
+    if(prefixPointer != NULL)
     {
         char *newLinePointer = strstr(prefixPointer, "\n");
         if(newLinePointer != NULL)
@@ -618,21 +605,9 @@ static char tempSmsBuffer[400];
 void simcom_5360_get_latest_sms_containing_substring(SG_Socket *socket, char *buffer, const char *substring)
 {
     int smsIndex = 1;
-	
-	strcpy(buffer, "{\"sg_apn\":\"www\",\"sg_user\":\"\",\"sg_pass\":\"\"}");
+	strcpy(buffer, "{\"sg_apn\":\"www\",\"sg_user\":\"\",\"sg_pass\":\"\",\"prov_pin\":\"test\"}");
 	return;
-
-
-
-    /*
-     * The modem must be set-up properly (SIM in place, etc.) for us to retrieve the sms.
-     */
-    while(setUpModem(socket) == FAILURE)
-    {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Retrying setting up modem, as we need the bootstrap sms ..");
-        info_log(LOG_GLOBAL_BUFFER);
-    }
-
+	
     /*
      * Enable retrieving of SMS.
      */
@@ -807,45 +782,7 @@ static int setUpModemSocketUDP(SG_Socket *socket)
 {
     int rc = FAILURE;
 
-    /*
-     */
-    commands[0].command = "AT+CIFSR\r";
-    commands[0].delimiter = "\r\n";
-    commands[0].logInfoCommand = "Get-IP-Address-Or-Connect-Will-Always-Fail";
-    commands[0].successStrings[0] = "\r\n";
-    commands[0].successStrings[1] = NULL;
-    commands[0].commandInCaseNoSuccessStringPresent = NULL;
-
-    /*
-     */
-    commands[1].command = (char*)sg_malloc(MAX_BUFFER_SIZE);
-    if(commands[1].command == NULL)
-    {
-        sg_sprintf(LOG_GLOBAL_BUFFER, MODEM_SOCKET "Could not allocate memory for AT+CIPSTART", socket->socket);
-        error_log(LOG_GLOBAL_BUFFER);
-
-        goto exit;
-    }
-
-    sg_sprintf((char*) (commands[1].command),
-               "AT+CIPSTART=%u,\"%s\",\"%s\",\"%u\"\r", socket->socket, socket->type, socket->host, socket->port);
-    commands[1].delimiter = SOCKET_CONNECTION_DELIM;
-    commands[1].logInfoCommand = "UDP-Socket-Connection-To-Server";
-    commands[1].successStrings[0] = "CONNECT OK\r\n";
-    commands[1].successStrings[1] = NULL;
-    commands[1].commandInCaseNoSuccessStringPresent = NULL;
-
-
-    /*
-     */
-    commands[2].command = NULL;
-    rc = runBatchCommands("UDP-MODEM-SOCKET-SETUP", 0);
-
-exit:
-    if(commands[1].command)
-        sg_free((char*) (commands[1].command));
-
-    return rc;
+	return rc;
 }
 
 
@@ -853,83 +790,42 @@ static int setUpModemSocket(SG_Socket *socket)
 {
     int rc = FAILURE;
 
-    /*
-     */
-    commands[0].command = "AT+CIFSR\r";
-    commands[0].delimiter = "\r\n";
-    commands[0].logInfoCommand = "Get-IP-Address-Or-Connect-Will-Always-Fail";
-    commands[0].successStrings[0] = "\r\n";
-    commands[0].successStrings[1] = NULL;
-    commands[0].commandInCaseNoSuccessStringPresent = NULL;
-
     if(sslEnabledAtSocketLayer == 1)
     {
-        /*
-         */
-        commands[1].command = "AT+SSLOPT=1,1\r";
-        commands[1].delimiter = OK_DELIMITER;
-        commands[1].logInfoCommand = "Set-SSL-Options";
-        commands[1].successStrings[0] = OK_DELIMITER;
-        commands[1].successStrings[1] = NULL;
-        commands[1].commandInCaseNoSuccessStringPresent = NULL;
-
-        /*
-         */
-        commands[2].command = "AT+CIPSSL=1\r";
-        commands[2].delimiter = OK_DELIMITER;
-        commands[2].logInfoCommand = "Set-SSL";
-        commands[2].successStrings[0] = OK_DELIMITER;
-        commands[2].successStrings[1] = NULL;
-        commands[2].commandInCaseNoSuccessStringPresent = NULL;
-
-        /*
-         */
-        commands[3].command = (char*)sg_malloc(MAX_BUFFER_SIZE);
-        if(commands[3].command == NULL)
-        {
-            sg_sprintf(LOG_GLOBAL_BUFFER, MODEM_SOCKET "Could not allocate memory for AT+CIPSTART", socket->socket);
-            error_log(LOG_GLOBAL_BUFFER);
-
-            goto exit;
-        }
-
-        sg_sprintf((char*) (commands[3].command),
-                   "AT+CIPSTART=%u,\"%s\",\"%s\",\"%u\"\r", socket->socket, socket->type, socket->host, socket->port);
-        commands[3].delimiter = SOCKET_CONNECTION_DELIM;
-        commands[3].logInfoCommand = "Socket-Connection-To-Server";
-        commands[3].successStrings[0] = "CONNECT OK\r\n";
-        commands[3].successStrings[1] = NULL;
-        commands[3].commandInCaseNoSuccessStringPresent = NULL;
-
-
-        /*
-         */
-        commands[4].command = NULL;
     }
     else
     {
         /*
          */
-        commands[1].command = (char*)sg_malloc(MAX_BUFFER_SIZE);
-        if(commands[1].command == NULL)
+        commands[0].command = (char*)sg_malloc(MAX_BUFFER_SIZE);
+        if(commands[0].command == NULL)
         {
-            sg_sprintf(LOG_GLOBAL_BUFFER, MODEM_SOCKET "Could not allocate memory for AT+CIPSTART", socket->socket);
+            sg_sprintf(LOG_GLOBAL_BUFFER, MODEM_SOCKET "Could not allocate memory for AT+CIPOPEN", socket->socket);
             error_log(LOG_GLOBAL_BUFFER);
 
             goto exit;
         }
 
-        sg_sprintf((char*) (commands[1].command),
-                   "AT+CIPSTART=%u,\"%s\",\"%s\",\"%u\"\r", socket->socket, socket->type, socket->host, socket->port);
-        commands[1].delimiter = SOCKET_CONNECTION_DELIM;
-        commands[1].logInfoCommand = "Socket-Connection-To-Server";
-        commands[1].successStrings[0] = "CONNECT OK\r\n";
-        commands[1].successStrings[1] = NULL;
-        commands[1].commandInCaseNoSuccessStringPresent = NULL;
+        sg_sprintf((char*) (commands[0].command),
+                   "AT+CIPOPEN=%u,\"%s\",\"%s\",%u\r", socket->socket, socket->type, socket->host, socket->port);
+        commands[0].delimiter = "+CIPOPEN: ";
+        commands[0].logInfoCommand = "Socket-Connection-To-Server";
+		commands[0].successStrings[0] = (char*)sg_malloc(MAX_BUFFER_SIZE);
+        if(commands[0].successStrings[0] == NULL)
+        {
+            sg_sprintf(LOG_GLOBAL_BUFFER, MODEM_SOCKET "Could not allocate memory for CIPOPEN socket-check", socket->socket);
+            error_log(LOG_GLOBAL_BUFFER);
+
+            goto exit;
+        }
+		
+        sg_sprintf((char*) (commands[0].successStrings[0]), "+CIPOPEN: %u,0", socket->socket);
+        commands[0].successStrings[1] = NULL;
+        commands[0].commandInCaseNoSuccessStringPresent = NULL;
 
         /*
          */
-        commands[2].command = NULL;
+        commands[1].command = NULL;
     }
 
     rc = runBatchCommands("MODEM-SOCKET-SETUP", 0);
@@ -937,16 +833,16 @@ static int setUpModemSocket(SG_Socket *socket)
 exit:
     if(sslEnabledAtSocketLayer == 1)
     {
-        if(commands[3].command)
-        {
-            sg_free((char*) (commands[3].command));
-        }
     }
     else
     {
-        if(commands[1].command)
+        if(commands[0].successStrings[0])
         {
-            sg_free((char*) (commands[1].command));
+            sg_free((char*) (commands[0].successStrings[0]));
+        }
+		if(commands[0].command)
+        {
+            sg_free((char*) (commands[0].command));
         }
     }
 
@@ -981,11 +877,6 @@ void simcom_5360_connect_underlying_socket_medium_try_once(SG_Socket* socket)
     sg_sprintf(LOG_GLOBAL_BUFFER, "MODEM INITIALIZATION DONE.");
     info_log(LOG_GLOBAL_BUFFER);
 	
-	sg_sprintf(LOG_GLOBAL_BUFFER, "breakpoint reached baby");
-	info_log(LOG_GLOBAL_BUFFER);
-	
-	while(1);
-
     socket->socket = nextConnectionNumber;
     nextConnectionNumber++;
 
@@ -1087,7 +978,7 @@ int simcom_5360_socket_read(SG_Socket* socket, unsigned char* buffer, int len, u
         }
 
         bytesSoFar = bytesSoFar + bytesActuallyRead;
-        if(bytesActuallyRead == len)
+        if(bytesSoFar == len)
         {
             bytes_received_over_wire = bytes_received_over_wire + len;
 
@@ -1149,10 +1040,10 @@ int simcom_5360_socket_write(SG_Socket* socket, unsigned char* buffer, int len)
     sg_sprintf(smallBuffer, "AT+CIPSEND=%u,%d\r", socket->socket, len);
 
     memset(receiveBuffer, 0, sizeof(receiveBuffer));
-    run_simple_at_command_and_get_output(smallBuffer, strlen(smallBuffer), receiveBuffer, sizeof(receiveBuffer), "\n>", 0, 0);
+    run_simple_at_command_and_get_output(smallBuffer, strlen(smallBuffer), receiveBuffer, sizeof(receiveBuffer), "\n", 0, 0);
 
     memset(receiveBuffer, 0, sizeof(receiveBuffer));
-    run_simple_at_command_and_get_output((char*)buffer, len, receiveBuffer, sizeof(receiveBuffer), "SEND OK\r\n", 0, 0);
+    run_simple_at_command_and_get_output((char*)buffer, len, receiveBuffer, sizeof(receiveBuffer), "\r\n+CIPSEND: ", 0, 0);
 
     if(errorObtained == 0)
     {
