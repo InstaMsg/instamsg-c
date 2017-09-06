@@ -55,17 +55,6 @@ static unsigned char returnSingleCharacter()
 }
 
 
-static unsigned char isError(const char *atResponse)
-{
-    if(strstr(atResponse, "ERROR\r\n") == NULL)
-    {
-        return 0;
-    }
-
-    return 1;
-}
-
-
 static unsigned char readNextChar()
 {
     unsigned char c = returnSingleCharacter();
@@ -74,6 +63,23 @@ static unsigned char readNextChar()
     modemReceiveBytesSoFar++;
 	
     return c;
+}
+
+
+static void readTillNewLineAndAppendToBuffer(unsigned char *buffer, int sizeSoFar)
+{
+	while(1)
+	{
+		unsigned char c = returnSingleCharacter();	
+	
+		*(buffer + sizeSoFar) = c;
+		sizeSoFar++;
+		
+		if(c == '\n')
+		{
+			break;
+		}
+	}
 }
 
 
@@ -586,26 +592,27 @@ exit:
  * Please note that this method is called by Instamsg-application, *****BEFORE***** calling
  * "connect_underlying_socket_medium_try_once".
  */
+#define SMS_STORAGE_AREA_COMMAND		"AT+CPMS=\"SM\",\"SM\",\"SM\"\r"
 #define SMS_MODE_SETTER_COMMAND         "AT+CMGF=1\r"
-static char tempSmsBuffer[400];
+
+static char tempSmsBuffer[1000];
 
 void simcom_5360_get_latest_sms_containing_substring(SG_Socket *socket, char *buffer, const char *substring)
 {
     int smsIndex = 1;
-	strcpy(buffer, "{\"sg_apn\":\"www\",\"sg_user\":\"\",\"sg_pass\":\"\",\"prov_pin\":\"test\"}");
-	return;
 	
     /*
      * Enable retrieving of SMS.
      */
-    while(1)
+    if(1)
     {
+		memset(messageBuffer, 0, sizeof(messageBuffer));
+		run_simple_at_command_and_get_output(SMS_STORAGE_AREA_COMMAND, strlen(SMS_STORAGE_AREA_COMMAND),
+											 messageBuffer, sizeof(messageBuffer), OK_DELIMITER, 1, 0);	
+											 			
+		memset(messageBuffer, 0, sizeof(messageBuffer));
         run_simple_at_command_and_get_output(SMS_MODE_SETTER_COMMAND, strlen(SMS_MODE_SETTER_COMMAND),
                                              messageBuffer, sizeof(messageBuffer), OK_DELIMITER, 1, 0);
-        if(isError(messageBuffer) == 0)
-        {
-            break;
-        }
     }
 
     while(1)
@@ -625,14 +632,23 @@ void simcom_5360_get_latest_sms_containing_substring(SG_Socket *socket, char *bu
         sg_sprintf(LOG_GLOBAL_BUFFER, "\n\nScanning SMS [%u] for Provisioning-Params", smsIndex);
         info_log(LOG_GLOBAL_BUFFER);
 
-        run_simple_at_command_and_get_output(smallBuffer, strlen(smallBuffer), messageBuffer, sizeof(messageBuffer), OK_DELIMITER, 1, 0);
-        if(isError(messageBuffer) == 1)
-        {
-            /*
-             * We stop scanning further SMSes.. if an ERROR-identifier was received as the command-output...
-             */
-            break;
-        }
+        run_simple_at_command_and_get_output(smallBuffer, strlen(smallBuffer), messageBuffer, sizeof(messageBuffer), "\r\n+C", 1, 0);
+		if(strstr(messageBuffer, "ERROR: Invalid memory index") != NULL)
+		{
+			sg_sprintf(LOG_GLOBAL_BUFFER, "No more SMSes to read ... ");
+			info_log(LOG_GLOBAL_BUFFER);
+			
+			break;
+		}
+		else
+		{
+			readTillNewLineAndAppendToBuffer((unsigned char*) messageBuffer, strlen(messageBuffer));
+			readTillNewLineAndAppendToBuffer((unsigned char*) messageBuffer, strlen(messageBuffer));
+			readTillNewLineAndAppendToBuffer((unsigned char*) messageBuffer, strlen(messageBuffer));
+		}
+		
+		sg_sprintf(LOG_GLOBAL_BUFFER, "Complete response of AT+CMGR [%s]", messageBuffer);
+		info_log(LOG_GLOBAL_BUFFER);
 
 #if 0
         /*
