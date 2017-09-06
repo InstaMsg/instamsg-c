@@ -84,7 +84,6 @@ void serial_poller_func(void);
 			removed = removed + remove_unwanted_line_with_prefix(usefulOutput, "RECV FROM:");                                           \
 			removed = removed + remove_unwanted_line_with_prefix(usefulOutput, "+IPD");													\
 			removed = removed + remove_unwanted_line_with_prefix(usefulOutput, "+IPCLOSE:");											\
-
                                                                                                                                         \
             if(removed == 0)                                                                                                            \
             {                                                                                                                           \
