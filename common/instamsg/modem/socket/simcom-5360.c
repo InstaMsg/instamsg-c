@@ -77,19 +77,6 @@ static unsigned char readNextChar()
 }
 
 
-static void read_till_newline()
-{
-    while(1)
-    {
-        unsigned char c = readNextChar();
-        if(c == '\n')
-        {
-            break;
-        }
-    }
-}
-
-
 static void reset_modem_receive_buffer()
 {
     memset(modemReceiveBuffer, 0, sizeof(modemReceiveBuffer));
