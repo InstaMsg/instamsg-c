@@ -439,6 +439,37 @@ static int setUpModemMinimal(SG_Socket *socket)
     commands[i].successStrings[1] = NULL;
     commands[i].commandInCaseNoSuccessStringPresent = NULL;
 
+
+    /*
+     */
+	i++;
+    commands[i].command = "AT+CIPRXGET=1\r";
+    commands[i].delimiter = OK_DELIMITER;
+    commands[i].logInfoCommand = "Enable-Data-Sync-Read";
+    commands[i].successStrings[0] = OK_DELIMITER;
+    commands[i].successStrings[1] = NULL;
+    commands[i].commandInCaseNoSuccessStringPresent = NULL;
+
+
+    /*
+     */
+	i++;
+    commands[i].command = "AT+CIPHEAD=0\r";
+    commands[i].delimiter = OK_DELIMITER;
+    commands[i].logInfoCommand = "Disable-IP-Header-Async-Notification";
+    commands[i].successStrings[0] = OK_DELIMITER;
+    commands[i].successStrings[1] = NULL;
+    commands[i].commandInCaseNoSuccessStringPresent = NULL;
+    /*
+     */
+	i++;
+    commands[i].command = "AT+CIPSRIP=0\r";
+    commands[i].delimiter = OK_DELIMITER;
+    commands[i].logInfoCommand = "Disable-Data-Received-Prompt";
+    commands[i].successStrings[0] = "+CIPRXGET: 1";
+    commands[i].successStrings[1] = NULL;
+    commands[i].commandInCaseNoSuccessStringPresent = NULL;
+
     /*
      */
 	i++;
@@ -490,17 +521,6 @@ static int setUpModem(SG_Socket *socket)
 #else
     commands[i].commandInCaseNoSuccessStringPresent = "AT+CGATT=1\r";
 #endif 
-
-
-    /*
-     */
-	i++;
-    commands[i].command = "AT+CIPRXGET?\r";
-    commands[i].delimiter = OK_DELIMITER;
-    commands[i].logInfoCommand = "Enable-Data-Sync-Read";
-    commands[i].successStrings[0] = "+CIPRXGET: 1";
-    commands[i].successStrings[1] = NULL;
-    commands[i].commandInCaseNoSuccessStringPresent = "AT+CIPRXGET=1\r";
 
 
     /*
