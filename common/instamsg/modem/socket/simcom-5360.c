@@ -466,7 +466,7 @@ static int setUpModemMinimal(SG_Socket *socket)
     commands[i].command = "AT+CIPSRIP=0\r";
     commands[i].delimiter = OK_DELIMITER;
     commands[i].logInfoCommand = "Disable-Data-Received-Prompt";
-    commands[i].successStrings[0] = "+CIPRXGET: 1";
+    commands[i].successStrings[0] = OK_DELIMITER;
     commands[i].successStrings[1] = NULL;
     commands[i].commandInCaseNoSuccessStringPresent = NULL;
 
