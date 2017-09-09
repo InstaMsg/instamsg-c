@@ -826,12 +826,69 @@ void simcom_5360_get_latest_sms_containing_substring(SG_Socket *socket, char *bu
 }
 #endif
 
+
 static unsigned int nextConnectionNumber;
 static int setUpModemSocketUDP(SG_Socket *socket)
 {
     int rc = FAILURE;
 
-	return rc;
+    if(0)
+    {
+    }
+    else
+    {
+        /*
+         */
+        commands[0].command = (char*)sg_malloc(MAX_BUFFER_SIZE);
+        if(commands[0].command == NULL)
+        {
+            sg_sprintf(LOG_GLOBAL_BUFFER, MODEM_SOCKET "Could not allocate memory for AT+CIPOPEN", socket->socket);
+            error_log(LOG_GLOBAL_BUFFER);
+
+            goto exit;
+        }
+
+        sg_sprintf((char*) (commands[0].command),
+                   "AT+CIPOPEN=%u,\"%s\",,,9000\r", socket->socket, socket->type);
+        commands[0].delimiter = "+CIPOPEN: ";
+        commands[0].logInfoCommand = "UDP-Socket-Connection-To-Server";
+		commands[0].successStrings[0] = (char*)sg_malloc(MAX_BUFFER_SIZE);
+        if(commands[0].successStrings[0] == NULL)
+        {
+            sg_sprintf(LOG_GLOBAL_BUFFER, MODEM_SOCKET "Could not allocate memory for CIPOPEN socket-check", socket->socket);
+            error_log(LOG_GLOBAL_BUFFER);
+
+            goto exit;
+        }
+		
+        sg_sprintf((char*) (commands[0].successStrings[0]), "+CIPOPEN: %u,0", socket->socket);
+        commands[0].successStrings[1] = NULL;
+        commands[0].commandInCaseNoSuccessStringPresent = NULL;
+
+        /*
+         */
+        commands[1].command = NULL;
+    }
+
+    rc = runBatchCommands("UDP-MODEM-SOCKET-SETUP", 0);
+
+exit:
+    if(sslEnabledAtSocketLayer == 1)
+    {
+    }
+    else
+    {
+        if(commands[0].successStrings[0])
+        {
+            sg_free((char*) (commands[0].successStrings[0]));
+        }
+		if(commands[0].command)
+        {
+            sg_free((char*) (commands[0].command));
+        }
+    }
+
+    return rc;
 }
 
 
@@ -1085,10 +1142,18 @@ int simcom_5360_socket_read(SG_Socket* socket, unsigned char* buffer, int len, u
 extern unsigned int bytes_sent_over_wire;
 int simcom_5360_socket_write(SG_Socket* socket, unsigned char* buffer, int len)
 {
-    memset(smallBuffer, 0, sizeof(smallBuffer));	
-    sg_sprintf(smallBuffer, "AT+CIPSEND=%u,%d\r", socket->socket, len);
-
+    memset(smallBuffer, 0, sizeof(smallBuffer));
     memset(receiveBuffer, 0, sizeof(receiveBuffer));
+
+    if(strcmp(socket->type, SOCKET_TCP) == 0)
+    {
+        sg_sprintf(smallBuffer, "AT+CIPSEND=%u,%d\r", socket->socket, len);
+    }
+    else
+    {
+        sg_sprintf(smallBuffer, "AT+CIPSEND=%u,%d,\"%s\",%u\r", socket->socket, len, socket->host, socket->port);
+    }
+
     run_simple_at_command_and_get_output(smallBuffer, strlen(smallBuffer), receiveBuffer, sizeof(receiveBuffer), CIPSEND_HEADER, 0, 0);
 
     memset(receiveBuffer, 0, sizeof(receiveBuffer));
