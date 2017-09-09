@@ -452,10 +452,19 @@ continue_with_next_command:
 
 
 static unsigned char setUpModemDone;
+static unsigned char minimalModemSetupDone;
 
-static int setUpModemMinimal(SG_Socket *socket)
+static int setUpModemMinimal()
 {
-	int i = -1;
+	int i = -1, rc = FAILURE;
+	
+	if(minimalModemSetupDone == 1)
+	{
+		sg_sprintf(LOG_GLOBAL_BUFFER, "\"setUpModemMinimal\" step already done successfully, not re-doing");
+		info_log(LOG_GLOBAL_BUFFER);
+		
+		return SUCCESS;
+	}
 	
     /*
      * Prepare-init-commands.
@@ -492,6 +501,8 @@ static int setUpModemMinimal(SG_Socket *socket)
     commands[i].successStrings[0] = OK_DELIMITER;
     commands[i].successStrings[1] = NULL;
     commands[i].commandInCaseNoSuccessStringPresent = NULL;
+	
+	
     /*
      */
 	i++;
@@ -501,12 +512,31 @@ static int setUpModemMinimal(SG_Socket *socket)
     commands[i].successStrings[0] = OK_DELIMITER;
     commands[i].successStrings[1] = NULL;
     commands[i].commandInCaseNoSuccessStringPresent = NULL;
+	
+	
+#if ( (SEND_GPS_LOCATION == 1) || (GPS_TIME_SYNC_PRESENT == 1) )
+	i++;
+	commands[i].command = "AT+CGPS=1,1\r";
+	commands[i].delimiter = OK_DELIMITER;
+	commands[i].logInfoCommand = "Start-GPS";
+	commands[i].successStrings[0] = OK_DELIMITER;
+	commands[i].successStrings[1] = NULL;
+	commands[i].commandInCaseNoSuccessStringPresent = NULL;
+#endif
 
     /*
      */
 	i++;
     commands[i].command = NULL;
-    return runBatchCommands("MODEM-SETUP-MINIMAL", 1);
+	
+	
+    rc =  runBatchCommands("MODEM-SETUP-MINIMAL", 1);
+	if(rc == SUCCESS)
+	{
+		minimalModemSetupDone = 1;
+	}
+	
+	return rc;
 }
 
 
@@ -652,6 +682,10 @@ static char tempSmsBuffer[1000];
 void simcom_5360_get_latest_sms_containing_substring(SG_Socket *socket, char *buffer, const char *substring)
 {
     int smsIndex = 1;
+	
+	while(setUpModemMinimal() != SUCCESS)
+	{
+	}
 	
     /*
      * Enable retrieving of SMS.

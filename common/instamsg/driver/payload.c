@@ -241,7 +241,7 @@ static void send_special_command(char *data, char *command, char *portName, char
     pre_process_payload();
     strcat(messageBuffer, data);
 
-    assignPortInfoToStructure(&portInfoArgument, portName, portAddress, "", "");
+    assignPortInfoToStructure(&portInfoArgument, portName, portAddress, (char*) "", (char*) "");
     post_process_payload(0, add_port_info, &portInfoArgument);
 }
 #endif
@@ -250,7 +250,7 @@ static void send_special_command(char *data, char *command, char *portName, char
 #if SEND_GPS_LOCATION == 1
 void ioeye_send_gps_data_to_server(char *data)
 {
-    send_special_command(data, "GPS-INFO", PORT_NAME_GPS, "");
+    send_special_command(data, (char*) "GPS-INFO", (char*) PORT_NAME_GPS, (char*) "");
 }
 #endif
 

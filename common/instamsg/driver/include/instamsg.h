@@ -157,6 +157,8 @@ int disconnect ();
 int MQTTUnsubscribe(const char* topicFilter);
 int MQTTDisconnect(InstaMsg* c);
 
+void sendGpsLocationToServer(void);
+
 
 
 
