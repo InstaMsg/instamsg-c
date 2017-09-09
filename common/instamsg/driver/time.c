@@ -224,7 +224,7 @@ unsigned long getUTCTimeStamp()
 
 
 static DateParams dateParams;
-static void addTwoDigitField(char *buffer, int field, const char *follower)
+void addTwoDigitTimeField(char *buffer, int field, const char *follower)
 {
     char smallBuffer[4] = {0};
 
@@ -253,11 +253,11 @@ void getUTCTimeInDesiredFormat(char *buffer, int maxBufferLength)
     extract_date_params(utcTimestamp, &dateParams, NULL);
 
     strcat(buffer, "20");
-    addTwoDigitField(buffer, dateParams.tm_year, "");
-    addTwoDigitField(buffer, dateParams.tm_mon, "");
-    addTwoDigitField(buffer, dateParams.tm_mday, "");
+    addTwoDigitTimeField(buffer, dateParams.tm_year, "");
+    addTwoDigitTimeField(buffer, dateParams.tm_mon, "");
+    addTwoDigitTimeField(buffer, dateParams.tm_mday, "");
     strcat(buffer, "4");
-    addTwoDigitField(buffer, dateParams.tm_hour, "");
-    addTwoDigitField(buffer, dateParams.tm_min, "");
-    addTwoDigitField(buffer, dateParams.tm_sec, "");
+    addTwoDigitTimeField(buffer, dateParams.tm_hour, "");
+    addTwoDigitTimeField(buffer, dateParams.tm_min, "");
+    addTwoDigitTimeField(buffer, dateParams.tm_sec, "");
 }

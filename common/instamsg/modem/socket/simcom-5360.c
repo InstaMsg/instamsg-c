@@ -123,7 +123,7 @@ static void check_if_output_desired_and_available()
             {
                 if(modemReceiveBytesSoFar > 0)
                 {
-					if(strcmp(response_delimiter, CIPSEND_HEADER) == 0)
+					if(strcmp((char*) response_delimiter, CIPSEND_HEADER) == 0)
 					{
 						if(
 							(*(modemReceiveBuffer + modemReceiveBytesSoFar - 1) == '>') &&
@@ -188,9 +188,9 @@ static void check_if_output_desired_and_available()
 
                     readResponse = 0;
                 }
-				else if(strcmp(response_delimiter, BYTES_POLL_RESP_HEADER) == 0)
+				else if(strcmp((char*) response_delimiter, BYTES_POLL_RESP_HEADER) == 0)
 				{
-					char *errorId = "\r\nERROR\r\n";
+					const char *errorId = "\r\nERROR\r\n";
 					
 					char *ptr = (char*)sg_memnmem(modemReceiveBuffer, errorId, modemReceiveBytesSoFar, strlen(errorId));
 					if(ptr != NULL)
