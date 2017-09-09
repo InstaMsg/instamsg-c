@@ -1,5 +1,7 @@
 #include "device_serial.h"
 
+#include "../../ioeye/include/serial.h"
+
 
 /*
  * This method initializes and connects to the serial-interface.
