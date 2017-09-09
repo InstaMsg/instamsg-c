@@ -195,6 +195,12 @@ static void check_if_output_desired_and_available()
 					char *ptr = (char*)sg_memnmem(modemReceiveBuffer, errorId, modemReceiveBytesSoFar, strlen(errorId));
 					if(ptr != NULL)
 					{
+                        /*
+                         * Send the bytes so-far to response-buffer.
+                         */
+                        memcpy((void*)responseBuffer, modemReceiveBuffer, modemReceiveBytesSoFar);
+                        reset_modem_receive_buffer();
+
 						bytesActuallyRead = 0;
 						bytesStartReading = 0;
 						readResponse = 0;
