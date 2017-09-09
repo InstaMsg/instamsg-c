@@ -107,6 +107,7 @@ void reset_circular_buffer()
 
 
 #define BYTES_POLL_RESP_HEADER      "+CIPRXGET: 2,"
+#define CIPSEND_HEADER				"\n>"
 
 static void check_if_output_desired_and_available()
 {
@@ -122,10 +123,23 @@ static void check_if_output_desired_and_available()
             {
                 if(modemReceiveBytesSoFar > 0)
                 {
-                    if(*(modemReceiveBuffer + modemReceiveBytesSoFar - 1) == '\n')
-                    {
-                        okToCheckForDelimiter = 1;
-                    }
+					if(strcmp(response_delimiter, CIPSEND_HEADER) == 0)
+					{
+						if(
+							(*(modemReceiveBuffer + modemReceiveBytesSoFar - 1) == '>') &&
+							(*(modemReceiveBuffer + modemReceiveBytesSoFar - 2) == '\n')
+						  )
+						  {
+							  okToCheckForDelimiter = 1;
+						  }
+					}
+					else
+					{						
+						if(*(modemReceiveBuffer + modemReceiveBytesSoFar - 1) == '\n')
+						{
+							okToCheckForDelimiter = 1;
+						}
+					}
                 }
             }
 
@@ -174,6 +188,18 @@ static void check_if_output_desired_and_available()
 
                     readResponse = 0;
                 }
+				else if(strcmp(response_delimiter, BYTES_POLL_RESP_HEADER) == 0)
+				{
+					char *errorId = "\r\nERROR\r\n";
+					
+					char *ptr = (char*)sg_memnmem(modemReceiveBuffer, errorId, modemReceiveBytesSoFar, strlen(errorId));
+					if(ptr != NULL)
+					{
+						bytesActuallyRead = 0;
+						bytesStartReading = 0;
+						readResponse = 0;
+					}
+				}
             }
         }
     }
@@ -1059,11 +1085,11 @@ int simcom_5360_socket_read(SG_Socket* socket, unsigned char* buffer, int len, u
 extern unsigned int bytes_sent_over_wire;
 int simcom_5360_socket_write(SG_Socket* socket, unsigned char* buffer, int len)
 {
-    memset(smallBuffer, 0, sizeof(smallBuffer));
+    memset(smallBuffer, 0, sizeof(smallBuffer));	
     sg_sprintf(smallBuffer, "AT+CIPSEND=%u,%d\r", socket->socket, len);
 
     memset(receiveBuffer, 0, sizeof(receiveBuffer));
-    run_simple_at_command_and_get_output(smallBuffer, strlen(smallBuffer), receiveBuffer, sizeof(receiveBuffer), "\n", 0, 0);
+    run_simple_at_command_and_get_output(smallBuffer, strlen(smallBuffer), receiveBuffer, sizeof(receiveBuffer), CIPSEND_HEADER, 0, 0);
 
     memset(receiveBuffer, 0, sizeof(receiveBuffer));
     run_simple_at_command_and_get_output((char*)buffer, len, receiveBuffer, sizeof(receiveBuffer), "\r\n+CIPSEND: ", 0, 0);
