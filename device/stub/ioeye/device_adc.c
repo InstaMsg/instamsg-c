@@ -2,6 +2,9 @@
 
 #include "./device_adc.h"
 
+#include "../../ioeye/include/adc.h"
+
+
 /*
  * This method initializes and connects to the ADC-interface.
  */
