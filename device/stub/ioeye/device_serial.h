@@ -2,7 +2,6 @@
 #define IOEYE_SERIAL
 
 #include "../../../common/instamsg/driver/include/globals.h"
-#include "../../../common/ioeye/include/globals.h"
 
 #include "device_socket.h"
 
