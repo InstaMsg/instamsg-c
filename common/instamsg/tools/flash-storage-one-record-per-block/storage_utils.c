@@ -19,8 +19,7 @@
 #define MEMORY_FORMATTED_IDENTIFIER                                         'y'
 
 volatile unsigned char persistent_storage_initialized;
-static unsigned char tempBuffer[MAX_RECORD_SIZE_BYTES];
-
+static unsigned char tempBuffer[OPERATING_SECTOR_SIZE];
 
 /*
  *
@@ -33,13 +32,13 @@ static unsigned char tempBuffer[MAX_RECORD_SIZE_BYTES];
  **************************   BOUNDARY WALL BETWEEN LOWER AND MIDDLE LAYER ********************************
  *********************************************************************************************************/
 
-static void write_record_at_address(unsigned long address, unsigned char *buffer, int len)
+static void write_record_at_address(unsigned int address, unsigned char *buffer, int len)
 {
     /* TODO: CORE RECORD-WRITE CODE GOES HERE */
 }
 
 
-static void read_record_at_address(unsigned long address, unsigned char *buffer, int len)
+static void read_record_at_address(unsigned int address, unsigned char *buffer, int len)
 {
     /* TODO: CORE RECORD-READ CODE GOES HERE */
 }
@@ -102,7 +101,6 @@ static void write_record(int recordNumber, unsigned char *buffer, unsigned short
 static unsigned short read_record(int recordNumber, unsigned char *buffer)
 {
     unsigned char *tmp = tempBuffer;
-
     unsigned short len = 0;
 
     /*
@@ -111,15 +109,24 @@ static unsigned short read_record(int recordNumber, unsigned char *buffer)
     {
         unsigned char *ptr = (unsigned char*) &len;
 
-        read_record_at_address(recordNumber * MAX_RECORD_SIZE_BYTES, tmp, OPERATING_SECTOR_SIZE);
+        read_record_at_address(recordNumber * MAX_RECORD_SIZE_BYTES, tmp, 2);
         *ptr        = tmp[0];
         *(ptr + 1)  = tmp[1];
 
-        memcpy(buffer, tmp + 2, len);
-        return len;
+		read_record_at_address(recordNumber * MAX_RECORD_SIZE_BYTES, tmp, len + 2);
+		memcpy(buffer, tmp + 2, len);
     }
 
     return len;
+}
+
+
+static void read_mbr(int recordNumber, unsigned char *buffer)
+{
+    unsigned char *tmp = tempBuffer;
+
+    read_record_at_address(recordNumber * MAX_RECORD_SIZE_BYTES, tmp, 7);
+	memcpy(buffer, tmp + 2, 5);
 }
 
 
@@ -128,15 +135,12 @@ static unsigned short getRecordSize(unsigned short recordNumber)
     unsigned short c;
     unsigned char *ptr = (unsigned char*) &c;
 
-    /*
-     * Using LOG_GLOBAL_BUFFER to save RAM.
-     */
-    read_record_at_address(recordNumber * MAX_RECORD_SIZE_BYTES, (unsigned char*)LOG_GLOBAL_BUFFER, 2);
+    read_record_at_address(recordNumber * MAX_RECORD_SIZE_BYTES, (unsigned char*) LOG_GLOBAL_BUFFER, 2);
 
-    *ptr        = ((unsigned char*)LOG_GLOBAL_BUFFER)[0];
-    *(ptr + 1) 	= ((unsigned char*)LOG_GLOBAL_BUFFER)[1];
+    *ptr        = ((unsigned char*) LOG_GLOBAL_BUFFER)[0];
+    *(ptr + 1) 	= ((unsigned char*) LOG_GLOBAL_BUFFER)[1];
 
-    memset(LOG_GLOBAL_BUFFER, 0, sizeof(LOG_GLOBAL_BUFFER));
+	memset(LOG_GLOBAL_BUFFER, 0, sizeof(LOG_GLOBAL_BUFFER));
     return c;
 }
 
@@ -159,7 +163,7 @@ void write_mbr(unsigned short readNumber, unsigned short writeNumber)
         small[3] = *ptr;
         small[4] = *(ptr + 1);
 
-        write_record(0, small, 5);
+        write_record(MBR_INDEX, small, 5);
     }
 
     sg_sprintf(LOG_GLOBAL_BUFFER, "Done\n");
@@ -172,7 +176,7 @@ void read_next_read_and_write_record_number_values(unsigned short *readNumber, u
     unsigned char *ptr;
     unsigned char small[10] = {0};
 
-    read_record(0, small);
+    read_record(MBR_INDEX, small);
 
     ptr = (unsigned char*) readNumber;
     *ptr        = small[1];
@@ -230,6 +234,7 @@ void init_persistent_storage()
     }
 
     spi_flash_init();
+	startAndCountdownTimer(3, 1);
 
      /*
       * We use the first-record of SPI-FLash as the MBR.
@@ -238,7 +243,7 @@ void init_persistent_storage()
       * If it is, it means that the memory has been initialized once fine.
       */
 
-    read_record(0, (unsigned char*)LOG_GLOBAL_BUFFER);
+    read_mbr(MBR_INDEX, (unsigned char*)LOG_GLOBAL_BUFFER);
 
     {
         unsigned char byte = LOG_GLOBAL_BUFFER[0];
@@ -264,7 +269,7 @@ void init_persistent_storage()
             /*
              * Erase the data-pages.
              */
-            for(i = 1; i < MAX_RECORDS; i++)
+            for(i = MBR_INDEX; i < MAX_RECORDS; i++)
             {
                 sg_sprintf(LOG_GLOBAL_BUFFER, "Erasing Page [%u]", i);
                 info_log(LOG_GLOBAL_BUFFER);
