@@ -62,15 +62,6 @@ void save_record_to_persistent_storage(char *record)
     write_record_on_persistent_storage(nextWriteNumber, record, DATA_TYPE);
 
     /*
-     * If we have just written the record which was actually about to be read next, that means it has been overwritten.
-     * Advance the read-pointer.
-     */
-    if(nextWriteNumber == nextReadNumber)
-    {
-        nextReadNumber++;
-    }
-
-    /*
      * If till this point, there was no record to be read, so point the read-pointer to the just-written record.
      */
     if(nextReadNumber == NO_MORE_RECORD_TO_READ)
