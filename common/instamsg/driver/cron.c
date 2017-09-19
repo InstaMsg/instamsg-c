@@ -40,7 +40,7 @@
 #define DUMMY_VALUE         100
 static struct CronParams cronParams;
 
-static int processParsedCronField(char *cron, char *field, char *field_desc, struct dateFieldRange *cronParam)
+static int processParsedCronField(char *cron, char *field, const char *field_desc, struct dateFieldRange *cronParam)
 {
     if(1)
     {
