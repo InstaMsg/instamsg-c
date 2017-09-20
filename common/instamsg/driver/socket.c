@@ -588,76 +588,8 @@ static void init_ssl()
 #endif
 
 
-void init_socket(SG_Socket *socket, const char *hostName, unsigned int port, const char *type, unsigned char secure)
+void fetch_gprs_params_from_sms(SG_Socket *socket)
 {
-    if(port == 0)
-    {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "port is 0 in init_socket.. bye ..");
-        error_log(LOG_GLOBAL_BUFFER);
-
-        resetDevice();
-    }
-
-
-    socket->socketCorrupted = 1;
-
-#if SSL_ENABLED == 1
-    if(ssl_init_try_once_done == 0)
-    {
-        init_ssl();
-        ssl_init_try_once_done = 1;
-    }
-
-    if(ssl_init_successful == 0)
-    {
-        return;
-    }
-
-    socket->ssl = SSL_new(solitary_ssl_ctx);
-    if(socket->ssl == NULL)
-    {
-        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("SSL_new"), 0)
-    }
-
-    if (!BIO_new_bio_pair(&(socket->inter_bio), WIRE_BUFFER_SIZE, &(socket->network_bio), WIRE_BUFFER_SIZE))
-    {
-        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("BIO_new_bio_pair"), 0)
-    }
-
-    socket->ssl_bio = BIO_new(BIO_f_ssl());
-    if (!(socket->ssl_bio))
-    {
-        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("BIO_new"), 0)
-    }
-
-    SSL_set_connect_state(socket->ssl);
-    SSL_set_bio(socket->ssl, socket->inter_bio, socket->inter_bio);
-    BIO_set_ssl(socket->ssl_bio, socket->ssl, BIO_NOCLOSE);
-#endif
-
-    if((secure == 1) && (sslEnabledAtAppLayer == 1))
-    {
-#if SSL_ENABLED == 1
-	    socket->read = secure_socket_read;
-	    socket->write = secure_socket_write;
-#else
-        socket->read = socket_read;
-        socket->write = socket_write;
-#endif
-    }
-    else
-    {
-        socket->read = socket_read;
-        socket->write = socket_write;
-    }
-
-
-    /* Keep a copy of connection-parameters, for easy book-keeping. */
-    memset(socket->host, 0, sizeof(socket->host));
-    sg_sprintf(socket->host, "%s", hostName);
-    socket->port = port;
-    socket->type = (char*) type;
-
 #if GSM_INTERFACE_ENABLED == 1
     /* Empty-initialize the GSM-params. */
     memset(socket->gsmApn, 0, sizeof(socket->gsmApn));
@@ -766,7 +698,82 @@ sms_already_fetched:
 
     startAndCountdownTimer(3, 0);
 #endif
+}
 
+
+void init_socket(SG_Socket *socket, const char *hostName, unsigned int port, const char *type, unsigned char secure)
+{
+    if(port == 0)
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, "port is 0 in init_socket.. bye ..");
+        error_log(LOG_GLOBAL_BUFFER);
+
+        resetDevice();
+    }
+
+
+    socket->socketCorrupted = 1;
+
+#if SSL_ENABLED == 1
+    if(ssl_init_try_once_done == 0)
+    {
+        init_ssl();
+        ssl_init_try_once_done = 1;
+    }
+
+    if(ssl_init_successful == 0)
+    {
+        return;
+    }
+
+    socket->ssl = SSL_new(solitary_ssl_ctx);
+    if(socket->ssl == NULL)
+    {
+        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("SSL_new"), 0)
+    }
+
+    if (!BIO_new_bio_pair(&(socket->inter_bio), WIRE_BUFFER_SIZE, &(socket->network_bio), WIRE_BUFFER_SIZE))
+    {
+        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("BIO_new_bio_pair"), 0)
+    }
+
+    socket->ssl_bio = BIO_new(BIO_f_ssl());
+    if (!(socket->ssl_bio))
+    {
+        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("BIO_new"), 0)
+    }
+
+    SSL_set_connect_state(socket->ssl);
+    SSL_set_bio(socket->ssl, socket->inter_bio, socket->inter_bio);
+    BIO_set_ssl(socket->ssl_bio, socket->ssl, BIO_NOCLOSE);
+#endif
+
+    if((secure == 1) && (sslEnabledAtAppLayer == 1))
+    {
+#if SSL_ENABLED == 1
+	    socket->read = secure_socket_read;
+	    socket->write = secure_socket_write;
+#else
+        socket->read = socket_read;
+        socket->write = socket_write;
+#endif
+    }
+    else
+    {
+        socket->read = socket_read;
+        socket->write = socket_write;
+    }
+
+
+    /* Keep a copy of connection-parameters, for easy book-keeping. */
+    memset(socket->host, 0, sizeof(socket->host));
+    sg_sprintf(socket->host, "%s", hostName);
+    socket->port = port;
+    socket->type = (char*) type;
+
+#ifndef ETHERNET_AS_FIRST_PRIORITY
+    fetch_gprs_params_from_sms(socket);
+#endif
 
     /* Connect the medium (socket). */
     watchdog_reset_and_enable(SOCKET_CONNECTION_SOLITARY_ATTEMPT_MAX_ALLOWED_TIME_SECONDS, "TRYING-SOCKET-CONNECTION-SOLITARY-ATTEMPT", 1);

@@ -59,6 +59,7 @@
  * Global-functions callable.
  */
 void init_socket(SG_Socket *socket, const char *hostName, unsigned int port, const char *type, unsigned char secure);
+void fetch_gprs_params_from_sms(socket);
 void release_socket(SG_Socket *socket);
 
 
