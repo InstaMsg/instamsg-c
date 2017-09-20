@@ -776,9 +776,7 @@ void init_socket(SG_Socket *socket, const char *hostName, unsigned int port, con
 #endif
 
     /* Connect the medium (socket). */
-    watchdog_reset_and_enable(SOCKET_CONNECTION_SOLITARY_ATTEMPT_MAX_ALLOWED_TIME_SECONDS, "TRYING-SOCKET-CONNECTION-SOLITARY-ATTEMPT", 1);
     connect_underlying_socket_medium_try_once(socket);
-    watchdog_disable(NULL, NULL);
 }
 
 
