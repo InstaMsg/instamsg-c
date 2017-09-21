@@ -773,10 +773,15 @@ void init_socket(SG_Socket *socket, const char *hostName, unsigned int port, con
 
 #ifndef ETHERNET_AS_FIRST_PRIORITY
     fetch_gprs_params_from_sms(socket);
+    watchdog_reset_and_enable(SOCKET_CONNECTION_SOLITARY_ATTEMPT_MAX_ALLOWED_TIME_SECONDS, "TRYING-SOCKET-CONNECTION-SOLITARY-ATTEMPT", 1);
 #endif
 
     /* Connect the medium (socket). */
     connect_underlying_socket_medium_try_once(socket);
+
+#ifndef ETHERNET_AS_FIRST_PRIORITY
+    watchdog_disable(NULL, NULL);
+#endif
 }
 
 
