@@ -578,11 +578,7 @@ static int setUpModem(SG_Socket *socket)
     commands[i].logInfoCommand = "GPRS-Attachment-State";
     commands[i].successStrings[0] = "+CGATT: 1";
     commands[i].successStrings[1] = NULL;
-#if DISABLE_EXPLICIT_PS_ATTACHMENT == 1
     commands[i].commandInCaseNoSuccessStringPresent = NULL;
-#else
-    commands[i].commandInCaseNoSuccessStringPresent = "AT+CGATT=1\r";
-#endif 
 
 
     /*
@@ -630,17 +626,6 @@ static int setUpModem(SG_Socket *socket)
     commands[i].commandInCaseNoSuccessStringPresent = NULL;
 	
 	
-		/*
-     */
-	i++;
-    commands[i].command = "AT+IPADDR\r";
-    commands[i].delimiter = OK_DELIMITER;
-    commands[i].logInfoCommand = "Fetch-IP-Address";
-    commands[i].successStrings[0] = "\r\n+IPADDR: ";
-    commands[i].successStrings[1] = NULL;
-    commands[i].commandInCaseNoSuccessStringPresent = NULL;
-	
-
     /*
      */
 	i++;
