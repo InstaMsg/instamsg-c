@@ -473,17 +473,6 @@ static int setUpModemMinimal()
     /*
      */
 	i++;
-    commands[i].command = "AT+CPIN?\r";
-    commands[i].delimiter = OK_DELIMITER;
-    commands[i].logInfoCommand = "SIM-PIN-Ready";
-    commands[i].successStrings[0] = "READY";
-    commands[i].successStrings[1] = NULL;
-    commands[i].commandInCaseNoSuccessStringPresent = NULL;
-
-
-    /*
-     */
-	i++;
     commands[i].command = "AT+CIPRXGET=1\r";
     commands[i].delimiter = OK_DELIMITER;
     commands[i].logInfoCommand = "Enable-Data-Sync-Read";
