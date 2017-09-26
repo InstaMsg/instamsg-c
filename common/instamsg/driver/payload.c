@@ -258,6 +258,6 @@ void ioeye_send_gps_data_to_server(char *data)
 #if SEND_GPIO_INFORMATION == 1
 void ioeye_send_gpio_data_to_server(char *data)
 {
-    send_special_command(data, "GPIO-INFO", PORT_NAME_GPIO, "");
+    send_special_command(data, (char*) "GPIO-INFO", (char*) PORT_NAME_GPIO, (char*) "");
 }
 #endif
