@@ -47,12 +47,15 @@
 #define SG_PASS         PROSTR("sg_pass")
 #define SG_PIN          PROSTR("sg_pin")
 #define PROV_PIN        PROSTR("prov_pin")
+#define SG_MODE			PROSTR("sg_mode")
 
 #define SMS_FILE        PROSTR("/home/sensegrow/sms.txt")
 #define SMS_TEMP_FILE   PROSTR("/home/sensegrow/sms_temp.txt")
 
 #define SSL_STR         PROSTR("[SSL] ")
 #define SSL_ERROR_STR   PROSTR("[SSL_ERROR] ")
+
+#define SMS     PROSTR("SMS")
 
 
 /*

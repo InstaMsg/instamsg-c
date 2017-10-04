@@ -43,11 +43,10 @@
 #include "./include/sg_openssl/err.h"
 #endif
 
-#define SMS     PROSTR("SMS")
 
 #if GSM_INTERFACE_ENABLED == 1
 
-static char sms[200];
+char sms[200];
 static unsigned char smsFetched;
 
 void replaceSmsCharacter(char *sms, char old_char, char new_char);
@@ -597,6 +596,7 @@ void fetch_gprs_params_from_sms(SG_Socket *socket)
     memset(socket->gsmPass, 0, sizeof(socket->gsmPass));
     memset(socket->gsmPin, 0, sizeof(socket->gsmPin));
     memset(socket->provPin, 0, sizeof(socket->provPin));
+	memset(socket->gsmMode, 0, sizeof(socket->gsmMode));
 
     if(smsFetched == 1)
     {
@@ -685,6 +685,7 @@ sms_already_fetched:
     getJsonKeyValueIfPresent(sms, SG_PASS, socket->gsmPass);
     getJsonKeyValueIfPresent(sms, SG_PIN, socket->gsmPin);
     getJsonKeyValueIfPresent(sms, PROV_PIN, socket->provPin);
+	getJsonKeyValueIfPresent(sms, SG_MODE, socket->gsmMode);
 
 #if 0
     memset(socket->gsmApn, 0, sizeof(socket->gsmApn));
