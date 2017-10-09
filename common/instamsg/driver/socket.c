@@ -693,8 +693,8 @@ sms_already_fetched:
 #endif
 
     sg_sprintf(LOG_GLOBAL_BUFFER,
-               PROSTR("\n\nProvisioning-Params ::  sg_apn : [%s], sg_user : [%s], sg_pass : [%s], sg_pin : [%s], prov_pin : [%s]\n\n"),
-               socket->gsmApn, socket->gsmUser, socket->gsmPass, socket->gsmPin, socket->provPin);
+               PROSTR("\n\nProvisioning-Params ::  sg_apn : [%s], sg_user : [%s], sg_pass : [%s], sg_pin : [%s], prov_pin : [%s], sg_mode : [%s]\n\n"),
+               socket->gsmApn, socket->gsmUser, socket->gsmPass, socket->gsmPin, socket->provPin, socket->gsmMode);
     info_log(LOG_GLOBAL_BUFFER);
 
     startAndCountdownTimer(3, 0);
