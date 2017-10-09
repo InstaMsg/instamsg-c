@@ -1033,7 +1033,7 @@ static int setUpModemSocket(SG_Socket *socket)
         }
 
         sg_sprintf((char*) (commands[0].command),
-                   "AT+CIPOPEN=%u,\"%s\",\"%s\",%u\r", socket->socket, socket->type, socket->host, 12345);
+                   "AT+CIPOPEN=%u,\"%s\",\"%s\",%u\r", socket->socket, socket->type, socket->host, socket->port);
         commands[0].delimiter = "+CIPOPEN: ";
         commands[0].logInfoCommand = "Socket-Connection-To-Server";
 		commands[0].successStrings[0] = (char*)sg_malloc(MAX_BUFFER_SIZE);
