@@ -11,6 +11,8 @@
 #include "../driver/include/sg_stdlib.h"
 #include "../driver/include/misc.h"
 #include "../driver/include/socket.h"
+#include "../driver/include/config.h"
+#include "../driver/include/json.h"
 
 
 char modemReceiveBuffer[MAX_BUFFER_SIZE];
@@ -32,6 +34,11 @@ volatile char *response_delimiter;
 volatile unsigned int writeIndex;
 volatile unsigned int readIndex;
 volatile unsigned char circularBuffer[2 * CIRCULAR_BUFFER_SIZE];
+
+#define SIM_CHECKER_CMD				"AT+CPIN?\r"
+
+#define SIM_SLOT_INDEX				"SIM_SLOT_INDEX"
+static char simSlotBuffer[500];
 
 static unsigned char returnSingleCharacter()
 {
@@ -63,6 +70,19 @@ static unsigned char readNextChar()
     modemReceiveBytesSoFar++;
 	
     return c;
+}
+
+
+static void read_till_newline()
+{
+	while(1)
+	{
+		unsigned char c = returnSingleCharacter();
+		if(c == '\n')
+		{
+			break;
+		}
+	}
 }
 
 
@@ -301,6 +321,64 @@ struct SocketInitCommands
 };
 SocketInitCommands commands[8];
 
+
+static void switch_sim_slot(unsigned char rebootImmediately)
+{
+	if(1)
+	{
+		int rc = FAILURE;
+		int index = 0;
+								
+		memset(simSlotBuffer, 0, sizeof(simSlotBuffer));
+		rc = get_config_value_from_persistent_storage(SIM_SLOT_INDEX, simSlotBuffer, sizeof(simSlotBuffer));
+								
+		if(rc == SUCCESS)
+		{
+			char small[4] = {0};
+			getJsonKeyValueIfPresent(simSlotBuffer, CONFIG_VALUE_KEY, small);
+									
+			index = sg_atoi(small);		
+		}
+								
+							
+		watchdog_active = 0;
+						
+		{
+			char command[50] = {0};
+			memset(simSlotBuffer, 0, sizeof(simSlotBuffer));
+										
+			sg_sprintf(command, "AT+CGSETV=44,%u,1\r", index ^ 1);
+								
+			sg_sprintf(LOG_GLOBAL_BUFFER, "Firing command [%s]", command);
+			info_log(LOG_GLOBAL_BUFFER);
+									
+			run_simple_at_command_and_get_output(command, strlen(command), simSlotBuffer, sizeof(simSlotBuffer), OK_DELIMITER, 1, 1);
+																			 
+			/*
+			Save the toggled index on config.
+			*/
+									
+			memset(simSlotBuffer, 0, sizeof(simSlotBuffer));
+									
+			{
+				char small[4] = {0};
+				sg_sprintf(small, "%u", index ^ 1);
+		
+				generate_config_json(simSlotBuffer, SIM_SLOT_INDEX, CONFIG_INT, small, "");
+				save_config_value_on_persistent_storage(SIM_SLOT_INDEX, simSlotBuffer, 0);
+			}
+		}
+
+		startAndCountdownTimer(1, 1);
+		
+		if(rebootImmediately == 1)
+		{
+			resetDevice();
+		}
+	}
+}
+
+
 static int runBatchCommands(const char *batchName, unsigned char giveModemSleep)
 {
     int i, j, passed, failed;
@@ -386,6 +464,14 @@ start_commands:
                     {
                         sg_sprintf(LOG_GLOBAL_BUFFER, COMMAND "\"%s\" Failed :(", i + 1, commands[i].logInfoCommand);
                         info_log(LOG_GLOBAL_BUFFER);
+						
+						if(strcmp(commands[i].command, SIM_CHECKER_CMD) == 0)
+						{
+							sg_sprintf(LOG_GLOBAL_BUFFER, "SIM-Check failed .. next slot will be tried next time ..");
+							error_log(LOG_GLOBAL_BUFFER);
+							
+							switch_sim_slot(1);
+						}
 
                         failed++;
                         break;
@@ -417,6 +503,15 @@ start_commands:
                         {
                             sg_sprintf(LOG_GLOBAL_BUFFER, COMMAND "Found [%s] in output", i + 1, token);
                             info_log(LOG_GLOBAL_BUFFER);
+							
+							if(strcmp(commands[i].command, SIM_CHECKER_CMD) == 0)
+							{
+								sg_sprintf(LOG_GLOBAL_BUFFER, "Reading two additional lines from modem ..");
+								info_log(LOG_GLOBAL_BUFFER);
+								
+								read_till_newline();
+								read_till_newline();
+							}
                         }
                         else
                         {
@@ -473,8 +568,8 @@ static int setUpModemMinimal()
     /*
      */
 	i++;
-    commands[i].command = "AT+CPIN?\r";
-    commands[i].delimiter = OK_DELIMITER;
+    commands[i].command = SIM_CHECKER_CMD;
+    commands[i].delimiter = "+";
     commands[i].logInfoCommand = "SIM-PIN-Ready";
     commands[i].successStrings[0] = "READY";
     commands[i].successStrings[1] = NULL;
@@ -938,7 +1033,7 @@ static int setUpModemSocket(SG_Socket *socket)
         }
 
         sg_sprintf((char*) (commands[0].command),
-                   "AT+CIPOPEN=%u,\"%s\",\"%s\",%u\r", socket->socket, socket->type, socket->host, socket->port);
+                   "AT+CIPOPEN=%u,\"%s\",\"%s\",%u\r", socket->socket, socket->type, socket->host, 12345);
         commands[0].delimiter = "+CIPOPEN: ";
         commands[0].logInfoCommand = "Socket-Connection-To-Server";
 		commands[0].successStrings[0] = (char*)sg_malloc(MAX_BUFFER_SIZE);
@@ -1031,6 +1126,8 @@ void simcom_5360_connect_underlying_socket_medium_try_once(SG_Socket* socket)
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, "MODEM-INITIALIZATION DONE... BUT SOCKET COULD NOT BE CONNECTED :(");
         info_log(LOG_GLOBAL_BUFFER);
+		
+		switch_sim_slot(0);
     }
 }
 

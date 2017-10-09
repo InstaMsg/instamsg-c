@@ -82,6 +82,8 @@ void serial_poller_func(void);
             }																															\
 																																		\
 			removed = removed + remove_unwanted_line_with_prefix(usefulOutput, "+IPCLOSE:");											\
+			removed = removed + remove_unwanted_line_with_prefix(usefulOutput, "+SIMCARD:");											\
+			removed = removed + remove_unwanted_line_with_prefix(usefulOutput, "+CIPEVENT:");											\
                                                                                                                                         \
             if(removed == 0)                                                                                                            \
             {                                                                                                                           \
