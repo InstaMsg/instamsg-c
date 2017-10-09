@@ -30,6 +30,7 @@ struct SG_Socket
     char gsmPass[MAX_GSM_PROVISION_PARAM_SIZE];
     char gsmPin[MAX_GSM_PROVISION_PARAM_SIZE];
     char provPin[MAX_GSM_PROVISION_PARAM_SIZE];
+	char gsmMode[MAX_GSM_PROVISION_PARAM_SIZE];
 #endif
 
     int (*read) (SG_Socket *socket, unsigned char* buffer, int len, unsigned char guaranteed);
