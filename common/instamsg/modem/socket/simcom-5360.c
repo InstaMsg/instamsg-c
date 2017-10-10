@@ -324,6 +324,7 @@ SocketInitCommands commands[8];
 
 static void switch_sim_slot(unsigned char rebootImmediately)
 {
+#if SIM_SLOT_SWITCHING_ENABLED == 1
 	if(1)
 	{
 		int rc = FAILURE;
@@ -376,6 +377,7 @@ static void switch_sim_slot(unsigned char rebootImmediately)
 			resetDevice();
 		}
 	}
+#endif
 }
 
 
