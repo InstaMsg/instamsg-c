@@ -141,4 +141,9 @@ extern volatile int countdownTimerForBusinessLogic;
 extern int debugLoggingEnabled;
 
 #define SYSTEM_WIDE_TEMP_FILE   "temp"
+
+#if ETHERNET_STATIC_PARAMS_ENABLED == 1
+#define STATIC_IP_PARAMS	PROSTR("ETHERNET_STATIC_IP_PARAMS")
+#endif
+
 #endif

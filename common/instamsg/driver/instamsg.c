@@ -180,6 +180,8 @@ static char cronTask[200];
 static int cronInterval;
 #endif
 
+
+
 static int statsDisplayInterval;
 unsigned int bytes_sent_over_wire;
 unsigned int bytes_received_over_wire;
@@ -1701,6 +1703,14 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
                                CONFIG_INT,
                                DEFAULT_SSL_ENABLED,
                                PROSTR(""));
+#endif
+
+#if ETHERNET_STATIC_PARAMS_ENABLED == 1
+		registerEditableConfig(ethernetStaticParams,
+		                       STATIC_IP_PARAMS,
+							   CONFIG_STRING,
+							   "",
+							   "")
 #endif
 
 #if HTTP_PROXY_ENABLED == 1
