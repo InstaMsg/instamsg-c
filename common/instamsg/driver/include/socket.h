@@ -64,6 +64,7 @@
 void init_socket(SG_Socket *socket, const char *hostName, unsigned int port, const char *type, unsigned char secure);
 void fetch_gprs_params_from_sms(SG_Socket *socket);
 void release_socket(SG_Socket *socket);
+void get_ip_address_tokens(char *ipAddress, int *first, int *second, int *third, int *fourth);
 
 
 /*

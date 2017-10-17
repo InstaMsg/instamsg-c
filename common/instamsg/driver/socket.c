@@ -36,6 +36,7 @@
 #include "./include/watchdog.h"
 #include "./include/config.h"
 #include "./include/misc.h"
+#include "./include/sg_stdlib.h"
 
 #if SSL_ENABLED == 1
 #include "./include/sg_openssl/ssl.h"
@@ -794,4 +795,25 @@ void release_socket(SG_Socket *socket)
                PROSTR("COMPLETE [TCP-SOCKET] STRUCTURE, INCLUDING THE UNDERLYING MEDIUM CLEANED FOR HOST = [%s], PORT = [%d]."),
                socket->host, socket->port);
     info_log(LOG_GLOBAL_BUFFER);
+}
+
+
+void get_ip_address_tokens(char *ipAddress, int *first, int *second, int *third, int *fourth)
+{
+	char small[5] = {0};
+		
+	get_nth_token_thread_safe(ipAddress, '.', 1, small, 1);
+	*first = sg_atoi(small);
+	
+	memset(small, 0, sizeof(small));
+	get_nth_token_thread_safe(ipAddress, '.', 2, small, 1);
+	*second = sg_atoi(small);
+	
+	memset(small, 0, sizeof(small));
+	get_nth_token_thread_safe(ipAddress, '.', 3, small, 1);
+	*third = sg_atoi(small);
+	
+	memset(small, 0, sizeof(small));
+	get_nth_token_thread_safe(ipAddress, '.', 4, small, 1);
+	*fourth = sg_atoi(small);
 }
