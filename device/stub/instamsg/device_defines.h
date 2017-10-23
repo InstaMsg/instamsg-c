@@ -92,6 +92,10 @@
  * Whether OpenSSL is enabled.
  */
 #define SSL_ENABLED                                             0
+#if SSL_ENABLED == 1
+#define SSL_WIRE_BUFFER_SIZE                                    MAX_BUFFER_SIZE
+#endif
+
 
 
 /*

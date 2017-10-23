@@ -5,6 +5,12 @@
 
 #include <string.h>
 
+#if SSL_ENABLED == 1
+#include "../../../common/instamsg/driver/include/sg_openssl/ssl.h"
+#include "../../../common/instamsg/driver/include/sg_openssl/bio.h"
+
+#endif
+
 typedef struct SG_Socket SG_Socket;
 
 struct SG_Socket
