@@ -37,6 +37,7 @@
 #include "./include/config.h"
 #include "./include/misc.h"
 #include "./include/sg_stdlib.h"
+#include "./include/sg_mem.h"
 
 #if SSL_ENABLED == 1
 #include "./include/sg_openssl/ssl.h"

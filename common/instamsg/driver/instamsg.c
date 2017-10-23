@@ -537,7 +537,7 @@ static void handleConfigReceived(InstaMsg *c, MQTTMessage *msg)
 
 
 #if (SSL_ENABLED == 1) || (SOCKET_SSL_ENABLED == 1)
-static void saveClientAuthFieldInfoOntoDevice(char *payload, char *key, void (*func)(char *buffer))
+static void saveClientAuthFieldInfoOntoDevice(char *payload, const char *key, void (*func)(char *buffer))
 {
     int sz = 2000;
 
