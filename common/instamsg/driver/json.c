@@ -36,15 +36,6 @@
 #include "include/sg_mem.h"
 #include "include/json.h"
 
-#if (MAX_BUFFER_SIZE < 4000)
-#define SSL_JSON_BUFFER_SIZE            4000
-#define SSL_JSON_VALUE_BUFFER_SIZE      2000
-#else
-#define SSL_JSON_BUFFER_SIZE            MAX_BUFFER_SIZE
-#define SSL_JSON_VALUE_BUFFER_SIZE      MAX_BUFFER_SIZE
-#endif
-
-
 #if SSL_ENABLED == 1
 #define JSON_BUFFER_SIZE            SSL_JSON_BUFFER_SIZE
 #define JSON_VALUE_BUFFER_SIZE      SSL_JSON_VALUE_BUFFER_SIZE
