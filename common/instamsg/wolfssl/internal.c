@@ -6098,7 +6098,6 @@ retry:
     }
 }
 
-
 /* Switch dynamic output buffer back to static, buffer is assumed clear */
 void ShrinkOutputBuffer(WOLFSSL* ssl)
 {
@@ -9443,7 +9442,6 @@ static int DoHandShakeMsgType(WOLFSSL* ssl, byte* input, word32* inOutIdx,
 
     WOLFSSL_ENTER("DoHandShakeMsgType");
 
-    printf("checkpoint 1\n");
 #ifdef WOLFSSL_TLS13
     if (type == hello_retry_request) {
         return DoTls13HandShakeMsgType(ssl, input, inOutIdx, type, size,
@@ -9451,7 +9449,6 @@ static int DoHandShakeMsgType(WOLFSSL* ssl, byte* input, word32* inOutIdx,
     }
 #endif
 
-    printf("checkpoint 2\n");
     /* make sure can read the message */
     if (*inOutIdx + size > totalSz)
         return INCOMPLETE_DATA;
@@ -9459,14 +9456,12 @@ static int DoHandShakeMsgType(WOLFSSL* ssl, byte* input, word32* inOutIdx,
     expectedIdx = *inOutIdx + size +
                   (ssl->keys.encryptionOn ? ssl->keys.padSz : 0);
 
-    printf("checkpoint 3\n");
     /* sanity check msg received */
     if ( (ret = SanityCheckMsgReceived(ssl, type)) != 0) {
         WOLFSSL_MSG("Sanity Check on handshake message type received failed");
         return ret;
     }
 
-    printf("checkpoint 4\n");
 #ifdef WOLFSSL_CALLBACKS
     /* add name later, add on record and handshake header part back on */
     if (ssl->toInfoOn) {
@@ -9477,14 +9472,12 @@ static int DoHandShakeMsgType(WOLFSSL* ssl, byte* input, word32* inOutIdx,
     }
 #endif
 
-    printf("checkpoint 5\n");
     if (ssl->options.handShakeState == HANDSHAKE_DONE && type != hello_request){
         WOLFSSL_MSG("HandShake message after handshake complete");
         SendAlert(ssl, alert_fatal, unexpected_message);
         return OUT_OF_ORDER_E;
     }
 
-    printf("checkpoint 6\n");
     if (ssl->options.side == WOLFSSL_CLIENT_END && ssl->options.dtls == 0 &&
                ssl->options.serverState == NULL_STATE && type != server_hello) {
         WOLFSSL_MSG("First server message not server hello");
@@ -9492,7 +9485,6 @@ static int DoHandShakeMsgType(WOLFSSL* ssl, byte* input, word32* inOutIdx,
         return OUT_OF_ORDER_E;
     }
 
-    printf("checkpoint 7\n");
     if (ssl->options.side == WOLFSSL_CLIENT_END && ssl->options.dtls &&
             type == server_hello_done &&
             ssl->options.serverState < SERVER_HELLO_COMPLETE) {
@@ -9501,7 +9493,6 @@ static int DoHandShakeMsgType(WOLFSSL* ssl, byte* input, word32* inOutIdx,
         return OUT_OF_ORDER_E;
     }
 
-    printf("checkpoint 8\n");
     if (ssl->options.side == WOLFSSL_SERVER_END &&
                ssl->options.clientState == NULL_STATE && type != client_hello) {
         WOLFSSL_MSG("First client message not client hello");
@@ -9509,7 +9500,6 @@ static int DoHandShakeMsgType(WOLFSSL* ssl, byte* input, word32* inOutIdx,
         return OUT_OF_ORDER_E;
     }
 
-    printf("checkpoint 9\n");
     /* above checks handshake state */
     /* hello_request not hashed */
     /* Also, skip hashing the client_hello message here for DTLS. It will be
@@ -9652,7 +9642,6 @@ static int DoHandShakeMsg(WOLFSSL* ssl, byte* input, word32* inOutIdx,
 
     WOLFSSL_ENTER("DoHandShakeMsg()");
 
-    printf("checkpoint 1\n");
     if (ssl->arrays == NULL) {
         byte   type;
         word32 size;
@@ -9665,18 +9654,15 @@ static int DoHandShakeMsg(WOLFSSL* ssl, byte* input, word32* inOutIdx,
 
     inputLength = ssl->buffers.inputBuffer.length - *inOutIdx;
 
-    printf("checkpoint 2\n");
     /* If there is a pending fragmented handshake message,
      * pending message size will be non-zero. */
     if (ssl->arrays->pendingMsgSz == 0) {
         byte   type;
         word32 size;
 
-    printf("checkpoint 3\n");
         if (GetHandShakeHeader(ssl,input, inOutIdx, &type, &size, totalSz) != 0)
             return PARSE_ERROR;
 
-    printf("checkpoint 4\n");
         /* Cap the maximum size of a handshake message to something reasonable.
          * By default is the maximum size of a certificate message assuming
          * nine 2048-bit RSA certificates in the chain. */
@@ -9685,7 +9671,6 @@ static int DoHandShakeMsg(WOLFSSL* ssl, byte* input, word32* inOutIdx,
             return HANDSHAKE_SIZE_ERROR;
         }
 
-    printf("checkpoint 5\n");
         /* size is the size of the certificate message payload */
         if (inputLength - HANDSHAKE_HEADER_SZ < size) {
             ssl->arrays->pendingMsgType = type;
@@ -9703,7 +9688,6 @@ static int DoHandShakeMsg(WOLFSSL* ssl, byte* input, word32* inOutIdx,
             return 0;
         }
 
-    printf("checkpoint 6\n");
         ret = DoHandShakeMsgType(ssl, input, inOutIdx, type, size, totalSz);
     }
     else {
@@ -9721,10 +9705,8 @@ static int DoHandShakeMsg(WOLFSSL* ssl, byte* input, word32* inOutIdx,
         ssl->arrays->pendingMsgOffset += inputLength;
         *inOutIdx += inputLength;
 
-    printf("checkpoint 8\n");
         if (ssl->arrays->pendingMsgOffset == ssl->arrays->pendingMsgSz)
         {
-    printf("checkpoint 9\n");
             word32 idx = 0;
             ret = DoHandShakeMsgType(ssl,
                                      ssl->arrays->pendingMsg
@@ -9749,7 +9731,6 @@ static int DoHandShakeMsg(WOLFSSL* ssl, byte* input, word32* inOutIdx,
         }
     }
 
-    printf("checkpoint 10\n");
     WOLFSSL_LEAVE("DoHandShakeMsg()", ret);
     return ret;
 }
@@ -14145,9 +14126,6 @@ const char* wolfSSL_ERR_reason_error_string(unsigned long e)
     case NOT_READY_ERROR :
         return "handshake layer not ready yet, complete first";
 
-    case PMS_VERSION_ERROR :
-        return "premaster secret version mismatch error";
-
     case VERSION_ERROR :
         return "record layer version error";
 
@@ -16459,10 +16437,7 @@ void PickHashSigAlgo(WOLFSSL* ssl, const byte* hashSigAlgo,
 
         ssl->buffers.outputBuffer.length += sendSz;
 
-        {
-            int rc = SendBuffered(ssl);
-            return rc;
-        }
+        return SendBuffered(ssl);
     }
 
 
@@ -18718,8 +18693,10 @@ int SendClientKeyExchange(WOLFSSL* ssl)
             #ifndef NO_RSA
                 case rsa_kea:
                 {
+                    /* build PreMasterSecret with RNG data */
                     ret = wc_RNG_GenerateBlock(ssl->rng,
-                        ssl->arrays->preMasterSecret, SECRET_LEN);
+                        &ssl->arrays->preMasterSecret[VERSION_SZ],
+                        SECRET_LEN - VERSION_SZ);
                     if (ret != 0) {
                         goto exit_scke;
                     }
@@ -23517,6 +23494,9 @@ static int DoSessionTicket(WOLFSSL* ssl, const byte* input, word32* inOutIdx,
         word32 idx;
         word32 begin;
         word32 sigSz;
+    #ifndef NO_RSA
+        int    lastErr;
+    #endif
     } DckeArgs;
 
     static void FreeDckeArgs(WOLFSSL* ssl, void* pArgs)
@@ -23740,6 +23720,14 @@ static int DoSessionTicket(WOLFSSL* ssl, const byte* input, word32* inOutIdx,
                         if ((args->idx - args->begin) + args->length > size) {
                             WOLFSSL_MSG("RSA message too big");
                             ERROR_OUT(BUFFER_ERROR, exit_dcke);
+                        }
+
+                        /* pre-load PreMasterSecret with RNG data */
+                        ret = wc_RNG_GenerateBlock(ssl->rng,
+                            &ssl->arrays->preMasterSecret[VERSION_SZ],
+                            SECRET_LEN - VERSION_SZ);
+                        if (ret != 0) {
+                            goto exit_dcke;
                         }
 
                         args->output = NULL;
@@ -24206,6 +24194,20 @@ static int DoSessionTicket(WOLFSSL* ssl, const byte* input, word32* inOutIdx,
                             NULL, 0, NULL
                         #endif
                         );
+
+                        /*  Errors that can occur here that should be
+                         *  indistinguishable:
+                         *       RSA_BUFFER_E, RSA_PAD_E and RSA_PRIVATE_ERROR
+                         */
+                        if (ret < 0 && ret != BAD_FUNC_ARG) {
+                        #ifdef WOLFSSL_ASYNC_CRYPT
+                            if (ret == WC_PENDING_E)
+                                goto exit_dcke;
+                        #endif
+                            /* store error code for handling below */
+                            args->lastErr = ret;
+                            ret = 0;
+                        }
                         break;
                     } /* rsa_kea */
                 #endif /* !NO_RSA */
@@ -24352,16 +24354,42 @@ static int DoSessionTicket(WOLFSSL* ssl, const byte* input, word32* inOutIdx,
                         /* Add the signature length to idx */
                         args->idx += args->length;
 
-                        if (args->sigSz == SECRET_LEN && args->output != NULL) {
-                            XMEMCPY(ssl->arrays->preMasterSecret, args->output, SECRET_LEN);
-                            if (ssl->arrays->preMasterSecret[0] != ssl->chVersion.major ||
-                                ssl->arrays->preMasterSecret[1] != ssl->chVersion.minor) {
-                                ERROR_OUT(PMS_VERSION_ERROR, exit_dcke);
+                    #ifdef DEBUG_WOLFSSL
+                        /* check version (debug warning message only) */
+                        if (args->output != NULL) {
+                            if (args->output[0] != ssl->chVersion.major ||
+                                args->output[1] != ssl->chVersion.minor) {
+                                WOLFSSL_MSG("preMasterSecret version mismatch");
                             }
                         }
-                        else {
-                            ERROR_OUT(RSA_PRIVATE_ERROR, exit_dcke);
+                    #endif
+
+                        /* RFC5246 7.4.7.1:
+                         * Treat incorrectly formatted message blocks and/or
+                         * mismatched version numbers in a manner
+                         * indistinguishable from correctly formatted RSA blocks
+                         */
+
+                        ret = args->lastErr;
+                        args->lastErr = 0; /* reset */
+
+                        /* build PreMasterSecret */
+                        ssl->arrays->preMasterSecret[0] = ssl->chVersion.major;
+                        ssl->arrays->preMasterSecret[1] = ssl->chVersion.minor;
+                        if (ret == 0 && args->sigSz == SECRET_LEN &&
+                                                         args->output != NULL) {
+                            XMEMCPY(&ssl->arrays->preMasterSecret[VERSION_SZ],
+                                &args->output[VERSION_SZ],
+                                SECRET_LEN - VERSION_SZ);
                         }
+                        else {
+                            /* preMasterSecret has RNG and version set */
+                            /* return proper length and ignore error */
+                            /* error will be caught as decryption error */
+                            args->sigSz = SECRET_LEN;
+                            ret = 0;
+                        }
+
                         break;
                     } /* rsa_kea */
                 #endif /* !NO_RSA */
