@@ -24,12 +24,12 @@ EXTRA_OBJECT_FILES=`echo	`
 
 # Compile-cum-Link command for the platform.
 #
-COMPILE_COMMAND="gcc -nostdinc -pedantic -pthread "
+COMPILE_COMMAND="gcc -g -nostdinc -pthread "
 
 
 # Any final libraries that need to be linked.
 #
-POST_LINKED_LIBS=" -lgstreamer-1.0 -lgobject-2.0 -lglib-2.0 -lssl -lcrypto "
+POST_LINKED_LIBS=" -lgstreamer-1.0 -lgobject-2.0 -lglib-2.0 -lm "
 
 
 # Any final commands that need to be run.

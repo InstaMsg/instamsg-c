@@ -486,7 +486,7 @@ static void set_up_network_ports()
     {
         int rc = get_config_value_from_persistent_storage(SSL_ACTUALLY_ENABLED, (char*)GLOBAL_BUFFER, sizeof(GLOBAL_BUFFER));
 
-        sslEnabledAtAppLayer = 1;
+        sslEnabledAtAppLayer = 0;
         if(rc == SUCCESS)
         {
             char small[3] = {0};

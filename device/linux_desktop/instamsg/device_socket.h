@@ -37,8 +37,7 @@
 #include <string.h>
 
 #if SSL_ENABLED == 1
-#include "../../../common/instamsg/driver/include/sg_openssl/ssl.h"
-#include "../../../common/instamsg/driver/include/sg_openssl/bio.h"
+#include "../driver/include/wolfssl/internal.h"
 #endif
 
 typedef struct SG_Socket SG_Socket;
@@ -53,11 +52,7 @@ struct SG_Socket
     unsigned char socketCorrupted;
 
 #if SSL_ENABLED == 1
-    SSL *ssl;
-
-    BIO *ssl_bio;
-    BIO *inter_bio;
-    BIO *network_bio;
+    WOLFSSL* ssl;
 #endif
 
 #if GSM_INTERFACE_ENABLED == 1

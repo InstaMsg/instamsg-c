@@ -40,9 +40,8 @@
 #include "./include/sg_mem.h"
 
 #if SSL_ENABLED == 1
-#include "./include/sg_openssl/ssl.h"
-#include "./include/sg_openssl/bio.h"
-#include "./include/sg_openssl/err.h"
+#include "./include/wolfssl/internal.h"
+#include "./include/wolfssl/error-ssl.h"
 #endif
 
 
@@ -126,183 +125,6 @@ void store_sms_in_config(char *sms, char *smsConfigBuffer, int smsConfigBufferLe
 
 
 #if SSL_ENABLED == 1
-SSL_CTX *solitary_ssl_ctx;
-
-static unsigned char ssl_init_try_once_done;
-static unsigned char ssl_init_successful;
-
-static unsigned char wire_buffer[SSL_WIRE_BUFFER_SIZE];
-static int WIRE_BUFFER_SIZE;
-
-
-/*
- * Returns one of the following ::
- *
- *  SUCCESS   =>    if some bytes were sent over the network successfully.
- *  FAILURE   =>    otherwise.
- */
-static int write_pending_data_to_network(SG_Socket* socket)
-{
-    int c = 0, rc = 0;
-
-    c = BIO_pending(socket->network_bio);
-    if(c > 0)
-    {
-        rc = BIO_read(socket->network_bio, wire_buffer, c);
-        if(rc != c)
-        {
-            /*
-             * Being bullet-proof in our checks always helps :)
-             */
-            sg_sprintf(LOG_GLOBAL_BUFFER, "%sExpected pending %d bytes to be read from network_bio, however %d bytes read",
-                                          SSL_ERROR_STR, c, rc);
-
-            error_log(LOG_GLOBAL_BUFFER);
-            return FAILURE;
-        }
-
-#if 0
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Writing pending [%d] bytes", c);
-        info_log(LOG_GLOBAL_BUFFER);
-#endif
-
-        /*
-         * Remember, "socket_write" returns ::
-         *
-         *      SUCCESS, if bytes were sent successfully over the wire,
-         *      FAILURE, otherwise.
-         */
-        return socket_write(socket, wire_buffer, c);
-    }
-
-    return SUCCESS;
-}
-
-
-/*
- * Returns one of the following ::
- *
- *  SUCCESS                 =>    if some bytes were read successfully from the wire successfully.
- *  SOCKET_READ_TIMEOUT     =>    if there is nothing available to be read from the wire.
- *  FAILURE                 =>    otherwise.
- */
-static int read_pending_data_from_network(SG_Socket* socket, unsigned char must_read_some_bytes_from_wire)
-{
-    int c = 0, rc = 0;
-
-    if(write_pending_data_to_network(socket) != SUCCESS)
-    {
-        return FAILURE;
-    }
-
-    c = BIO_get_read_request(socket->network_bio);
-    if( (c == 0) && (must_read_some_bytes_from_wire == 0) )
-    {
-        /*
-         * The network-bio is not in need of any bytes.
-         *
-         * But since we still landed on this method, is possible only if the application wants to read some
-         * "potentially available" bytes. Any such "potential" bytes might actually have been pushed by the server,
-         * or they may have been not.
-         *
-         * So, we just try to read 1 byte from the wire in a non-blocking way, and if we do get 1 byte, then we will push it into
-         * the network-bio. Thereafter, the ssl-bio (via its network-bio pair) will command reading of some bytes in the next cycle.
-         */
-        c = 1;
-    }
-
-    if(c > 0)
-    {
-#if 0
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Reading pending [%d] bytes", c);
-        info_log(LOG_GLOBAL_BUFFER);
-#endif
-
-        rc = socket_read(socket, wire_buffer, c, must_read_some_bytes_from_wire);
-        if(rc == SUCCESS)
-        {
-            rc = BIO_write(socket->network_bio, wire_buffer, c);
-            if(rc != c)
-            {
-                /*
-                 * Being bullet-proof in our checks always helps :)
-                 */
-                sg_sprintf(LOG_GLOBAL_BUFFER, "%sExpected %d bytes to be written into network_bio, however %d bytes written",
-                                              SSL_ERROR_STR, c, rc);
-
-                error_log(LOG_GLOBAL_BUFFER);
-                return FAILURE;
-            }
-
-            return SUCCESS;
-        }
-        else
-        {
-            return rc;  /* Covers both cases of FAILURE or SOCKET_READ_TIMEOUT being returned from lower layer */
-        }
-    }
-    else
-    {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "%sSome unknown case hit in \"read_pending_data_from_network\" .. debug the code ..", 
-			                           SSL_ERROR_STR);
-        error_log(LOG_GLOBAL_BUFFER);
-
-        return FAILURE;
-    }
-}
-
-
-#define HANDLE_NO_RETRY_CASE_IF_APPLICABLE(action)                                                                  \
-    if(BIO_should_retry(socket->ssl_bio) == 0)                                                                      \
-    {                                                                                                               \
-        sg_sprintf(LOG_GLOBAL_BUFFER, "%sBIO_%s from ssl_bio failed with %d error-code", SSL_ERROR_STR, action, rc);\
-        error_log(LOG_GLOBAL_BUFFER);                                                                               \
-                                                                                                                    \
-        return FAILURE;                                                                                             \
-    }
-
-
-#define HANDLE_SSL_NEED_FOR_WRITE_IF_APPLICABLE                                                                     \
-    else if(BIO_should_write(socket->ssl_bio) != 0)                                                                 \
-    {                                                                                                               \
-        rc = write_pending_data_to_network(socket);                                                                 \
-        if(rc == FAILURE)                                                                                           \
-        {                                                                                                           \
-            return FAILURE;                                                                                         \
-        }                                                                                                           \
-        else                                                                                                        \
-        {                                                                                                           \
-            continue;                                                                                               \
-        }                                                                                                           \
-    }
-
-
-#define HANDLE_UNEXPLORED_AREA_IF_APPLICABLE(action)                                                                \
-    else                                                                                                            \
-    {                                                                                                               \
-        sg_sprintf(LOG_GLOBAL_BUFFER, "\n\n%sSSL-%s has reached unexplored territories.\n\n",                       \
-                                       SSL_ERROR_STR, action);                                                      \
-        error_log(LOG_GLOBAL_BUFFER);                                                                               \
-                                                                                                                    \
-        return FAILURE;                                                                                             \
-    }
-
-
-#define HANDLE_TWO_SSL_WRITE_READ_FROM_APP_CASES(action)                                                            \
-    else if(rc == 0)                                                                                                \
-    {                                                                                                               \
-        sg_sprintf(LOG_GLOBAL_BUFFER, "%sBIO_%s to ssl_bio failed with %d error-code", SSL_ERROR_STR, action, rc);  \
-        error_log(LOG_GLOBAL_BUFFER);                                                                               \
-                                                                                                                    \
-        return FAILURE;                                                                                             \
-    }                                                                                                               \
-                                                                                                                    \
-    else if(rc != remaining_bytes)                                                                                  \
-    {                                                                                                               \
-        remaining_bytes = remaining_bytes - rc;                                                                     \
-        continue;                                                                                                   \
-    }
-
 
 /*
  * This method reads "len" bytes from "ssl_bio" into "buffer".
@@ -354,71 +176,26 @@ static int read_pending_data_from_network(SG_Socket* socket, unsigned char must_
  */
 static int secure_socket_read(SG_Socket* socket, unsigned char* buffer, int len, unsigned char guaranteed)
 {
-    int rc = FAILURE;
-    int remaining_bytes = len;
+    int rem = len;
 
-    /*
-     * We write the app-payload-bytes to the going-in side of SSL-BIO.
-     */
     while(1)
     {
-        rc = BIO_read(socket->ssl_bio, buffer + len - remaining_bytes, remaining_bytes);
-
-        /* Case 1 */
-        if(rc < 0)
+        int rc = wolfSSL_read(socket->ssl, buffer, len);
+        if(rc > 0)
         {
-            HANDLE_NO_RETRY_CASE_IF_APPLICABLE("read")
-            HANDLE_SSL_NEED_FOR_WRITE_IF_APPLICABLE
-            else if(BIO_should_read(socket->ssl_bio) != 0)
+            rem = rem - rc;
+            if(rem == 0)
             {
-                if(1)
-                {
-                    /*
-                     * Here, SSL_ERROR_WANT_READ might have been raised, as there may genuinely be no data to be read from socket.
-                     * So, we are not sure whether we need to read anything from socket or not in actuality.
-                     */
-                    rc = read_pending_data_from_network(socket, 0);
-                    if(rc == FAILURE)
-                    {
-                        /*
-                         * Failure will never be tolerated ..
-                         */
-                        return FAILURE;
-                    }
-                    else if(rc == SOCKET_READ_TIMEOUT)
-                    {
-                        if(guaranteed == 1)
-                        {
-                            /*
-                             * We must continue searching for bytes ...
-                             */
-                            continue;
-                        }
-                        else
-                        {
-                            /*
-                             * Nothing available, so we must return the same to app-layer.
-                             */
-                            return SOCKET_READ_TIMEOUT;
-                        }
-                    }
-                    else
-                    {
-                        /*
-                         * We fulfilled ssl_bio's need to read ... retry ..
-                         */
-                        continue;
-                    }
-                }
+                return SUCCESS;
             }
-            HANDLE_UNEXPLORED_AREA_IF_APPLICABLE("read")
         }
-
-        HANDLE_TWO_SSL_WRITE_READ_FROM_APP_CASES("read")
-
+        else if(rc == WANT_READ)
+        {
+            return SOCKET_READ_TIMEOUT;
+        }
         else
         {
-            return SUCCESS;
+            return FAILURE;
         }
     }
 
@@ -442,62 +219,12 @@ static int secure_socket_read(SG_Socket* socket, unsigned char* buffer, int len,
  */
 static int secure_socket_write(SG_Socket* socket, unsigned char* buffer, int len)
 {
-    int rc = FAILURE;
-    int remaining_bytes = len;
-
-    /*
-     * We write the app-payload-bytes to the going-in side of SSL-BIO.
-     */
-    while(1)
+    if(wolfSSL_write(socket->ssl, buffer, len) == len)
     {
-        rc = BIO_write(socket->ssl_bio, buffer + len - remaining_bytes, remaining_bytes);
-
-        /* Case 1 */
-        if(rc < 0)
-        {
-            HANDLE_NO_RETRY_CASE_IF_APPLICABLE("write")
-            HANDLE_SSL_NEED_FOR_WRITE_IF_APPLICABLE
-            else if(BIO_should_read(socket->ssl_bio) != 0)
-            {
-                if(1)
-                {
-                    /*
-                     * Here, SSL wants to read some bytes from socket, before it can proceed.
-                     * Obviously, this is a MUST-READ-FROM-SOCKET scenario.
-                     */
-                    rc = read_pending_data_from_network(socket, 1);
-                    if(rc == FAILURE)
-                    {
-                        /*
-                         * Failure will never be tolerated ..
-                         */
-                        return FAILURE;
-                    }
-                    else
-                    {
-                        /*
-                         * We fulfilled ssl_bio's need to read ... retry ..
-                         */
-                        continue;
-                    }
-                }
-            }
-            HANDLE_UNEXPLORED_AREA_IF_APPLICABLE("write")
-        }
-
-        HANDLE_TWO_SSL_WRITE_READ_FROM_APP_CASES("write")
-
-        else
-        {
-            /*
-             * BIO_write to ssl-bio was successful.
-             *
-             * So, we send the encrypted-bytes (as emerging from network-bio) to network right-away.
-             * In this way, we save an extra if-retry-then-write-pending-data cycle in the next iteration.
-             */
-            return write_pending_data_to_network(socket);
-        }
+        return SUCCESS;
     }
+
+    return FAILURE;
 }
 
 
@@ -515,75 +242,23 @@ static int secure_socket_write(SG_Socket* socket, unsigned char* buffer, int len
     }
 
 
-static void loadClientCertificateAndKeyIfPresent()
-{
-    char *buf = (char*) sg_malloc(2000);
-    if(buf == NULL)
-    {
-        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("Memory allocation in loadClientCertificateAndKeyIfPresent"), 1);
-    }
+WOLFSSL_CTX* solitary_ssl_ctx;
 
-    memset(buf, 0, sizeof(buf));
-    load_client_certificate_into_buffer(buf, sizeof(buf));
-    if(strlen(buf) > 0)
-    {
-        BIO *cert_bio = NULL;
-        X509 *cert = NULL;
-
-        cert_bio = BIO_new_mem_buf((void*)buf, -1);
-        cert = PEM_read_bio_X509(cert_bio, NULL, 0, NULL);
-        if(cert == NULL)
-        {
-            HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("PEM_read_bio_X509"), 1);
-        }
-
-        if(!SSL_CTX_use_certificate(solitary_ssl_ctx, cert))
-        {
-            HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("SSL_CTX_use_certificate"), 1)
-        }
-    }
-
-    memset(buf, 0, sizeof(buf));
-    load_client_private_key_into_buffer(buf, sizeof(buf));
-    if(strlen(buf) > 0)
-    {
-        BIO *key_bio = NULL;
-        RSA *rsa = NULL;
-
-        key_bio = BIO_new_mem_buf((void*)buf, -1);
-        rsa = PEM_read_bio_RSAPrivateKey(key_bio, NULL, 0, NULL);
-        if(rsa == NULL)
-        {
-            HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("PEM_read_bio_RSAPrivateKey"), 1);
-        }
-
-        if(!SSL_CTX_use_RSAPrivateKey(solitary_ssl_ctx, rsa))
-        {
-            HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("SSL_CTX_use_RSAPrivateKey"), 1)
-        }
-    }
-
-    sg_free(buf);
-}
-
+static unsigned ssl_init_try_once_done;
+static unsigned char ssl_init_successful;
 
 static void init_ssl()
 {
-    SSL_library_init();
-    OpenSSL_add_ssl_algorithms();
-    OpenSSL_add_all_algorithms();
-    SSL_load_error_strings();
-    ERR_load_crypto_strings();
+    wolfSSL_Init();
 
-    WIRE_BUFFER_SIZE = sizeof(wire_buffer);
-
-    solitary_ssl_ctx = SSL_CTX_new(SSLv23_client_method());
+    solitary_ssl_ctx = wolfSSL_CTX_new(wolfSSLv23_client_method());
     if(solitary_ssl_ctx == NULL)
     {
-        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("SSL_CTX_new"), 1)
+        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("wolfSSL_CTX_new"), 1)
     }
 
-    loadClientCertificateAndKeyIfPresent();
+    wolfSSL_CTX_set_verify(solitary_ssl_ctx, SSL_VERIFY_NONE, 0);
+
     ssl_init_successful = 1;
 }
 #endif
@@ -729,26 +404,11 @@ void init_socket(SG_Socket *socket, const char *hostName, unsigned int port, con
         return;
     }
 
-    socket->ssl = SSL_new(solitary_ssl_ctx);
+    socket->ssl = wolfSSL_new(solitary_ssl_ctx);
     if(socket->ssl == NULL)
     {
-        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("SSL_new"), 0)
+        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("wolfSSL_new"), 0)
     }
-
-    if (!BIO_new_bio_pair(&(socket->inter_bio), WIRE_BUFFER_SIZE, &(socket->network_bio), WIRE_BUFFER_SIZE))
-    {
-        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("BIO_new_bio_pair"), 0)
-    }
-
-    socket->ssl_bio = BIO_new(BIO_f_ssl());
-    if (!(socket->ssl_bio))
-    {
-        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("BIO_new"), 0)
-    }
-
-    SSL_set_connect_state(socket->ssl);
-    SSL_set_bio(socket->ssl, socket->inter_bio, socket->inter_bio);
-    BIO_set_ssl(socket->ssl_bio, socket->ssl, BIO_NOCLOSE);
 #endif
 
     if((secure == 1) && (sslEnabledAtAppLayer == 1))
@@ -785,6 +445,22 @@ void init_socket(SG_Socket *socket, const char *hostName, unsigned int port, con
 #ifndef ETHERNET_AS_FIRST_PRIORITY
     watchdog_disable(NULL, NULL);
 #endif
+
+#if SSL_ENABLED == 1
+    if((secure == 1) && (sslEnabledAtAppLayer == 1))
+    {
+        socket->ssl->IOCB_WriteCtx = socket;
+        socket->ssl->IOCB_ReadCtx = socket;
+
+        if(socket->socketCorrupted == 0)
+        {
+            if(wolfSSL_connect(socket->ssl) != SSL_SUCCESS)
+            {
+                HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("wolfSSL_connect"), 1)
+            }
+        }
+    }
+#endif
 }
 
 
@@ -802,18 +478,18 @@ void release_socket(SG_Socket *socket)
 void get_ip_address_tokens(char *ipAddress, int *first, int *second, int *third, int *fourth)
 {
 	char small[5] = {0};
-		
+
 	get_nth_token_thread_safe(ipAddress, '.', 1, small, 1);
 	*first = sg_atoi(small);
-	
+
 	memset(small, 0, sizeof(small));
 	get_nth_token_thread_safe(ipAddress, '.', 2, small, 1);
 	*second = sg_atoi(small);
-	
+
 	memset(small, 0, sizeof(small));
 	get_nth_token_thread_safe(ipAddress, '.', 3, small, 1);
 	*third = sg_atoi(small);
-	
+
 	memset(small, 0, sizeof(small));
 	get_nth_token_thread_safe(ipAddress, '.', 4, small, 1);
 	*fourth = sg_atoi(small);

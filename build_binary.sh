@@ -37,6 +37,33 @@ SOURCES=`echo                                                                   
         common/instamsg/driver/fs_config.c                                                      \
         common/instamsg/driver/fs_data_logger.c                                                 \
                                                                                                 \
+        common/instamsg/wolfssl/ssl.c                                                           \
+        common/instamsg/wolfssl/tls.c                                                           \
+        common/instamsg/wolfssl/keys.c                                                          \
+        common/instamsg/wolfssl/internal.c                                                      \
+        common/instamsg/wolfssl/wolfio.c                                                        \
+        common/instamsg/wolfcrypt/src/memory.c                                                  \
+        common/instamsg/wolfcrypt/src/wc_port.c                                                 \
+        common/instamsg/wolfcrypt/src/asn.c                                                     \
+        common/instamsg/wolfcrypt/src/coding.c                                                  \
+        common/instamsg/wolfcrypt/src/rsa.c                                                     \
+        common/instamsg/wolfcrypt/src/hash.c                                                    \
+        common/instamsg/wolfcrypt/src/hmac.c                                                    \
+        common/instamsg/wolfcrypt/src/md5.c                                                     \
+        common/instamsg/wolfcrypt/src/sha.c                                                     \
+        common/instamsg/wolfcrypt/src/sha256.c                                                  \
+        common/instamsg/wolfcrypt/src/arc4.c                                                    \
+        common/instamsg/wolfcrypt/src/des3.c                                                    \
+        common/instamsg/wolfcrypt/src/aes.c                                                     \
+        common/instamsg/wolfcrypt/src/random.c                                                  \
+        common/instamsg/wolfcrypt/src/dh.c                                                      \
+        common/instamsg/wolfcrypt/src/error.c                                                   \
+        common/instamsg/wolfcrypt/src/tfm.c                                                     \
+        common/instamsg/wolfcrypt/src/integer.c                                                 \
+        common/instamsg/wolfcrypt/src/pwdbased.c                                                \
+        common/instamsg/wolfcrypt/src/logging.c                                                 \
+        common/instamsg/wolfcrypt/src/ecc.c                                                     \
+                                                                                                \
         common/instamsg/mqtt/src/MQTTFormat.c                                                   \
         common/instamsg/mqtt/src/MQTTPacket.c                                                   \
         common/instamsg/mqtt/src/MQTTDeserializePublish.c                                       \
