@@ -192,7 +192,6 @@ static int secure_socket_read(SG_Socket* socket, unsigned char* buffer, int len,
         }
         else if(rc == WANT_READ)
         {
-            printf("sahi aaya\n");
             return SOCKET_READ_TIMEOUT;
         }
         else
