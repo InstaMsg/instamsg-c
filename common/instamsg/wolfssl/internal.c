@@ -36,6 +36,7 @@
 #include "../driver/include/wolfssl/wolfcrypt/asn.h"
 #include "../driver/include/wolfssl/wolfcrypt/dh.h"
 
+
 #ifdef NO_INLINE
     #include <wolfssl/wolfcrypt/misc.h>
 #else
@@ -6071,7 +6072,6 @@ static void AddFragHeaders(byte* output, word32 fragSz, word32 fragOffset,
 }
 #endif /* NO_CERTS */
 
-
 /* return bytes received, -1 on error */
 static int Receive(WOLFSSL* ssl, byte* buf, word32 sz)
 {
@@ -6086,6 +6086,7 @@ retry:
     recvd = ssl->ctx->CBIORecv(ssl, (char *)buf, (int)sz, ssl->IOCB_ReadCtx);
     if(recvd == SOCKET_READ_TIMEOUT)
     {
+        printf("checkpoint 1\n");
         return WANT_READ;
     }
     else if(recvd == FAILURE)
@@ -6097,6 +6098,7 @@ retry:
         return recvd;
     }
 }
+
 
 /* Switch dynamic output buffer back to static, buffer is assumed clear */
 void ShrinkOutputBuffer(WOLFSSL* ssl)
@@ -6176,7 +6178,6 @@ int SendBuffered(WOLFSSL* ssl)
 
     return 0;
 }
-
 
 /* Grow the output buffer */
 static INLINE int GrowOutputBuffer(WOLFSSL* ssl, int size)
@@ -8082,7 +8083,7 @@ int ProcessPeerCerts(WOLFSSL* ssl, byte* input, word32* inOutIdx,
 
                     #ifdef WOLFSSL_NGINX
                         if (args->certIdx > args->untrustedDepth)
-                            args->untrustedDepth = args->certIdx + 1;
+                            args->untrustedDepth = (char) args->certIdx + 1;
                     #endif
 
                         /* already verified above */
@@ -9693,9 +9694,6 @@ static int DoHandShakeMsg(WOLFSSL* ssl, byte* input, word32* inOutIdx,
     else {
         if (inputLength + ssl->arrays->pendingMsgOffset
                                                   > ssl->arrays->pendingMsgSz) {
-
-            printf("checkpoint 7, inputLength = [%d], ssl->arrays->pendingMsgOffset = [%d], ssl->arrays->pendingMsgSz = [%d]\n",
-                    inputLength, ssl->arrays->pendingMsgOffset, ssl->arrays->pendingMsgSz);
 
             return BUFFER_ERROR;
         }
@@ -11891,10 +11889,16 @@ int ProcessReply(WOLFSSL* ssl)
                 ssl->keys.decryptedCur = 1;
 #ifdef WOLFSSL_TLS13
                 if (ssl->options.tls1_3) {
+                    word16 i = ssl->buffers.inputBuffer.length -
+                               ssl->keys.padSz;
+                    /* Remove padding from end of plain text. */
+                    for (--i; i > ssl->buffers.inputBuffer.idx; i--) {
+                        if (ssl->buffers.inputBuffer.buffer[i] != 0)
+                            break;
+                    }
                     /* Get the real content type from the end of the data. */
-                    ssl->keys.padSz++;
-                    ssl->curRL.type = ssl->buffers.inputBuffer.buffer[
-                        ssl->buffers.inputBuffer.length - ssl->keys.padSz];
+                    ssl->curRL.type = ssl->buffers.inputBuffer.buffer[i];
+                    ssl->keys.padSz = ssl->buffers.inputBuffer.length - i;
                 }
 #endif
             }
@@ -13178,7 +13182,7 @@ int SendCertificateRequest(WOLFSSL* ssl)
     while (names != NULL) {
         byte seq[MAX_SEQ_SZ];
 
-        c16toa(names->data.name->rawLen +
+        c16toa((word16)names->data.name->rawLen +
                SetSequence(names->data.name->rawLen, seq), &output[i]);
         i += OPAQUE16_LEN;
         i += SetSequence(names->data.name->rawLen, output + i);
@@ -17113,6 +17117,9 @@ static int DoServerKeyExchange(WOLFSSL* ssl, const byte* input,
     DskeArgs  args[1];
 #endif
 
+    (void)input;
+    (void)size;
+
     WOLFSSL_ENTER("DoServerKeyExchange");
 
 #ifdef WOLFSSL_ASYNC_CRYPT
@@ -19462,6 +19469,8 @@ int DecodePrivateKey(WOLFSSL *ssl, word16* length)
 #if !defined(NO_RSA) || defined(HAVE_ECC) || defined(HAVE_ED25519)
     int      keySz;
     word32   idx;
+    (void)idx;
+    (void)keySz;
 #else
     (void)length;
 #endif
@@ -20052,7 +20061,7 @@ int SetTicket(WOLFSSL* ssl, const byte* ticket, word32 length)
         ssl->session.ticket = sessionTicket;
         ssl->session.isDynamic = 1;
     }
-    ssl->session.ticketLen = length;
+    ssl->session.ticketLen = (word16)length;
 
     if (length > 0) {
         XMEMCPY(ssl->session.ticket, ticket, length);
@@ -20199,8 +20208,8 @@ static int DoSessionTicket(WOLFSSL* ssl, const byte* input, word32* inOutIdx,
 
         /* now write to output */
         /* first version */
-        output[idx++] = ssl->version.major;
-        output[idx++] = ssl->version.minor;
+        output[idx++] = (byte)ssl->version.major;
+        output[idx++] = (byte)ssl->version.minor;
 
         /* then random and session id */
         if (!ssl->options.resuming) {
@@ -23196,6 +23205,9 @@ static int DoSessionTicket(WOLFSSL* ssl, const byte* input, word32* inOutIdx,
 #ifdef WOLFSSL_TLS13
         word32          ageAdd;                /* Obfuscation of age */
         byte            namedGroup;            /* Named group used */
+    #ifndef WOLFSSL_TLS13_DRAFT_18
+        TicketNonce     ticketNonce;           /* Ticket nonce */
+    #endif
     #ifdef WOLFSSL_EARLY_DATA
         word32          maxEarlyDataSz;        /* Max size of early data */
     #endif
@@ -23251,6 +23263,10 @@ static int DoSessionTicket(WOLFSSL* ssl, const byte* input, word32* inOutIdx,
             it.timestamp = TimeNowInMilliseconds();
             /* Resumption master secret. */
             XMEMCPY(it.msecret, ssl->session.masterSecret, SECRET_LEN);
+    #ifndef WOLFSSL_TLS13_DRAFT_18
+            XMEMCPY(&it.ticketNonce, &ssl->session.ticketNonce,
+                                                           sizeof(TicketNonce));
+    #endif
 #endif
         }
 
@@ -23363,6 +23379,10 @@ static int DoSessionTicket(WOLFSSL* ssl, const byte* input, word32* inOutIdx,
     #endif
                 /* Resumption master secret. */
                 XMEMCPY(ssl->session.masterSecret, it->msecret, SECRET_LEN);
+    #ifndef WOLFSSL_TLS13_DRAFT_18
+                XMEMCPY(&ssl->session.ticketNonce, &it->ticketNonce,
+                                                           sizeof(TicketNonce));
+    #endif
                 ssl->session.namedGroup = it->namedGroup;
 #endif
             }
@@ -23518,6 +23538,8 @@ static int DoSessionTicket(WOLFSSL* ssl, const byte* input, word32* inOutIdx,
     #else
         DckeArgs  args[1];
     #endif
+
+        (void)size;
 
         WOLFSSL_ENTER("DoClientKeyExchange");
 
@@ -24227,6 +24249,7 @@ static int DoSessionTicket(WOLFSSL* ssl, const byte* input, word32* inOutIdx,
                     case ecc_diffie_hellman_kea:
                     {
                         void* private_key = ssl->eccTempKey;
+                        (void)private_key;
 
                     #ifdef HAVE_CURVE25519
                         if (ssl->ecdhCurveOID == ECC_X25519_OID) {

@@ -63,6 +63,7 @@ SOURCES=`echo                                                                   
         common/instamsg/wolfcrypt/src/pwdbased.c                                                \
         common/instamsg/wolfcrypt/src/logging.c                                                 \
         common/instamsg/wolfcrypt/src/ecc.c                                                     \
+        common/instamsg/wolfcrypt/src/wolfmath.c                                                \
                                                                                                 \
         common/instamsg/mqtt/src/MQTTFormat.c                                                   \
         common/instamsg/mqtt/src/MQTTPacket.c                                                   \

@@ -71,6 +71,7 @@ struct SG_Socket
 
     /* ============================= ANY EXTRA FIELDS GO HERE ============================================= */
     int socket;
+    int bytes_received;
     /* ============================= ANY EXTRA FIELDS GO HERE ============================================= */
 };
 

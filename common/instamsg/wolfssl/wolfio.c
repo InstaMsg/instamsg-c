@@ -196,8 +196,16 @@ int EmbedReceive(WOLFSSL *ssl, char *buf, int sz, void *ctx)
 
     if(rc == SOCKET_READ_TIMEOUT)
     {
-        printf("==> got timeout\n");
-        return SOCKET_READ_TIMEOUT;
+        if(sock->bytes_received > 0)
+        {
+            printf("==> got partial success [%d]\n", sock->bytes_received);
+            return sock->bytes_received;
+        }
+        else
+        {
+            printf("==> got timeout\n");
+            return SOCKET_READ_TIMEOUT;
+        }
     }
     else if(rc == FAILURE)
     {
@@ -206,8 +214,8 @@ int EmbedReceive(WOLFSSL *ssl, char *buf, int sz, void *ctx)
     }
     else
     {
-        printf("==> got success\n");
-        return sz;
+        printf("==> got full success\n");
+        return sock->bytes_received;
     }
 }
 

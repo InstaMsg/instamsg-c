@@ -1568,6 +1568,13 @@ extern void uITRON4_free(void *p) ;
     #endif
 #endif
 
+#define HAVE_ECC
+#define HAVE_ECC_SIGN
+#define HAVE_ECC_VERIFY
+#define HAVE_ECC_DHE
+#define HAVE_ECC_KEY_IMPORT
+#define HAVE_ECC_KEY_EXPORT
+
 #ifdef __cplusplus
     }   /* extern "C" */
 #endif

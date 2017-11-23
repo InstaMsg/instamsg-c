@@ -1734,9 +1734,20 @@ static int wolfSSL_read_internal(WOLFSSL* ssl, void* data, int sz, int peek)
     WOLFSSL_LEAVE("wolfSSL_read_internal()", ret);
 
     if (ret < 0)
-        return WOLFSSL_FATAL_ERROR;
+    {
+        if(ret == WANT_READ)
+        {
+            return ret;
+        }
+        else
+        {
+            return WOLFSSL_FATAL_ERROR;
+        }
+    }
     else
+    {
         return ret;
+    }
 }
 
 

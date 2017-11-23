@@ -27,16 +27,16 @@
 #endif
 
 /* in case user set USE_FAST_MATH there */
-#include <wolfssl/wolfcrypt/settings.h>
+#include "../../driver/include/wolfssl/wolfcrypt/settings.h"
 
 #ifdef USE_FAST_MATH
     #include <wolfssl/wolfcrypt/tfm.h>
 #else
-    #include <wolfssl/wolfcrypt/integer.h>
+    #include "../../driver/include/wolfssl/wolfcrypt/integer.h"
 #endif
 
-#include <wolfssl/wolfcrypt/error-crypt.h>
-#include <wolfssl/wolfcrypt/logging.h>
+#include "../../driver/include/wolfssl/wolfcrypt/error-crypt.h"
+#include "../../driver/include/wolfssl/wolfcrypt/logging.h"
 
 #if defined(USE_FAST_MATH) || !defined(NO_BIG_INT)
 
@@ -48,7 +48,7 @@
     #include <wolfssl/wolfcrypt/misc.h>
 #else
     #define WOLFSSL_MISC_INCLUDED
-    #include <wolfcrypt/src/misc.c>
+    #include "./misc.c"
 #endif
 
 

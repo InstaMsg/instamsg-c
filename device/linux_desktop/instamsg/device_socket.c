@@ -300,6 +300,7 @@ int socket_read(SG_Socket* socket, unsigned char* buffer, int len, unsigned char
         {
             printf("==> read [%u] bytes\n", rc);
             bytes = bytes + rc;
+            socket->bytes_received = bytes;
         }
 	}
 

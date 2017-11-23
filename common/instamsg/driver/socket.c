@@ -177,6 +177,7 @@ void store_sms_in_config(char *sms, char *smsConfigBuffer, int smsConfigBufferLe
 static int secure_socket_read(SG_Socket* socket, unsigned char* buffer, int len, unsigned char guaranteed)
 {
     int rem = len;
+    socket->bytes_received = 0;
 
     while(1)
     {
@@ -191,6 +192,7 @@ static int secure_socket_read(SG_Socket* socket, unsigned char* buffer, int len,
         }
         else if(rc == WANT_READ)
         {
+            printf("sahi aaya\n");
             return SOCKET_READ_TIMEOUT;
         }
         else
@@ -219,9 +221,17 @@ static int secure_socket_read(SG_Socket* socket, unsigned char* buffer, int len,
  */
 static int secure_socket_write(SG_Socket* socket, unsigned char* buffer, int len)
 {
-    if(wolfSSL_write(socket->ssl, buffer, len) == len)
+    int rc = 0;
+
+    rc = wolfSSL_write(socket->ssl, buffer, len);
+    if(rc == len)
     {
+        printf("===> baraabar\n");
         return SUCCESS;
+    }
+    else
+    {
+        printf("=======> dekho [%d]\n", rc);
     }
 
     return FAILURE;
