@@ -213,7 +213,7 @@ int wc_PBKDF2(byte* output, const byte* passwd, int pLen, const byte* salt,
             if (ret != 0)
                 break;
 
-            currentLen = min(kLen, hLen);
+            currentLen = wolf_min(kLen, hLen);
             XMEMCPY(output, buffer, currentLen);
 
             for (j = 1; j < iterations; j++) {
@@ -574,7 +574,7 @@ int wc_PKCS12_PBKDF_ex(byte* output, const byte* passwd, int passLen,
             if (ret < 0) break;
         }
 
-        currentLen = min(kLen, (int)u);
+        currentLen = wolf_min(kLen, (int)u);
         XMEMCPY(output, Ai, currentLen);
         output += currentLen;
         kLen   -= currentLen;

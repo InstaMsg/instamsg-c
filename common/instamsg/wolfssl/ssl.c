@@ -744,7 +744,7 @@ const char* wolfSSL_get_shared_ciphers(WOLFSSL* ssl, char* buf, int len)
 
     cipher = wolfSSL_get_cipher_name_from_suite(ssl->options.cipherSuite,
                                                 ssl->options.cipherSuite0);
-    len = min(len, (int)(XSTRLEN(cipher) + 1));
+    len = wolf_min(len, (int)(XSTRLEN(cipher) + 1));
     XMEMCPY(buf, cipher, len);
     return buf;
 }
@@ -1400,12 +1400,12 @@ int wolfSSL_GetMaxOutputSize(WOLFSSL* ssl)
     }
 
 #ifdef HAVE_MAX_FRAGMENT
-    maxSize = min(maxSize, ssl->max_fragment);
+    maxSize = wolf_min(maxSize, ssl->max_fragment);
 #endif
 
 #ifdef WOLFSSL_DTLS
     if (ssl->options.dtls) {
-        maxSize = min(maxSize, MAX_UDP_SIZE);
+        maxSize = wolf_min(maxSize, MAX_UDP_SIZE);
     }
 #endif
 
@@ -1712,9 +1712,9 @@ static int wolfSSL_read_internal(WOLFSSL* ssl, void* data, int sz, int peek)
     }
 #endif
 
-    sz = min(sz, OUTPUT_RECORD_SIZE);
+    sz = wolf_min(sz, OUTPUT_RECORD_SIZE);
 #ifdef HAVE_MAX_FRAGMENT
-    sz = min(sz, ssl->max_fragment);
+    sz = wolf_min(sz, ssl->max_fragment);
 #endif
     ret = ReceiveData(ssl, (byte*)data, sz, peek);
 
@@ -3408,7 +3408,7 @@ static INLINE int OurPasswordCb(char* passwd, int sz, int rw, void* userdata)
         return 0;
 
     XSTRNCPY(passwd, (char*)userdata, sz);
-    return min((word32)sz, (word32)XSTRLEN((char*)userdata));
+    return wolf_min((word32)sz, (word32)XSTRLEN((char*)userdata));
 }
 
 #endif /* OPENSSL_EXTRA || HAVE_WEBSERVER */
@@ -4614,7 +4614,7 @@ int PemToDer(const unsigned char* buff, long longSz, int type,
         /* remove encrypted header if there */
         const char* const encHeader = "Proc-Type";
         word32 headerEndSz = (word32)(bufferEnd - headerEnd);
-        char* line         = XSTRNSTR(headerEnd, encHeader, min(headerEndSz,
+        char* line         = XSTRNSTR(headerEnd, encHeader, wolf_min(headerEndSz,
                                                                 PEM_LINE_LEN));
         if (line != NULL) {
             word32 lineSz;
@@ -4629,10 +4629,10 @@ int PemToDer(const unsigned char* buff, long longSz, int type,
             }
 
             lineSz = (word32)(bufferEnd - line);
-            start = XSTRNSTR(line, "DES", min(lineSz, PEM_LINE_LEN));
+            start = XSTRNSTR(line, "DES", wolf_min(lineSz, PEM_LINE_LEN));
 
             if (start == NULL) {
-                start = XSTRNSTR(line, "AES", min(lineSz, PEM_LINE_LEN));
+                start = XSTRNSTR(line, "AES", wolf_min(lineSz, PEM_LINE_LEN));
             }
 
             if (start == NULL) return WOLFSSL_BAD_FILE;
@@ -4643,7 +4643,7 @@ int PemToDer(const unsigned char* buff, long longSz, int type,
             }
 
             startSz = (word32)(bufferEnd - start);
-            finish = XSTRNSTR(start, ",", min(startSz, PEM_LINE_LEN));
+            finish = XSTRNSTR(start, ",", wolf_min(startSz, PEM_LINE_LEN));
 
             if ((start != NULL) && (finish != NULL) && (start < finish)) {
                 if (finish >= bufferEnd) {
@@ -4651,7 +4651,7 @@ int PemToDer(const unsigned char* buff, long longSz, int type,
                 }
 
                 finishSz = (word32)(bufferEnd - finish);
-                newline = XSTRNSTR(finish, "\r", min(finishSz, PEM_LINE_LEN));
+                newline = XSTRNSTR(finish, "\r", wolf_min(finishSz, PEM_LINE_LEN));
 
                 if (NAME_SZ < (finish - start)) /* buffer size of info->name*/
                     return BUFFER_E;
@@ -4664,7 +4664,7 @@ int PemToDer(const unsigned char* buff, long longSz, int type,
                     return WOLFSSL_FATAL_ERROR;
 
                 if (newline == NULL)
-                    newline = XSTRNSTR(finish, "\n", min(finishSz,
+                    newline = XSTRNSTR(finish, "\n", wolf_min(finishSz,
                                                          PEM_LINE_LEN));
                 if ((newline != NULL) && (newline > finish)) {
                     info->ivSz = (word32)(newline - (finish + 1));
@@ -7741,7 +7741,7 @@ int wolfSSL_SetServerID(WOLFSSL* ssl, const byte* id, int len, int newSession)
     if (session == NULL) {
         WOLFSSL_MSG("Valid ServerID not cached already");
 
-        ssl->session.idLen = (word16)min(SERVER_ID_LEN, (word32)len);
+        ssl->session.idLen = (word16)wolf_min(SERVER_ID_LEN, (word32)len);
         XMEMCPY(ssl->session.serverID, id, ssl->session.idLen);
     }
     #ifdef HAVE_EXT_CACHE
@@ -9568,7 +9568,7 @@ WOLFSSL_SESSION* GetSessionClient(WOLFSSL* ssl, const byte* id, int len)
     if (ssl->options.side == WOLFSSL_SERVER_END)
         return NULL;
 
-    len = min(SERVER_ID_LEN, (word32)len);
+    len = wolf_min(SERVER_ID_LEN, (word32)len);
 
 #ifdef HAVE_EXT_CACHE
     if (ssl->ctx->get_sess_cb != NULL) {
@@ -9594,7 +9594,7 @@ WOLFSSL_SESSION* GetSessionClient(WOLFSSL* ssl, const byte* id, int len)
     }
 
     /* start from most recently used */
-    count = min((word32)ClientCache[row].totalCount, SESSIONS_PER_ROW);
+    count = wolf_min((word32)ClientCache[row].totalCount, SESSIONS_PER_ROW);
     idx = ClientCache[row].nextIdx - 1;
     if (idx < 0)
         idx = SESSIONS_PER_ROW - 1; /* if back to front, the previous was end */
@@ -9712,7 +9712,7 @@ WOLFSSL_SESSION* GetSession(WOLFSSL* ssl, byte* masterSecret,
         return 0;
 
     /* start from most recently used */
-    count = min((word32)SessionCache[row].totalCount, SESSIONS_PER_ROW);
+    count = wolf_min((word32)SessionCache[row].totalCount, SESSIONS_PER_ROW);
     idx = SessionCache[row].nextIdx - 1;
     if (idx < 0)
         idx = SESSIONS_PER_ROW - 1; /* if back to front, the previous was end */
@@ -10151,7 +10151,7 @@ int wolfSSL_GetSessionAtIndex(int idx, WOLFSSL_SESSION* session)
     }
 
     if (row < SESSION_ROWS &&
-        col < (int)min(SessionCache[row].totalCount, SESSIONS_PER_ROW)) {
+        col < (int)wolf_min(SessionCache[row].totalCount, SESSIONS_PER_ROW)) {
         XMEMCPY(session,
                  &SessionCache[row].Sessions[col], sizeof(WOLFSSL_SESSION));
         result = WOLFSSL_SUCCESS;
@@ -10206,7 +10206,7 @@ static int get_locked_session_stats(word32* active, word32* total, word32* peak)
         if (active == NULL)
             continue;  /* no need to calculate what we can't set */
 
-        count = min((word32)SessionCache[i].totalCount, SESSIONS_PER_ROW);
+        count = wolf_min((word32)SessionCache[i].totalCount, SESSIONS_PER_ROW);
         idx   = SessionCache[i].nextIdx - 1;
         if (idx < 0)
             idx = SESSIONS_PER_ROW - 1; /* if back to front previous was end */
@@ -12169,7 +12169,7 @@ int wolfSSL_set_compression(WOLFSSL* ssl)
             }
 
             if (keyLeft) {
-                int store = min(keyLeft, WC_MD5_DIGEST_SIZE);
+                int store = wolf_min(keyLeft, WC_MD5_DIGEST_SIZE);
                 XMEMCPY(&key[keyLen - keyLeft], digest, store);
 
                 keyOutput  += store;
@@ -12178,7 +12178,7 @@ int wolfSSL_set_compression(WOLFSSL* ssl)
             }
 
             if (ivLeft && digestLeft) {
-                int store = min(ivLeft, digestLeft);
+                int store = wolf_min(ivLeft, digestLeft);
                 if (iv != NULL)
                     XMEMCPY(&iv[ivLen - ivLeft],
                             &digest[WC_MD5_DIGEST_SIZE - digestLeft], store);
@@ -14310,7 +14310,7 @@ static void ExternalFreeX509(WOLFSSL_X509* x509)
 
         if (x509 != NULL) {
             if (x509->authKeyIdSet) {
-                copySz = min(dstLen != NULL ? *dstLen : 0,
+                copySz = wolf_min(dstLen != NULL ? *dstLen : 0,
                              (int)x509->authKeyIdSz);
                 id = x509->authKeyId;
             }
@@ -14338,7 +14338,7 @@ static void ExternalFreeX509(WOLFSSL_X509* x509)
 
         if (x509 != NULL) {
             if (x509->subjKeyIdSet) {
-                copySz = min(dstLen != NULL ? *dstLen : 0,
+                copySz = wolf_min(dstLen != NULL ? *dstLen : 0,
                                                         (int)x509->subjKeyIdSz);
                 id = x509->subjKeyId;
             }
@@ -14436,7 +14436,7 @@ static void ExternalFreeX509(WOLFSSL_X509* x509)
         }
 
         if (buf != NULL && text != NULL) {
-            textSz = min(textSz + 1, len); /* + 1 to account for null char */
+            textSz = wolf_min(textSz + 1, len); /* + 1 to account for null char */
             if (textSz > 0) {
                 XMEMCPY(buf, text, textSz - 1);
                 buf[textSz - 1] = '\0';
@@ -14527,7 +14527,7 @@ static void ExternalFreeX509(WOLFSSL_X509* x509)
             return NULL;
         }
 
-        copySz = min(sz, name->sz);
+        copySz = wolf_min(sz, name->sz);
 
         WOLFSSL_ENTER("wolfSSL_X509_NAME_oneline");
         if (!name->sz) return in;
@@ -14657,7 +14657,7 @@ byte* wolfSSL_X509_get_device_type(WOLFSSL_X509* x509, byte* in, int *inOutSz)
     if (inOutSz == NULL) return NULL;
     if (!x509->deviceTypeSz) return in;
 
-    copySz = min(*inOutSz, x509->deviceTypeSz);
+    copySz = wolf_min(*inOutSz, x509->deviceTypeSz);
 
     if (!in) {
     #ifdef WOLFSSL_STATIC_MEMORY
@@ -14685,7 +14685,7 @@ byte* wolfSSL_X509_get_hw_type(WOLFSSL_X509* x509, byte* in, int* inOutSz)
     if (inOutSz == NULL) return NULL;
     if (!x509->hwTypeSz) return in;
 
-    copySz = min(*inOutSz, x509->hwTypeSz);
+    copySz = wolf_min(*inOutSz, x509->hwTypeSz);
 
     if (!in) {
     #ifdef WOLFSSL_STATIC_MEMORY
@@ -14714,7 +14714,7 @@ byte* wolfSSL_X509_get_hw_serial_number(WOLFSSL_X509* x509,byte* in,
     if (inOutSz == NULL) return NULL;
     if (!x509->hwTypeSz) return in;
 
-    copySz = min(*inOutSz, x509->hwSerialNumSz);
+    copySz = wolf_min(*inOutSz, x509->hwSerialNumSz);
 
     if (!in) {
     #ifdef WOLFSSL_STATIC_MEMORY

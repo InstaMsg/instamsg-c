@@ -222,7 +222,7 @@ STATIC INLINE int ConstantCompare(const byte* a, const byte* b, int length)
     #if defined(HAVE_FIPS) && !defined(min) /* so ifdef check passes */
         #define min min
     #endif
-    STATIC INLINE word32 min(word32 a, word32 b)
+    STATIC INLINE word32 wolf_min(word32 a, word32 b)
     {
         return a > b ? b : a;
     }
@@ -233,7 +233,7 @@ STATIC INLINE int ConstantCompare(const byte* a, const byte* b, int length)
     #if defined(HAVE_FIPS) && !defined(max) /* so ifdef check passes */
         #define max max
     #endif
-    STATIC INLINE word32 max(word32 a, word32 b)
+    STATIC INLINE word32 wolf_max(word32 a, word32 b)
     {
         return a > b ? a : b;
     }

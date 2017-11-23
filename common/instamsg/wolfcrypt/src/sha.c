@@ -170,7 +170,7 @@ static INLINE void AddLength(wc_Sha* sha, word32 len);
             return BUFFER_E;
 
         while (len) {
-            word32 add = min(len, SHA_REG_SIZE - sha->buffLen);
+            word32 add = wolf_min(len, SHA_REG_SIZE - sha->buffLen);
             XMEMCPY(&local[sha->buffLen], data, add);
 
             sha->buffLen += add;
@@ -505,7 +505,7 @@ int wc_ShaUpdate(wc_Sha* sha, const byte* data, word32 len)
         return BUFFER_E;
 
     while (len) {
-        word32 add = min(len, WC_SHA_BLOCK_SIZE - sha->buffLen);
+        word32 add = wolf_min(len, WC_SHA_BLOCK_SIZE - sha->buffLen);
         XMEMCPY(&local[sha->buffLen], data, add);
 
         sha->buffLen += add;

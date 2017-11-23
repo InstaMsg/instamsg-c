@@ -439,7 +439,7 @@ static int InitSha256(wc_Sha256* sha256)
             return BUFFER_E;
 
         while (len) {
-            word32 add = min(len, SHA256_REG_SIZE - sha256->buffLen);
+            word32 add = wolf_min(len, SHA256_REG_SIZE - sha256->buffLen);
             XMEMCPY(&local[sha256->buffLen], data, add);
 
             sha256->buffLen += add;
@@ -685,7 +685,7 @@ static INLINE void AddLength(wc_Sha256* sha256, word32 len)
             return BUFFER_E;
 
         if (sha256->buffLen > 0) {
-            word32 add = min(len, WC_SHA256_BLOCK_SIZE - sha256->buffLen);
+            word32 add = wolf_min(len, WC_SHA256_BLOCK_SIZE - sha256->buffLen);
             XMEMCPY(&local[sha256->buffLen], data, add);
 
             sha256->buffLen += add;
@@ -2632,7 +2632,7 @@ SHA256_NOINLINE static int Transform_Sha256_AVX2_RORX_Len(wc_Sha256* sha256,
             return BUFFER_E;
 
         while (len) {
-            word32 add = min(len, SHA224_REG_SIZE - sha224->buffLen);
+            word32 add = wolf_min(len, SHA224_REG_SIZE - sha224->buffLen);
             XMEMCPY(&local[sha224->buffLen], data, add);
 
             sha224->buffLen += add;

@@ -5324,7 +5324,7 @@ int DtlsMsgSet(DtlsMsg* msg, word32 seq, const byte* data, byte type,
                 added = bytesLeft;
             else
                 /* we're in between two frames */
-                added = min(bytesLeft, cur->begin - fragOffset);
+                added = wolf_min(bytesLeft, cur->begin - fragOffset);
 
             /* data already there */
             if (added == 0)
@@ -7429,21 +7429,21 @@ int CopyDecodedToX509(WOLFSSL_X509* x509, DecodedCert* dCert)
 
 #ifdef WOLFSSL_SEP
     {
-        int minSz = min(dCert->deviceTypeSz, EXTERNAL_SERIAL_SIZE);
+        int minSz = wolf_min(dCert->deviceTypeSz, EXTERNAL_SERIAL_SIZE);
         if (minSz > 0) {
             x509->deviceTypeSz = minSz;
             XMEMCPY(x509->deviceType, dCert->deviceType, minSz);
         }
         else
             x509->deviceTypeSz = 0;
-        minSz = min(dCert->hwTypeSz, EXTERNAL_SERIAL_SIZE);
+        minSz = wolf_min(dCert->hwTypeSz, EXTERNAL_SERIAL_SIZE);
         if (minSz > 0) {
             x509->hwTypeSz = minSz;
             XMEMCPY(x509->hwType, dCert->hwType, minSz);
         }
         else
             x509->hwTypeSz = 0;
-        minSz = min(dCert->hwSerialNumSz, EXTERNAL_SERIAL_SIZE);
+        minSz = wolf_min(dCert->hwSerialNumSz, EXTERNAL_SERIAL_SIZE);
         if (minSz > 0) {
             x509->hwSerialNumSz = minSz;
             XMEMCPY(x509->hwSerialNum, dCert->hwSerialNum, minSz);
@@ -7453,14 +7453,14 @@ int CopyDecodedToX509(WOLFSSL_X509* x509, DecodedCert* dCert)
     }
 #endif /* WOLFSSL_SEP */
     {
-        int minSz = min(dCert->beforeDateLen, MAX_DATE_SZ);
+        int minSz = wolf_min(dCert->beforeDateLen, MAX_DATE_SZ);
         if (minSz > 0) {
             x509->notBeforeSz = minSz;
             XMEMCPY(x509->notBefore, dCert->beforeDate, minSz);
         }
         else
             x509->notBeforeSz = 0;
-        minSz = min(dCert->afterDateLen, MAX_DATE_SZ);
+        minSz = wolf_min(dCert->afterDateLen, MAX_DATE_SZ);
         if (minSz > 0) {
             x509->notAfterSz = minSz;
             XMEMCPY(x509->notAfter, dCert->afterDate, minSz);
@@ -12576,7 +12576,7 @@ int BuildMessage(WOLFSSL* ssl, byte* output, int outSz, const byte* input,
             args->digestSz = ssl->specs.hash_size;
         #ifdef HAVE_TRUNCATED_HMAC
             if (ssl->truncated_hmac)
-                args->digestSz = min(TRUNCATED_HMAC_SZ, args->digestSz);
+                args->digestSz = wolf_min(TRUNCATED_HMAC_SZ, args->digestSz);
         #endif
             args->sz += args->digestSz;
 
@@ -12641,7 +12641,7 @@ int BuildMessage(WOLFSSL* ssl, byte* output, int outSz, const byte* input,
             /* write to output */
             if (args->ivSz) {
                 XMEMCPY(output + args->idx, args->iv,
-                                        min(args->ivSz, sizeof(args->iv)));
+                                        wolf_min(args->ivSz, sizeof(args->iv)));
                 args->idx += args->ivSz;
             }
             XMEMCPY(output + args->idx, input, inSz);
@@ -12927,7 +12927,7 @@ int SendCertificate(WOLFSSL* ssl)
                 i += HANDSHAKE_HEADER_SZ;
             }
             else {
-                fragSz = min(length, maxFragment);
+                fragSz = wolf_min(length, maxFragment);
                 sendSz += fragSz;
             }
 
@@ -12936,7 +12936,7 @@ int SendCertificate(WOLFSSL* ssl)
         }
         else {
         #ifdef WOLFSSL_DTLS
-            fragSz = min(length, maxFragment);
+            fragSz = wolf_min(length, maxFragment);
             sendSz += fragSz + DTLS_RECORD_EXTRA + DTLS_HANDSHAKE_EXTRA
                       + HANDSHAKE_HEADER_SZ;
             i      += DTLS_RECORD_EXTRA + DTLS_HANDSHAKE_EXTRA
@@ -13012,7 +13012,7 @@ int SendCertificate(WOLFSSL* ssl)
 
         /* member */
         if (certSz && ssl->fragOffset < certSz) {
-            word32 copySz = min(certSz - ssl->fragOffset, fragSz);
+            word32 copySz = wolf_min(certSz - ssl->fragOffset, fragSz);
             XMEMCPY(output + i,
                     ssl->buffers.certificate->buffer + ssl->fragOffset, copySz);
             i += copySz;
@@ -13021,7 +13021,7 @@ int SendCertificate(WOLFSSL* ssl)
             fragSz -= copySz;
         }
         if (certChainSz && fragSz) {
-            word32 copySz = min(certChainSz + certSz - ssl->fragOffset, fragSz);
+            word32 copySz = wolf_min(certChainSz + certSz - ssl->fragOffset, fragSz);
             XMEMCPY(output + i,
                     ssl->buffers.certChain->buffer + ssl->fragOffset - certSz,
                     copySz);
@@ -13749,14 +13749,14 @@ int SendData(WOLFSSL* ssl, const void* data, int sz)
 
         if (sent == sz) break;
 
-        len = min(sz - sent, OUTPUT_RECORD_SIZE);
+        len = wolf_min(sz - sent, OUTPUT_RECORD_SIZE);
 #ifdef HAVE_MAX_FRAGMENT
-        len = min(len, ssl->max_fragment);
+        len = wolf_min(len, ssl->max_fragment);
 #endif
 
 #ifdef WOLFSSL_DTLS
         if (IsDtlsNotSctpMode(ssl)) {
-            len = min(len, MAX_UDP_SIZE);
+            len = wolf_min(len, MAX_UDP_SIZE);
         }
 #endif
         buffSz = len;
@@ -15920,7 +15920,7 @@ int SetCipherList(WOLFSSL_CTX* ctx, Suites* suites, const char* list)
         word32 length;
 
         next   = XSTRSTR(next, ":");
-        length = min(sizeof(name), !next ? (word32)XSTRLEN(current) /* last */
+        length = wolf_min(sizeof(name), !next ? (word32)XSTRLEN(current) /* last */
                                          : (word32)(next - current));
 
         XSTRNCPY(name, current, length);
@@ -17175,7 +17175,7 @@ static int DoServerKeyExchange(WOLFSSL* ssl, const byte* input,
                     }
 
                     /* get PSK server hint from the wire */
-                    srvHintLen = min(length, MAX_PSK_ID_LEN);
+                    srvHintLen = wolf_min(length, MAX_PSK_ID_LEN);
                     XMEMCPY(ssl->arrays->server_hint, input + args->idx,
                                                                     srvHintLen);
                     ssl->arrays->server_hint[srvHintLen] = '\0'; /* null term */
@@ -17373,7 +17373,7 @@ static int DoServerKeyExchange(WOLFSSL* ssl, const byte* input,
                     }
 
                     /* get PSK server hint from the wire */
-                    srvHintLen = min(length, MAX_PSK_ID_LEN);
+                    srvHintLen = wolf_min(length, MAX_PSK_ID_LEN);
                     XMEMCPY(ssl->arrays->server_hint, input + args->idx,
                                                                 srvHintLen);
                     ssl->arrays->server_hint[srvHintLen] = '\0'; /* null term */
@@ -17484,7 +17484,7 @@ static int DoServerKeyExchange(WOLFSSL* ssl, const byte* input,
                     }
 
                     /* get PSK server hint from the wire */
-                    srvHintLen = min(length, MAX_PSK_ID_LEN);
+                    srvHintLen = wolf_min(length, MAX_PSK_ID_LEN);
                     XMEMCPY(ssl->arrays->server_hint, input + args->idx,
                                                                     srvHintLen);
                     ssl->arrays->server_hint[srvHintLen] = '\0'; /* null term */
@@ -17925,7 +17925,7 @@ static int DoServerKeyExchange(WOLFSSL* ssl, const byte* input,
                                     TypeHash(args->hashAlgo));
                                 if (encSigSz != args->sigSz || !args->output ||
                                     XMEMCMP(args->output, encodedSig,
-                                            min(encSigSz, MAX_ENCODED_SIG_SZ)) != 0) {
+                                            wolf_min(encSigSz, MAX_ENCODED_SIG_SZ)) != 0) {
                                     ret = VERIFY_SIGN_ERROR;
                                 }
                             #ifdef WOLFSSL_SMALL_STACK
@@ -23067,7 +23067,7 @@ static int DoSessionTicket(WOLFSSL* ssl, const byte* input, word32* inOutIdx,
 
                             if (args->sendSz != args->sigSz || !args->output ||
                                 XMEMCMP(args->output, encodedSig,
-                                    min(args->sigSz, MAX_ENCODED_SIG_SZ)) != 0) {
+                                    wolf_min(args->sigSz, MAX_ENCODED_SIG_SZ)) != 0) {
                                 ret = VERIFY_CERT_ERROR;
                             }
 

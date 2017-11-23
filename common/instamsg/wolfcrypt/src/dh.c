@@ -589,7 +589,7 @@ static int GeneratePrivateDh(DhKey* key, WC_RNG* rng, byte* priv, word32* privSz
         default:
         #ifndef WOLFSSL_DH_CONST
             /* if using floating points and size of p is not in table */
-            sz = min(sz, 2 * DiscreteLogWorkFactor(sz * WOLFSSL_BIT_SIZE) /
+            sz = wolf_min(sz, 2 * DiscreteLogWorkFactor(sz * WOLFSSL_BIT_SIZE) /
                                        WOLFSSL_BIT_SIZE + 1);
             break;
         #else

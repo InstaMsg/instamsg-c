@@ -176,7 +176,7 @@ static int p_hash(byte* result, word32 resLen, const byte* secret,
 
                 if ((i == lastTime) && lastLen)
                     XMEMCPY(&result[idx], current,
-                                             min(lastLen, P_HASH_MAX_SIZE));
+                                             wolf_min(lastLen, P_HASH_MAX_SIZE));
                 else {
                     XMEMCPY(&result[idx], current, len);
                     idx += len;
@@ -1927,18 +1927,18 @@ int TLSX_SNI_GetFromBuffer(const byte* clientHello, word32 helloSz,
 
                 if (sniType != type) {
                     offset  += sniLen;
-                    listLen -= min(ENUM_LEN + OPAQUE16_LEN + sniLen, listLen);
+                    listLen -= wolf_min(ENUM_LEN + OPAQUE16_LEN + sniLen, listLen);
                     continue;
                 }
 
-                *inOutSz = min(sniLen, *inOutSz);
+                *inOutSz = wolf_min(sniLen, *inOutSz);
                 XMEMCPY(sni, clientHello + offset, *inOutSz);
 
                 return WOLFSSL_SUCCESS;
             }
         }
 
-        len16 -= min(2 * OPAQUE16_LEN + extLen, len16);
+        len16 -= wolf_min(2 * OPAQUE16_LEN + extLen, len16);
     }
 
     return len16 ? BUFFER_ERROR : 0;
