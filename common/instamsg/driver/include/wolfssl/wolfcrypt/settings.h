@@ -1577,6 +1577,7 @@ extern void uITRON4_free(void *p) ;
 
 #define XMALLOC_USER
 #define SINGLE_THREADED
+#define NO_WRITEV
 
 
 #ifdef __cplusplus
