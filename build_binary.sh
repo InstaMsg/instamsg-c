@@ -54,7 +54,6 @@ SOURCES=`echo                                                                   
         common/instamsg/wolfcrypt/src/sha256.c                                                  \
         common/instamsg/wolfcrypt/src/arc4.c                                                    \
         common/instamsg/wolfcrypt/src/des3.c                                                    \
-        common/instamsg/wolfcrypt/src/aes.c                                                     \
         common/instamsg/wolfcrypt/src/random.c                                                  \
         common/instamsg/wolfcrypt/src/dh.c                                                      \
         common/instamsg/wolfcrypt/src/error.c                                                   \
