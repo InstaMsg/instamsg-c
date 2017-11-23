@@ -35,6 +35,7 @@
 #include "../../driver/include/wolfssl/wolfcrypt/settings.h"
 
 #include "../../driver/include/log.h"
+#include "../../driver/include/misc.h"
 
 #ifdef NO_INLINE
     #include <wolfssl/wolfcrypt/misc.h>
@@ -394,7 +395,7 @@ int mp_copy (mp_int * a, mp_int * b)
 int mp_grow (mp_int * a, int size)
 {
   int     i;
-  mp_digit *tmp;
+  mp_digit *tmp = NULL;
 
   /* if the alloc size is smaller alloc more ram */
   if (a->alloc < size || size == 0) {

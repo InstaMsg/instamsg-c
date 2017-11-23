@@ -117,6 +117,7 @@
         #elif defined(EBSNET)
             #include "rtipapi.h"  /* errno */
             #include "socket.h"
+#if 0
         #elif !defined(DEVKITPRO) && !defined(WOLFSSL_PICOTCP)
             #include <sys/socket.h>
             #include <arpa/inet.h>
@@ -127,6 +128,7 @@
             #else
                 #include <sys/ioctl.h>
             #endif
+#endif
         #endif
     #endif
 #endif /* USE_WINDOWS_API */
@@ -238,12 +240,14 @@
 #elif defined(WOLFSSL_VXWORKS)
     #define SEND_FUNCTION send
     #define RECV_FUNCTION recv
+#if 0
 #else
     #define SEND_FUNCTION send
     #define RECV_FUNCTION recv
     #if !defined(HAVE_SOCKADDR) && !defined(WOLFSSL_NO_SOCK)
         #define HAVE_SOCKADDR
     #endif
+#endif
 #endif
 
 #ifdef USE_WINDOWS_API
@@ -286,8 +290,6 @@
 #endif
 WOLFSSL_API  int wolfIO_TcpConnect(SOCKET_T* sockfd, const char* ip,
     unsigned short port, int to_sec);
-WOLFSSL_API  int wolfIO_Send(SOCKET_T sd, char *buf, int sz, int wrFlags);
-WOLFSSL_API  int wolfIO_Recv(SOCKET_T sd, char *buf, int sz, int rdFlags);
 
 #endif /* USE_WOLFSSL_IO || HAVE_HTTP_CLIENT */
 

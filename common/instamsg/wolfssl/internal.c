@@ -26,6 +26,7 @@
 #endif
 
 #include "../driver/include/globals.h"
+#include "../driver/include/time.h"
 
 #include "../driver/include/wolfssl/wolfcrypt/settings.h"
 
@@ -6082,7 +6083,6 @@ static int Receive(WOLFSSL* ssl, byte* buf, word32 sz)
         return -1;
     }
 
-retry:
     recvd = ssl->ctx->CBIORecv(ssl, (char *)buf, (int)sz, ssl->IOCB_ReadCtx);
     if(recvd == SOCKET_READ_TIMEOUT)
     {
@@ -16154,7 +16154,10 @@ void PickHashSigAlgo(WOLFSSL* ssl, const byte* hashSigAlgo,
                        int sz, void* heap)
     {
         if (info->numberPackets < (MAX_PACKETS_HANDSHAKE - 1)) {
+			
+#if 0
             Timeval currTime;
+#endif
 
             /* may add name after */
             if (name)
@@ -16175,11 +16178,11 @@ void PickHashSigAlgo(WOLFSSL* ssl, const byte* hashSigAlgo,
                     XMEMCPY(info->packets[info->numberPackets].bufferValue,
                            data, sz);
             }
-            gettimeofday(&currTime, 0);
-            info->packets[info->numberPackets].timestamp.tv_sec  =
-                                                             currTime.tv_sec;
-            info->packets[info->numberPackets].timestamp.tv_usec =
-                                                             currTime.tv_usec;
+			
+
+            info->packets[info->numberPackets].timestamp.tv_sec  = getCurrentTick();
+            info->packets[info->numberPackets].timestamp.tv_usec = 0;
+			
             info->numberPackets++;
         }
     }
@@ -24717,5 +24720,17 @@ int wolfSSL_AsyncPush(WOLFSSL* ssl, WC_ASYNC_DEV* asyncDev)
 
 
 #undef ERROR_OUT
+
+#if 0
+int _gettimeofday( struct timeval *tv, void *tzvp );
+int _gettimeofday( struct timeval *tv, void *tzvp )
+{
+	uint64_t t = getCurrentTick();
+	tv->tv_sec = t;
+	tv->tv_usec = 0;
+	
+	return 0; 
+}
+#endif
 
 #endif /* WOLFCRYPT_ONLY */

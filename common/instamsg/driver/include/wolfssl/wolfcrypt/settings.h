@@ -1580,7 +1580,7 @@ extern void uITRON4_free(void *p) ;
 #define NO_WRITEV
 #define NO_AES
 #define NO_FILESYSTEM
-
+#define WOLFSSL_SMALL_STACK
 
 #ifdef __cplusplus
     }   /* extern "C" */

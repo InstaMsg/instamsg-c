@@ -28,6 +28,7 @@
 #endif
 
 #include "../driver/include/log.h"
+#include "../driver/include/misc.h"
 
 #include "../driver/include/wolfssl/wolfcrypt/settings.h"
 
@@ -10490,8 +10491,8 @@ int wolfSSL_set_compression(WOLFSSL* ssl)
     {
         int       ret        = WOLFSSL_FATAL_ERROR;
         int       oldTimerOn = 0;   /* was timer already on */
-        Timeval   startTime;
-        Timeval   endTime;
+		Timeval	  startTime;
+		Timeval   endTime;
         Timeval   totalTime;
         Itimerval myTimeout;
         Itimerval oldTimeout; /* if old timer adjust from total time to reset */
@@ -10507,7 +10508,9 @@ int wolfSSL_set_compression(WOLFSSL* ssl)
             ssl->toInfoOn = 1;
             InitTimeoutInfo(&ssl->timeoutInfo);
 
-            if (gettimeofday(&startTime, 0) < 0)
+			startTime.tv_sec = getCurrentTick();
+			startTime.tv_usec = 0;			
+            if (startTime.tv_sec < 0)
                 ERR_OUT(GETTIME_ERROR);
 
             /* use setitimer to simulate getitimer, init 0 myTimeout */
@@ -10557,7 +10560,9 @@ int wolfSSL_set_compression(WOLFSSL* ssl)
         /* do callbacks */
         if (toCb) {
             if (oldTimerOn) {
-                gettimeofday(&endTime, 0);
+                endTime.tv_sec = getCurrentTick();
+				endTime.tv_usec = 0;
+				
                 SubtractTimes(endTime, startTime, totalTime);
                 /* adjust old timer for elapsed time */
                 if (CmpTimes(totalTime, oldTimeout.it_value, <))
@@ -26383,6 +26388,7 @@ void *XREALLOC(void *p, size_t n, void* heap, int type)
     error_log(LOG_GLOBAL_BUFFER);
 
     resetDevice();
+	return NULL;
 }
 
 void XFREE(void *p, void* heap, int type)

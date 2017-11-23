@@ -41,6 +41,9 @@
 #include "../driver/include/wolfssl/error-ssl.h"
 #include "../driver/include/wolfssl/wolfio.h"
 
+#include "../driver/include/socket.h"
+
+
 #if defined(HAVE_HTTP_CLIENT)
     #include <stdlib.h>   /* atoi(), strtol() */
 #endif
@@ -191,7 +194,7 @@ int EmbedReceive(WOLFSSL *ssl, char *buf, int sz, void *ctx)
     int rc = FAILURE;
 
     SG_Socket *sock = (SG_Socket*) ctx;
-    rc = socket_read(sock, buf, sz, 0);
+    rc = socket_read(sock, (unsigned char*) buf, sz, 0);
 
     if(rc == SOCKET_READ_TIMEOUT)
     {
@@ -212,6 +215,8 @@ int EmbedReceive(WOLFSSL *ssl, char *buf, int sz, void *ctx)
     {
         return sock->bytes_received;
     }
+	
+	return FAILURE;
 }
 
 /* The send embedded callback
@@ -223,7 +228,7 @@ int EmbedSend(WOLFSSL* ssl, char *buf, int sz, void *ctx)
     int rc = FAILURE;
 
     SG_Socket *sock = (SG_Socket*) ctx;
-    rc = socket_write(sock, buf, sz);
+    rc = socket_write(sock, (unsigned char*) buf, sz);
 
     return rc;
 }
@@ -606,28 +611,6 @@ int EmbedGenerateCookie(WOLFSSL* ssl, byte *buf, int sz, void *ctx)
     }
 #endif /* WOLFSSL_SESSION_EXPORT */
 #endif /* WOLFSSL_DTLS */
-
-
-int wolfIO_Recv(SOCKET_T sd, char *buf, int sz, int rdFlags)
-{
-    int recvd;
-
-    recvd = (int)RECV_FUNCTION(sd, buf, sz, rdFlags);
-    recvd = TranslateReturnCode(recvd, sd);
-
-    return recvd;
-}
-
-int wolfIO_Send(SOCKET_T sd, char *buf, int sz, int wrFlags)
-{
-    int sent;
-
-    sent = (int)SEND_FUNCTION(sd, buf, sz, wrFlags);
-    sent = TranslateReturnCode(sent, sd);
-
-    return sent;
-}
-
 #endif /* USE_WOLFSSL_IO */
 
 
