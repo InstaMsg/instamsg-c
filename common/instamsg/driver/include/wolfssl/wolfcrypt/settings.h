@@ -1579,6 +1579,10 @@ extern void uITRON4_free(void *p) ;
 #define SINGLE_THREADED
 #define NO_WRITEV
 #define NO_AES
+#define NO_DSA
+#define NO_DH
+#define NO_PSK
+#define NO_WOLFSSL_SERVER
 #define NO_FILESYSTEM
 #define WOLFSSL_SMALL_STACK
 
