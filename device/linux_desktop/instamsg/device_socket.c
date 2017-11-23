@@ -298,7 +298,6 @@ int socket_read(SG_Socket* socket, unsigned char* buffer, int len, unsigned char
         }
         else
         {
-            printf("==> read [%u] bytes\n", rc);
             bytes = bytes + rc;
             socket->bytes_received = bytes;
         }
@@ -376,10 +375,6 @@ int socket_write(SG_Socket* socket, unsigned char* buffer, int len)
 	}
 
     bytes_sent_over_wire = bytes_sent_over_wire + len;
-
-    sg_sprintf(LOG_GLOBAL_BUFFER, "[%u] bytes written", len);
-    info_log(LOG_GLOBAL_BUFFER);
-
     return SUCCESS;
 }
 

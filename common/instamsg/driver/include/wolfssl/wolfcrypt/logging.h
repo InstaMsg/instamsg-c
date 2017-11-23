@@ -83,11 +83,11 @@ WOLFSSL_API int wolfSSL_SetLoggingCb(wolfSSL_Logging_cb log_function);
 
 #else /* DEBUG_WOLFSSL   */
 
-    #define WOLFSSL_ENTER(m)    printf("Entering [%s]\n", m)
-    #define WOLFSSL_LEAVE(m, r) printf("Leaving [%s] with return-code [%d]\n", m, r);
-    #define WOLFSSL_STUB(m)     printf("Stub [%s]\n", m);
+    #define WOLFSSL_ENTER(m)    /*printf("Entering [%s]\n", m)*/
+    #define WOLFSSL_LEAVE(m, r) /*printf("Leaving [%s] with return-code [%d]\n", m, r);*/
+    #define WOLFSSL_STUB(m)     /*printf("Stub [%s]\n", m);*/
 
-    #define WOLFSSL_MSG(m)      printf("%s\n", m)
+    #define WOLFSSL_MSG(m)      /*printf("%s\n", m)*/
     #define WOLFSSL_BUFFER(b, l)
 
 #endif /* DEBUG_WOLFSSL  */

@@ -6086,7 +6086,6 @@ retry:
     recvd = ssl->ctx->CBIORecv(ssl, (char *)buf, (int)sz, ssl->IOCB_ReadCtx);
     if(recvd == SOCKET_READ_TIMEOUT)
     {
-        printf("checkpoint 1\n");
         return WANT_READ;
     }
     else if(recvd == FAILURE)

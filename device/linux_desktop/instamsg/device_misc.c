@@ -32,7 +32,10 @@
 #include <signal.h>
 #include <string.h>
 
+#include <stdlib.h>
+
 #include "../../../common/instamsg/driver/include/globals.h"
+
 
 
 /*

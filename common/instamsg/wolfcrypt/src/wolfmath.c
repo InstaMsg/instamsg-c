@@ -30,7 +30,7 @@
 #include "../../driver/include/wolfssl/wolfcrypt/settings.h"
 
 #ifdef USE_FAST_MATH
-    #include <wolfssl/wolfcrypt/tfm.h>
+    #include "../../driver/include/wolfssl/wolfcrypt/tfm.h"
 #else
     #include "../../driver/include/wolfssl/wolfcrypt/integer.h"
 #endif

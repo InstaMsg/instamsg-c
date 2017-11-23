@@ -34,7 +34,7 @@
 */
 #include "./types.h"       /* will set MP_xxBIT if not default */
 #ifdef USE_FAST_MATH
-    #include <wolfssl/wolfcrypt/tfm.h>
+    #include "./tfm.h"
 #else
 
 #include "./random.h"

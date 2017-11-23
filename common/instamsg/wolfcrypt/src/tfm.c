@@ -46,10 +46,11 @@
 
 #ifdef USE_FAST_MATH
 
-#include <wolfssl/wolfcrypt/random.h>
-#include <wolfssl/wolfcrypt/tfm.h>
-#include <wolfcrypt/src/asm.c>  /* will define asm MACROS or C ones */
-#include <wolfssl/wolfcrypt/wolfmath.h> /* common functions */
+#include "../../driver/include/wolfssl/wolfcrypt/random.h"
+#include "../../driver/include/wolfssl/wolfcrypt/tfm.h"
+#include "../../driver/include/wolfssl/wolfcrypt/wolfmath.h"
+
+#include "./asm.c"  /* will define asm MACROS or C ones */
 
 #if defined(FREESCALE_LTC_TFM)
     #include <wolfssl/wolfcrypt/port/nxp/ksdk_port.h>

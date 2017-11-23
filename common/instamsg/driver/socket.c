@@ -226,12 +226,12 @@ static int secure_socket_write(SG_Socket* socket, unsigned char* buffer, int len
     rc = wolfSSL_write(socket->ssl, buffer, len);
     if(rc == len)
     {
-        printf("===> baraabar\n");
         return SUCCESS;
     }
     else
     {
-        printf("=======> dekho [%d]\n", rc);
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Bytes-Write failed in secure_socket_write, code = [%d]", rc);
+        error_log(LOG_GLOBAL_BUFFER);
     }
 
     return FAILURE;

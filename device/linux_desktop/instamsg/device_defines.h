@@ -46,11 +46,16 @@
 /*
  * We use the vanilla "malloc/free" methods for Linux.
  */
-#define USE_DEFAULT_MALLOC          0
-
 #include <stdlib.h>
-#define sg_malloc                   malloc
-#define sg_free                     free
+
+#define USE_DEFAULT_MALLOC                                      0
+#if USE_DEFAULT_MALLOC == 1
+#define sg_malloc                                               DEFAULT_MALLOC
+#define sg_free                                                 DEFAULT_FREE
+#else
+#define sg_malloc                                               malloc
+#define sg_free                                                 free
+#endif
 
 #define PROSTR
 

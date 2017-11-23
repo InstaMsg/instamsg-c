@@ -1575,6 +1575,10 @@ extern void uITRON4_free(void *p) ;
 #define HAVE_ECC_KEY_IMPORT
 #define HAVE_ECC_KEY_EXPORT
 
+
+/*#define XMALLOC_USER*/
+
+
 #ifdef __cplusplus
     }   /* extern "C" */
 #endif

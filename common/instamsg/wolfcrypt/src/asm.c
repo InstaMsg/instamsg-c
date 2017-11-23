@@ -24,7 +24,7 @@
     #include <config.h>
 #endif
 
-#include <wolfssl/wolfcrypt/settings.h>
+#include "../../driver/include/wolfssl/wolfcrypt/settings.h"
 
 /*
  * Based on public domain TomsFastMath 0.10 by Tom St Denis, tomstdenis@iahu.ca,

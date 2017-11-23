@@ -26369,6 +26369,38 @@ int wolfSSL_set_msg_callback_arg(WOLFSSL *ssl, void* arg)
 }
 #endif
 
+#if 0
+#include <stdlib.h>
+
+void *XMALLOC(size_t n, void* heap, int type)
+{
+    return ((void*) malloc(n));
+#if 0
+    return ((void*) DEFAULT_MALLOC(n));
+#endif
+
+}
+
+void *XREALLOC(void *p, size_t n, void* heap, int type)
+{
+    /*return ((void*) realloc(p, n));*/
+#if 0
+    printf("\n\n\n !!!!!!!!!!!!! problem !!!!!!!!!!!!!!!!!!!!\n\n\n");
+    exit(1);
+#endif
+}
+
+
+void XFREE(void *p, void* heap, int type)
+{
+    free(p);
+#if 0
+    DEFAULT_FREE(p);
+#endif
+}
+#endif
+
+
 
 #endif /* WOLFCRYPT_ONLY */
 #endif
