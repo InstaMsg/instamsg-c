@@ -34,6 +34,8 @@
 /* in case user set USE_FAST_MATH there */
 #include "../../driver/include/wolfssl/wolfcrypt/settings.h"
 
+#include "../../driver/include/log.h"
+
 #ifdef NO_INLINE
     #include <wolfssl/wolfcrypt/misc.h>
 #else
@@ -397,7 +399,9 @@ int mp_grow (mp_int * a, int size)
   /* if the alloc size is smaller alloc more ram */
   if (a->alloc < size || size == 0) {
     /* ensure there are always at least MP_PREC digits extra on top */
-    size += (MP_PREC * 2) - (size % MP_PREC);
+
+    /*size += (MP_PREC * 2) - (size % MP_PREC);*/
+    size = 160;
 
     /* reallocate the array a->dp
      *
@@ -405,8 +409,18 @@ int mp_grow (mp_int * a, int size)
      * in case the operation failed we don't want
      * to overwrite the dp member of a.
      */
-    tmp = OPT_CAST(mp_digit) XREALLOC (a->dp, sizeof (mp_digit) * size, NULL,
-                                                           DYNAMIC_TYPE_BIGINT);
+    if((a->dp == NULL) && (a->alloc == 0))
+    {
+        tmp = OPT_CAST(mp_digit) XMALLOC (sizeof (mp_digit) * size, NULL, DYNAMIC_TYPE_BIGINT);
+    }
+    else
+    {
+        sg_sprintf(LOG_GLOBAL_BUFFER, "Unexpected case hit ..");
+        error_log(LOG_GLOBAL_BUFFER);
+
+        resetDevice();
+    }
+
     if (tmp == NULL) {
       /* reallocation failed but "a" is still valid [can be freed] */
       return MP_MEM;
@@ -2964,7 +2978,8 @@ int mp_init_size (mp_int * a, int size)
   int x;
 
   /* pad size so there are always extra digits */
-  size += (MP_PREC * 2) - (size % MP_PREC);
+  /*size += (MP_PREC * 2) - (size % MP_PREC);*/
+  size = 160;
 
   /* alloc mem */
   a->dp = OPT_CAST(mp_digit) XMALLOC (sizeof (mp_digit) * size, NULL,

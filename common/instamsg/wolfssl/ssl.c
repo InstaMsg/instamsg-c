@@ -27,6 +27,8 @@
     #include <config.h>
 #endif
 
+#include "../driver/include/log.h"
+
 #include "../driver/include/wolfssl/wolfcrypt/settings.h"
 
 #ifndef WOLFCRYPT_ONLY
@@ -26369,37 +26371,24 @@ int wolfSSL_set_msg_callback_arg(WOLFSSL *ssl, void* arg)
 }
 #endif
 
-#if 0
-#include <stdlib.h>
-
 void *XMALLOC(size_t n, void* heap, int type)
 {
-    return ((void*) malloc(n));
-#if 0
-    return ((void*) DEFAULT_MALLOC(n));
-#endif
+    return ((void*) sg_malloc(n));
 
 }
 
 void *XREALLOC(void *p, size_t n, void* heap, int type)
 {
-    /*return ((void*) realloc(p, n));*/
-#if 0
-    printf("\n\n\n !!!!!!!!!!!!! problem !!!!!!!!!!!!!!!!!!!!\n\n\n");
-    exit(1);
-#endif
-}
+    sg_sprintf(LOG_GLOBAL_BUFFER, "Unexpected realloc hit, rebooting ..");
+    error_log(LOG_GLOBAL_BUFFER);
 
+    resetDevice();
+}
 
 void XFREE(void *p, void* heap, int type)
 {
-    free(p);
-#if 0
-    DEFAULT_FREE(p);
-#endif
+    sg_free(p);
 }
-#endif
-
 
 
 #endif /* WOLFCRYPT_ONLY */
