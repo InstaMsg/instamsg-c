@@ -24,7 +24,6 @@
     #include <config.h>
 #endif
 
-#include "device_defines.h"
 #include "../../driver/include/wolfssl/wolfcrypt/settings.h"
 
 /* on HPUX 11 you may need to install /dev/random see
@@ -1655,7 +1654,7 @@ int wc_GenerateSeed(OS_Seed* os, byte* output, word32 sz)
     }
     */
 
-#elif USE_DEFAULT_RANDOM_SEEDER == 1
+#elif 0
 
     /* may block */
     int wc_GenerateSeed(OS_Seed* os, byte* output, word32 sz)
