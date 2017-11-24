@@ -27,6 +27,9 @@
 
 #include "./wolfcrypt/types.h"
 #include "./ssl.h"
+
+#include "./wolfcrypt/memory.h"
+
 #ifdef HAVE_CRL
     #include "./crl.h"
 #endif
