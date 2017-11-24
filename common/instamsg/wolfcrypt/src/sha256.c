@@ -28,6 +28,10 @@
 
 #include "../../driver/include/wolfssl/wolfcrypt/settings.h"
 
+#include "../../driver/include/log.h"
+#include "../../driver/include/globals.h"
+
+
 #if !defined(NO_SHA256)
 
 #include "../../driver/include/wolfssl/wolfcrypt/sha256.h"
@@ -119,24 +123,38 @@ static INLINE void AddLength(wc_Sha256* sha256, word32 len);
 static int InitSha256(wc_Sha256* sha256)
 {
     int ret = 0;
-
+	
+	sg_sprintf(LOG_GLOBAL_BUFFER, "checkpoint 1");
     if (sha256 == NULL)
+	{
         return BAD_FUNC_ARG;
+	}
+		
+	sg_sprintf(LOG_GLOBAL_BUFFER, "checkpoint ");
 
     XMEMSET(sha256->digest, 0, sizeof(sha256->digest));
-    sha256->digest[0] = 0x6A09E667L;
-    sha256->digest[1] = 0xBB67AE85L;
-    sha256->digest[2] = 0x3C6EF372L;
-    sha256->digest[3] = 0xA54FF53AL;
-    sha256->digest[4] = 0x510E527FL;
-    sha256->digest[5] = 0x9B05688CL;
-    sha256->digest[6] = 0x1F83D9ABL;
-    sha256->digest[7] = 0x5BE0CD19L;
+    sha256->digest[0] = 0x6A09E667;
+	sg_sprintf(LOG_GLOBAL_BUFFER, "checkpoint 2");
+    sha256->digest[1] = 0xBB67AE85;
+	sg_sprintf(LOG_GLOBAL_BUFFER, "checkpoint 3");
+    sha256->digest[2] = 0x3C6EF372;
+	sg_sprintf(LOG_GLOBAL_BUFFER, "checkpoint 4");
+    sha256->digest[3] = 0xA54FF53A;
+	sg_sprintf(LOG_GLOBAL_BUFFER, "checkpoint 5");
+    sha256->digest[4] = 0x510E527F;
+	sg_sprintf(LOG_GLOBAL_BUFFER, "checkpoint 6");
+    sha256->digest[5] = 0x9B05688C;
+	sg_sprintf(LOG_GLOBAL_BUFFER, "checkpoint 7");
+    sha256->digest[6] = 0x1F83D9AB;
+	sg_sprintf(LOG_GLOBAL_BUFFER, "checkpoint 8");
+    sha256->digest[7] = 0x5BE0CD19;
 
     sha256->buffLen = 0;
     sha256->loLen   = 0;
     sha256->hiLen   = 0;
 
+//sg_sprintf(LOG_GLOBAL_BUFFER, "checkpoint 9");
+//info_log(LOG_GLOBAL_BUFFER);
     return ret;
 }
 #endif

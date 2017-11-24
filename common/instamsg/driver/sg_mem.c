@@ -41,7 +41,7 @@
 #endif
 
 #if SSL_ENABLED == 1
-#define MAX_HEAP_SIZE               (15 * (MAX_BUFFER_SIZE + HEADER_SIZE))
+#define MAX_HEAP_SIZE               (18 * (MAX_BUFFER_SIZE + HEADER_SIZE))
 #else
 #define MAX_HEAP_SIZE               (10 * (MAX_BUFFER_SIZE + HEADER_SIZE))
 #endif
@@ -62,8 +62,7 @@ void* DEFAULT_MALLOC(unsigned short numBytes)
         oneCallDone = 1;
         currentBytesUsed = 0;
     }
-
-
+	
     if((currentBytesUsed + numBytes + HEADER_SIZE) > MAX_HEAP_SIZE)
     {
         sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("%sCannot allocate [%u] bytes of memory."), MEM_ALLOC, numBytes);
