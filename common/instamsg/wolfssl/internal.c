@@ -26,6 +26,8 @@
 #endif
 
 #include "../driver/include/globals.h"
+#include "../driver/include/log.h"
+#include "../driver/include/misc.h"
 #include "../driver/include/time.h"
 
 #include "../driver/include/wolfssl/wolfcrypt/settings.h"
@@ -24721,7 +24723,6 @@ int wolfSSL_AsyncPush(WOLFSSL* ssl, WC_ASYNC_DEV* asyncDev)
 
 #undef ERROR_OUT
 
-#if 0
 int _gettimeofday( struct timeval *tv, void *tzvp );
 int _gettimeofday( struct timeval *tv, void *tzvp )
 {
@@ -24731,6 +24732,15 @@ int _gettimeofday( struct timeval *tv, void *tzvp )
 	
 	return 0; 
 }
-#endif
+
+int _open(const char *path, int oflags, mode_t mode);
+int _open(const char *path, int oflags, mode_t mode)
+{
+	sg_sprintf(LOG_GLOBAL_BUFFER, "_open hit unexpectedly, resetting device");
+	error_log(LOG_GLOBAL_BUFFER);
+	
+	resetDevice();
+	return 0;
+}
 
 #endif /* WOLFCRYPT_ONLY */
