@@ -24723,24 +24723,4 @@ int wolfSSL_AsyncPush(WOLFSSL* ssl, WC_ASYNC_DEV* asyncDev)
 
 #undef ERROR_OUT
 
-int _gettimeofday( struct timeval *tv, void *tzvp );
-int _gettimeofday( struct timeval *tv, void *tzvp )
-{
-	uint64_t t = getCurrentTick();
-	tv->tv_sec = t;
-	tv->tv_usec = 0;
-	
-	return 0; 
-}
-
-int _open(const char *path, int oflags, mode_t mode);
-int _open(const char *path, int oflags, mode_t mode)
-{
-	sg_sprintf(LOG_GLOBAL_BUFFER, "_open hit unexpectedly, resetting device");
-	error_log(LOG_GLOBAL_BUFFER);
-	
-	resetDevice();
-	return 0;
-}
-
 #endif /* WOLFCRYPT_ONLY */
