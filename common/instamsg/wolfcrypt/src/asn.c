@@ -1403,25 +1403,18 @@ int GetObjectId(const byte* input, word32* inOutIdx, word32* oid,
 
         #ifdef ASN_DUMP_OID
             /* support for dumping OID information */
-            printf("OID (Type %d, Sz %d, Sum %d): ", oidType, actualOidSz, *oid);
             for (i=0; i<actualOidSz; i++) {
-                printf("%d, ", actualOid[i]);
             }
-            printf("\n");
             #ifdef HAVE_OID_DECODING
             {
                 word16 decOid[16];
                 word32 decOidSz = sizeof(decOid);
                 ret = DecodeObjectId(actualOid, actualOidSz, decOid, &decOidSz);
                 if (ret == 0) {
-                    printf("  Decoded (Sz %d): ", decOidSz);
                     for (i=0; i<decOidSz; i++) {
-                        printf("%d.", decOid[i]);
                     }
-                    printf("\n");
                 }
                 else {
-                    printf("DecodeObjectId failed: %d\n", ret);
                 }
             }
             #endif /* HAVE_OID_DECODING */
