@@ -95,6 +95,7 @@
 
 #if SSL_ENABLED == 1
 #define SSL_WIRE_BUFFER_SIZE        MAX_BUFFER_SIZE
+#define USE_DEFAULT_RANDOM_SEEDER   1
 #endif
 
 #define NTP_TIME_SYNC_PRESENT       1
