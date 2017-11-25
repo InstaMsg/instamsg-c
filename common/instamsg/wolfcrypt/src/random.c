@@ -1657,7 +1657,7 @@ int wc_GenerateSeed(OS_Seed* os, byte* output, word32 sz)
     }
     */
 
-#elif 0
+#elif (USE_DEFAULT_SEEDER == 1)
 
     /* may block */
     int wc_GenerateSeed(OS_Seed* os, byte* output, word32 sz)

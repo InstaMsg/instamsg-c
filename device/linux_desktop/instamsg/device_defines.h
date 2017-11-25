@@ -94,8 +94,18 @@
 #define SOCKET_SSL_ENABLED          0
 
 #if SSL_ENABLED == 1
-#define SSL_WIRE_BUFFER_SIZE        MAX_BUFFER_SIZE
-#define USE_DEFAULT_RANDOM_SEEDER   1
+
+#define SSL_WIRE_BUFFER_SIZE                                    MAX_BUFFER_SIZE
+
+/*
+ * Set this to 1, if this is a Linux-like system.
+ * Else, set this to 0, and implement
+ *
+ *   int wc_GenerateSeed(OS_Seed* os, byte* output, word32 sz)
+ *
+ * in device_misc.c
+ */
+#define USE_DEFAULT_SEEDER                                      1
 #endif
 
 #define NTP_TIME_SYNC_PRESENT       1
