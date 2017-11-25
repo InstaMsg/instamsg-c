@@ -56,7 +56,6 @@ SOURCES=`echo                                                                   
         common/instamsg/wolfcrypt/src/error.c                                                   \
         common/instamsg/wolfcrypt/src/tfm.c                                                     \
         common/instamsg/wolfcrypt/src/integer.c                                                 \
-        common/instamsg/wolfcrypt/src/pwdbased.c                                                \
         common/instamsg/wolfcrypt/src/logging.c                                                 \
         common/instamsg/wolfcrypt/src/ecc.c                                                     \
         common/instamsg/wolfcrypt/src/wolfmath.c                                                \
