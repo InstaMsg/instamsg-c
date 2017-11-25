@@ -33,9 +33,6 @@
 #ifndef INSTAMSG_MEM
 #define INSTAMSG_MEM
 
-#include "globals.h"
-#include "stdint.h"
-
 #define HEADER_SIZE 2
 
 void* DEFAULT_MALLOC(unsigned short numBytes);
