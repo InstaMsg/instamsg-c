@@ -49,7 +49,6 @@ SOURCES=`echo                                                                   
         common/instamsg/wolfcrypt/src/coding.c                                                  \
         common/instamsg/wolfcrypt/src/hash.c                                                    \
         common/instamsg/wolfcrypt/src/hmac.c                                                    \
-        common/instamsg/wolfcrypt/src/md5.c                                                     \
         common/instamsg/wolfcrypt/src/sha.c                                                     \
         common/instamsg/wolfcrypt/src/sha256.c                                                  \
         common/instamsg/wolfcrypt/src/arc4.c                                                    \

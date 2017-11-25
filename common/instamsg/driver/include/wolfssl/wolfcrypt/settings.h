@@ -1584,6 +1584,8 @@ extern void uITRON4_free(void *p) ;
 #define NO_PSK
 #define NO_DES3
 #define NO_CERT
+#define NO_OLD_TLS
+#define NO_MD5
 #define NO_WOLFSSL_SERVER
 #define NO_FILESYSTEM
 #define WOLFSSL_SMALL_STACK
