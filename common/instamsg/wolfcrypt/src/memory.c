@@ -19,6 +19,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335, USA
  */
 
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 
 #ifdef HAVE_CONFIG_H
     #include <config.h>
@@ -922,3 +925,4 @@ void XFREE(void *p, void* heap, int type)
 
 #endif /* HAVE_IO_POOL */
 
+#endif

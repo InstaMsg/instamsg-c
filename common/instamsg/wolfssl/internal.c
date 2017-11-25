@@ -18,6 +18,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335, USA
  */
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 
 
 
@@ -24724,3 +24727,5 @@ int wolfSSL_AsyncPush(WOLFSSL* ssl, WC_ASYNC_DEV* asyncDev)
 #undef ERROR_OUT
 
 #endif /* WOLFCRYPT_ONLY */
+
+#endif

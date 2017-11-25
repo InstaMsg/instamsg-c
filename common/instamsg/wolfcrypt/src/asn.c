@@ -19,6 +19,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335, USA
  */
 
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 
 #ifdef HAVE_CONFIG_H
     #include <config.h>
@@ -11257,3 +11260,6 @@ int ParseCRL(DecodedCRL* dcrl, const byte* buff, word32 sz, void* cm)
 
 
 #endif /* WOLFSSL_SEP */
+
+
+#endif

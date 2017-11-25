@@ -18,6 +18,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335, USA
  */
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 
 
 #ifdef HAVE_CONFIG_H
@@ -1385,4 +1388,7 @@ time_t XTIME(time_t * timer)
 #if defined(WOLFSSL_TI_CRYPT) || defined(WOLFSSL_TI_HASH)
     #include <wolfcrypt/src/port/ti/ti-ccm.c>  /* initialize and Mutex for TI Crypt Engine */
     #include <wolfcrypt/src/port/ti/ti-hash.c> /* md5, sha1, sha224, sha256 */
+#endif
+
+
 #endif

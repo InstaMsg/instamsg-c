@@ -19,6 +19,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335, USA
  */
 
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 
 /* common functions for either math library */
 
@@ -270,3 +273,6 @@ int wc_bigint_to_mp(WC_BIGINT* src, mp_int* dst)
 #endif /* HAVE_WOLF_BIGINT */
 
 #endif /* USE_FAST_MATH || !NO_BIG_INT */
+
+
+#endif

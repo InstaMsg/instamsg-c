@@ -19,6 +19,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335, USA
  */
 
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 
 /* code submitted by raphael.huck@efixo.com */
 
@@ -2931,3 +2934,6 @@ int wc_Sha256Copy(wc_Sha256* src, wc_Sha256* dst)
 #endif /* !WOLFSSL_TI_HASH */
 
 #endif /* NO_SHA256 */
+
+
+#endif

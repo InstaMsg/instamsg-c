@@ -19,6 +19,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335, USA
  */
 
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 
 
 /*
@@ -3397,3 +3400,6 @@ int mp_lshd (mp_int * a, int b)
 }
 
 #endif /* USE_FAST_MATH */
+
+
+#endif

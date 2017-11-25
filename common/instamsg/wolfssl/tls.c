@@ -19,6 +19,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335, USA
  */
 
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 
 
 #ifdef HAVE_CONFIG_H
@@ -8875,3 +8878,5 @@ int TLSX_Parse(WOLFSSL* ssl, byte* input, word16 length, byte msgType,
 #endif /* NO_WOLFSSL_SERVER */
 #endif /* NO_TLS */
 #endif /* WOLFCRYPT_ONLY */
+
+#endif

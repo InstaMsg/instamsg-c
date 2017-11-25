@@ -18,6 +18,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335, USA
  */
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 
 
 #ifdef HAVE_CONFIG_H
@@ -457,3 +460,5 @@ int Base16_Encode(const byte* in, word32 inLen, byte* out, word32* outLen)
 #endif /* (OPENSSL_EXTRA) || (HAVE_WEBSERVER) || (HAVE_FIPS) */
 
 #endif /* NO_CODING */
+
+#endif

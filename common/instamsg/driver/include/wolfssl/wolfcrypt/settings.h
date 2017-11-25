@@ -1587,7 +1587,6 @@ extern void uITRON4_free(void *p) ;
 #define NO_WOLFSSL_SERVER
 #define NO_FILESYSTEM
 #define WOLFSSL_SMALL_STACK
-//#define WOLFSSL_STATIC_MEMORY
 
 #ifdef __cplusplus
     }   /* extern "C" */

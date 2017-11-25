@@ -19,6 +19,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335, USA
  */
 
+#include "device_defines.h"
+
+#if SSL_ENABLED == 1
 
 
 #ifdef HAVE_CONFIG_H
@@ -536,3 +539,6 @@ int wc_Md5Copy(wc_Md5* src, wc_Md5* dst)
 
 #endif /* WOLFSSL_TI_HASH */
 #endif /* NO_MD5 */
+
+
+#endif
