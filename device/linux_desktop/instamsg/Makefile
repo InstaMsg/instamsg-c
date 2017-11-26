@@ -24,7 +24,7 @@ EXTRA_OBJECT_FILES=`echo	`
 
 # Compile-cum-Link command for the platform.
 #
-COMPILE_COMMAND="gcc -g -nostdinc -pthread "
+COMPILE_COMMAND="gcc -nostdinc -pthread "
 
 
 # Any final libraries that need to be linked.

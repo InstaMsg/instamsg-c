@@ -2490,7 +2490,7 @@ exit:
                     info_log(LOG_GLOBAL_BUFFER);
                 }
 
-                //readAndProcessIncomingMQTTPacketsIfAny(c);
+                readAndProcessIncomingMQTTPacketsIfAny(c);
             }
         }
 
