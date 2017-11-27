@@ -197,29 +197,71 @@ int EmbedReceive(WOLFSSL *ssl, char *buf, int sz, void *ctx)
     int rc = FAILURE;
 
     SG_Socket *sock = (SG_Socket*) ctx;
-    rc = socket_read(sock, (unsigned char*) buf, sz, 0);
 
-    if(rc == SOCKET_READ_TIMEOUT)
+    int remaining = sz;
+    int curr_it = sz;
+
+    int total_received = 0;
+    int final = 0;
+
+    while(1)
     {
-        if(sock->bytes_received > 0)
+
+        if(remaining > (MAX_BUFFER_SIZE - 10))
         {
-            return sock->bytes_received;
+            curr_it = MAX_BUFFER_SIZE - 10;
         }
         else
         {
-            return SOCKET_READ_TIMEOUT;
+            curr_it = remaining;
+        }
+
+        remaining = remaining - curr_it;
+        sock->bytes_received = 0;
+
+        rc = socket_read(sock, (unsigned char*) (buf + total_received), curr_it, 0);
+
+        if(rc == SOCKET_READ_TIMEOUT)
+        {
+            if(sock->bytes_received > 0)
+            {
+                total_received = total_received + (sock->bytes_received);
+            }
+
+            if(total_received > 0)
+            {
+                final = total_received;
+                goto exit;
+            }
+            else
+            {
+                final = SOCKET_READ_TIMEOUT;
+                goto exit;
+            }
+        }
+        else if(rc == FAILURE)
+        {
+            final = FAILURE;
+            goto exit;
+        }
+        else
+        {
+            total_received = total_received + sock->bytes_received;
+        }
+
+        if(remaining == 0)
+        {
+            final = total_received;
+            goto exit;
+        }
+        else
+        {
+            continue;
         }
     }
-    else if(rc == FAILURE)
-    {
-        return FAILURE;
-    }
-    else
-    {
-        return sock->bytes_received;
-    }
-	
-	return FAILURE;
+
+exit:
+	return final;
 }
 
 /* The send embedded callback
