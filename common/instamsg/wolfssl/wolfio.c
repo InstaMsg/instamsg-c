@@ -207,9 +207,9 @@ int EmbedReceive(WOLFSSL *ssl, char *buf, int sz, void *ctx)
     while(1)
     {
 
-        if(remaining > (MAX_BUFFER_SIZE - 10))
+        if(remaining > 200)
         {
-            curr_it = MAX_BUFFER_SIZE - 10;
+            curr_it = 200;
         }
         else
         {
