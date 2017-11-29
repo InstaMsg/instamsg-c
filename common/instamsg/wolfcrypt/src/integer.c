@@ -24,6 +24,7 @@
 #if SSL_ENABLED == 1
 
 
+
 /*
  * Based on public domain LibTomMath 0.38 by Tom St Denis, tomstdenis@iahu.ca,
  * http://math.libtomcrypt.com
@@ -403,9 +404,7 @@ int mp_grow (mp_int * a, int size)
   /* if the alloc size is smaller alloc more ram */
   if (a->alloc < size || size == 0) {
     /* ensure there are always at least MP_PREC digits extra on top */
-
-    /*size += (MP_PREC * 2) - (size % MP_PREC);*/
-    size = 160;
+    size += (MP_PREC * 2) - (size % MP_PREC);
 
     /* reallocate the array a->dp
      *
@@ -413,18 +412,12 @@ int mp_grow (mp_int * a, int size)
      * in case the operation failed we don't want
      * to overwrite the dp member of a.
      */
-    if((a->dp == NULL) && (a->alloc == 0))
+    if( (a->dp) != NULL)
     {
-        tmp = OPT_CAST(mp_digit) XMALLOC (sizeof (mp_digit) * size, NULL, DYNAMIC_TYPE_BIGINT);
-    }
-    else
-    {
-        sg_sprintf(LOG_GLOBAL_BUFFER, "Unexpected case hit ..");
-        error_log(LOG_GLOBAL_BUFFER);
-
-        resetDevice();
+        XFREE(a->dp, 0, DYNAMIC_TYPE_BIGINT);
     }
 
+    tmp = OPT_CAST(mp_digit) XMALLOC (sizeof (mp_digit) * size, NULL, DYNAMIC_TYPE_BIGINT);
     if (tmp == NULL) {
       /* reallocation failed but "a" is still valid [can be freed] */
       return MP_MEM;
@@ -2982,8 +2975,7 @@ int mp_init_size (mp_int * a, int size)
   int x;
 
   /* pad size so there are always extra digits */
-  /*size += (MP_PREC * 2) - (size % MP_PREC);*/
-  size = 160;
+  size += (MP_PREC * 2) - (size % MP_PREC);
 
   /* alloc mem */
   a->dp = OPT_CAST(mp_digit) XMALLOC (sizeof (mp_digit) * size, NULL,
