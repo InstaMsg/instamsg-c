@@ -2150,7 +2150,9 @@ void* MQTTConnect(void* arg)
          * We will receive PROVACK for this leg.
          */
         strcpy(c->clientIdMachine, PROVISIONING_CLIENT_ID);
-#if GSM_INTERFACE_ENABLED == 1
+#ifdef ETHERNET_AS_FIRST_PRIORITY
+        strcpy(c->password, "test");
+#elif (GSM_INTERFACE_ENABLED == 1)
         strcpy(c->password, (c->ipstack).provPin);
 #else
         get_prov_pin_for_non_gsm_devices(c->password, sizeof(c->password));
