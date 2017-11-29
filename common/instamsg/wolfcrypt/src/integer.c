@@ -400,6 +400,7 @@ int mp_grow (mp_int * a, int size)
 {
   int     i;
   mp_digit *tmp = NULL;
+  mp_digit *older = NULL;
 
   /* if the alloc size is smaller alloc more ram */
   if (a->alloc < size || size == 0) {
@@ -412,10 +413,7 @@ int mp_grow (mp_int * a, int size)
      * in case the operation failed we don't want
      * to overwrite the dp member of a.
      */
-    if( (a->dp) != NULL)
-    {
-        XFREE(a->dp, 0, DYNAMIC_TYPE_BIGINT);
-    }
+    older = a->dp;
 
     tmp = OPT_CAST(mp_digit) XMALLOC (sizeof (mp_digit) * size, NULL, DYNAMIC_TYPE_BIGINT);
     if (tmp == NULL) {
@@ -425,6 +423,16 @@ int mp_grow (mp_int * a, int size)
 
     /* reallocation succeeded so set a->dp */
     a->dp = tmp;
+
+    if(older != NULL)
+    {
+        for(i = 0; i < a->alloc; i++)
+        {
+            a->dp[i] = older[i];
+        }
+
+        XFREE(older, NULL, DYNAMIC_TYPE_BIGINT);
+    }
 
     /* zero excess digits */
     i        = a->alloc;
