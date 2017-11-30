@@ -413,11 +413,14 @@ void init_socket(SG_Socket *socket, const char *hostName, unsigned int port, con
         return;
     }
 
-    socket->ssl = wolfSSL_new(solitary_ssl_ctx);
-    if(socket->ssl == NULL)
-    {
-        HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("wolfSSL_new"), 0)
-    }
+	if((secure == 1) && (sslEnabledAtAppLayer == 1))
+	{
+		socket->ssl = wolfSSL_new(solitary_ssl_ctx);
+		if(socket->ssl == NULL)
+		{
+			HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("wolfSSL_new"), 0)
+		}
+	}
 #endif
 
     if((secure == 1) && (sslEnabledAtAppLayer == 1))
