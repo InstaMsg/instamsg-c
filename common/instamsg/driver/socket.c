@@ -387,7 +387,7 @@ sms_already_fetched:
 #endif
 }
 
-unsigned char giveEnoughTimeBeforeRead;
+volatile unsigned char giveEnoughTimeBeforeRead;
 void init_socket(SG_Socket *socket, const char *hostName, unsigned int port, const char *type, unsigned char secure)
 {
     if(port == 0)

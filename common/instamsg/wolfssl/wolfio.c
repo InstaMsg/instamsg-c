@@ -192,7 +192,7 @@ int EmbedReceive(WOLFSSL *ssl, char *buf, int sz, void *ctx)
 }
 #endif
 
-extern unsigned char giveEnoughTimeBeforeRead;
+extern volatile unsigned char giveEnoughTimeBeforeRead;
 int EmbedReceive(WOLFSSL *ssl, char *buf, int sz, void *ctx)
 {
     int rc = FAILURE;
