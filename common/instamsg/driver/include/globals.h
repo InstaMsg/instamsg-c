@@ -32,7 +32,7 @@
 #ifndef INSTAMSG_GLOBALS
 #define INSTAMSG_GLOBALS
 
-#define INSTAMSG_VERSION "16.3.0"
+#define INSTAMSG_VERSION "16.4.0"
 
 #include "device_defines.h"
 
