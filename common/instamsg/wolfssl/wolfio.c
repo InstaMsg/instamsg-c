@@ -45,6 +45,7 @@
 #include "../driver/include/wolfssl/wolfio.h"
 
 #include "../driver/include/socket.h"
+#include "../driver/include/globals.h"
 
 
 #if defined(HAVE_HTTP_CLIENT)
@@ -191,6 +192,7 @@ int EmbedReceive(WOLFSSL *ssl, char *buf, int sz, void *ctx)
 }
 #endif
 
+extern unsigned char giveEnoughTimeBeforeRead;
 int EmbedReceive(WOLFSSL *ssl, char *buf, int sz, void *ctx)
 {
     int rc = FAILURE;
@@ -202,14 +204,13 @@ int EmbedReceive(WOLFSSL *ssl, char *buf, int sz, void *ctx)
 
     int total_received = 0;
     int final = 0;
-	
-	unsigned char guaranteed = 0;	
+
+	unsigned char guaranteed = 0;
     while(1)
     {
-
-        if(remaining > 200)
+        if(remaining > (MAX_BUFFER_SIZE - 10))
         {
-            curr_it = 200;
+            curr_it = MAX_BUFFER_SIZE - 10;
         }
         else
         {
@@ -219,6 +220,11 @@ int EmbedReceive(WOLFSSL *ssl, char *buf, int sz, void *ctx)
         remaining = remaining - curr_it;
         sock->bytes_received = 0;
 
+        if(giveEnoughTimeBeforeRead == 1)
+        {
+            startAndCountdownTimer(3, 0);
+        }
+
         rc = socket_read(sock, (unsigned char*) (buf + total_received), curr_it, guaranteed);
 
         if(rc == SOCKET_READ_TIMEOUT)
@@ -227,12 +233,12 @@ int EmbedReceive(WOLFSSL *ssl, char *buf, int sz, void *ctx)
             {
                 total_received = total_received + (sock->bytes_received);
             }
-			
+
 			if(total_received > 0)
 			{
 				remaining = sz - total_received;
 				guaranteed = 1;
-				
+
 				continue;
 			}
 

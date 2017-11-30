@@ -387,7 +387,7 @@ sms_already_fetched:
 #endif
 }
 
-
+unsigned char giveEnoughTimeBeforeRead;
 void init_socket(SG_Socket *socket, const char *hostName, unsigned int port, const char *type, unsigned char secure)
 {
     if(port == 0)
@@ -397,6 +397,8 @@ void init_socket(SG_Socket *socket, const char *hostName, unsigned int port, con
 
         resetDevice();
     }
+
+    giveEnoughTimeBeforeRead = 0;
 
 
     socket->socketCorrupted = 1;
@@ -456,24 +458,28 @@ void init_socket(SG_Socket *socket, const char *hostName, unsigned int port, con
         if(socket->socketCorrupted == 0)
         {
 			int rc = 0;
-			
+
 			socket->ssl = wolfSSL_new(solitary_ssl_ctx);
 			if(socket->ssl == NULL)
 			{
 				HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("wolfSSL_new"), 1)
-			}		
-				
+			}
+
 			socket->ssl->IOCB_WriteCtx = socket;
 			socket->ssl->IOCB_ReadCtx = socket;
-						
+
+            giveEnoughTimeBeforeRead = 1;
+
 			rc = wolfSSL_connect(socket->ssl);
             if(rc != SSL_SUCCESS)
             {
 				sg_sprintf(LOG_GLOBAL_BUFFER, "[wolfSSL_connect] failed with error-code [%d]", rc);
 				error_log(LOG_GLOBAL_BUFFER);
-				
+
                 HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("wolfSSL_connect"), 1)
             }
+
+            giveEnoughTimeBeforeRead = 0;
         }
     }
 #endif
