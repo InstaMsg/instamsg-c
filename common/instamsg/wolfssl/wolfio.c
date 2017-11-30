@@ -204,13 +204,14 @@ int EmbedReceive(WOLFSSL *ssl, char *buf, int sz, void *ctx)
 
     int total_received = 0;
     int final = 0;
+    int chunkSize = MAX_BUFFER_SIZE - 100;
 
 	unsigned char guaranteed = 0;
     while(1)
     {
-        if(remaining > (MAX_BUFFER_SIZE - 10))
+        if(remaining > chunkSize)
         {
-            curr_it = MAX_BUFFER_SIZE - 10;
+            curr_it = chunkSize;
         }
         else
         {

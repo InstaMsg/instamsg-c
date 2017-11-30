@@ -11,7 +11,6 @@ extern volatile unsigned char readResponse;
 extern volatile char *response_delimiter;
 
 
-#define CIRCULAR_BUFFER_SIZE    500
 #define INVALID_DATA            0
 #define VALID_DATA              1
 #define STARTING_INDEX          0

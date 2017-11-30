@@ -57,6 +57,7 @@
 
 #define SMS     PROSTR("SMS")
 
+#define CIRCULAR_BUFFER_SIZE	MAX_BUFFER_SIZE
 
 /*
  * Global-functions callable.

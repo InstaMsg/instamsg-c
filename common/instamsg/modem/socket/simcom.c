@@ -1217,7 +1217,8 @@ int simcom_socket_read(SG_Socket* socket, unsigned char* buffer, int len, unsign
         bytesSoFar = bytesSoFar + bytesActuallyRead;
         if(bytesActuallyRead == len)
         {
-            bytes_received_over_wire = bytes_received_over_wire + len;
+			socket->bytes_received = len;
+			bytes_received_over_wire = bytes_received_over_wire + len;
 
             /*
              * Cases a) and d).

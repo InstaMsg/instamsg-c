@@ -1186,7 +1186,7 @@ extern unsigned int bytes_received_over_wire;
 int simcom_5360_socket_read(SG_Socket* socket, unsigned char* buffer, int len, unsigned char guaranteed)
 {
     int bytesSoFar = 0;
-
+	
     while(1)
     {
         memset(smallBuffer, 0, sizeof(smallBuffer));
@@ -1206,11 +1206,12 @@ int simcom_5360_socket_read(SG_Socket* socket, unsigned char* buffer, int len, u
         {
             startAndCountdownTimer(1, 0);
         }
-
+	
         bytesSoFar = bytesSoFar + bytesActuallyRead;
-        if(bytesSoFar == len)
+	    if(bytesSoFar == len)
         {
-            bytes_received_over_wire = bytes_received_over_wire + len;
+			socket->bytes_received = len;
+			bytes_received_over_wire = bytes_received_over_wire + len;
 
             /*
              * Cases a) and d).
