@@ -413,14 +413,6 @@ void init_socket(SG_Socket *socket, const char *hostName, unsigned int port, con
         return;
     }
 
-	if((secure == 1) && (sslEnabledAtAppLayer == 1))
-	{
-		socket->ssl = wolfSSL_new(solitary_ssl_ctx);
-		if(socket->ssl == NULL)
-		{
-			HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("wolfSSL_new"), 0)
-		}
-	}
 #endif
 
     if((secure == 1) && (sslEnabledAtAppLayer == 1))
@@ -461,13 +453,25 @@ void init_socket(SG_Socket *socket, const char *hostName, unsigned int port, con
 #if SSL_ENABLED == 1
     if((secure == 1) && (sslEnabledAtAppLayer == 1))
     {
-        socket->ssl->IOCB_WriteCtx = socket;
-        socket->ssl->IOCB_ReadCtx = socket;
-
         if(socket->socketCorrupted == 0)
         {
-            if(wolfSSL_connect(socket->ssl) != SSL_SUCCESS)
+			int rc = 0;
+			
+			socket->ssl = wolfSSL_new(solitary_ssl_ctx);
+			if(socket->ssl == NULL)
+			{
+				HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("wolfSSL_new"), 1)
+			}		
+				
+			socket->ssl->IOCB_WriteCtx = socket;
+			socket->ssl->IOCB_ReadCtx = socket;
+						
+			rc = wolfSSL_connect(socket->ssl);
+            if(rc != SSL_SUCCESS)
             {
+				sg_sprintf(LOG_GLOBAL_BUFFER, "[wolfSSL_connect] failed with error-code [%d]", rc);
+				error_log(LOG_GLOBAL_BUFFER);
+				
                 HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("wolfSSL_connect"), 1)
             }
         }
