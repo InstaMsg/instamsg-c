@@ -229,8 +229,7 @@ int EmbedReceive(WOLFSSL *ssl, char *buf, int sz, void *ctx)
              * The delay needs to be given just before first-read.
              * If partial bytes are read, that is taken care of later by "partial_bytes_cycles".
              */
-            startAndCountdownTimer(5, 0);
-            giveEnoughTimeBeforeRead = 0;
+            startAndCountdownTimer(3, 0);
         }
 
         rc = socket_read(sock, (unsigned char*) (buf + total_received), curr_it, guaranteed);
