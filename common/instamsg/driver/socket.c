@@ -478,8 +478,6 @@ void init_socket(SG_Socket *socket, const char *hostName, unsigned int port, con
 
                 HANDLE_CATASTROPHIC_INIT_ERROR(PROSTR("wolfSSL_connect"), 1)
             }
-
-            giveEnoughTimeBeforeRead = 0;
         }
     }
 #endif

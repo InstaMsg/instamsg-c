@@ -46,6 +46,7 @@
 
 #include "../driver/include/socket.h"
 #include "../driver/include/globals.h"
+#include "../driver/include/log.h"
 
 
 #if defined(HAVE_HTTP_CLIENT)
@@ -205,6 +206,7 @@ int EmbedReceive(WOLFSSL *ssl, char *buf, int sz, void *ctx)
     int total_received = 0;
     int final = 0;
     int chunkSize = MAX_BUFFER_SIZE - 100;
+    int partial_bytes_cycles = 0;
 
 	unsigned char guaranteed = 0;
     while(1)
@@ -223,7 +225,12 @@ int EmbedReceive(WOLFSSL *ssl, char *buf, int sz, void *ctx)
 
         if(giveEnoughTimeBeforeRead == 1)
         {
-            startAndCountdownTimer(3, 0);
+            /*
+             * The delay needs to be given just before first-read.
+             * If partial bytes are read, that is taken care of later by "partial_bytes_cycles".
+             */
+            startAndCountdownTimer(5, 0);
+            giveEnoughTimeBeforeRead = 0;
         }
 
         rc = socket_read(sock, (unsigned char*) (buf + total_received), curr_it, guaranteed);
@@ -237,17 +244,26 @@ int EmbedReceive(WOLFSSL *ssl, char *buf, int sz, void *ctx)
 
 			if(total_received > 0)
 			{
+                partial_bytes_cycles++;
+
+                sg_sprintf(LOG_GLOBAL_BUFFER, "Cycle [%u] : Partially [%u] bytes read out of [%u] bytes",
+                                               partial_bytes_cycles, sock->bytes_received, curr_it);
+                info_log(LOG_GLOBAL_BUFFER);
+
+                if(partial_bytes_cycles > 50)
+                {
+                    sg_sprintf(LOG_GLOBAL_BUFFER, "Partial bytes stupidity persevered too long ... returning failure :(");
+                    error_log(LOG_GLOBAL_BUFFER);
+
+                    final = FAILURE;
+                    goto exit;
+                }
+
 				remaining = sz - total_received;
 				guaranteed = 1;
 
 				continue;
 			}
-
-            if(total_received > 0)
-            {
-                final = total_received;
-                goto exit;
-            }
             else
             {
                 final = SOCKET_READ_TIMEOUT;
