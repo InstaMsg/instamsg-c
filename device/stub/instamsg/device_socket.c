@@ -44,7 +44,10 @@ void connect_underlying_socket_medium_try_once(SG_Socket* socket)
  * So, this "read" must bahave as a blocking-read.
  *
  * Also, exactly "len" bytes are read successfully.
- * So, SUCCESS must be returned.
+ * So,
+ *
+ *      i) "socket->bytes_received" must be set to "len".
+ *      ii) SUCCESS must be returned.
  *
  *                      OR
  *
@@ -61,8 +64,11 @@ void connect_underlying_socket_medium_try_once(SG_Socket* socket)
  * "guaranteed" is 0.
  * So, this "read" must behave as a non-blocking read.
  *
- * Also, no bytes could be read in SOCKET_READ_TIMEOUT_SECS seconds (defined in "globals.h").
- * So, SOCKET_READ_TIMEOUT must be returned immediately.
+ * Also, no/partial bytes (but not "len" bytes) could be read in SOCKET_READ_TIMEOUT_SECS seconds (defined in "globals.h").
+ * So,
+ *
+ *      i) "socket->bytes_received" must be set to whatever partial number of bytes are read.
+ *      ii) SOCKET_READ_TIMEOUT must be returned.
  *
  *                      OR
  *
@@ -71,7 +77,10 @@ void connect_underlying_socket_medium_try_once(SG_Socket* socket)
  * So, this "read" must behave as a non-blocking read.
  *
  * Also, exactly "len" bytes are successfully read.
- * So, SUCCESS must be returned.
+ * So
+ *
+ *      i) "socket->bytes_received" must be set to "len".
+ *      ii) SUCCESS must be returned.
  *
  *                      OR
  *
@@ -129,40 +138,3 @@ void release_socket_simple_guaranteed(SG_Socket* socket)
 {
 }
 
-
-#if (SSL_ENABLED == 1) || (SOCKET_SSL_ENABLED == 1)
-/*
- * This method loads the client-certificate into buffer.
- */
-void load_client_certificate_into_buffer(char *cert_buffer, int maxLength)
-{
-#error "Function not implemented."
-}
-
-
-/*
- * This method saves the client-certificate onto the device in a persistent manner.
- */
-void save_client_certificate_from_buffer(char *cert_buffer)
-{
-#error "Function not implemented."
-}
-
-
-/*
- * This method loads the client-private-key into buffer.
- */
-void load_client_private_key_into_buffer(char *private_key_buffer, int maxLength)
-{
-#error "Function not implemented."
-}
-
-
-/*
- * This method saves the client-private-key onto the device in a persistent manner.
- */
-void save_client_private_key_from_buffer(char *private_key_buffer)
-{
-#error "Function not implemented."
-}
-#endif
