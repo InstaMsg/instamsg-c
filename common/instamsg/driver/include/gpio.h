@@ -45,5 +45,6 @@
  */
 void fill_dio_data(char *buffer, int maxBufferLength);
 void fillPinPrefix(char *orientationConfig, int positionInOrientationConfig, char *pinPrefix, char *pinId);
+void performDigitalOutputAction(const char *action);
 
 #endif

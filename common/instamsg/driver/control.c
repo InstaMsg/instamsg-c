@@ -35,6 +35,11 @@
 #include "./include/json.h"
 #include "./include/log.h"
 #include "./include/sg_stdlib.h"
+#include "./include/gpio.h"
+
+#if MODBUS_INTERFACE_ENABLED == 1
+#include "../../ioeye/include/serial.h"
+#endif
 
 static char temp[20];
 static int isOkToRunControlCommandTimeWise(char *outerJson)
@@ -131,5 +136,25 @@ void processControlCommand(char *controlCommandPayload)
         strcpy(controlCommandParams.command, controlCommandPayload);
     }
 
-    do_process_control_action_command(&controlCommandParams);
+    if(strcmp(controlCommandParams.portName, PORT_NAME_GPIO) == 0)
+    {
+        performDigitalOutputAction(controlCommandParams.command);
+    }
+    else
+    {
+#if MODBUS_INTERFACE_ENABLED == 1
+        /*
+         * It's a modbus-command, over a COM-port.
+         */
+        int i = 0;
+        for(i = 0; i < MAX_PORTS_ALLOWED; i++)
+        {
+            Serial *s = &(serialInterfaces[i]);
+            if( (strcmp(s->portName, PORT_NAME_COM) == 0) && (sg_atoi(s->portAddress) == sg_atoi(controlCommandParams.portAddress)) )
+            {
+                processCommand(controlCommandParams.command, s);
+            }
+        }
+#endif
+    }
 }

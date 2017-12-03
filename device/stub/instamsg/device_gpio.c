@@ -23,6 +23,24 @@
 void fill_dio_data(char *buffer, int maxBufferLength)
 {
 }
-
 #endif
+
+
+/*
+ * Here, "action" will be of the form :;
+ *
+ *      GPIO/DOxxy
+ *
+ * Examples ::
+ *
+ *      GPIO/DO000
+ *      GPIO/DO001
+ *      GPIO/DO011 .. and so on
+ *
+ * xx represent the digital-output number
+ * y  represents the intended-state (0 means to put off, 1 means to put on.
+ */
+void performDigitalOutputAction(const char *action)
+{
+}
 

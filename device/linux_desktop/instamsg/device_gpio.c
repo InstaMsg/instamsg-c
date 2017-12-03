@@ -17,3 +17,8 @@ void fill_dio_data(char *buffer, int maxBufferLength)
 }
 #endif
 
+
+void performDigitalOutputAction(const char *action)
+{
+}
+
