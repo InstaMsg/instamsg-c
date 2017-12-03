@@ -36,6 +36,7 @@
 #include "./include/log.h"
 #include "./include/sg_stdlib.h"
 #include "./include/gpio.h"
+#include "./include/payload.h"
 
 #if MODBUS_INTERFACE_ENABLED == 1
 #include "../../ioeye/include/serial.h"
@@ -142,7 +143,7 @@ void processControlCommand(char *controlCommandPayload)
     }
     else
     {
-#if MODBUS_INTERFACE_ENABLED == 1
+#ifdef MODBUS_INTERFACE_ENABLED
         /*
          * It's a modbus-command, over a COM-port.
          */
