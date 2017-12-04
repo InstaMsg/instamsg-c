@@ -38,7 +38,7 @@
 #include "./include/gpio.h"
 #include "./include/payload.h"
 
-#if MODBUS_INTERFACE_ENABLED == 1
+#ifdef MODBUS_INTERFACE_ENABLED
 #include "../../ioeye/include/serial.h"
 #endif
 
