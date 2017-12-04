@@ -148,7 +148,7 @@ void processControlCommand(char *controlCommandPayload)
          * It's a modbus-command, over a COM-port.
          */
         int i = 0;
-        for(i = 0; i < MAX_PORTS_ALLOWED; i++)
+        for(i = 0; i < num_ports_in_use; i++)
         {
             Serial *s = &(serialInterfaces[i]);
             if( (strcmp(s->portName, PORT_NAME_COM) == 0) && (sg_atoi(s->portAddress) == sg_atoi(controlCommandParams.portAddress)) )
