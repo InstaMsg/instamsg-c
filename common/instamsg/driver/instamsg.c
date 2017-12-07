@@ -1696,7 +1696,7 @@ static void handleConnOrProvAckGeneric(InstaMsg *c, int connack_rc, const char *
         registerEditableConfig(&sendGpsLocationInterval,
                                SEND_GPS_LOCATION_INTERVAL,
                                CONFIG_INT,
-                               PROSTR(DEFAULT_SEND_GPS_LOCATION_INTERVAL),
+                               PROSTR("0"),
                                PROSTR(""));
 #endif
 

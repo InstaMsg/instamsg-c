@@ -46,6 +46,8 @@ static void get_client_id(char *messagebuffer, int maxbufferlength)
 
 
 #if SEND_GPS_LOCATION == 1
+
+extern int sendGpsLocationInterval;
 static void get_geo_tag(char *messagebuffer, int maxbufferlength)
 {
     memset(messagebuffer, 0, maxbufferlength);
@@ -177,7 +179,10 @@ void post_process_payload(unsigned int errorCase, void (*func)(char *, void*), v
     addPayloadField(messageBuffer, "id", get_device_uuid);
     addPayloadField(messageBuffer, "time", getTimeInDesiredFormat);
 #if SEND_GPS_LOCATION == 1
-    addPayloadField(messageBuffer, "geo", get_geo_tag);
+    if(sendGpsLocationInterval != 0)
+    {
+        addPayloadField(messageBuffer, "geo", get_geo_tag);
+    }
 #endif
     addPayloadField(messageBuffer, "offset", getTimezoneOffset);
 

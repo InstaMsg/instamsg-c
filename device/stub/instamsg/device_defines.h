@@ -214,16 +214,11 @@
 
 
 /*
- * a) See code for usage of GPS_LOCATION_SENTENCE_TYPE
- *
- * b) DEFAULT_SEND_GPS_LOCATION_INTERVAL determines interval after which a message, dedicatedly containing GPS-information, is sent.
- *    If DEFAULT_SEND_GPS_LOCATION_INTERVAL is 0, then this dedicated message is never sent ("normal" messages, containing location
- *    as a geo-tag, will be continued to be sent as usual).
+ * See code for usage of GPS_LOCATION_SENTENCE_TYPE
  */
 #define SEND_GPS_LOCATION                                       0
 #if SEND_GPS_LOCATION == 1
 #define GPS_LOCATION_SENTENCE_TYPE                              ""
-#define DEFAULT_SEND_GPS_LOCATION_INTERVAL                      "0"
 #endif
 
 
