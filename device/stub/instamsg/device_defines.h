@@ -132,18 +132,6 @@
 
 
 /*
- * If either GSM/GPS time-syncing is present, DEFAULT_MAX_SECONDS_FOR_GPS_GSM_TIME_SYNC defines the default interval
- * for which instamsg tries syncing time via GPS/GSM.
- *
- * The configurable-variable MAX_SECONDS_FOR_GPS_GSM_TIME_SYNC actually controls the maximum-time.
- * Default value of MAX_SECONDS_FOR_GPS_GSM_TIME_SYNC is DEFAULT_MAX_SECONDS_FOR_GPS_GSM_TIME_SYNC.
- */
-#if (GPS_TIME_SYNC_PRESENT == 1) || (GSM_TIME_SYNC_PRESENT == 1)
-#define DEFAULT_MAX_SECONDS_FOR_GPS_GSM_TIME_SYNC               "900"
-#endif
-
-
-/*
  * Following two macros define if any thread-level locking is required anywhere.
  */
 #define ACQUIRE_THREAD_MUTEX
