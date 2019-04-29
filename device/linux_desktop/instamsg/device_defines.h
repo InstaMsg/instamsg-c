@@ -87,10 +87,11 @@
 
 #define MEDIA_STREAMING_ENABLED                                 1
 #define FILE_LOGGING_ENABLED                                    1
+#define MAX_DEBUG_LOGGER_FILE_SIZE_BYTES						100000
 #define FILE_SYSTEM_ENABLED                                     1
 
 #define GSM_INTERFACE_ENABLED       0
-#define SSL_ENABLED                 1
+#define SSL_ENABLED                 0
 #define SOCKET_SSL_ENABLED          0
 
 #if SSL_ENABLED == 1
@@ -132,7 +133,7 @@
 #define DEFAULT_NTP_SERVER                                  ""
 
 #define ENSURE_EXPLICIT_TIME_SYNC       0
-#define DEFAULT_SSL_ENABLED             "1"
+#define DEFAULT_SSL_ENABLED             "0"
 #define MAX_CYCLES_TO_WAIT_FOR_PUBACK   20
 
 #define HTTP_PROXY_ENABLED              1

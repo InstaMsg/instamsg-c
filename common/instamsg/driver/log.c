@@ -43,6 +43,7 @@
 
 #if FILE_LOGGING_ENABLED == 1
 FileLogger fileLogger;
+
 #endif
 
 int currentLogLevel;
@@ -50,7 +51,7 @@ int currentLogLevel;
 #if FILE_LOGGING_ENABLED == 1
 #define LOG_COMMON_CODE(log, level)                                                                     \
                                                                                                         \
-    strcat((char*) log, "\r\n");                                                                       \
+    strcat((char*) log, "\r\n");                                                                        \
                                                                                                         \
     if((instaMsg.serverLoggingEnabled == 1) && (level <= currentLogLevel))                              \
     {                                                                                                   \
@@ -66,17 +67,26 @@ int currentLogLevel;
     {                                                                                                   \
         if(debugLoggingEnabled == 1)                                                                    \
         {                                                                                               \
-            serial_logger_write((unsigned char *)log, strlen(log));                                     \
-            sg_file_write(&(fileLogger.fs), (unsigned char *)log, strlen(log));                         \
+            long currentFileSize = getFileSize(NULL, fileLogger.fs.fileName);                           \
+            if(currentFileSize < MAX_DEBUG_LOGGER_FILE_SIZE_BYTES)                                      \
+            {                                                                                           \
+                sg_file_write(&(fileLogger.fs), (unsigned char *)log, strlen(log));                     \
+            }                                                                                           \
+            else                                                                                        \
+            {                                                                                           \
+                release_file_system(&(fileLogger.fs));                                                  \
+                sg_createEmptyFile(fileLogger.fs.fileName);                                             \
+                release_file_system(&(fileLogger.fs));                                                  \
+                init_file_logger(&fileLogger, fileLogger.fs.fileName);                                  \
+            }                                                                                           \
         }                                                                                               \
     }                                                                                                   \
-    memset(LOG_GLOBAL_BUFFER, 0, sizeof(LOG_GLOBAL_BUFFER));
-#else
+   memset(LOG_GLOBAL_BUFFER, 0, sizeof(LOG_GLOBAL_BUFFER));                                            
+#else                                                                                                   
 #define LOG_COMMON_CODE(log, level)                                                                     \
                                                                                                         \
     strcat((char*) log, "\r\n");                                                                        \
-                                                                                                        \
-    if((instaMsg.serverLoggingEnabled == 1) && (level <= currentLogLevel))                              \
+       sg_sprintf(LOG_GLOBAL_BUFFER, PROSTR("step3---\n"));                                             \
     {                                                                                                   \
         publish(instaMsg.serverLogsTopic,                                                               \
                 log,                                                                                    \

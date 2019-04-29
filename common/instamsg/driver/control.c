@@ -42,6 +42,9 @@
 #include "../../ioeye/include/serial.h"
 #endif
 
+static char tcpIPAddress[30];
+char *tcpCommandUnderProcess;
+
 static char temp[20];
 static int isOkToRunControlCommandTimeWise(char *outerJson)
 {
@@ -155,6 +158,22 @@ void processControlCommand(char *controlCommandPayload)
             {
                 processCommand(controlCommandParams.command, s);
             }
+	    if( (strcmp(s->portName, PORT_NAME_WIFI) == 0) && (sg_atoi(s->portAddress) == sg_atoi(controlCommandParams.portAddress)) )
+            {	
+                tcpCommandUnderProcess = (char*) sg_malloc(sizeof(controlCommandParams.command) + 1);
+		memset(tcpCommandUnderProcess, 0, sizeof(controlCommandParams.command) + 1);
+		strcpy(tcpCommandUnderProcess, controlCommandParams.command);
+
+                memset(tcpIPAddress, 0, sizeof(tcpIPAddress));
+		char *colon = strstr(tcpCommandUnderProcess, ":");
+
+                get_nth_token_thread_safe(tcpCommandUnderProcess, ':', 1, tcpIPAddress, 1);
+                tcpCommandUnderProcess = colon + 1;
+
+		processTcpCommand(tcpCommandUnderProcess, s, tcpIPAddress);
+                tcpCommandUnderProcess = strtok(NULL, ",");
+            }
+	
         }
 #endif
     }
